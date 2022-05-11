@@ -86,4 +86,16 @@ class TestBDTrees(unittest.TestCase):
                                 msg="Truth should be contained within 95%-CI " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
 
 if __name__ == '__main__':
+    # can be called from tests/
+    # $ python3 test_bdtrees.py
+    # 
+    # can also be called from phylojunction/
+    # $ python3 tests/test_bdtrees.py
+    # or
+    # $ python3 -m tests.test_bdtrees
+    # or, for a specific test
+    # $ python3 -m unittest tests.test_bdtrees.TestBDTrees.test_expected_size_bd for that specific tes
+    #
+    # can also be called from VS Code, if open folder is phylojuction/
+
     unittest.main()

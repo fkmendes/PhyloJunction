@@ -6,7 +6,8 @@ import numpy
 # import statistics
 import random
 # from random import seed, choice
-from dendropy import Tree, Node, Taxon
+import dendropy as dp
+# from dendropy import Tree, Node, Taxon, TaxonNamespace
 # from matplotlib.pyplot import draw
 
 # pj imports
@@ -139,7 +140,7 @@ class DnSSE(pgm.DistributionPGM):
     ######################
     # Simulation methods #
     ######################
-    def get_next_event_time(self, total_rate, a_seed=None):
+    def get_next_event_time(self, total_rate: float, a_seed: ty.Optional[int]=None) -> float:
         """Draw next exponentially distributed event time
 
         Args:
@@ -158,9 +159,9 @@ class DnSSE(pgm.DistributionPGM):
         return next_time
 
 
-    def execute_birth(self, tr_namespace, chosen_node, state_representation_dict,
-                                    untargetable_node_set, cumulative_node_count, last_node2speciate,
-                                    macroevol_atomic_param, debug=False):
+    def execute_birth(self, tr_namespace: dp.TaxonNamespace, chosen_node: dp.Node, state_representation_dict,
+                                    untargetable_node_set, cumulative_node_count: int, last_node2speciate: dp.Node,
+                                    macroevol_atomic_param: sseobj.AtomicSSERateParameter, debug=False) -> ty.Tuple[dp.Node, int]:
         """Execute lineage birth
 
         Args:
@@ -186,7 +187,7 @@ class DnSSE(pgm.DistributionPGM):
         # assume only bifurcations
         cumulative_node_count += 1
         left_label = "nd" + str(cumulative_node_count)
-        left_child = Node(taxon=Taxon(label=left_label), label=left_label, edge_length=0.0)
+        left_child = dp.Node(taxon=dp.Taxon(label=left_label), label=left_label, edge_length=0.0)
         left_child.alive = True
         left_child.state = left_arriving_state
         left_child.annotations.add_bound_attribute("state")
@@ -194,7 +195,7 @@ class DnSSE(pgm.DistributionPGM):
 
         cumulative_node_count += 1
         right_label = "nd" + str(cumulative_node_count)
-        right_child = Node(taxon=Taxon(label=right_label), label=right_label, edge_length=0.0)
+        right_child = dp.Node(taxon=dp.Taxon(label=right_label), label=right_label, edge_length=0.0)
         right_child.alive = True
         right_child.state = right_arriving_state
         right_child.annotations.add_bound_attribute("state")
@@ -336,7 +337,7 @@ class DnSSE(pgm.DistributionPGM):
         start_state = a_start_state
         state_representation_dict = dict((i, set()) for i in range(self.events.state_count)) # { 0: ["origin", "root"], 1: ["nd1", "nd2"], 2:["nd3",...], ... }
         last_chosen_node = None
-        tr = Tree()
+        tr = dp.Tree()
 
         if self.stop == "age":
             t_stop = float(self.stop_val)
@@ -347,14 +348,14 @@ class DnSSE(pgm.DistributionPGM):
         # simulation starts at origin
         if self.with_origin:
             # origin node will be the seed_node
-            origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+            origin_node = dp.Node(taxon=dp.Taxon(label="origin"), label="origin", edge_length=0.0)
             origin_node.state = start_state
             origin_node.annotations.add_bound_attribute("state")
             origin_node.alive = False
             untargetable_node_set.add("origin")
 
             # creating root already upon initialization for practical purposes (at the moment root edge = 0.0)
-            root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
+            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=0.0)
             root_node.alive = True # we will pick the root as the first event
             root_node.state = origin_node.state
             root_node.annotations.add_bound_attribute("state")
@@ -364,18 +365,18 @@ class DnSSE(pgm.DistributionPGM):
             origin_node.add_child(root_node)
 
             # now make tree
-            tr = Tree(seed_node=origin_node) # will remain a "is_leaf() == True" until we add children
+            tr = dp.Tree(seed_node=origin_node) # will remain a "is_leaf() == True" until we add children
 
         # simulation starts at root
         else:
             # root node will be the seed_node, and will be untargetable from the get-go
-            root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
+            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=0.0)
             root_node.state = start_state
             root_node.alive = False
             untargetable_node_set.add("root")
 
             # we will actually start off with the left and right nodes being targetable
-            left_node = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.0)
+            left_node = dp.Node(taxon=dp.Taxon(label="nd1"), label="nd1", edge_length=0.0)
             left_node.alive = True
             left_node.state = root_node.state # get state from parent (root)
             left_node.annotations.add_bound_attribute("state")
@@ -383,7 +384,7 @@ class DnSSE(pgm.DistributionPGM):
             state_representation_dict[left_node.state].add(left_node.label)
             cumulative_node_count += 1
 
-            right_node = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=0.0)
+            right_node = dp.Node(taxon=dp.Taxon(label="nd2"), label="nd2", edge_length=0.0)
             right_node.alive = True
             right_node.state = root_node.state # get state from parent (root)
             right_node.annotations.add_bound_attribute("state")
@@ -392,7 +393,7 @@ class DnSSE(pgm.DistributionPGM):
             cumulative_node_count += 1
 
             # now make tree
-            tr = Tree(seed_node=root_node) # will remain a "is_leaf() == True" until we add children
+            tr = dp.Tree(seed_node=root_node) # will remain a "is_leaf() == True" until we add children
             tr.taxon_namespace.add_taxon(left_node)
             tr.taxon_namespace.add_taxon(right_node)
 
