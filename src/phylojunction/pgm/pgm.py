@@ -1,12 +1,91 @@
+from __future__ import annotations
 import sys
 sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/pgm/)
 import typing as ty
 import numpy as np
+import matplotlib.pyplot as plt # type: ignore
+import matplotlib.ticker as mticker # type: ignore
 from abc import ABC, abstractmethod
 
 # pj imports
 import utility.exception_classes as ec
 from data.tree import AnnotatedTree
+
+class ProbabilisticGraphicalModel():
+    def __init__(self):
+        self.node_dict = dict() # keys are proper PGM nodes, values are their values
+        self.node_name_val_dict = dict() # keys are StochasticNodePGM names, vals are StochasticNodePGM objects
+        self.n_nodes: int = 0
+        self.sample_size: int = 0 # how many simulations will be run
+
+    def add_node(self, node_pgm):
+        # check that nodes carry the right number of values (the number of simulations)
+        if isinstance(node_pgm, StochasticNodePGM):
+            
+            #############
+            # Important #
+            #############
+
+            # note how only sampled nodes have any business in setting
+            # the sample size of a PGM object; this means we let the users
+            # fool around with nodes with assigned (fixed, clamped) values
+            # through '<-'
+            if node_pgm.is_sampled:
+            # if the pgm's sample size is still 0,
+            # or if we started off with a scalar node but then added sampled node,
+            # we update the pgm's sample size
+                if not self.sample_size or (self.sample_size == 1 and node_pgm.sample_size > 1):
+                    self.sample_size = node_pgm.sample_size
+            
+            # if the number of values in a node is 1, it gets vectorized, so this is allowed;
+            # but if the node is sampled and the number of values is > 1 and < than that of other nodes,
+            # we have a problem;
+                elif self.sample_size != node_pgm.sample_size and node_pgm.sample_size > 1:
+                    print("self.sample_size = " + str(self.sample_size))
+                    print("node_pgm.sample_size = " + str(node_pgm.sample_size))
+                    raise RuntimeError("Number of simulations did not match. Exiting...")
+
+        replacing_node = False
+        if node_pgm in self.node_dict:
+            # removes existing node with that node_pgm_name
+            call_order_idx = node_pgm.call_order_idx
+            del self.node_dict[node_pgm]
+            replacing_node = True
+
+        # maintaining call order
+        if replacing_node:
+            node_pgm.call_order_idx = call_order_idx
+        
+        # new rv, add to call order
+        else:
+            self.n_nodes += 1
+            node_pgm.call_order_idx = self.n_nodes
+        
+        # if node is not deterministic and has a value and node_pgm_name
+        try:
+            self.node_dict[node_pgm] = node_pgm.value
+        except:
+            self.node_dict[node_pgm] = None
+            
+        self.node_name_val_dict[node_pgm.node_pgm_name] = node_pgm
+        
+
+    def get_node_pgm_by_name(self, node_name):
+        if node_name in self.node_name_val_dict:
+            return self.node_name_val_dict[node_name]
+
+
+    def get_display_str_by_name(self, node_name, sample_idx=None, repl_size=1):
+        if node_name in self.node_name_val_dict:
+            return str(self.node_name_val_dict[node_name]) # calls __str__() of NodePGM
+
+    def get_sorted_node_pgm_list(self):
+        node_pgm_list = [node_pgm for node_pgm in self.node_dict]
+        node_pgm_list.sort()
+
+        return node_pgm_list
+
+##############################################################################
 
 class DistributionPGM(ABC):
     @abstractmethod
@@ -29,13 +108,15 @@ class DistributionPGM(ABC):
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         pass
 
+##############################################################################
+
 class NodePGM(ABC):
     # for later, I think
     # value: ty.Union[float, ty.List[ty.Union[float,T]]] = None
 
     # don't want to allow NodePGM to be initialized
     @abstractmethod
-    def __init__(self, node_name: str, sample_size: int, value = None, replicate_size: int=1, call_order_idx=None, sampled: bool=False, deterministic: bool=False, clamped: bool=False, parent_nodes=None):
+    def __init__(self, node_name: str, sample_size: int, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, sampled: bool=False, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[NodePGM]]=None):
         self.node_pgm_name = node_name
         self.value = value
         self.sample_size = sample_size
@@ -56,7 +137,7 @@ class NodePGM(ABC):
         # self.full_length = self.length * self.repl_size # total number of values
         self.param_of = None
 
-        if type(self.value) in (list, np.ndarray) and not isinstance(self.value[0], pjc.AnnotatedTree):
+        if isinstance(self.value, (list, np.ndarray)) and not isinstance(self.value[0], AnnotatedTree):
             self.flatten_and_extract_values()
 
     # side-effect updates self.value
@@ -67,7 +148,7 @@ class NodePGM(ABC):
                 values_inside_nodes = v.value
 
                 for val in values_inside_nodes:
-                    if not type(val) in (int, float, str, np.float64):
+                    if not isinstance(val, (int, float, str, np.float64)):
                         raise ec.VariableAssignmentError(self.node_pgm_name)
 
                     values.append(val)
@@ -76,13 +157,13 @@ class NodePGM(ABC):
 
         self.value = values
 
-    def get_start2end_str(self, start:int, end:int) -> str:
+    def get_start2end_str(self, start: int, end: int) -> str:
         if type(self.value) == np.ndarray:
             self.value = ", ".join(str(v) for v in self.value.tolist()[start:end])
 
         if type(self.value) == list:
             if len(self.value) >= 2:
-                if type(self.value[0]) in (int, float, str, np.float64):
+                if isinstance(self.value[0], (int, float, str, np.float64)):
                     return ", ".join(str(v) for v in self.value[start:end])
                 else:
                     return "\n".join(str(v) for v in self.value[start:end])
@@ -121,12 +202,87 @@ class NodePGM(ABC):
             return 1
 
     @abstractmethod
-    def get_gcf(self):
+    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: ty.Optional[int]=0, repl_size: ty.Optional[int]=1, branch_attr: ty.Optional[str]="state") -> None:
         pass
 
     @abstractmethod
     def populate_operator_weight(self):
         pass
+
+##############################################################################
+
+class StochasticNodePGM(NodePGM):
+
+    def __init__(self, node_pgm_name: str, sample_size: int, sampled_from=None, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[ty.Any]]=None):
+        super().__init__(node_pgm_name, sample_size=sample_size, value=value, replicate_size=replicate_size, call_order_idx=call_order_idx, deterministic=deterministic, clamped=clamped, parent_nodes=parent_nodes)
+        
+        self.is_sampled = False
+        self.sampling_dn = sampled_from # dn object
+        self.operator_weight = 0.0 # used for MCMC move/operator setup during inference
+        if not value:
+            self.sample()
+
+        self.populate_operator_weight()
+        
+        # pgm specs
+        if self.sampling_dn:
+            self.is_sampled = True # r.v. value is sampled
+
+    def sample(self):
+        if self.sampling_dn:
+            self.value = self.sampling_dn.generate()
+        else:
+            raise RuntimeError("exiting...")
+
+    def __str__(self):
+        return super().__str__()
+
+    def __lt__(self, other):
+        return super().__lt__(other)
+
+    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: ty.Optional[int]=0, repl_size: ty.Optional[int]=1, branch_attr: ty.Optional[str]="state") -> None:
+        """_summary_
+
+        Args:
+            axes (_type_): _description_
+            sample_idx (int, optional): Which sample to plot. Defaults to 0.
+            repl_idx (int, optional): Which tree replicate to plot (one tree is plotted at a time). Defaults to 0.
+            repl_size (int, optional): How many scalar random variables to plot at a time. Defaults to 1.
+            branch_attr (str, optional): Which discrete attribute associated to a branch length to color by. Defaults to "state".
+        """
+        # if list 
+        if super().__len__() >= 1 and type(self.value) == list:
+            # if tree, we only plot first one
+            if isinstance(self.value[0], AnnotatedTree):
+                if self.value[0].state_count > 1:
+                    self.value[sample_idx*repl_size + repl_idx].get_gcf(axes, node_attr=branch_attr)
+                else:
+                    self.value[sample_idx*repl_size + repl_idx].get_gcf(axes)
+            # one sample
+            elif not sample_idx == None and self.sampling_dn:
+                get_histogram_gcf(axes, self.value, sample_idx=sample_idx, repl_size=repl_size)
+            # all samples
+            else:
+                get_histogram_gcf(axes, self.value, repl_size=repl_size)
+        
+        # if scalar
+        elif type(self.value) in (int, float, str):
+            return get_histogram_gcf(axes, [float(self.value)])
+
+    def populate_operator_weight(self):
+        if isinstance(self.value, (list, np.ndarray)):
+            if isinstance(self.value[0], (int, float, str, np.float64)):
+                self.operator_weight = 1 # this is a scalar random variable
+            # has objects like AtomicSSERateParameter inside list of values
+            else:
+                # TODO: later see how rev moves 2D-arrays and tree nodes
+                print("value has objects inside")
+                print(self.value)
+        else:
+            # TODO: later see how rev moves 2D-arrays and tree nodes
+            raise RuntimeError("Could not determine dimension of StochasticNodePGM when figuring out operator weight. Exiting...")
+
+##############################################################################
 
 class DeterministicNodePGM(NodePGM):
     def __init__(self, node_pgm_name, value=None, call_order_idx=None, deterministic=True, parent_nodes=None):
@@ -139,7 +295,7 @@ class DeterministicNodePGM(NodePGM):
     def __lt__(self, other) -> bool:
         return super().__lt__(other)
 
-    def get_gcf(self, axes, idx_value=0, **kwargs):
+    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: ty.Optional[int]=0, repl_size: ty.Optional[int]=1, branch_attr: ty.Optional[str]="state") -> None:
         # return get_blank_gcf(axes)
         pass
 
@@ -147,6 +303,41 @@ class DeterministicNodePGM(NodePGM):
         pass
 
 ##############################################################################
+
+############
+# Plotting #
+############
+def get_histogram_gcf(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
+
+    values_list_to_plot = list()
+    if not sample_idx == None:
+        start = sample_idx * repl_size
+        end = start + repl_size 
+        values_list_to_plot = [float(v) for v in values_list[start:end]]
+    else:
+        values_list_to_plot = [float(v) for v in values_list]
+
+    # figure canvas was created outside main loop in GUI
+    axes.cla() 
+    counts, bins, _ = axes.hist(values_list_to_plot, histtype='stepfilled', color="steelblue", edgecolor="none", alpha=0.3) 
+    
+    axes.spines['left'].set_visible(True)
+    axes.spines['bottom'].set_visible(True)
+    # axes.patch.set_alpha(0.0)
+    
+    # bins = axes.get_xticks().tolist()
+    
+    axes.xaxis.set_major_locator(mticker.FixedLocator(bins))
+    
+    # label_format = '{:,.0f}'
+    # axes.set_xticklabels([label_format.format(x) for x in bins])
+    
+    plt.xticks(bins)
+    plt.yticks(np.linspace(0, max(counts.tolist()), 5))
+    
+    axes.axes.xaxis.set_ticklabels([np.round(i,decimals=2) for i in bins])
+
+
 
 if __name__ == "__main__":
     # can be called from pgm/

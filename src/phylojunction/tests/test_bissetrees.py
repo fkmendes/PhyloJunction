@@ -366,4 +366,16 @@ class TestBiSSETrees(unittest.TestCase):
                                 msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
 
 if __name__ == '__main__':
+    # can be called from tests/
+    # $ python3 test_bissetrees.py
+    # 
+    # can also be called from phylojunction/
+    # $ python3 tests/test_bissetrees.py
+    # or
+    # $ python3 -m tests.test_bissetrees
+    # or, for a specific test
+    # $ python3 -m unittest tests.test_bissetrees.TestBiSSETrees.test_tree_size_state_count_max_taxa_bisse
+    #
+    # can also be called from VS Code, if open folder is phylojuction/
+
     unittest.main()
