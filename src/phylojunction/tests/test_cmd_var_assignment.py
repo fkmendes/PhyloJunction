@@ -5,7 +5,7 @@ import re
 
 # pj imports
 import pgm.pgm as pgm
-# import interface.cmd_parse as cmd
+import interface.cmd_parse as cmd
 import interface.cmd_parse_utils as cmdu
 
 class TestVarAssignment(unittest.TestCase):

@@ -1,7 +1,8 @@
 import sys
 sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/data/)
 import typing as ty
-from dendropy import Node, Tree, Taxon # type: ignore
+import dendropy as dp # type: ignore
+# from dendropy import Node, Tree, Taxon 
 
 # plotting tree
 import matplotlib.pyplot as plt # type: ignore
@@ -15,11 +16,35 @@ import utility.helper_functions as pjh
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-class AnnotatedTree(Tree):
+class AnnotatedTree(dp.Tree):
+
+    with_origin: bool
+    origin_node: ty.Optional[dp.Node] # can be None
+    origin_age: ty.Optional[float] # can be None
+    root_node: ty.Optional[dp.Node] # can be None
+    root_age: ty.Optional[float] # can be None
+    tree_read_as_newick_by_dendropy: bool
+    tree: dp.Tree
+    state_count: int
+    seed_age: float
+    epsilon: float
+    tree_died: bool
+    state_count_dict: ty.Dict[int, int]
+    node_heights_dict: ty.Dict[str, float]
+    node_ages_dict: ty.Dict[str, float]
+    node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]
+    slice_t_ends: ty.Optional[ty.List[float]] # can be None
+    slice_age_ends: ty.Optional[ty.List[float]] # can be None
+    n_extant_obs_nodes: int
+    n_extinct_obs_nodes: int
+    n_sa_obs_nodes: int
+    extant_obs_nodes_labels: ty.Tuple[str, ...]
+    extinct_obs_nodes_labels: ty.Tuple[str, ...]
+
     def __init__(self,
-                a_tree: ty.Type[Tree],
+                a_tree: dp.Tree,
                 total_state_count: int,
-                start_at_origin: ty.Optional[bool]=False,
+                start_at_origin: bool=False,
                 max_age: ty.Optional[float]=None,
                 slice_t_ends: ty.Optional[ty.List[float]]=None,
                 slice_age_ends: ty.Optional[ty.List[float]]=None,
@@ -27,8 +52,8 @@ class AnnotatedTree(Tree):
 
         self.with_origin = start_at_origin
         self.origin_node = None
-        self.root_node: ty.Optional[Node] = None
-        self.tree_read_as_newick_by_dendropy = bool()
+        self.root_node = None
+        self.tree_read_as_newick_by_dendropy = False
         self.tree = a_tree
         self.state_count = total_state_count
         self.seed_age = self.tree.max_distance_from_root()
@@ -73,7 +98,7 @@ class AnnotatedTree(Tree):
             if len(self.tree.seed_node.child_nodes()) == 2 and self.tree.seed_node.edge_length:
                 self.root_node = self.tree.seed_node
                 self.root_edge_length = self.root_node.edge_length
-                self.origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+                self.origin_node = dp.Node(taxon=dp.Taxon(label="origin"), label="origin", edge_length=0.0)
                 self.origin_node.alive = False
                 self.origin_node.add_child(self.root_node)
                 self.tree.seed_node = self.origin_node
@@ -120,8 +145,8 @@ class AnnotatedTree(Tree):
     #            self.self.extinct_obs_nodes_labels
     def count_observable_nodes(self) -> None:
         # nd.distance_from_root() gives distance to seed!
-        extant_obs_nodes_labels_list = list()
-        extinct_obs_nodes_labels_list = list()
+        extant_obs_nodes_labels_list: ty.List[str] = []
+        extinct_obs_nodes_labels_list: ty.List[str] = []
 
         # tree died before first speciation event
         if self.tree_died:
@@ -251,7 +276,7 @@ class AnnotatedTree(Tree):
         return self.tree.as_string(schema="newick", suppress_annotations=False, suppress_internal_taxon_labels=True)
 
 
-    def get_gcf(self, axes, node_attr=None, **kwargs):
+    def get_gcf(self, axes, node_attr=None, **kwargs) -> None:
         if not node_attr:
             return get_gcf_ann_tree(self, axes)
 
@@ -414,7 +439,7 @@ def get_gcf_ann_tree(ann_tr: AnnotatedTree, axes: plt.Axes, use_age: bool=False,
         x_here = x_coords[nd_name]
         y_here = y_coords[nd_name]
 
-        from_x_here_to_this_x = 0.0 # default
+        from_x_here_to_this_x: ty.Optional[float]=0.0 # default
         if use_age and nd in (ann_tr.origin_node, ann_tr.root_node):
             from_x_here_to_this_x = ann_tr.root_age
 
@@ -537,6 +562,6 @@ if __name__ == "__main__":
 
     total_state_count = 1
     rootedge_tr_str = "(((nd6:3.0,nd7:1.0)nd3:1.0,(nd4:1.0,nd5:3.0)nd2:1.0)root:2.0)origin:0.0;"
-    tr_origin = Tree.get(data=rootedge_tr_str, schema="newick")
+    tr_origin = dp.Tree.get(data=rootedge_tr_str, schema="newick")
     tree_origin = AnnotatedTree(tr_origin, total_state_count, start_at_origin=True, epsilon=1e-12)
     print(tree_origin)

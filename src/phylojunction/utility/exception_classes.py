@@ -1,6 +1,3 @@
-from re import S
-
-
 class ScriptSyntaxError(Exception):
     cmd_line: str
     message: str
@@ -40,7 +37,9 @@ class VariableAssignmentError(Exception):
         return "\nERROR: Cannot assign values of different types to a variable (\'" + self.rv_name + "\'). Exiting..."
 
 class VariableMisspec(Exception):
-    def __init__(self, rv_name) -> None:
+    rv_name: str
+
+    def __init__(self, rv_name: str) -> None:
         self.message = ""
         self.rv_name = rv_name
         super().__init__(self.message)
@@ -71,7 +70,10 @@ class FunctionArgError(Exception):
         return "\nERROR: Could not set value for function parameter " + self.par_name + ". " + self.message
 
 class InvalidFunctionArgError(Exception):
-    def __init__(self, function_name, message) -> None:
+    function_name: str
+    message: str
+
+    def __init__(self, function_name: str, message: str) -> None:
         self.function_name = function_name
         self.message = message
         super().__init__(self.message)
@@ -104,7 +106,12 @@ class NotAParameterError(Exception):
         return "\nERROR: \'" + self.par_name + "\' does not seem to be a valid parameter." + self.message + " Exiting... "
 
 class WrongDimensionError(Exception):
-    def __init__(self, container_name, obs_len, exp_len=0, message="") -> None:
+    container_name: str
+    obs_len: int
+    exp_len: int
+    message: str
+
+    def __init__(self, container_name: str, obs_len: int, exp_len: int=0, message: str="") -> None:
         self.obj_name = container_name
         self.obs_len = obs_len
         self.exp_len = exp_len
@@ -115,7 +122,10 @@ class WrongDimensionError(Exception):
         return "\nERROR: Could not set value for function parameter " + self.par_name + ". " + self.message + ". Exiting... "
 
 class DimensionalityError(Exception):
-    def __init__(self, dn_name) -> None:
+    dn_name: str
+    message: str
+
+    def __init__(self, dn_name: str) -> None:
         self.dn_name = dn_name
         self.message = ""
         super().__init__(self.message)
@@ -127,7 +137,10 @@ class DimensionalityError(Exception):
             "  (iii) thet number(s) was larger than 1, but smaller than the specified number of draws.\nExiting..."
 
 class NodeInferenceDimensionalityError(Exception):
-    def __init__(self, node_name) -> None:
+    node_name: str
+    message: str
+
+    def __init__(self, node_name: str) -> None:
         self.node_name = node_name
         self.message = ""
         super().__init__(self.message)
@@ -138,7 +151,11 @@ class NodeInferenceDimensionalityError(Exception):
             "other nodes. Unsure how to parse values. Exiting..."
 
 class NoPlatingAllowedError(Exception):
-    def __init__(self, det_name, problematic_node_pgm_name, message="") -> None:
+    det_name: str
+    message: str
+    node_pgm_name: str
+
+    def __init__(self, det_name: str, problematic_node_pgm_name: str, message: str="") -> None:
         self.det_name = det_name
         self.message = message
         self.node_pgm_name = problematic_node_pgm_name
@@ -152,7 +169,7 @@ class RequireScalarError(Exception):
     dn_name: str
     message: str
 
-    def __init__(self, dn_name, arg, message="") -> None:
+    def __init__(self, dn_name: str, arg: str, message: str="") -> None:
         self.dn_name = dn_name
         self.arg = arg
         self.message = message
@@ -220,7 +237,7 @@ class DnInitMisspec(Exception):
     dn_name: str
     message: str
 
-    def __init__(self, dn_name, message) -> None:
+    def __init__(self, dn_name: str, message: str) -> None:
         self.dn_name = dn_name
         self.message = message
         super().__init__(self.message)
@@ -231,7 +248,7 @@ class DnInitMisspec(Exception):
 class InvalidMCMCChainLength(Exception):
     message: str
 
-    def __init__(self, message) -> None:
+    def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(self.message)
 

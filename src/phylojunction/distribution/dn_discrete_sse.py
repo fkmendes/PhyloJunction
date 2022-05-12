@@ -6,7 +6,7 @@ import numpy
 # import statistics
 import random
 # from random import seed, choice
-import dendropy as dp
+import dendropy as dp # type: ignore
 # from dendropy import Tree, Node, Taxon, TaxonNamespace
 # from matplotlib.pyplot import draw
 
@@ -61,9 +61,27 @@ class DnSSE(pgm.DistributionPGM):
 
     DN_NAME = "DnSSE"
 
-    def __init__(self, n=1, n_replicates=1, stop=None, stop_value=None, origin=True, event_handler=None,
-                start_states_list=[], condition_on_speciation=False, condition_on_survival=False,
-                seeds_list=None, epsilon=1e-12, runtime_limit=60, debug=False):
+    n_sim: int
+    n_repl: int
+    with_origin: bool
+    stop: str
+    stop_val: str
+    condition_on_speciation: bool
+    condition_on_survival: bool
+    events: sseobj.MacroEvolEventHandler
+    start_states: ty.List[int]
+    state_count: int
+    n_time_slices: int
+    slice_t_ends: ty.List[float]
+    seed_age: float
+    seeds: ty.List[int]
+    epsilon: float    
+    runtime_limit: int
+    debug: bool
+
+    def __init__(self, n: int=1, n_replicates: int=1, stop: ty.Optional[str]=None, stop_value: ty.Optional[str]=None, origin: bool=True, event_handler: ty.Optional[sseobj.MacroEvolEventHandler]=None,
+                start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=False,
+                seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
@@ -109,7 +127,7 @@ class DnSSE(pgm.DistributionPGM):
     #########################
     # Vectorization methods #
     #########################
-    def check_sample_size(self):
+    def check_sample_size(self) -> None:
         # changing atomic_rate_params_matrix here should affect fig_rates_manager
         atomic_rate_params_matrix = self.events.fig_rates_manager.atomic_rate_params_matrix # 1D: time slices, 2D: list of atomic rate params
 
@@ -218,7 +236,7 @@ class DnSSE(pgm.DistributionPGM):
 
         return last_node2speciate, cumulative_node_count
 
-    def execute_death(self, chosen_node, state_representation_dict, untargetable_node_set, debug=False):
+    def execute_death(self, chosen_node, state_representation_dict, untargetable_node_set, debug=False) -> dp.Node:
         """Execute lineage death (side-effect)
 
         Args:
@@ -244,7 +262,7 @@ class DnSSE(pgm.DistributionPGM):
         return last_node2die
 
 
-    def execute_anatrans(self, chosen_node, state_representation_dict, macroevol_atomic_param, debug=False):
+    def execute_anatrans(self, chosen_node, state_representation_dict, macroevol_atomic_param, debug=False) -> None:
         """Execute anagenetic trait-state transition on path to chosen node (side-effect)
 
         Args:
@@ -268,7 +286,7 @@ class DnSSE(pgm.DistributionPGM):
         state_representation_dict[chosen_node.state].add(chosen_node.label)
 
 
-    def execute_event(self, tr_namespace, macroevol_atomic_param, chosen_node, state_representation_dict, untargetable_node_set, cumulative_node_count, last_chosen_node, debug=False):
+    def execute_event(self, tr_namespace, macroevol_atomic_param, chosen_node, state_representation_dict, untargetable_node_set, cumulative_node_count, last_chosen_node, debug=False) -> ty.Tuple[dp.Node, int]:
         """Execute event on chosen node and bookkeep things
 
         Args:
@@ -302,7 +320,7 @@ class DnSSE(pgm.DistributionPGM):
         return last_chosen_node, cumulative_node_count
 
 
-    def simulate(self, a_start_state, value_idx=0, a_seed=None):
+    def simulate(self, a_start_state: int, value_idx: int=0, a_seed: ty.Optional[int]=None) -> AnnotatedTree:
         """Sample (simulate) tree with states at its terminal nodes]
 
         Args:
@@ -533,7 +551,7 @@ class DnSSE(pgm.DistributionPGM):
     ### END simulation loop ###
 
 
-    def generate(self):
+    def generate(self) -> ty.List[AnnotatedTree]:
         # output
         output = list()
 
@@ -574,7 +592,7 @@ class DnSSE(pgm.DistributionPGM):
     #########################
     # Output health methods #
     #########################
-    def is_tr_ok(self, ann_tr):
+    def is_tr_ok(self, ann_tr: AnnotatedTree) -> bool:
         """Check that simulated tree meets stop conditions, so that it can be returned
 
         Args:
