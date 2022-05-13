@@ -33,12 +33,12 @@ def verify_or_convert2_vector(param_list, dn_name, size_to_grow=1) -> ty.List[ty
 
     Args:
         size_to_grow (int): This will be the number of simulations (n_draws inside a DistributionPGM object)
-    """
+    """    
     param_list_array = np.array(param_list, dtype=object) # using numpy array as a hack to get nested-ness of param_list
     n_params = len(param_list_array.shape) # each entry in shape is a dimension
 
     vectorizable_param_list = param_list
-    vectorized_param_list: ty.List[ty.List[ty.Union[int, float, str]]] = list()
+    vectorized_param_list: ty.List[ty.List[ty.Union[int, float, str]]] = []
 
     one_scalar_provided: bool = False
     one_scalar_in_list_provided: bool = False
@@ -52,7 +52,7 @@ def verify_or_convert2_vector(param_list, dn_name, size_to_grow=1) -> ty.List[ty
     # dealing with weird cases -- must set some flags
     # and/or initialize variables appropriately
     elif type(param_list) == list:
-        # single scalar provided by itself inside list, e.g, param_list = [1.0]
+        # single scalar provided by itself inside list, e.g, param_list = [1.0]        
         if len(param_list) == 1:
             one_scalar_in_list_provided = True
         # we have a single parameter inside a list of size_to_grow already,

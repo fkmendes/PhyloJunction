@@ -93,11 +93,11 @@ class DistributionPGM(ABC):
         pass
 
     @abstractmethod
-    def generate(self) -> ty.Union[ty.Any, ty.List[ty.Any]]:
+    def generate(self) -> ty.Optional[ty.List[float]]:
         pass
 
     @abstractmethod
-    def check_sample_size(self) -> None: 
+    def check_sample_size(self, param_list: ty.List[ty.Any]) -> ty.List[ty.List[ty.Union[int, float, str]]]: 
         """Check sample size against number of provided parameter values
 
         This is the function behind the vectorization functionality
@@ -142,26 +142,33 @@ class NodePGM(ABC):
 
     # side-effect updates self.value
     def flatten_and_extract_values(self) -> None:
-        values: ty.List[float] = []
-        for v in self.value:
-            if not type(v) in (int, float, str, np.float64):
-                values_inside_nodes = v.value
+        values: ty.List[ty.Any] = []
+        
+        # so mypy won't complain
+        if isinstance(self.value, list):
+            
+            for v in self.value:
+                if not isinstance(v, (int, float, str, np.float64)):
+                    values_inside_nodes = v.value
 
-                for val in values_inside_nodes:
-                    if not isinstance(val, (int, float, str, np.float64)):
-                        raise ec.VariableAssignmentError(self.node_pgm_name)
+                    # so mypy won't complain
+                    if isinstance(values_inside_nodes, list):
 
-                    values.append(val)
+                        for val in values_inside_nodes:
+                            if not isinstance(val, (int, float, str, np.float64)):
+                                raise ec.VariableAssignmentError(self.node_pgm_name)
 
-            else: values.append(v)
+                            values.append(val)
+
+                else: values.append(v)
 
         self.value = values
 
     def get_start2end_str(self, start: int, end: int) -> str:
-        if type(self.value) == np.ndarray:
+        if isinstance(self.value, np.ndarray):
             self.value = ", ".join(str(v) for v in self.value.tolist()[start:end])
 
-        if type(self.value) == list:
+        if isinstance(self.value, list):
             if len(self.value) >= 2:
                 if isinstance(self.value[0], (int, float, str, np.float64)):
                     return ", ".join(str(v) for v in self.value[start:end])
@@ -181,16 +188,21 @@ class NodePGM(ABC):
     # stringify _all_ values
     def __str__(self) -> str:
         try:
-            return self.get_start2end_str(0, len(self.value))
+            if isinstance(self.value, list):
+                return self.get_start2end_str(0, len(self.value))
         except:
             return str(self.value)
+
+        # cosmetic return required by mypy
+        return ""
 
     def __lt__(self, other) -> bool:
         return self.call_order_idx < other.call_order_idx
 
     def __len__(self) -> int:
         try:
-            n_values = len(self.value)
+            if isinstance(self.value, list):
+                n_values = len(self.value)
             n_repls = self.repl_size
 
             if n_values >= 1:
@@ -201,8 +213,11 @@ class NodePGM(ABC):
         except:
             return 1
 
+        # cosmetic return required by mypy
+        return 1
+
     @abstractmethod
-    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: ty.Optional[int]=0, repl_size: ty.Optional[int]=1, branch_attr: ty.Optional[str]="state") -> None:
+    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: int=0, repl_size: int=1, branch_attr: ty.Optional[str]="state") -> None:
         pass
 
     @abstractmethod
@@ -234,13 +249,13 @@ class StochasticNodePGM(NodePGM):
         else:
             raise RuntimeError("exiting...")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return super().__str__()
 
     def __lt__(self, other):
         return super().__lt__(other)
 
-    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: ty.Optional[int]=0, repl_size: ty.Optional[int]=1, branch_attr: ty.Optional[str]="state") -> None:
+    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: int=0, repl_size: int=1, branch_attr: ty.Optional[str]="state") -> None:
         """_summary_
 
         Args:
@@ -251,22 +266,32 @@ class StochasticNodePGM(NodePGM):
             branch_attr (str, optional): Which discrete attribute associated to a branch length to color by. Defaults to "state".
         """
         # if list 
-        if super().__len__() >= 1 and type(self.value) == list:
-            # if tree, we only plot first one
+        if super().__len__() >= 1 and isinstance(self.value, list):
+            # if tree, we only plot one
             if isinstance(self.value[0], AnnotatedTree):
-                if self.value[0].state_count > 1:
-                    self.value[sample_idx*repl_size + repl_idx].get_gcf(axes, node_attr=branch_attr)
-                else:
-                    self.value[sample_idx*repl_size + repl_idx].get_gcf(axes)
-            # one sample
-            elif not sample_idx == None and self.sampling_dn:
-                get_histogram_gcf(axes, self.value, sample_idx=sample_idx, repl_size=repl_size)
-            # all samples
+                
+                # so mypy won't complain
+                if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], AnnotatedTree):
+                    
+                    if self.value[0].state_count > 1:
+                        self.value[sample_idx*repl_size + repl_idx].get_gcf(axes, node_attr=branch_attr)
+                    else:
+                        self.value[sample_idx*repl_size + repl_idx].get_gcf(axes)
+            
+            # not a tree
             else:
-                get_histogram_gcf(axes, self.value, repl_size=repl_size)
+                # so mypy won't complain
+                hist_vals = [ty.cast(float, v) for v in self.value]
+                
+                # one sample
+                if not sample_idx == None and self.sampling_dn:
+                    get_histogram_gcf(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
+                # all samples
+                else:
+                    get_histogram_gcf(axes, hist_vals, repl_size=repl_size)
         
         # if scalar
-        elif type(self.value) in (int, float, str):
+        elif isinstance(self.value, (int, float, str)):
             return get_histogram_gcf(axes, [float(self.value)])
 
     def populate_operator_weight(self):
@@ -310,7 +335,8 @@ class DeterministicNodePGM(NodePGM):
 def get_histogram_gcf(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
 
     values_list_to_plot = list()
-    if not sample_idx == None:
+    # if not sample_idx == None:
+    if isinstance(sample_idx, int):
         start = sample_idx * repl_size
         end = start + repl_size 
         values_list_to_plot = [float(v) for v in values_list[start:end]]
