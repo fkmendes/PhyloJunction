@@ -1,5 +1,5 @@
 import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
+sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/interface/)
 import re
 import io
 
@@ -8,8 +8,8 @@ import pgm.pgm as pgm
 import user_interface.phylojunction_inference as pjinf
 import user_interface.phylojunction_io as pjio
 import user_interface.cmd_parse_utils as cmdu
-from user_interface.dn_grammar import DnGrammar as dngrammar
-from user_interface.det_fn_grammar import PJDetFnGrammar as detgrammar
+import interface.grammar.dn_grammar as dngrammar
+import interface.grammar.det_fn_grammar as detgrammar
 import utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
