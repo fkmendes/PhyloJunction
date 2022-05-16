@@ -111,7 +111,7 @@ class FIGRatesManager:
     might become vectorized.
     """
 
-    slice_t_ends: ty.Optional[ty.List[float]]
+    slice_t_ends: ty.Optional[ty.List[ty.Optional[float]]]
 
     # NOTE: This class is flexible in that it allows different parameter
     # numbers per time slice, for whatever that is worth. However, the
@@ -132,9 +132,7 @@ class FIGRatesManager:
         self.seed_age = seed_age_for_time_slicing # this is the origin or root age, and it is used to anchor the user-specified ages to convert it to time
         self.n_time_slices = 1 # default is one slice
         self.slice_age_ends = [ 0.0 ] # default slice ends at present (age = 0.0)
-        self.slice_t_ends = []
-        if isinstance(self.seed_age, float):
-            self.slice_t_ends = [ self.seed_age ] # default slice t's at present (t = seed_age = stop_value with "age" condition)
+        self.slice_t_ends = [ self.seed_age ] # default slice t's at present (t = seed_age = stop_value with "age" condition)
 
         # age ends (larger in the past, 0.0 in the present)
         if list_time_slice_age_ends:
@@ -190,9 +188,11 @@ class FIGRatesManager:
             time_slice_index += 1
 
             try:
-                if isinstance(self.slice_t_ends, list):
-                    if a_time > self.slice_t_ends[time_slice_index] or (abs(a_time - self.slice_t_ends[time_slice_index]) <= self.epsilon):
-                        continue
+                if isinstance(self.slice_t_ends, list) and isinstance(self.slice_t_ends[time_slice_index], float):
+                        time_slice_t_end = ty.cast(float, self.slice_t_ends[time_slice_index])
+                        
+                        if a_time > time_slice_t_end or (abs(a_time - time_slice_t_end) <= self.epsilon):
+                            continue
 
             # self.slice_t_ends will be None if no seed age or time slice age ends are provided
             except:
@@ -223,7 +223,7 @@ class MacroEvolEventHandler():
     # that forces the user to specify the same number of parameters in
     # all time slices
 
-    slice_t_ends: ty.Optional[ty.List[float]]
+    slice_t_ends: ty.Optional[ty.List[ty.Optional[float]]]
 
     def __init__(self, a_fig_rates_manager: FIGRatesManager):
         self.fig_rates_manager = a_fig_rates_manager
@@ -241,7 +241,8 @@ class MacroEvolEventHandler():
             # time slice k
             for k, list_atomic_rates_slice in enumerate(atomic_rates_state_mat):
                 if self.seed_age and isinstance(self.slice_t_ends, list):
-                    self.str_representation += "    Time slice " + str(k + 1) + " (time = " + str(round(self.slice_t_ends[k],4)) + ", age = " + str(round(self.slice_age_ends[k],4)) + ")\n"
+                    time_slice_t_end = ty.cast(float, self.slice_t_ends[k])
+                    self.str_representation += "    Time slice " + str(k + 1) + " (time = " + str(round(time_slice_t_end,4)) + ", age = " + str(round(self.slice_age_ends[k],4)) + ")\n"
                 else:
                     self.str_representation += "    Time slice " + str(k + 1) + " (age = " + str(round(self.slice_age_ends[k],4)) + ")\n"
 

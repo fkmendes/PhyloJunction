@@ -99,10 +99,7 @@ class DnSSE(pgm.DistributionPGM):
         self.events = event_handler # carries all parameters, number of states and of slices        
         self.state_count = self.events.state_count
         self.n_time_slices = self.events.n_time_slices
-        try: 
-            self.slice_t_ends = self.events.slice_t_ends
-        except: 
-            pass
+        self.slice_t_ends = self.events.slice_t_ends
         self.seed_age = self.events.seed_age # used just for verifying inputs
 
         # other specs
