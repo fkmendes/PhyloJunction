@@ -58,7 +58,7 @@ class TestBiSSETrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(n=n_sim, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin, event_handler=self.event_handler,
+            sse_sim = distsse.DnSSE(self.event_handler, n=n_sim, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin,
                 start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
                 condition_on_speciation=True, condition_on_survival=True,
                 debug=False)
@@ -223,7 +223,7 @@ class TestBiSSETrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(n=100, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin, event_handler=self.event_handler,
+            sse_sim = distsse.DnSSE(self.event_handler, n=100, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin,
                                     start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
                                     condition_on_speciation=True, condition_on_survival=True,
                                     debug=False)

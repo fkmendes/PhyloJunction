@@ -6,6 +6,7 @@ import typing as ty
 import calculation.discrete_sse as sseobj # type: ignore
 import utility.exception_classes as ec
 import det_fn_discrete_sse as detsse
+import pgm.pgm as pgm
 
 class PJDetFnGrammar():
 
@@ -27,15 +28,15 @@ class PJDetFnGrammar():
         return False
 
     @classmethod
-    def init_return_sse_rate(cls, det_fn_param_dict: ty.Dict[str, str]) -> sseobj.AtomicSSERateParameter:
+    def init_return_sse_rate(cls, det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.AtomicSSERateParameter:
         return detsse.make_SSEAtomicRate(det_fn_param_dict)
 
     @classmethod
-    def init_return_macroevol_handler(cls, det_fn_param_dict: ty.Dict[str, str]) -> sseobj.MacroEvolEventHandler:
+    def init_return_macroevol_handler(cls, det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
         return detsse.make_MacroEvolEventHandler(det_fn_param_dict)
 
     @classmethod
-    def create_det_fn_obj(cls, det_fn_id: str, det_fn_param_dict: ty.Dict[str, str]) -> ty.Optional[ty.Union[sseobj.AtomicSSERateParameter, sseobj.MacroEvolEventHandler]]:
+    def create_det_fn_obj(cls, det_fn_id: str, det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> ty.Optional[ty.Union[sseobj.AtomicSSERateParameter, sseobj.MacroEvolEventHandler]]:
         # validate input
         if det_fn_id == "sse_rate":
             return cls.init_return_sse_rate(det_fn_param_dict)

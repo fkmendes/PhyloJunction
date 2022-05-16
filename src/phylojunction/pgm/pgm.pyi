@@ -6,6 +6,9 @@ import numpy as np
 from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 
+# pj imports
+from data.tree import AnnotatedTree
+
 class ProbabilisticGraphicalModel:
     node_dict: Incomplete
     node_name_val_dict: Incomplete
@@ -21,9 +24,9 @@ class DistributionPGM(ABC, metaclass=abc.ABCMeta):
     @abstractmethod
     def __init__(self): ...
     @abstractmethod
-    def generate(self) -> ty.Optional[ty.List[float]]: ...
+    def generate(self) -> ty.Optional[ty.List[ty.Any]]: ...
     @abstractmethod
-    def check_sample_size(self, param_list: ty.List[ty.Any]) -> ty.List[ty.List[ty.Union[int, float, str]]]: ...
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     @abstractmethod
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...
 

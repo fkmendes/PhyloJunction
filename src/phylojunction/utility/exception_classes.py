@@ -119,7 +119,7 @@ class WrongDimensionError(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "\nERROR: Could not set value for function parameter " + self.par_name + ". " + self.message + ". Exiting... "
+        return "\nERROR: Container " + self.obj_name + " had a different dimension than expected. " + self.message + ". Exiting... "
 
 class DimensionalityError(Exception):
     dn_name: str

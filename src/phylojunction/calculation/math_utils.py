@@ -21,7 +21,7 @@ def exp_root_height_yule_ntaxa(birth_rate: float, n_taxa: int) -> float:
     return expected_root_height
 
 
-def exp_extant_count_bd(birth_rate: float, death_rate: float, tree_age: float, speciation_k: int=1) -> int:
+def exp_extant_count_bd(birth_rate: float, death_rate: float, tree_age: float, speciation_k: int=1) -> float:
     """Return expected count of extant taxa in a birth-death tree
 
     Args:

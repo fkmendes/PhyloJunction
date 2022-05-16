@@ -93,11 +93,11 @@ class DistributionPGM(ABC):
         pass
 
     @abstractmethod
-    def generate(self) -> ty.Optional[ty.List[float]]:
+    def generate(self) -> ty.Optional[ty.List[ty.Any]]:
         pass
 
     @abstractmethod
-    def check_sample_size(self, param_list: ty.List[ty.Any]) -> ty.List[ty.List[ty.Union[int, float, str]]]: 
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: 
         """Check sample size against number of provided parameter values
 
         This is the function behind the vectorization functionality

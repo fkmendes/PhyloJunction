@@ -1,5 +1,5 @@
 import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/utility/)
+sys.path.extend(["./", "../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/utility/)
 import time
 import typing as ty
 import numpy as np # type: ignore
@@ -28,13 +28,13 @@ def autovivify(levels=1, final=dict) -> ty.DefaultDict:
             defaultdict(lambda: autovivify(levels - 1, final)))
 
 
-def verify_or_convert2_vector(param_list, dn_name, size_to_grow=1) -> ty.List[ty.List[ty.Union[int, float, str]]]:
+def verify_or_convert2_vector(param_list: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], dn_name: str, size_to_grow=1) -> ty.List[ty.List[ty.Union[int, float, str]]]:
     """
 
     Args:
         size_to_grow (int): This will be the number of simulations (n_draws inside a DistributionPGM object)
     """    
-    param_list_array = np.array(param_list, dtype=object) # using numpy array as a hack to get nested-ness of param_list
+    param_list_array: ty.Any = np.array(param_list, dtype=object) # using numpy array as a hack to get nested-ness of param_list
     n_params = len(param_list_array.shape) # each entry in shape is a dimension
 
     vectorizable_param_list = param_list
@@ -45,13 +45,13 @@ def verify_or_convert2_vector(param_list, dn_name, size_to_grow=1) -> ty.List[ty
     one_par_right_value_count: bool = False
 
     # scalar provided by itself, e.g., rate = 1.0
-    if isinstance(param_list, (int, float, str)):
+    if isinstance(vectorizable_param_list, (int, float, str)):
         vectorizable_param_list = [vectorizable_param_list]
         one_scalar_provided = True
 
     # dealing with weird cases -- must set some flags
     # and/or initialize variables appropriately
-    elif type(param_list) == list:
+    elif isinstance(param_list, list):
         # single scalar provided by itself inside list, e.g, param_list = [1.0]        
         if len(param_list) == 1:
             one_scalar_in_list_provided = True
@@ -68,36 +68,37 @@ def verify_or_convert2_vector(param_list, dn_name, size_to_grow=1) -> ty.List[ty
 
     # each v here will be a different parameter (e.g., mean and sd) in case there
     # is more than one parameter
-    for v in vectorizable_param_list:
-        # a single value was provided as scalar, either by itself, or inside a list by itself
-        if isinstance(v, (int, float, str)):
-            # param list is a single scalar, e.g., mean=1.0
-            if one_scalar_provided:
-                vectorized_param_list.append([v for i in range(size_to_grow)])
-            # param list is a single scalar, by itself, inside a list, e.g., mean=[[1.0]]
-            elif one_scalar_in_list_provided:
-                vectorized_param_list.append([v] * size_to_grow)
-            # param list contains a single parameter, and we already have the right number of values
-            elif one_par_right_value_count:
-                vectorized_param_list[0].append(v)
+    if isinstance(vectorizable_param_list, list):
+        for v in vectorizable_param_list:
+            # a single value was provided as scalar, either by itself, or inside a list by itself
+            if isinstance(v, (int, float, str)):
+                # param list is a single scalar, e.g., mean=1.0
+                if one_scalar_provided:
+                    vectorized_param_list.append([v for i in range(size_to_grow)])
+                # param list is a single scalar, by itself, inside a list, e.g., mean=[[1.0]]
+                elif one_scalar_in_list_provided:
+                    vectorized_param_list.append([v] * size_to_grow)
+                # param list contains a single parameter, and we already have the right number of values
+                elif one_par_right_value_count:
+                    vectorized_param_list[0].append(v)
 
-        elif type(v) == list:
-            n_val = len(v)
-            # more values than specified number of samples
-            if n_val > size_to_grow:
-                raise ec.DimensionalityError(dn_name)
+            elif type(v) == list:
+                n_val = len(v)
+                # more values than specified number of samples
+                if n_val > size_to_grow:
+                    raise ec.DimensionalityError(dn_name)
 
-            # don't know how to multiply if more than one element
-            elif n_val > 1 and n_val < size_to_grow:
-                raise ec.DimensionalityError(dn_name)
+                # don't know how to multiply if more than one element
+                elif n_val > 1 and n_val < size_to_grow:
+                    raise ec.DimensionalityError(dn_name)
 
-            # a single value was provided as list
-            elif n_val == 1:
-                vectorized_param_list.append([v[0] for i in range(size_to_grow)])
+                # a single value was provided as list
+                elif n_val == 1:
+                    vectorized_param_list.append([v[0] for i in range(size_to_grow)])
 
-            # more than 1 value, but same as specified number of samples
-            else:
-                vectorized_param_list.append(v)
+                # more than 1 value, but same as specified number of samples
+                else:
+                    vectorized_param_list.append(v)
 
     return vectorized_param_list
 

@@ -27,7 +27,7 @@ sampling_dn_spec_regex = re.compile("([a-zA-Z]+_*[a-zA-Z]*)\((.+)\)")
 deterministic_regex = re.compile("\s*(:=)\s*")
 
 
-def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel, val: ty.List[str]) -> ty.List[ty.Union[pgm.StochasticNodePGM, str]]:
+def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel, val: ty.List[str]) -> ty.List[ty.Union[pgm.NodePGM, str]]:
     """_summary_
 
     Args:
@@ -40,7 +40,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel, val: ty.List[str]) -> t
     Returns:
         (str): List of strings (representing values or quoted-enclosed strings) and/or stochastic node objects
     """
-    val_or_obj_list = list()
+    val_or_obj_list: ty.List[ty.Union[pgm.NodePGM, str]] = []
     
     for v in val:
         if type(v) == str:
@@ -59,8 +59,9 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel, val: ty.List[str]) -> t
     return val_or_obj_list
 
 
-def parse_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, fn_spec_str: str, cmd_line: str) -> ty.Tuple[ty.Dict[str, ty.List[ty.Union[str, pgm.ProbabilisticGraphicalModel]]], ty.List[ty.Union[str, pgm.ProbabilisticGraphicalModel]]]:
-    spec_dict = tokenize_fn_spec(fn_spec_str, cmd_line)
+def parse_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, fn_spec_str: str, cmd_line: str) -> ty.Tuple[ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]], ty.List[pgm.NodePGM]]:
+    spec_dict: ty.Dict[str, str] = tokenize_fn_spec(fn_spec_str, cmd_line)
+    spec_dict_return: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]
 
     parent_pgm_nodes = list()
     for param_name, an_arg in spec_dict.items():
@@ -80,14 +81,15 @@ def parse_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, fn_spec_str: str, cmd_l
             arg_list.append(an_arg)
         
         val_obj_list = val_or_obj(pgm_obj, arg_list)
-        spec_dict[param_name] = val_obj_list
+        spec_dict_return[param_name] = val_obj_list
+        # { param_name_str: [ number_or_quoted_str_str1, a_NodePGM1, number_or_quoted_str_str2, aNodePGM2 ] }
 
         for vo in val_obj_list:
             if type(vo) == pgm.NodePGM:
                 parent_pgm_nodes.append(vo)
 
     # values in spec_dict will be lists of strings or lists of NodePGMs
-    return spec_dict, parent_pgm_nodes
+    return spec_dict_return, parent_pgm_nodes
 
 
 def parse_val_vector(vec_str: str) -> ty.List[str]:

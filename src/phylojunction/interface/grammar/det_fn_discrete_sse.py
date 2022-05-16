@@ -7,7 +7,7 @@ import utility.exception_classes as ec
 import pgm.pgm as pgm
 import calculation.discrete_sse as sseobj # type: ignore
 
-def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, str]):
+def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]):
     """Create SSEAtomicRate as prompted by deterministic function call. Still no support for vectorization.
 
     Args:
@@ -68,13 +68,13 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, str]):
             # val is a list of random variable objects
             # if type(val[0]) != str:
             if isinstance(val[0], pgm.NodePGM):
-                val = ty.cast(ty.List[pgm.NodePGM], val)
-                value = extract_value_from_pgmnodes(val)
+                cast_val1: ty.List[pgm.NodePGM] = ty.cast(ty.List[pgm.NodePGM], val) # need to declare cast_val separately so mypy won't complain
+                value = extract_value_from_pgmnodes(cast_val1)
             
             # val is a list of strings
             elif isinstance(val[0], str):
-                val = ty.cast(ty.List[str], val)
-                value = [float(v) for v in val]
+                cast_val2: ty.List[str] = ty.cast(ty.List[str], val)
+                value = [float(v) for v in cast_val2]
 
         elif arg == "name" and not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without name. Exiting...")
         
@@ -108,7 +108,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, str]):
         return sseobj.AtomicSSERateParameter(name=det_fn_param_dict["name"][0], val=value, event=event_type)
 
 
-def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.Union[ty.List[str], ty.List[pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
+def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
 
     if not det_fn_param_dict:
         raise ec.NoSpecificationError(message="Cannot initialize SSE stash without specifications. Exiting...")
@@ -164,7 +164,7 @@ def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.Union[ty.List[
     except:
         raise ec.SSEStashMisspec(message="Cannot initialize SSE stash without a vector of SSE rates. Exiting...")
         
-    _matrix_det_node_atomic_rate_params: ty.List[pgm.DeterministicNodePGM] = []
+    # _matrix_det_node_atomic_rate_params: ty.List[pgm.DeterministicNodePGM] = []
     _matrix_atomic_rate_params: ty.List[ty.List[sseobj.AtomicSSERateParameter]] = []
     _total_n_rate_params = len(_flat_rate_mat)
     _n_rate_params_per_slice = int(_total_n_rate_params / _n_time_slices)
@@ -172,14 +172,14 @@ def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.Union[ty.List[
     # iterating over time slices
     for i in range(0, _total_n_rate_params, _n_rate_params_per_slice):
 
-        atomic_rate_params = list()
+        atomic_rate_params: ty.List[sseobj.AtomicSSERateParameter] = []
         for atomic_rate_param_det_nd in _flat_rate_mat[i:(i+_n_rate_params_per_slice)]:
             atomic_rate_params.append(atomic_rate_param_det_nd.value)
         
-        _matrix_atomic_rate_params.append(atomic_rate_params) # appending a list
-                                                             # 1D: time slices, 2D: atomic SSE rate list
+        _matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of AtomicSSERateParameters
+                                                              # 1D: time slices, 2D: atomic SSE rate list
         
-        _matrix_det_node_atomic_rate_params.append(_flat_rate_mat[i:(i+_n_rate_params_per_slice)]) # list of lists of DeterministicNodePGM's
+        # _matrix_det_node_atomic_rate_params.append(_flat_rate_mat[i:(i+_n_rate_params_per_slice)]) # list of lists of DeterministicNodePGM's
     
     # matrix_atomic_rate_params = [det_node_atomic_rate.value for det_node_atomic_rate in _matrix_det_node_atomic_rate_params]
         

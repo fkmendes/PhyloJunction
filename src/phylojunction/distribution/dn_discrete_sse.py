@@ -1,5 +1,7 @@
 """dn_discrete_sse.py: Class for distribution of discrete state-dependent speciation and extinction process"""
 
+import sys
+sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/distribution/)
 import typing as ty
 import time
 import numpy
@@ -12,9 +14,8 @@ import dendropy as dp # type: ignore
 
 # pj imports
 import pgm.pgm as pgm
-import distribution.dn_parametric as dnpar
-# from tpsimulator_utils import *
-# from tpsimulator_math_lib import draw_exp
+import distribution.dn_parametric as dnpar # type: ignore
+## could not get dn_parametric's stub to be seen by mypy... will ignore... if don't ignore it, also get several errors being spit out by mypy that require "--no-implicit-reexport" flag
 import calculation.discrete_sse as sseobj
 import utility.helper_functions as pjh
 import utility.exception_classes as ec
@@ -65,7 +66,7 @@ class DnSSE(pgm.DistributionPGM):
     n_repl: int
     with_origin: bool
     stop: str
-    stop_val: str
+    stop_val: float
     condition_on_speciation: bool
     condition_on_survival: bool
     events: sseobj.MacroEvolEventHandler
@@ -73,13 +74,14 @@ class DnSSE(pgm.DistributionPGM):
     state_count: int
     n_time_slices: int
     slice_t_ends: ty.List[float]
-    seed_age: float
-    seeds: ty.List[int]
+    seed_age: ty.Optional[float]
+    seeds: ty.Optional[ty.List[int]]
     epsilon: float    
     runtime_limit: int
     debug: bool
 
-    def __init__(self, n: int=1, n_replicates: int=1, stop: ty.Optional[str]=None, stop_value: ty.Optional[str]=None, origin: bool=True, event_handler: ty.Optional[sseobj.MacroEvolEventHandler]=None,
+    # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
+    def __init__(self, event_handler: sseobj.MacroEvolEventHandler, n: int=1, n_replicates: int=1, stop: str="", stop_value: str="", origin: bool=True,
                 start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=False,
                 seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
 
@@ -88,16 +90,19 @@ class DnSSE(pgm.DistributionPGM):
         self.n_repl = n_replicates # number of replicate trees (in plate) for a given simulation
         self.with_origin = origin
         self.stop = stop
-        self.stop_val = stop_value
+        self.stop_val = float(stop_value)
         self.condition_on_speciation = condition_on_speciation
         self.condition_on_survival = condition_on_survival
 
         # model parameters
-        self.events = event_handler # carries all parameters, number of states and of slices
         self.start_states = start_states_list
+        self.events = event_handler # carries all parameters, number of states and of slices        
         self.state_count = self.events.state_count
         self.n_time_slices = self.events.n_time_slices
-        self.slice_t_ends = self.events.slice_t_ends
+        try: 
+            self.slice_t_ends = self.events.slice_t_ends
+        except: 
+            pass
         self.seed_age = self.events.seed_age # used just for verifying inputs
 
         # other specs
@@ -127,7 +132,7 @@ class DnSSE(pgm.DistributionPGM):
     #########################
     # Vectorization methods #
     #########################
-    def check_sample_size(self) -> None:
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         # changing atomic_rate_params_matrix here should affect fig_rates_manager
         atomic_rate_params_matrix = self.events.fig_rates_manager.atomic_rate_params_matrix # 1D: time slices, 2D: list of atomic rate params
 
@@ -148,11 +153,14 @@ class DnSSE(pgm.DistributionPGM):
         if len(self.start_states) > self.n_sim or (len(self.start_states) > 1 and len(self.start_states) < self.n_sim):
             raise ec.DimensionalityError(self.DN_NAME)
 
+        # multiplying starting states if only one was passed and the number of simulations is > 1
         elif len(self.start_states) < self.n_sim and len(self.start_states) == 1:
-            try:
-                self.start_states = [int(self.start_states[0]) for i in range(self.n_sim)]
-            except:
-                self.start_states = [self.start_states for i in range(self.n_sim)]
+            # try:
+            self.start_states = [int(self.start_states[0]) for i in range(self.n_sim)]
+            # except:
+            #    self.start_states = [self.start_states for i in range(self.n_sim)]
+
+        return None
 
 
     ######################
@@ -177,7 +185,7 @@ class DnSSE(pgm.DistributionPGM):
         return next_time
 
 
-    def execute_birth(self, tr_namespace: dp.TaxonNamespace, chosen_node: dp.Node, state_representation_dict,
+    def execute_birth(self, tr_namespace: dp.TaxonNamespace, chosen_node: dp.Node, state_representation_dict: ty.Dict[int, ty.Set[str]],
                                     untargetable_node_set, cumulative_node_count: int, last_node2speciate: dp.Node,
                                     macroevol_atomic_param: sseobj.AtomicSSERateParameter, debug=False) -> ty.Tuple[dp.Node, int]:
         """Execute lineage birth
@@ -236,7 +244,7 @@ class DnSSE(pgm.DistributionPGM):
 
         return last_node2speciate, cumulative_node_count
 
-    def execute_death(self, chosen_node, state_representation_dict, untargetable_node_set, debug=False) -> dp.Node:
+    def execute_death(self, chosen_node, state_representation_dict: ty.Dict[int, ty.Set[str]], untargetable_node_set, debug=False) -> dp.Node:
         """Execute lineage death (side-effect)
 
         Args:
@@ -262,7 +270,7 @@ class DnSSE(pgm.DistributionPGM):
         return last_node2die
 
 
-    def execute_anatrans(self, chosen_node, state_representation_dict, macroevol_atomic_param, debug=False) -> None:
+    def execute_anatrans(self, chosen_node, state_representation_dict: ty.Dict[int, ty.Set[str]], macroevol_atomic_param, debug=False) -> None:
         """Execute anagenetic trait-state transition on path to chosen node (side-effect)
 
         Args:
@@ -286,7 +294,7 @@ class DnSSE(pgm.DistributionPGM):
         state_representation_dict[chosen_node.state].add(chosen_node.label)
 
 
-    def execute_event(self, tr_namespace, macroevol_atomic_param, chosen_node, state_representation_dict, untargetable_node_set, cumulative_node_count, last_chosen_node, debug=False) -> ty.Tuple[dp.Node, int]:
+    def execute_event(self, tr_namespace, macroevol_atomic_param, chosen_node, state_representation_dict: ty.Dict[int, ty.Set[str]], untargetable_node_set, cumulative_node_count, last_chosen_node, debug=False) -> ty.Tuple[dp.Node, int]:
         """Execute event on chosen node and bookkeep things
 
         Args:
@@ -353,7 +361,7 @@ class DnSSE(pgm.DistributionPGM):
         untargetable_node_set = set()
         reached_stop_condition = False
         start_state = a_start_state
-        state_representation_dict = dict((i, set()) for i in range(self.events.state_count)) # { 0: ["origin", "root"], 1: ["nd1", "nd2"], 2:["nd3",...], ... }
+        state_representation_dict: ty.Dict[int, ty.Set[str]] = dict((i, set()) for i in range(self.events.state_count)) # { 0: ["origin", "root"], 1: ["nd1", "nd2"], 2:["nd3",...], ... }
         last_chosen_node = None
         tr = dp.Tree()
 
@@ -551,9 +559,9 @@ class DnSSE(pgm.DistributionPGM):
     ### END simulation loop ###
 
 
-    def generate(self) -> ty.List[AnnotatedTree]:
+    def generate(self) -> ty.Optional[ty.List[ty.Any]]:
         # output
-        output = list()
+        output: ty.List[AnnotatedTree] = []
 
         # do something with self.runtime_limit
         start_time = time.time()
@@ -606,7 +614,7 @@ class DnSSE(pgm.DistributionPGM):
             return False
 
         if self.stop == "size":
-            if self.condition_on_speciation and len(ann_tr.root_node.child_nodes()) == 0:
+            if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:
                 return False
 
             if self.condition_on_survival and (ann_tr.n_extant_obs_nodes + ann_tr.n_sa_obs_nodes) != self.stop_val:
@@ -621,15 +629,19 @@ class DnSSE(pgm.DistributionPGM):
             #     return False
 
         elif self.stop == "age":
-            if ann_tr.with_origin:
+            if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
                 # tree is ok if either it reached the max age by epsilon, or if its age is smaller than max age
                 if abs(self.stop_val - ann_tr.origin_age) <= self.epsilon or ann_tr.origin_age < self.stop_val:
                     return True
                 elif ann_tr.origin_age > self.stop_val:
                     return False
 
-            else:
+            elif not ann_tr.with_origin and isinstance(ann_tr.root_age, float):
                 if self.stop_val >= ann_tr.root_age:
                     return True
                 else:
                     return False
+
+        # stop condition is neither "size" nor "age", and no conditioning was violated
+        # then something is off...
+        return False

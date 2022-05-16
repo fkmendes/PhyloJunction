@@ -57,7 +57,9 @@ class DnLogNormal(pgm.DistributionPGM):
 
         # makes sure these parameters are lists, or converts them into list
         # also multiplying element (when only one is provided) if necessary
-        self.vectorized_params = self.check_sample_size(pars[2:4])
+        check_sample_size_return = self.check_sample_size(pars[2:4])
+        if isinstance(check_sample_size_return, list):
+            self.vectorized_params = check_sample_size_return
 
         # params
         self.param_dict["mean_param"] = self.vectorized_params[0]
@@ -108,7 +110,7 @@ class DnLogNormal(pgm.DistributionPGM):
         return None
 
 
-    def check_sample_size(self, param_list) -> ty.List[ty.List[ty.Union[int, float, str]]]:
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
 
 
@@ -190,7 +192,9 @@ class DnNormal(pgm.DistributionPGM):
 
         # makes sure these parameters are lists, or converts them into list
         # also multiplying element (when only one is provided) if necessary
-        self.vectorized_params = self.check_sample_size(pars[2:4]) # one element per parameter
+        check_sample_size_return = self.check_sample_size(pars[2:4]) # one element per parameter
+        if isinstance(check_sample_size_return, list):
+            self.vectorized_params = check_sample_size_return
 
         # params
         self.param_dict["mean_param"] = self.vectorized_params[0]
@@ -238,7 +242,7 @@ class DnNormal(pgm.DistributionPGM):
         return None
 
 
-    def check_sample_size(self, param_list):
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
 
 
@@ -314,7 +318,9 @@ class DnExponential(pgm.DistributionPGM):
 
         # makes sure these parameters are lists, or converts them into list
         # also multiplying element (when only one is provided) if necessary
-        self.vectorized_params = self.check_sample_size(pars[2])
+        check_sample_size_return = self.check_sample_size([pars[2]]) # must convert to list because of method signature
+        if isinstance(check_sample_size_return, list):
+            self.vectorized_params = check_sample_size_return
 
         # params
         self.param_dict["scale_or_rate_param"] = self.vectorized_params[0]
@@ -362,7 +368,7 @@ class DnExponential(pgm.DistributionPGM):
         return None
 
 
-    def check_sample_size(self, param_list):
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
 
 
@@ -436,7 +442,9 @@ class DnGamma(pgm.DistributionPGM):
 
         # makes sure these parameters are lists, or converts them into lists
         # also multiplying element (when only one is provided) if necessary
-        self.vectorized_params = self.check_sample_size(pars[2:4])
+        check_sample_size_return = self.check_sample_size(pars[2:4]) # one element per parameter
+        if isinstance(check_sample_size_return, list):
+            self.vectorized_params = check_sample_size_return
 
         # params
         self.param_dict["shape_param"] = self.vectorized_params[0]
@@ -488,7 +496,7 @@ class DnGamma(pgm.DistributionPGM):
         return None
 
 
-    def check_sample_size(self, param_list: ty.List[ty.Any]) -> ty.List[ty.List[ty.Union[int, float, str]]]:
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
 
 
@@ -538,7 +546,9 @@ class DnUnif(pgm.DistributionPGM):
 
         # makes sure these parameters are lists, or converts them into lists
         # also multiplying element (when only one is provided) if necessary
-        self.vectorized_params = self.check_sample_size(pars[2:4])
+        check_sample_size_return = self.check_sample_size(pars[2:4]) # one element per parameter
+        if isinstance(check_sample_size_return, list):
+            self.vectorized_params = check_sample_size_return
 
         # params
         self.param_dict["min_param"] = self.vectorized_params[0]
@@ -587,7 +597,7 @@ class DnUnif(pgm.DistributionPGM):
         return None
 
 
-    def check_sample_size(self, param_list: ty.List[ty.Any]) -> ty.List[ty.List[ty.Union[int, float, str]]]:
+    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
 
 
