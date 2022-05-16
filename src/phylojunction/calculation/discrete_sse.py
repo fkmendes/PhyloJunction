@@ -20,10 +20,13 @@ class AtomicSSERateParameter():
 
     Supports vectorization of values only.
     """
+    
+    value: ty.List[float]
+    
     def __init__(self, val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], event: MacroevolEvent, name: str="", states: ty.List[int]=[0,0,0]):
         self.name = name
-        self.value: ty.List[float] = list()
-
+        self.value = []
+        
         # scalar
         # if not type(val) in (list, np.ndarray):
         # if type(val) in (int, float, str):
@@ -35,7 +38,7 @@ class AtomicSSERateParameter():
         # TODO: make sure that parametric distributions get output converted to list 
         # inside their own classes so the line below is not necessary (and mypy passes)
         # or type(val) == np.ndarray:
-        elif type(val) == list:
+        elif isinstance(val, list):
             # if isinstance(val, np.ndarray):
             #     val = val.tolist()
             if isinstance(val[0], (int, float, str, np.float64)):

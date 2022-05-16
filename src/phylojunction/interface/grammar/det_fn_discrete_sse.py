@@ -7,14 +7,14 @@ import utility.exception_classes as ec
 import pgm.pgm as pgm
 import calculation.discrete_sse as sseobj # type: ignore
 
-def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]):
+def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, str]):
     """Create SSEAtomicRate as prompted by deterministic function call. Still no support for vectorization.
 
     Args:
-        det_fn_param_dict (dict): dictionary containing parameter strings as keys and argument strings/NodePGM as value(s)
+        det_fn_param_dict (dict): dictionary containing parameter strings as keys, and lists of either strings or NodePGMs as value(s)
     """
 
-    def extract_value_from_pgmnodes(pgm_node_list: ty.List[ty.Union[str, pgm.NodePGM]]) -> ty.List[ty.List[float]]:
+    def extract_value_from_pgmnodes(pgm_node_list: ty.List[pgm.NodePGM]) -> ty.List[float]:
         """_summary_
 
         Args:
@@ -28,7 +28,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
             ty.List[ty.List[float]]: _description_
         """
         many_nodes_pgm = len(pgm_node_list) > 1
-        v_list: ty.List[ty.List[float]] = []
+        v_list: ty.List[float] = []
 
         for node_pgm in pgm_node_list:
             
@@ -63,14 +63,18 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
         if arg == "value":
             if not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without value. Exiting...")
             
-            value: ty.List[ty.List[float]] = []
+            value: ty.List[float] = []
+            
             # val is a list of random variable objects
             # if type(val[0]) != str:
             if isinstance(val[0], pgm.NodePGM):
+                val = ty.cast(ty.List[pgm.NodePGM], val)
                 value = extract_value_from_pgmnodes(val)
             
             # val is a list of strings
-            else: value = val
+            elif isinstance(val[0], str):
+                val = ty.cast(ty.List[str], val)
+                value = [float(v) for v in val]
 
         elif arg == "name" and not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without name. Exiting...")
         
@@ -104,54 +108,54 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
         return sseobj.AtomicSSERateParameter(name=det_fn_param_dict["name"][0], val=value, event=event_type)
 
 
-def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
+def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.Union[ty.List[str], ty.List[pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
 
     if not det_fn_param_dict:
         raise ec.NoSpecificationError(message="Cannot initialize SSE stash without specifications. Exiting...")
 
     _n_states: int = 1
     _n_time_slices: int = 1
-    _time_slice_age_ends: ty.List[str] = None
-    _seed_age_for_time_slicing: float = None
-    _flat_rate_mat = None
+    _time_slice_age_ends: ty.List[float] = []
+    _seed_age_for_time_slicing: ty.Optional[float] = None
+    _flat_rate_mat: ty.List[pgm.DeterministicNodePGM]
     # val is a list
     for arg, val in det_fn_param_dict.items():
-        if arg == "n_states":
-            try:
-                _n_states = int(val[0]) # TODO: Forbid different number of states here, so if len(val[0]) > 1, throw exception)
-            
-            except:
-                raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_states\'. Function was sse_stash().")
+        # so mypy won't complain
+        if isinstance(val[0], str):
+            if arg == "n_states":
+                try:
+                    _n_states = int(val[0]) # TODO: Forbid different number of states here, so if len(val[0]) > 1, throw exception)
+                
+                except:
+                    raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_states\'. Function was sse_stash().")
 
-        if arg == "n_epochs":
-            try:
-                _n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
-            except:
-                raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_stash().")
+            if arg == "n_epochs":
+                try:
+                    _n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
+                except:
+                    raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_stash().")
 
-        if arg == "seed_age":
-            try:
-                # TODO: Forbid different seed ages, because I will forbid different time slice age ends
-                # (if you allow different seed ages, those might be younger than time slice ends
-                _seed_age_for_time_slicing = float(val[0])
-            
-            except:
-                raise ec.FunctionArgError(arg, "Was expecting a float. Function was sse_stash().")
+            if arg == "seed_age":
+                try:
+                    # TODO: Forbid different seed ages, because I will forbid different time slice age ends
+                    # (if you allow different seed ages, those might be younger than time slice ends
+                    _seed_age_for_time_slicing = float(val[0])
+                
+                except:
+                    raise ec.FunctionArgError(arg, "Was expecting a float. Function was sse_stash().")
 
-        if arg == "epoch_age_ends":
-            try: 
-                _time_slice_age_ends = [float(v) for v in val]
+            if arg == "epoch_age_ends":
+                try:
+                    _time_slice_age_ends = [float(v) for v in val if isinstance(v, str)]
 
-            except: 
-                raise ec.FunctionArgError(arg, "Could not convert epoch bound ages to floats. Function was sse_stash().")
+                except: 
+                    raise ec.FunctionArgError(arg, "Could not convert epoch bound ages to floats. Function was sse_stash().")
 
-            if len(val) != (_n_time_slices - 1):
-                print(len(val))
-                print(_n_time_slices)
-                raise ec.FunctionArgsMismatchError("\"sse_wrap\" expects that the number of epoch ends is equal to the number of epochs minus 1")
+                if len(val) != (_n_time_slices - 1):
+                    raise ec.FunctionArgsMismatchError("sse_wrap", "\"sse_wrap\" expects that the number of epoch ends is equal to the number of epochs minus 1")
     
     try:
-        _flat_rate_mat = det_fn_param_dict["flat_rate_mat"] # list of NodePGM's
+        _flat_rate_mat = [v for v in det_fn_param_dict["flat_rate_mat"] if isinstance(v, pgm.DeterministicNodePGM)] # list of NodePGM's
 
         # number of rates has to be divisible by number of slices
         if len(_flat_rate_mat) % _n_time_slices != 0:
