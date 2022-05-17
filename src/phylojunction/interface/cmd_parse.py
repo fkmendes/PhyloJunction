@@ -119,7 +119,7 @@ def cmdline2pgm(pgm_obj, cmd_line):
 def parse_variable_assignment(pgm_obj, rv_name, rv_spec, cmd_line):
 
     def create_add_rv_pgm(a_rv_name, sample_size, a_val_obj_list):
-        rv_pgm = pgmc.StochasticNodePGM(a_rv_name, sample_size=sample_size, value=a_val_obj_list, clamped=True)
+        rv_pgm = pgm.StochasticNodePGM(a_rv_name, sample_size=sample_size, value=a_val_obj_list, clamped=True)
         pgm_obj.add_node(rv_pgm)
 
     #############
@@ -163,7 +163,7 @@ def parse_samp_dn_assignment(pgm_obj, rv_name, rv_dn_spec, cmd_line):
 
     def create_add_rv_pgm(a_rv_name, sample_size, replicate_size, a_dn_obj, parent_pgm_nodes, clamped):
         # set dn inside rv, then call .sample
-        rv_pgm = pgmc.StochasticNodePGM(a_rv_name, sample_size=sample_size, replicate_size=replicate_size, sampled_from=a_dn_obj, parent_nodes=parent_pgm_nodes, clamped=clamped)
+        rv_pgm = pgm.StochasticNodePGM(a_rv_name, sample_size=sample_size, replicate_size=replicate_size, sampled_from=a_dn_obj, parent_nodes=parent_pgm_nodes, clamped=clamped)
         pgm_obj.add_node(rv_pgm)
 
     if len(re.search(cmdu.sampling_dn_spec_regex, rv_dn_spec).groups()) != 2:

@@ -93,7 +93,7 @@ class DistributionPGM(ABC):
         pass
 
     @abstractmethod
-    def generate(self) -> ty.Optional[ty.List[ty.Any]]:
+    def generate(self) -> ty.List[ty.Any]:
         pass
 
     @abstractmethod

@@ -169,10 +169,10 @@ class RequireScalarError(Exception):
     dn_name: str
     message: str
 
-    def __init__(self, dn_name: str, arg: str, message: str="") -> None:
+    def __init__(self, dn_name: str, arg: str) -> None:
         self.dn_name = dn_name
         self.arg = arg
-        self.message = message
+        self.message = ""
         
     def __str__(self) -> str:
         return "ERROR: When specifying distribution " + self.dn_name + "'s parameter " + self.arg + ", more than one value was provided. A scalar is required. Exiting..."

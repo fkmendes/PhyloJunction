@@ -72,7 +72,7 @@ class RequireScalarError(Exception):
     dn_name: str
     message: str
     arg: Incomplete
-    def __init__(self, dn_name: str, arg: str, message: str = ...) -> None: ...
+    def __init__(self, dn_name: str, arg: str) -> None: ...
 
 class ReplicateNumberError(Exception):
     node_pgm_name: str

@@ -561,7 +561,7 @@ class DnSSE(pgm.DistributionPGM):
     ### END simulation loop ###
 
 
-    def generate(self) -> ty.Optional[ty.List[ty.Any]]:
+    def generate(self) -> ty.List[AnnotatedTree]:
         # output
         output: ty.List[AnnotatedTree] = []
 
