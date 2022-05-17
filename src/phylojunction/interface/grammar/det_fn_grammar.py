@@ -5,7 +5,7 @@ import typing as ty
 # pj imports
 import calculation.discrete_sse as sseobj
 import utility.exception_classes as ec
-import det_fn_discrete_sse as detsse
+import interface.grammar.det_fn_discrete_sse as detsse
 import pgm.pgm as pgm
 
 class PJDetFnGrammar():

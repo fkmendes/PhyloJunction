@@ -9,7 +9,7 @@ import pgm.pgm as pgm
 import utility.exception_classes as ec
 
 
-def make_discrete_SSE_dn(dn_param_dict):
+def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> pgm.DistributionPGM:
 
     ############################
     # Validating dn_param_dict #
@@ -19,47 +19,63 @@ def make_discrete_SSE_dn(dn_param_dict):
 
     # default values for args that are not mandatory
     # all remaining args must be specified
-    n_repl = 1
-    event_handler = None
-    stop, stop_value = str(), str()
-    origin, cond_spn, cond_surv = True, False, True
-    start_states_list = list()
-    eps = 1e-12
-    runtime_limit = 5 # 5 minutes
+    _n: int = 1
+    _n_repl: int = 1
+    _event_handler: sseobj.MacroEvolEventHandler = sseobj.MacroEvolEventHandler(sseobj.FIGRatesManager([[]], 1))
+    _stop: str
+    _stop_value: float
+    origin: bool = True
+    cond_spn: bool = False
+    cond_surv: bool = True
+    _start_states_list: ty.List[int]
+    eps: float = 1e-12
+    runtime_limit: int = 5 # 5 minutes
 
     # input validation (only things that are not already done by DnSSE)
     # NOTE: val is a list!
     for arg, val in dn_param_dict.items():
-        if val:
-            if arg == "meh":
-                meh_det_output_pgm = dn_param_dict["meh"][0] # there should be only one event handler always, but it will be in list
-                event_handler = meh_det_output_pgm.value
+        if val and isinstance(val[0], str):
+            first_val = val[0]
 
-            if arg in ("n", "nr", "runtime_limit"):
-                try: int_val = int(val[0]) # no vectorization allowed here
+            if arg == "meh" and isinstance(first_val, pgm.NodePGM):
+                nodepgm_val = first_val.value
+                
+                if isinstance(nodepgm_val, sseobj.MacroEvolEventHandler):
+                # there should be only one event handler always, but it will be in list
+                    _event_handler = nodepgm_val
+
+            elif arg in ("n", "nr", "runtime_limit"):
+                try:
+                    # if isinstance(first_val, str):
+                    int_val = int(first_val) # no vectorization allowed here
                 except: raise ec.FunctionArgError(arg, "Was expecting an integer. Distribution discrete_sse() could not be initialized.")
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
-                if arg == "n": n = int_val
+                if arg == "n": _n = int_val
                 if arg == "runtime_limit": runtime_limit = int_val
-                if arg == "nr": n_repl = int_val
+                if arg == "nr": _n_repl = int_val
 
-            if arg == "stop":
-                stop = val[0].replace("\"", "")
+            elif arg == "stop":
+                # if isinstance(first_val, str):
+                _stop = first_val.replace("\"", "")
 
-            if arg == "stop_value":
-                try: stop_value = float(val[0])
+            elif arg == "stop_value":
+                try:
+                    # if isinstance(first_val, str):
+                    stop_val = float(first_val)
                 except: raise ec.FunctionArgError(arg, "Was expecting a float. Distribution discrete_sse() could not be initialized.")
 
-                stop_value = float(val[0])
+                _stop_value = stop_val
+                # stop_value = float(first_val)
 
             # TODO deal with vectorization later
-            if arg in ("origin", "cond_spn", "cond_surv"):
-                if val[0] != "\"true\"" and val[0] != "\"false\"":
+            elif arg in ("origin", "cond_spn", "cond_surv"):
+                if first_val != "\"true\"" and first_val != "\"false\"":
                     raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\". Distribution discrete_sse() could not be initialized.")
 
                 else:
-                    parsed_val = val[0].replace("\"", "")
+                    #if isinstance(first_val, str):
+                    parsed_val = first_val.replace("\"", "")
 
                     if arg == "origin" and parsed_val == "true": origin = True
                     elif arg == "origin" and parsed_val == "false": origin = False
@@ -68,25 +84,29 @@ def make_discrete_SSE_dn(dn_param_dict):
                     elif arg == "cond_surv" and parsed_val == "true": cond_surv = True
                     elif arg == "cond_surv" and parsed_val == "false": cond_surv = False
 
-            if arg == "start_state":
-                start_states_list = [int(v) for v in val]
+            elif arg == "start_state":
+                _start_states_list = [int(v) for v in val if isinstance(v, str)]
 
             # if user specified epsilon, we use it, otherwise default is used
             if arg == "eps":
-                try: float_val = float(val[0]) # no vectorization allowed here
+                try:
+                    # if isinstance(first_val, str):
+                    float_val = float(first_val) # no vectorization allowed here
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting a double. Distribution discrete_sse() could not be initialized.")
 
                 eps = float_val
 
+    
+
     return dnsse.DnSSE(
-        n=n,
-        n_replicates=n_repl,
-        stop=stop,
-        stop_value=stop_value,
+        _event_handler,
+        _stop_value,
+        n=_n,
+        n_replicates=_n_repl,
+        stop=_stop,
         origin=origin,
-        event_handler=event_handler,
-        start_states_list=start_states_list,
+        start_states_list=_start_states_list,
         condition_on_speciation=cond_spn,
         condition_on_survival=cond_surv,
         epsilon=eps,
@@ -124,7 +144,7 @@ if __name__ == "__main__":
 
     det_nd_pgm = pgm.DeterministicNodePGM("events", value=event_handler, parent_nodes=None)
 
-    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.DeterministicNodePGM]]]
+    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
     dn_param_dict["n"] = ["1"]
     dn_param_dict["nr"] = ["1"]
     dn_param_dict["meh"] = [det_nd_pgm]

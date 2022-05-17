@@ -5,11 +5,11 @@ import typing as ty
 # pj imports
 import distribution.dn_parametric as dnpar
 import pgm.pgm as pgm
-import make_dn_discrete_sse as make_dnsse
+import interface.grammar.make_dn_discrete_sse as make_dnsse
 import utility.exception_classes as ec
 # from user_interface.dn_discrete_sse import make_discrete_SSE_dn # https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 
-class DnGrammar():
+class PJDnGrammar():
 
     dn_grammar_dict: ty.Dict[str, ty.Tuple[str, ...]]
 
@@ -43,7 +43,7 @@ class DnGrammar():
         return False
 
     @classmethod
-    def extract_value_from_rvpgm(cls, val_list: ty.List[ty.Union[str, pgm.StochasticNodePGM]]) -> ty.List[str]:
+    def extract_value_from_nodepgm(cls, val_list: ty.List[ty.Union[str, pgm.NodePGM]]) -> ty.List[str]:
         """
         Return copy of val_list if all elements are strings representing values.
         When elements are StochasticNodePGMs, replaces those objects by their values cast to string.
@@ -64,20 +64,20 @@ class DnGrammar():
         return extracted_val_list
 
     @classmethod
-    def init_return_discrete_SSE_dn(cls, det_fn_param_dict) -> pgm.DistributionPGM:
+    def init_return_discrete_SSE_dn(cls, dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> pgm.DistributionPGM:
         # dn_param_dict is validated inside
-        return make_dnsse.make_discrete_SSE_dn(det_fn_param_dict) # returns dnssewrap
+        return make_dnsse.make_discrete_SSE_dn(dn_param_dict) # returns dnssewrap
 
     @classmethod
-    def create_dn_obj(cls, dn_id: str, dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.StochasticNodePGM]]]) -> pgm.DistributionPGM:
+    def create_dn_obj(cls, dn_id: str, dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> pgm.DistributionPGM:
         """_summary_
 
         Args:
-            dn_id (_type_): _description_
-            dn_param_dict (_type_): _description_
+            dn_id (str): Name of the distribution one wants to create
+            dn_param_dict (dict): Dictionary containing distribution parameter names (str) as keys and lists (of either strings or StochasticNodePGMs) as values
 
         Returns:
-            _type_: _description_
+            DistributionPGM: a DistributionPGM instance
         """
 
         _extracted_val: ty.List[str]
@@ -87,11 +87,11 @@ class DnGrammar():
         #################################
         if dn_id == "lognormal":
             # pars = [1, 1, [0.0], [1.0], True] # log-space True by default
-            _ln_n_draws: int
-            _ln_n_repl: int
-            _ln_mean: ty.List[float]
-            _ln_sd: ty.List[float]
-            _ln_log_space: bool
+            _ln_n_draws: int = 1
+            _ln_n_repl: int = 1
+            _ln_mean: ty.List[float] = [1.0]
+            _ln_sd: ty.List[float] = [1.0]
+            _ln_log_space: bool = True
             parent_node_tracker = dict() # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
 
             if dn_param_dict:
@@ -103,7 +103,7 @@ class DnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name 
                     
-                    _extracted_val = cls.extract_value_from_rvpgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
+                    _extracted_val = cls.extract_value_from_nodepgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
 
                     if not cls.grammar_check("lognormal", arg):
                         raise ec.NotAParameterError(arg)
@@ -151,7 +151,7 @@ class DnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name
                     
-                    _extracted_val = cls.extract_value_from_rvpgm(val)
+                    _extracted_val = cls.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("normal", arg):
                         raise ec.NotAParameterError(arg)
@@ -192,7 +192,7 @@ class DnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name # needed for building inference specifications
                     
-                    _extracted_val = cls.extract_value_from_rvpgm(val)
+                    _extracted_val = cls.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("exponential", arg):
                         raise ec.NotAParameterError(arg)
@@ -238,7 +238,7 @@ class DnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name
                     
-                    _extracted_val = cls.extract_value_from_rvpgm(val)
+                    _extracted_val = cls.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("gamma", arg):
                         raise ec.NotAParameterError(arg)
@@ -286,7 +286,7 @@ class DnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name # needed for building inference specifications
                     
-                    _extracted_val = cls.extract_value_from_rvpgm(val)
+                    _extracted_val = cls.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("unif", arg):
                         raise ec.NotAParameterError(arg)

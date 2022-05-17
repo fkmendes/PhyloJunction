@@ -5,9 +5,9 @@ import io
 
 # pj imports
 import pgm.pgm as pgm
-import user_interface.phylojunction_inference as pjinf
-import user_interface.phylojunction_io as pjio
-import user_interface.cmd_parse_utils as cmdu
+# import user_interface.phylojunction_inference as pjinf
+# import user_interface.phylojunction_io as pjio
+import interface.cmd_parse_utils as cmdu
 import interface.grammar.dn_grammar as dngrammar
 import interface.grammar.det_fn_grammar as detgrammar
 import utility.exception_classes as ec
@@ -22,7 +22,7 @@ def script2pgm(file_handle):
         file_handle (file object): Path to script .txt file
     """
 
-    pgm_obj = pgm.ProbabilisticGraphicalModel
+    pgm_obj = pgm.ProbabilisticGraphicalModel()
 
     for line in file_handle:
 
@@ -43,10 +43,10 @@ def script2pgm(file_handle):
                 # print("node_pgm vals = " + str(node_pgm))
 
     # as if we had clicked "See" in the inference tab
-    all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, "./inference_test/", mcmc_chain_length=1000, prefix="test")
-    for i, ith_sim_model_spec in enumerate(all_sims_model_spec_list):
-        print(ith_sim_model_spec)
-        print(all_sims_mcmc_logging_spec_list[i])
+    # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, "./inference_test/", mcmc_chain_length=1000, prefix="test")
+    # for i, ith_sim_model_spec in enumerate(all_sims_model_spec_list):
+    #     print(ith_sim_model_spec)
+    #     print(all_sims_mcmc_logging_spec_list[i])
 
     # pjio.output_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix="test")
 
@@ -173,12 +173,12 @@ def parse_samp_dn_assignment(pgm_obj, rv_name, rv_dn_spec, cmd_line):
     else:
         dn_name, dn_spec = re.search(cmdu.sampling_dn_spec_regex, rv_dn_spec).groups()
 
-        if not dn_name in dngrammar.dn_grammar_dict:
+        if not dn_name in dngrammar.PJDnGrammar.dn_grammar_dict:
             raise ec.ScriptSyntaxError(rv_dn_spec, "Something went wrong during sampling distribution specification. Distribution name not recognized. Exiting...")
 
         # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
         spec_dict, parent_pgm_nodes = cmdu.parse_spec(pgm_obj, dn_spec, cmd_line)
-        dn_obj = dngrammar.create_dn_obj(dn_name, spec_dict)
+        dn_obj = dngrammar.PJDnGrammar.create_dn_obj(dn_name, spec_dict)
 
         # deal with clamping
         clamped = False
@@ -234,13 +234,13 @@ def parse_deterministic_function_assignment(pgm_obj, det_nd_name, det_fn_spec, c
     else:
         det_fn_name, dn_spec = re.search(cmdu.sampling_dn_spec_regex, det_fn_spec).groups()
 
-        if not det_fn_name in detgrammar.det_fn_grammar_dict:
+        if not det_fn_name in detgrammar.PJDetFnGrammar.det_fn_grammar_dict:
             raise ec.ScriptSyntaxError(det_fn_spec, "Something went wrong during sampling distribution specification. Distribution name not recognized. Exiting...")
 
         # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
         spec_dict, parent_pgm_nodes = cmdu.parse_spec(pgm_obj, dn_spec, cmd_line)
 
-        det_fn_obj = detgrammar.create_det_fn_obj(det_fn_name, spec_dict)
+        det_fn_obj = detgrammar.PJDetFnGrammar.create_det_fn_obj(det_fn_name, spec_dict)
 
         create_add_det_nd_pgm(det_nd_name, det_fn_obj, parent_pgm_nodes)
 

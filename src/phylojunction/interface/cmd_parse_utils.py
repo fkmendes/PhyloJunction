@@ -61,7 +61,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel, val: ty.List[str]) -> t
 
 def parse_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, fn_spec_str: str, cmd_line: str) -> ty.Tuple[ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]], ty.List[pgm.NodePGM]]:
     spec_dict: ty.Dict[str, str] = tokenize_fn_spec(fn_spec_str, cmd_line)
-    spec_dict_return: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]
+    spec_dict_return: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
 
     parent_pgm_nodes = list()
     for param_name, an_arg in spec_dict.items():

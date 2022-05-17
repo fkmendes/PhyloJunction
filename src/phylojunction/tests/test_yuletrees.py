@@ -48,7 +48,7 @@ class TestYuleTrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.event_handler, n=n_sim, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin,
+            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
                     start_states_list=start_states_list, condition_on_survival=True,
                     epsilon=1e-12, runtime_limit=3000)
 
@@ -117,7 +117,7 @@ class TestYuleTrees(unittest.TestCase):
         # simulations
         sim_batches = list()
         for i in range(n_batches):
-            sse_sim = distsse.DnSSE(self.event_handler, n=n_sim, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin,
+            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
                     start_states_list=start_states_list, epsilon=1e-8, runtime_limit=3000,
                     debug=False)
 

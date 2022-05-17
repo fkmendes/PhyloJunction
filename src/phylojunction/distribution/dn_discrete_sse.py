@@ -81,7 +81,7 @@ class DnSSE(pgm.DistributionPGM):
     debug: bool
 
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
-    def __init__(self, event_handler: sseobj.MacroEvolEventHandler, n: int=1, n_replicates: int=1, stop: str="", stop_value: str="", origin: bool=True,
+    def __init__(self, event_handler: sseobj.MacroEvolEventHandler, stop_value: float, n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
                 start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=False,
                 seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
 
@@ -90,7 +90,7 @@ class DnSSE(pgm.DistributionPGM):
         self.n_repl = n_replicates # number of replicate trees (in plate) for a given simulation
         self.with_origin = origin
         self.stop = stop
-        self.stop_val = float(stop_value)
+        self.stop_val = stop_value
         self.condition_on_speciation = condition_on_speciation
         self.condition_on_survival = condition_on_survival
 

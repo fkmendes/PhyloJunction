@@ -21,6 +21,12 @@ class ProbabilisticGraphicalModel:
     def get_sorted_node_pgm_list(self): ...
 
 class DistributionPGM(ABC, metaclass=abc.ABCMeta):
+
+    @property
+    @abstractmethod
+    def DN_NAME(self):
+        pass
+
     @abstractmethod
     def __init__(self): ...
     @abstractmethod

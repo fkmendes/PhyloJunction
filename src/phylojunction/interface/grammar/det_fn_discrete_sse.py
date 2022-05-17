@@ -58,6 +58,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
 
     event_type = None
     value: ty.List[float] = []
+    the_states: ty.List[int] = []
 
     # val is a list
     for arg, val in det_fn_param_dict.items():
@@ -96,7 +97,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
 
             # make it a list of integers
             if not event_type == sseobj.MacroevolEvent.EXTINCTION:
-                the_states: ty.List[int] = ty.cast(ty.List[int], val) # need to declare cast_val separately so mypy won't complain
+                the_states = ty.cast(ty.List[int], val) # need to declare cast_val separately so mypy won't complain
 
     sse_rate_name = det_fn_param_dict["name"][0]
     
