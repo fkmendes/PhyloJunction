@@ -57,13 +57,12 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
         raise ec.NoSpecificationError(message="Cannot initialize SSE rate without specifications. Exiting...")
 
     event_type = None
-    the_states = None
+    value: ty.List[float] = []
+
     # val is a list
     for arg, val in det_fn_param_dict.items():
         if arg == "value":
-            if not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without value. Exiting...")
-            
-            value: ty.List[float] = []
+            if not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without value. Exiting...")        
             
             # val is a list of random variable objects
             # if type(val[0]) != str:
@@ -97,15 +96,21 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
 
             # make it a list of integers
             if not event_type == sseobj.MacroevolEvent.EXTINCTION:
-                the_states = val
+                the_states: ty.List[int] = ty.cast(ty.List[int], val) # need to declare cast_val separately so mypy won't complain
 
+    sse_rate_name = det_fn_param_dict["name"][0]
+    
     if the_states:
         # TODO: deal with vectorization later
-        return sseobj.AtomicSSERateParameter(name=det_fn_param_dict["name"][0], val=value, event=event_type, states=the_states)
+        if isinstance(sse_rate_name, str):
+            # see 'invariance vs covariance' in mypy's doc for why list() is called here
+            return sseobj.AtomicSSERateParameter(name=sse_rate_name, val=list(value), event=event_type, states=the_states)
     
     else:
         # TODO: deal with vectorization later
-        return sseobj.AtomicSSERateParameter(name=det_fn_param_dict["name"][0], val=value, event=event_type)
+        if isinstance(sse_rate_name, str):
+            # see 'invariance vs covariance' in mypy's doc for why list() is called here
+            return sseobj.AtomicSSERateParameter(name=sse_rate_name, val=list(value), event=event_type)
 
 
 def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
@@ -174,7 +179,10 @@ def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[
 
         atomic_rate_params: ty.List[sseobj.AtomicSSERateParameter] = []
         for atomic_rate_param_det_nd in _flat_rate_mat[i:(i+_n_rate_params_per_slice)]:
-            atomic_rate_params.append(atomic_rate_param_det_nd.value)
+
+            # so mypy won't complain
+            if isinstance(atomic_rate_param_det_nd.value, sseobj.AtomicSSERateParameter):
+                atomic_rate_params.append(atomic_rate_param_det_nd.value)
         
         _matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of AtomicSSERateParameters
                                                               # 1D: time slices, 2D: atomic SSE rate list

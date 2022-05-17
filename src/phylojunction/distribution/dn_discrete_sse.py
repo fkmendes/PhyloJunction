@@ -14,12 +14,12 @@ import dendropy as dp # type: ignore
 
 # pj imports
 import pgm.pgm as pgm
-import distribution.dn_parametric as dnpar # type: ignore
-## could not get dn_parametric's stub to be seen by mypy... will ignore... if don't ignore it, also get several errors being spit out by mypy that require "--no-implicit-reexport" flag
 import calculation.discrete_sse as sseobj
 import utility.helper_functions as pjh
 import utility.exception_classes as ec
 from data.tree import AnnotatedTree
+import distribution.dn_parametric as dnpar # type: ignore
+## could not get dn_parametric's stub to be seen by mypy... will ignore... if don't ignore it, also get several errors being spit out by mypy that require "--no-implicit-reexport" flag
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -73,7 +73,7 @@ class DnSSE(pgm.DistributionPGM):
     start_states: ty.List[int]
     state_count: int
     n_time_slices: int
-    slice_t_ends: ty.List[float]
+    slice_t_ends: ty.List[ty.Optional[float]]
     seed_age: ty.Optional[float]
     seeds: ty.Optional[ty.List[int]]
     epsilon: float    
@@ -99,6 +99,9 @@ class DnSSE(pgm.DistributionPGM):
         self.events = event_handler # carries all parameters, number of states and of slices        
         self.state_count = self.events.state_count
         self.n_time_slices = self.events.n_time_slices
+        # if isinstance(self.events.slice_t_ends, list):
+        #     self.slice_t_ends = [float(t_end) for t_end in self.events.slice_t_ends if t_end] # so mypy won't complain
+        # else:
         self.slice_t_ends = self.events.slice_t_ends
         self.seed_age = self.events.seed_age # used just for verifying inputs
 
@@ -448,25 +451,27 @@ class DnSSE(pgm.DistributionPGM):
 
             # (3) get end time of this slice (user provides it as end ages,
             # but FIGManager converts it to time ends)
-            # print("self.slice_t_ends = ")
-            # print(self.slice_t_ends)
-            # print("time_slice_idx = " + str(time_slice_idx))
-            next_max_t = self.slice_t_ends[time_slice_idx]
+            _next_max_t: float
+            _t_end = self.slice_t_ends[time_slice_idx]
+            if isinstance(_t_end, float):
+                _next_max_t = _t_end
 
             # (4) check if new event time cut throw the end of a time slice, provided
             # there is more than 1 time slice, and that a max age was specified
             # through the "age stop condition"
+            # 
+            # next_max_t will be None if self.slice_t_ends is empty
             excess_t = 0.0
-            if self.stop == "age" and self.n_time_slices > 1 and latest_t > next_max_t:
-                excess_t = latest_t - next_max_t
-                latest_t = next_max_t
+            if self.stop == "age" and self.n_time_slices > 1 and latest_t > _next_max_t:
+                excess_t = latest_t - _next_max_t
+                latest_t = _next_max_t
                 time_slice_idx += 1
 
                 # extend all lineages (could keep just the extend in the else-block
                 # below) and keep everything up-to-date
                 extend_all_living_nodes(t_to_next_event - excess_t)
 
-                if next_max_t == t_stop:
+                if _next_max_t == t_stop:
                     reached_stop_condition = True
                     break
 

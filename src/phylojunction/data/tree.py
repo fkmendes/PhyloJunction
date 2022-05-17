@@ -33,7 +33,7 @@ class AnnotatedTree(dp.Tree):
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]
-    slice_t_ends: ty.Optional[ty.List[float]] # can be None
+    slice_t_ends: ty.List[ty.Optional[float]]
     slice_age_ends: ty.Optional[ty.List[float]] # can be None
     n_extant_obs_nodes: int
     n_extinct_obs_nodes: int
@@ -46,7 +46,7 @@ class AnnotatedTree(dp.Tree):
                 total_state_count: int,
                 start_at_origin: bool=False,
                 max_age: ty.Optional[float]=None,
-                slice_t_ends: ty.Optional[ty.List[float]]=None,
+                slice_t_ends: ty.List[ty.Optional[float]]=[],
                 slice_age_ends: ty.Optional[ty.List[float]]=None,
                 epsilon: float=1e-12):
 
@@ -499,7 +499,7 @@ def get_gcf_ann_tree(ann_tr: AnnotatedTree, axes: plt.Axes, use_age: bool=False,
         if use_age and ann_tr.slice_age_ends:
             xs = ann_tr.slice_age_ends[1:] # ignore present
         elif ann_tr.slice_t_ends:
-            xs = ann_tr.slice_t_ends[:-1]
+            xs = [t_end for t_end in ann_tr.slice_t_ends[:-1] if isinstance(t_end, float)] # so mypy won't complain
 
         for x in xs:
             axes.axvline(x=x, color="deeppink")

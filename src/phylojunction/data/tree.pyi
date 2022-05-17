@@ -20,7 +20,7 @@ class AnnotatedTree(dp.Tree):
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]
-    slice_t_ends: ty.Optional[ty.List[float]]
+    slice_t_ends: ty.List[ty.Optional[float]]
     slice_age_ends: ty.Optional[ty.List[float]]
     n_extant_obs_nodes: int
     n_extinct_obs_nodes: int
@@ -28,7 +28,7 @@ class AnnotatedTree(dp.Tree):
     extant_obs_nodes_labels: ty.Tuple[str, ...]
     extinct_obs_nodes_labels: ty.Tuple[str, ...]
     root_edge_length: Incomplete
-    def __init__(self, a_tree: dp.Tree, total_state_count: int, start_at_origin: bool = ..., max_age: ty.Optional[float] = ..., slice_t_ends: ty.Optional[ty.List[float]] = ..., slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
+    def __init__(self, a_tree: dp.Tree, total_state_count: int, start_at_origin: bool = ..., max_age: ty.Optional[float] = ..., slice_t_ends: ty.List[ty.Optional[float]] = ..., slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
     def count_sampled_ancestors(self) -> None: ...
     def count_observable_nodes(self) -> None: ...
     def count_observable_node_states(self) -> None: ...

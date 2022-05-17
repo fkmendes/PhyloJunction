@@ -1,5 +1,5 @@
 import sys
-sys.path.extend(["./", "../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/utility/)
+sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/utility/)
 import time
 import typing as ty
 import numpy as np # type: ignore

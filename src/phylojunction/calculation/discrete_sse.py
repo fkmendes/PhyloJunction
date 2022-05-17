@@ -111,7 +111,7 @@ class FIGRatesManager:
     might become vectorized.
     """
 
-    slice_t_ends: ty.Optional[ty.List[ty.Optional[float]]]
+    slice_t_ends: ty.List[ty.Optional[float]]
 
     # NOTE: This class is flexible in that it allows different parameter
     # numbers per time slice, for whatever that is worth. However, the
@@ -223,7 +223,7 @@ class MacroEvolEventHandler():
     # that forces the user to specify the same number of parameters in
     # all time slices
 
-    slice_t_ends: ty.Optional[ty.List[ty.Optional[float]]]
+    slice_t_ends: ty.List[ty.Optional[float]]
 
     def __init__(self, a_fig_rates_manager: FIGRatesManager):
         self.fig_rates_manager = a_fig_rates_manager
