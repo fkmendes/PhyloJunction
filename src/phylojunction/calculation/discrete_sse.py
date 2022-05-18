@@ -274,6 +274,7 @@ class MacroEvolEventHandler():
 
         total_rate = 0.0
         state_rates = [0.0 for i in range(len(state_representation_dict))]
+
         for state_idx, nd_labels in state_representation_dict.items():
             # if departing state is provided, then we do not care about rates not departing from it
             if departing_state is not None and departing_state != state_idx:

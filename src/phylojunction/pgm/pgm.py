@@ -11,6 +11,9 @@ from abc import ABC, abstractmethod
 import utility.exception_classes as ec
 from data.tree import AnnotatedTree
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 class ProbabilisticGraphicalModel():
     def __init__(self):
         self.node_dict = dict() # keys are proper PGM nodes, values are their values
@@ -301,8 +304,9 @@ class StochasticNodePGM(NodePGM):
             # has objects like AtomicSSERateParameter inside list of values
             else:
                 # TODO: later see how rev moves 2D-arrays and tree nodes
-                print("value has objects inside")
-                print(self.value)
+                # print("value has objects inside")
+                # print(self.value)
+                pass
         else:
             # TODO: later see how rev moves 2D-arrays and tree nodes
             raise RuntimeError("Could not determine dimension of StochasticNodePGM when figuring out operator weight. Exiting...")

@@ -46,7 +46,7 @@ class PJDnGrammar():
     def extract_value_from_nodepgm(cls, val_list: ty.List[ty.Union[str, pgm.NodePGM]]) -> ty.List[str]:
         """
         Return copy of val_list if all elements are strings representing values.
-        When elements are StochasticNodePGMs, replaces those objects by their values cast to string.
+        When elements are StochasticNodePGMs, replaces those objects by their values cast to string (their values must be within a list).
         If StochasticNodePGMs objects do not have .value field or if they cannot be string-fied, 
         raise exception.
         """
@@ -57,7 +57,7 @@ class PJDnGrammar():
             
             elif isinstance(v, pgm.StochasticNodePGM):
                 try:
-                    extracted_val_list.append(str(v.value))
+                    extracted_val_list.extend([str(i) for i in v.value])
                 except:
                     raise ec.VariableMisspec(str(v))
 
@@ -86,11 +86,13 @@ class PJDnGrammar():
         #  Parametric distributions #
         #################################
         if dn_id == "lognormal":
-            # pars = [1, 1, [0.0], [1.0], True] # log-space True by default
+            #############################
+            # IMPORTANT: Default values #
+            #############################
             _ln_n_draws: int = 1
             _ln_n_repl: int = 1
-            _ln_mean: ty.List[float] = [1.0]
-            _ln_sd: ty.List[float] = [1.0]
+            _ln_mean: ty.List[float] = []
+            _ln_sd: ty.List[float] = []
             _ln_log_space: bool = True
             parent_node_tracker = dict() # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
 
@@ -132,15 +134,22 @@ class PJDnGrammar():
                             # pars[4] = False
                             _ln_log_space = False
 
+            # making sure essential parameters of distribution have been specified
+            for par_obj, par_name in ((_ln_mean, "mean"), (_ln_sd, "standard deviation")):
+                if not par_obj:
+                    raise ec.DnInitMisspec("\"" + dnpar.DnLogNormal.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
+
             # return dnpar.DnLogNormal(pars, parent_node_tracker)
             return dnpar.DnLogNormal(_ln_n_draws, _ln_n_repl, _ln_mean, _ln_sd, _ln_log_space, parent_node_tracker)
 
         elif dn_id == "normal":
-            # pars = [1, 1, [0.0], [1.0]]
-            _norm_n_draws: int
-            _norm_n_repl: int
-            _norm_mean: ty.List[float]
-            _norm_sd: ty.List[float]
+            #############################
+            # IMPORTANT: Default values #
+            #############################
+            _norm_n_draws: int = 1
+            _norm_n_repl: int = 1
+            _norm_mean: ty.List[float] = []
+            _norm_sd: ty.List[float] = []
             parent_node_tracker = dict() # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
 
             if dn_param_dict:
@@ -173,15 +182,22 @@ class PJDnGrammar():
                         # pars[3] = [float(v) for v in extracted_val]
                         _norm_sd = [float(v) for v in _extracted_val]
 
+            # making sure essential parameters of distribution have been specified
+            for par_obj, par_name in ((_norm_mean, "mean"), (_norm_sd, "standard deviation")):
+                if not par_obj:
+                    raise ec.DnInitMisspec("\"" + dnpar.DnNormal.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
+
             # return dnpar.DnNormal(pars, parent_node_tracker)
             return dnpar.DnNormal(_norm_n_draws, _norm_n_repl, _norm_mean, _norm_sd, parent_node_tracker)
 
         elif dn_id == "exponential":
-            # pars = [1, 1, [1.0], True] # rate_parameterization True by default
-            _exp_n_draws: int
-            _exp_n_repl: int
-            _exp_scale_or_rate: ty.List[float]
-            _exp_rate_parameterization: bool
+            #############################
+            # IMPORTANT: Default values #
+            #############################
+            _exp_n_draws: int = 1
+            _exp_n_repl: int = 1
+            _exp_scale_or_rate: ty.List[float] = []
+            _exp_rate_parameterization: bool = True
             parent_node_tracker = dict() # { lambda: node_pgm1_name }
 
             if dn_param_dict:
@@ -218,16 +234,22 @@ class PJDnGrammar():
                             # pars[3] = False
                             _exp_rate_parameterization = False
 
+            # making sure essential parameters of distribution have been specified
+            if not _exp_scale_or_rate:
+                raise ec.DnInitMisspec("\"" + dnpar.DnExponential.DN_NAME + "\"", "Parameter \"scale-or-rate\" is missing.")
+
             # return dnpar.DnExponential(pars, parent_node_tracker)
             return dnpar.DnExponential(_exp_n_draws, _exp_n_repl, _exp_scale_or_rate, _exp_rate_parameterization, parent_node_tracker)
 
         elif dn_id == "gamma":
-            # pars = [1, 1, [1.0], [1.0], False] # rate_parameterization False by default
-            _gamma_n_draws: int
-            _gamma_n_repl: int
-            _gamma_shape: ty.List[float]
-            _gamma_scale_or_rate: ty.List[float]
-            _gamma_rate_parameterization: bool
+            #############################
+            # IMPORTANT: Default values #
+            #############################
+            _gamma_n_draws: int = 1
+            _gamma_n_repl: int = 1
+            _gamma_shape: ty.List[float] = []
+            _gamma_scale_or_rate: ty.List[float] = []
+            _gamma_rate_parameterization: bool = False
             parent_node_tracker = dict() # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
 
             if dn_param_dict:
@@ -267,15 +289,22 @@ class PJDnGrammar():
                             # pars[3] = False
                             _gamma_rate_parameterization = False
 
+            # making sure essential parameters of distribution have been specified
+            for par_obj, par_name in ((_gamma_scale_or_rate, "scale-or-rate"), (_gamma_shape, "shape")):
+                if not par_obj:
+                    raise ec.DnInitMisspec("\"" + dnpar.DnGamma.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
+
             # return dnpar.DnGamma(pars, parent_node_tracker)
             return dnpar.DnGamma(_gamma_n_draws, _gamma_n_repl, _gamma_shape, _gamma_scale_or_rate, _gamma_rate_parameterization, parent_node_tracker)
 
         elif dn_id == "unif":
-            # pars: ty.List[ty.Union[int, ty.List[float]]] = [1, 1, [0.0], [1.0]]
-            _unif_n_draws: int
-            _unif_n_repl: int
-            _unif_min: ty.List[float]
-            _unif_max: ty.List[float]
+            #############################
+            # IMPORTANT: Default values #
+            #############################
+            _unif_n_draws: int = 1
+            _unif_n_repl: int = 1
+            _unif_min: ty.List[float] = []
+            _unif_max: ty.List[float] = []
             parent_node_tracker = dict() # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
 
             if dn_param_dict:
@@ -294,19 +323,20 @@ class PJDnGrammar():
                     elif arg == "n":
                         if len(_extracted_val) > 1:
                             raise ec.RequireScalarError(dnpar.DnUnif.DN_NAME, arg)
-                        # pars[0] = int(_extracted_val[0])
                         _unif_n_draws = int(_extracted_val[0])
                     elif arg == "nr":
                         if len(_extracted_val) > 1:
                             raise ec.RequireScalarError(dnpar.DnUnif.DN_NAME, arg)
-                        # pars[1] = int(_extracted_val[0])
                         _unif_n_repl = int(_extracted_val[0])
                     elif arg == "min":
-                        # pars[2] = [float(v) for v in _extracted_val]
                         _unif_min = [float(v) for v in _extracted_val]
                     elif arg == "max":
-                        # pars[3] = [float(v) for v in _extracted_val]
                         _unif_max = [float(v) for v in _extracted_val]
+
+            # making sure essential parameters of distribution have been specified
+            for par_obj, par_name in ((_unif_min, "min value"), (_unif_max, "max value")):
+                if not par_obj:
+                    raise ec.DnInitMisspec("\"" + dnpar.DnUnif.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
 
             # return dnpar.DnUnif(pars, parent_node_tracker)
             return dnpar.DnUnif(_unif_n_draws, _unif_n_repl, _unif_min, _unif_max, parent_node_tracker)

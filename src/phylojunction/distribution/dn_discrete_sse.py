@@ -578,6 +578,10 @@ class DnSSE(pgm.DistributionPGM):
             # simulate!
             repl_size = 0
             while repl_size < self.n_repl:
+                # TODO: make stop_value (when stop is "age") a parameter, and
+                # vectorize it, passing it to .simulate as self.stop_value[ith_sim]
+                #
+                # This is so we can put a prior on origin or root ages
                 tr = self.simulate(self.start_states[ith_sim], value_idx=ith_sim)
 
                 # check if tr has right specs

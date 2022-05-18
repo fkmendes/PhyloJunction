@@ -17,6 +17,9 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     if not dn_param_dict:
         raise ec.NoSpecificationError(message="Cannot initialize discrete SSE distribution without specifications. Exiting...")
 
+    #############################
+    # IMPORTANT: Default values #
+    #############################
     # default values for args that are not mandatory
     # all remaining args must be specified
     _n: int = 1
@@ -27,16 +30,16 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     origin: bool = True
     cond_spn: bool = False
     cond_surv: bool = True
-    _start_states_list: ty.List[int]
+    _start_states_list: ty.List[int] = []
     eps: float = 1e-12
     runtime_limit: int = 5 # 5 minutes
 
     # input validation (only things that are not already done by DnSSE)
     # NOTE: val is a list!
     for arg, val in dn_param_dict.items():
-        if val and isinstance(val[0], str):
-            first_val = val[0]
-
+        if val:
+            first_val = val[0] 
+            
             if arg == "meh" and isinstance(first_val, pgm.NodePGM):
                 nodepgm_val = first_val.value
                 
@@ -46,8 +49,8 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
             elif arg in ("n", "nr", "runtime_limit"):
                 try:
-                    # if isinstance(first_val, str):
-                    int_val = int(first_val) # no vectorization allowed here
+                    if isinstance(first_val, str):
+                        int_val = int(first_val) # no vectorization allowed here
                 except: raise ec.FunctionArgError(arg, "Was expecting an integer. Distribution discrete_sse() could not be initialized.")
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
@@ -56,17 +59,17 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                 if arg == "nr": _n_repl = int_val
 
             elif arg == "stop":
-                # if isinstance(first_val, str):
-                _stop = first_val.replace("\"", "")
+                if isinstance(first_val, str):
+                    _stop = first_val.replace("\"", "")
 
+            # TODO: vectorize stop_value when stop is "age"
             elif arg == "stop_value":
                 try:
-                    # if isinstance(first_val, str):
-                    stop_val = float(first_val)
+                    if isinstance(first_val, str):
+                        stop_val = float(first_val)
                 except: raise ec.FunctionArgError(arg, "Was expecting a float. Distribution discrete_sse() could not be initialized.")
 
                 _stop_value = stop_val
-                # stop_value = float(first_val)
 
             # TODO deal with vectorization later
             elif arg in ("origin", "cond_spn", "cond_surv"):
@@ -74,8 +77,8 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                     raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\". Distribution discrete_sse() could not be initialized.")
 
                 else:
-                    #if isinstance(first_val, str):
-                    parsed_val = first_val.replace("\"", "")
+                    if isinstance(first_val, str):
+                        parsed_val = first_val.replace("\"", "")
 
                     if arg == "origin" and parsed_val == "true": origin = True
                     elif arg == "origin" and parsed_val == "false": origin = False
@@ -88,17 +91,21 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                 _start_states_list = [int(v) for v in val if isinstance(v, str)]
 
             # if user specified epsilon, we use it, otherwise default is used
-            if arg == "eps":
+            elif arg == "eps":
                 try:
-                    # if isinstance(first_val, str):
-                    float_val = float(first_val) # no vectorization allowed here
+                    if isinstance(first_val, str):
+                        float_val = float(first_val) # no vectorization allowed here
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting a double. Distribution discrete_sse() could not be initialized.")
 
                 eps = float_val
-
     
-
+    # making sure essential parameters of distribution have been specified
+    if not any(_event_handler.fig_rates_manager.atomic_rate_params_matrix):
+        raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"meh\" is missing.")
+    if not _stop_value:
+        raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
+        
     return dnsse.DnSSE(
         _event_handler,
         _stop_value,

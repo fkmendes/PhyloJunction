@@ -32,10 +32,10 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line2 = "b <- [1, 2, 3]"
 
         rv_name, _, rv_spec = re.split(cmdu.assign_regex, cmd_line2)
-        cmd.parse_variable_assignment(pgm, rv_name, rv_spec, cmd_line2)
-        b_node_pgm = pgm.get_node_pgm_by_name("b")
+        cmd.parse_variable_assignment(pgm_obj, rv_name, rv_spec, cmd_line2)
+        b_node_pgm = pgm_obj.get_node_pgm_by_name("b")
 
-        self.assertEqual(2, pgm.n_nodes)
+        self.assertEqual(2, pgm_obj.n_nodes)
         self.assertEqual(type(b_node_pgm.value), list)
         self.assertEqual(len(b_node_pgm.value), 3)
         self.assertEqual(b_node_pgm.value, ["1", "2", "3"])

@@ -7,6 +7,9 @@ import utility.exception_classes as ec
 import pgm.pgm as pgm
 import calculation.discrete_sse as sseobj # type: ignore
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]):
     """Create SSEAtomicRate as prompted by deterministic function call. Still no support for vectorization.
 

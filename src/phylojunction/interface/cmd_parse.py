@@ -31,16 +31,17 @@ def script2pgm(file_handle):
 
         cmdline2pgm(pgm_obj, line)
 
-        # debugging
-        # for node_pgm_name, node_pgm in pgm.node_name_val_dict.items():
-        #     print("\nnode name = " + node_pgm_name)
-        #     print(node_pgm.value)
-        #     if node_pgm_name == "tr":
-        #         fig = plt.Figure(figsize=(11,4.5))
-        #         axes = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-        #         node_pgm.get_gcf(axes)
-                # print("node_pgm name = " + node_pgm_name)
-                # print("node_pgm vals = " + str(node_pgm))
+    # debugging
+    # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():
+    #     print("\nnode name = " + node_pgm_name)
+    #     print(node_pgm.value)
+    
+    #     if node_pgm_name == "tr":
+    #         fig = plt.Figure(figsize=(11,4.5))
+    #         axes = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+    #         node_pgm.get_gcf(axes)
+            # print("node_pgm name = " + node_pgm_name)
+            # print("node_pgm vals = " + str(node_pgm))
 
     # as if we had clicked "See" in the inference tab
     # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, "./inference_test/", mcmc_chain_length=1000, prefix="test")
@@ -251,13 +252,13 @@ if __name__ == "__main__":
     script_str1 = "a <- 1.0"
     script_str2 = "a <- [1, 2, 3]"
     script_str3 = "a <- 1\nb <- 2\nc <- [a, b, 3]"
-    script_str4 = "a ~ lognormal(n=10, mean=0.0, sd=1.0)"
+    script_str4 = "a ~ lognormal(n=10, mean=10.0, sd=1.0)"
     script_str5 = "l0 <- 1.0\na := sse_rate(name=\"lambda\", value=l0, event=\"b_speciation\", states=[2, 0, 1])"
     script_str6 = "l0rate := sse_rate(name=\"lambda\", value=1.0, event=\"w_speciation\")"
     script_str6_2 = "l0rate := sse_rate(name=\"lambda\", value=[1.0, 1.1], event=\"w_speciation\")"
     script_str7 = script_str6 + "\nmeh := sse_wrap(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)"
     script_str8 = script_str7 + "\ntr ~ discrete_sse(n=2, meh=meh, start_state=[0,0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
-    script_str9 = "n <- 1000\nrv ~ unif(n=n)"
+    script_str9 = "n <- 1000\nrv ~ unif(n=n, min=0.0, max=1.0)"
     script_str10 = \
         "l0rate := sse_rate(name=\"lambda0\", value=1.0, states=[0,0,0], event=\"w_speciation\")\n" + \
         "l1rate := sse_rate(name=\"lambda1\", value=1.0, states=[1,1,1], event=\"w_speciation\")\n" + \

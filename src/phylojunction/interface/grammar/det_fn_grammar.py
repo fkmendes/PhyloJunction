@@ -8,10 +8,12 @@ import utility.exception_classes as ec
 import interface.grammar.det_fn_discrete_sse as detsse
 import pgm.pgm as pgm
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 class PJDetFnGrammar():
 
     det_fn_grammar_dict: ty.Dict[str, ty.Set[str]]
-
 
     ##########################################
     #  All available deterministic functions #

@@ -311,10 +311,10 @@ class DnExponential(pgm.DistributionPGM):
 
     DN_NAME = "Exponential"
 
-    n_draws: int
-    n_repl: int
-    exp_scale_or_rate_list: ty.List[float]
-    exp_rate_parameterization: bool
+    n_draws: int = 1
+    n_repl: int = 1
+    exp_scale_or_rate_list: ty.List[float] = []
+    exp_rate_parameterization: bool = True
     vectorized_params: ty.List[ty.List[ty.Union[int, float, str]]]
     param_dict: ty.Dict[str, ty.Union[bool, ty.List[ty.Union[int, float, str]]]]
     parent_node_tracker: ty.Optional[ty.Dict[str, str]]
