@@ -63,7 +63,7 @@ def parse_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, fn_spec_str: str, cmd_l
     spec_dict: ty.Dict[str, str] = tokenize_fn_spec(fn_spec_str, cmd_line)
     spec_dict_return: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
 
-    parent_pgm_nodes = list()
+    parent_pgm_nodes: ty.List[pgm.NodePGM] = []
     for param_name, an_arg in spec_dict.items():
 
         #############

@@ -2,6 +2,7 @@ import sys
 sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/interface/)
 import re
 import io
+import typing as ty
 
 # pj imports
 import pgm.pgm as pgm
@@ -15,7 +16,7 @@ import utility.exception_classes as ec
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-def script2pgm(file_handle):
+def script2pgm(file_handle) -> None:
     """Go through lines in file object and populate probabilistic graphical model
 
     Args:
@@ -51,12 +52,12 @@ def script2pgm(file_handle):
 
     # pjio.output_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix="test")
 
-def cmdline2pgm(pgm_obj, cmd_line):
-    """_summary_
+def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str):
+    """Update ProbabilisticGraphicalModel object using user-entered command line in PJ's language
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): Object holding all random variables created by user via commands
-        cmd_line (str): Command string provided by user through static script or via GUI
+        pgm_obj (ProbabilisticGraphicalModel): Object that will hold all stochastic nodes (random variables) created by user via commands
+        cmd_line (str): Command line string provided by user through static script or via GUI
 
     Returns:
         str: Command string if there was nothing wrong with it
@@ -65,6 +66,9 @@ def cmdline2pgm(pgm_obj, cmd_line):
     # skip comments
     if cmd_line.startswith("#"): return
 
+    ##################################
+    # Checking command line is valid #
+    ##################################
     if re.match(cmdu.cannot_start_with_this_regex, cmd_line):
         raise ec.ScriptSyntaxError(cmd_line, "A special character or digit was detected as the first character in this line, but this is not allowed. Exiting...")
 
@@ -83,7 +87,11 @@ def cmdline2pgm(pgm_obj, cmd_line):
         raise ec.ScriptSyntaxError(cmd_line, "One of the following must be done:\n    (1) [variable] <- [value]\n    (2) [variable] ~ [sampling distribution]" + \
             "\n    (3) [variable] := [deterministic function]\nExiting...")
 
-    # variable assignment
+    ##########################
+    # Executing command line #
+    ##########################
+    
+    # (1) variable assignment
     elif assignment_call_count == 1:
         try:
             rv_name, operator_str, rv_spec = re.split(cmdu.assign_regex, cmd_line)
@@ -93,7 +101,7 @@ def cmdline2pgm(pgm_obj, cmd_line):
             raise ec.ScriptSyntaxError(cmd_line, "Something went wrong during variable assignment. Variable name and value could not be tokenized. Exiting...")
 
 
-    # sampling distribution assignment
+    # (2) sampling distribution assignment
     elif sampled_as_call_count == 1:
         try:
             rv_name, operator_str, rv_dn_spec = re.split(cmdu.sampled_as_regex, cmd_line)
@@ -103,7 +111,7 @@ def cmdline2pgm(pgm_obj, cmd_line):
             raise ec.ScriptSyntaxError(cmd_line, "Something went wrong during sampling distribution assignment. Variable name and sampling distribution specification could not be tokenized. Exiting...")
 
 
-    # deterministic function assignment
+    # (3) deterministic function assignment
     elif deterministic_call_count == 1:
         try:
             det_nd_name, operator_str, det_fn_spec = re.split(cmdu.deterministic_regex, cmd_line)
@@ -115,13 +123,29 @@ def cmdline2pgm(pgm_obj, cmd_line):
     return cmd_line
 
 
+#####################
+# Parsing functions #
+#####################
 
+# function called by (1. variable assignment)
+def parse_variable_assignment(pgm_obj: pgm.ProbabilisticGraphicalModel, stoch_node_name: str, stoch_node_spec: str, cmd_line: str) -> None:
+    """Create StochasticNodePGM instance from command string with "<-" operator, then add it to ProbabilisticGraphiclModel instance
 
-def parse_variable_assignment(pgm_obj, rv_name, rv_spec, cmd_line):
+    This node will not be sampled and is in practice a constant node.
 
-    def create_add_rv_pgm(a_rv_name, sample_size, a_val_obj_list):
-        rv_pgm = pgm.StochasticNodePGM(a_rv_name, sample_size=sample_size, value=a_val_obj_list, clamped=True)
-        pgm_obj.add_node(rv_pgm)
+    Args:
+        pgm_obj (ProbabilisticGraphicalModel): Object that will hold all nodes created by user via commands
+        stoch_node_name (str): Name of stochastic node being created
+        stoch_node_spec (str): Stochastic node specification string (whatever is right of "<-" operator in PJ command)
+        cmd_line (str): Command line string provided by user through static script or via GUI
+
+    Returns:
+        None
+    """
+
+    def create_add_stoch_node_pgm(a_stoch_node_name, sample_size, a_val_obj_list):
+        stoch_node = pgm.StochasticNodePGM(a_stoch_node_name, sample_size=sample_size, value=a_val_obj_list, clamped=True)
+        pgm_obj.add_node(stoch_node)
 
     #############
     # IMPORTANT #
@@ -129,13 +153,14 @@ def parse_variable_assignment(pgm_obj, rv_name, rv_spec, cmd_line):
     values_list = list() # arguments of dn/det parameters will come out as lists
 
     # if argument is a list
-    if re.match(cmdu.vector_value_regex, rv_spec):
-        values_list = cmdu.parse_val_vector(rv_spec)
+    if re.match(cmdu.vector_value_regex, stoch_node_spec):
+        values_list = cmdu.parse_val_vector(stoch_node_spec)
+    
     # if scalar variable
     else:
-        if len(re.findall("\.", rv_spec)) > 1:
+        if len(re.findall("\.", stoch_node_spec)) > 1:
             raise ec.ScriptSyntaxError(cmd_line, "Something went wrong during variable assignment. It looks like there were two dots \".\" when only one is allowed. Exiting...")
-        values_list.append(rv_spec)
+        values_list.append(stoch_node_spec)
 
     val_obj_list = cmdu.val_or_obj(pgm_obj, values_list)
 
@@ -155,27 +180,39 @@ def parse_variable_assignment(pgm_obj, rv_name, rv_spec, cmd_line):
     #     raise ScriptSyntaxError(rv_spec, "Something went wrong during variable assignment. The value assigned to a variable must be a numeric scalar or a vector (not a character). Exiting...")
 
     n_samples = len(val_obj_list)
-    create_add_rv_pgm(rv_name, n_samples, val_obj_list)
+    create_add_stoch_node_pgm(stoch_node_name, n_samples, val_obj_list)
 
 
+# function called by (2. sampling distribution assignment)
+def parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_dn_spec, cmd_line):
+    """Create StochasticNodePGM instance from command string with "~" operator, then add it to ProbabilisticGraphiclModel instance
 
+    This node will be sampled from a distribution and is a random variable.
 
-def parse_samp_dn_assignment(pgm_obj, rv_name, rv_dn_spec, cmd_line):
+    Args:
+        pgm_obj (ProbabilisticGraphicalModel): Object that will hold all nodes created by user via commands
+        stoch_node_name (str): Name of stochastic node being created
+        stoch_node_dn_spec (str): Specification string for distribution from which stochastic node will be sampled (whatever is right of "~" operator in PJ command)
+        cmd_line (str): Command line string provided by user through static script or via GUI
 
-    def create_add_rv_pgm(a_rv_name, sample_size, replicate_size, a_dn_obj, parent_pgm_nodes, clamped):
+    Returns:
+        None
+    """
+
+    def create_add_rv_pgm(a_stoch_node_name: str, sample_size: int, replicate_size: int, a_dn_obj: pgm.DistributionPGM, parent_pgm_nodes: ty.List[pgm.NodePGM], clamped: bool):
         # set dn inside rv, then call .sample
-        rv_pgm = pgm.StochasticNodePGM(a_rv_name, sample_size=sample_size, replicate_size=replicate_size, sampled_from=a_dn_obj, parent_nodes=parent_pgm_nodes, clamped=clamped)
-        pgm_obj.add_node(rv_pgm)
+        stoch_node_pgm = pgm.StochasticNodePGM(a_stoch_node_name, sample_size=sample_size, replicate_size=replicate_size, sampled_from=a_dn_obj, parent_nodes=parent_pgm_nodes, clamped=clamped)
+        pgm_obj.add_node(stoch_node_pgm)
 
-    if len(re.search(cmdu.sampling_dn_spec_regex, rv_dn_spec).groups()) != 2:
-        raise ec.ScriptSyntaxError(rv_dn_spec, "Something went wrong during sampling distribution specification. Exiting...")
+    if len(re.search(cmdu.sampling_dn_spec_regex, stoch_node_dn_spec).groups()) != 2:
+        raise ec.ScriptSyntaxError(stoch_node_dn_spec, "Something went wrong during sampling distribution specification. Exiting...")
 
     # ok!
     else:
-        dn_name, dn_spec = re.search(cmdu.sampling_dn_spec_regex, rv_dn_spec).groups()
+        dn_name, dn_spec = re.search(cmdu.sampling_dn_spec_regex, stoch_node_dn_spec).groups()
 
         if not dn_name in dngrammar.PJDnGrammar.dn_grammar_dict:
-            raise ec.ScriptSyntaxError(rv_dn_spec, "Something went wrong during sampling distribution specification. Distribution name not recognized. Exiting...")
+            raise ec.ScriptSyntaxError(stoch_node_dn_spec, "Something went wrong during sampling distribution specification. Distribution name not recognized. Exiting...")
 
         # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
         spec_dict, parent_pgm_nodes = cmdu.parse_spec(pgm_obj, dn_spec, cmd_line)
@@ -205,14 +242,26 @@ def parse_samp_dn_assignment(pgm_obj, rv_name, rv_dn_spec, cmd_line):
             repl_size = int(spec_dict["nr"][0])
         except: pass # user did not provide replicate size
 
-        create_add_rv_pgm(rv_name, sample_size, repl_size, dn_obj, parent_pgm_nodes, clamped)
+        create_add_rv_pgm(stoch_node_name, sample_size, repl_size, dn_obj, parent_pgm_nodes, clamped)
 
 
+# function called by (3. deterministic function assignment)
+def parse_deterministic_function_assignment(pgm_obj: pgm.ProbabilisticGraphicalModel, det_nd_name: str, det_fn_spec: str, cmd_line: str) -> None:
+    """Create DeterministicNodePGM instance from command string with ":=" operator, then add it to ProbabilisticGraphiclModel instance
 
+    This node is not sampled (not a random variable) and is deterministically initialized from a deterministic function.
 
-def parse_deterministic_function_assignment(pgm_obj, det_nd_name, det_fn_spec, cmd_line):
+    Args:
+        pgm_obj (ProbabilisticGraphicalModel): Object that will hold all nodes created by user via commands
+        det_nd_name (str): Name of deterministic node being created
+        det_fn_spec (str): Specification string for deterministic function that will specify the deterministic node (whatever is right of ":=" operator in PJ command)
+        cmd_line (str): Command line string provided by user through static script or via GUI
 
-    def create_add_det_nd_pgm(det_nd_name, det_obj, parent_pgm_nodes):
+    Returns:
+        None
+    """
+
+    def create_add_det_nd_pgm(det_nd_name: str, det_obj: ty.Any, parent_pgm_nodes: ty.List[pgm.NodePGM]):
         det_nd_pgm = pgm.DeterministicNodePGM(det_nd_name, value=det_obj, parent_nodes=parent_pgm_nodes)
         pgm_obj.add_node(det_nd_pgm)
         # deterministic node is of class DeterministicNodePGM, which
@@ -228,22 +277,25 @@ def parse_deterministic_function_assignment(pgm_obj, det_nd_name, det_fn_spec, c
         #     det_nd_pgm = det_obj
         #     pgm_obj.add_node(det_nd_pgm)
 
-    if len(re.search(cmdu.sampling_dn_spec_regex, det_fn_spec).groups()) != 2:
-        raise ec.ScriptSyntaxError(det_fn_spec, "Something went wrong during deterministic function specification. Exiting...")
+    sampling_dn_matches = re.search(cmdu.sampling_dn_spec_regex, det_fn_spec)
+    if not sampling_dn_matches is None and len(sampling_dn_matches.groups()) != 2:
+            raise ec.ScriptSyntaxError(det_fn_spec, "Something went wrong during deterministic function specification. Exiting...")
 
     # ok!
     else:
-        det_fn_name, dn_spec = re.search(cmdu.sampling_dn_spec_regex, det_fn_spec).groups()
+        det_fn_matches = re.search(cmdu.sampling_dn_spec_regex, det_fn_spec)        
+        if not det_fn_matches is None:
+            det_fn_name, dn_spec = det_fn_matches.groups()
+        
+            if not det_fn_name in detgrammar.PJDetFnGrammar.det_fn_grammar_dict:
+                raise ec.ScriptSyntaxError(det_fn_spec, "Something went wrong during sampling distribution specification. Distribution name not recognized. Exiting...")
 
-        if not det_fn_name in detgrammar.PJDetFnGrammar.det_fn_grammar_dict:
-            raise ec.ScriptSyntaxError(det_fn_spec, "Something went wrong during sampling distribution specification. Distribution name not recognized. Exiting...")
+            # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
+            spec_dict, parent_pgm_nodes = cmdu.parse_spec(pgm_obj, dn_spec, cmd_line)
 
-        # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
-        spec_dict, parent_pgm_nodes = cmdu.parse_spec(pgm_obj, dn_spec, cmd_line)
+            det_fn_obj = detgrammar.PJDetFnGrammar.create_det_fn_obj(det_fn_name, spec_dict)
 
-        det_fn_obj = detgrammar.PJDetFnGrammar.create_det_fn_obj(det_fn_name, spec_dict)
-
-        create_add_det_nd_pgm(det_nd_name, det_fn_obj, parent_pgm_nodes)
+            create_add_det_nd_pgm(det_nd_name, det_fn_obj, parent_pgm_nodes)
 
 
 

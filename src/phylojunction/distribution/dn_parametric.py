@@ -7,7 +7,7 @@ from scipy.stats import expon, lognorm, norm, gamma, uniform # type: ignore
 
 # pj imports
 import pgm.pgm as pgm
-import calculation.math_utils as mu # type: ignore
+import calculation.math_utils as mu
 import utility.exception_classes as ec
 import utility.helper_functions as pjh
 

@@ -231,7 +231,7 @@ class NodePGM(ABC):
 
 class StochasticNodePGM(NodePGM):
 
-    def __init__(self, node_pgm_name: str, sample_size: int, sampled_from=None, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[ty.Any]]=None):
+    def __init__(self, node_pgm_name: str, sample_size: int, sampled_from: ty.Optional[DistributionPGM]=None, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[ty.Any]]=None):
         super().__init__(node_pgm_name, sample_size=sample_size, value=value, replicate_size=replicate_size, call_order_idx=call_order_idx, deterministic=deterministic, clamped=clamped, parent_nodes=parent_nodes)
         
         self.is_sampled = False
