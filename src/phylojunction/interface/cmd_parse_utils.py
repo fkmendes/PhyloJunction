@@ -28,7 +28,9 @@ deterministic_regex = re.compile("\s*(:=)\s*")
 
 
 def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel, val: ty.List[str]) -> ty.List[ty.Union[pgm.NodePGM, str]]:
-    """_summary_
+    """Check if provided values are directly accessible as values (e.g., 1.0, \"a_string_in_quotes\"))
+    or if they are names of nodes potentially in the graphical model. If the latter, check if they are indeed
+    nodes in the graphical model, and if so, append to return
 
     Args:
         pgm_obj (pgm.ProbabilisticGraphicalModel): Probabilistic graphical model object

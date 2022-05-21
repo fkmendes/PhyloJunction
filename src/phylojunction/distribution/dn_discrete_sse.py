@@ -18,8 +18,7 @@ import calculation.discrete_sse as sseobj
 import utility.helper_functions as pjh
 import utility.exception_classes as ec
 from data.tree import AnnotatedTree
-import distribution.dn_parametric as dnpar # type: ignore
-## could not get dn_parametric's stub to be seen by mypy... will ignore... if don't ignore it, also get several errors being spit out by mypy that require "--no-implicit-reexport" flag
+import distribution.dn_parametric as dnpar
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

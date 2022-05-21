@@ -5,18 +5,19 @@
 import os
 import typing as ty
 import re
-import PySimpleGUI as sg
-import pyperclip
-import matplotlib.pyplot as plt
+import PySimpleGUI as sg # type: ignore
+import pyperclip # type: ignore
+import matplotlib.pyplot as plt # type: ignore
 # from screeninfo import get_monitors
 # import pyautogui
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
+from matplotlib.figure import Figure # type: ignore
 
 # pj imports
 import pgm.pgm as pgm
-# import user_interface.phylojunction_inference as pjinf
-# import user_interface.phylojunction_io as pjio
+import inference.revbayes.rb_inference as rbinf
+import readwrite.pj_write as pjwrite
+import readwrite.pj_read as pjread
 import interface.cmd_parse as cmd
 import utility.exception_classes as ec
 import data.tree as pjdt
@@ -503,10 +504,10 @@ def call_gui():
         # Reading script #
         ##################
         elif event == "Load script":
-            _pgm = pgmc.ProbabilisticGraphicalModel() # resets _pgm
+            _pgm = pgm.ProbabilisticGraphicalModel() # resets _pgm
             _script_in_fp = sg.popup_get_file("Script to load", no_window=True, keep_on_top=True)
             
-            cmd_lines = pjio.read_text_file(_script_in_fp)
+            cmd_lines = pjread.read_text_file(_script_in_fp)
 
             _parse_cmd_lines(cmd_lines, _cmd_history, _pgm, window)
 
@@ -526,7 +527,7 @@ def call_gui():
             
             # default value is "./"
             # if _data_out_dir:
-            pjio.output_rv_data(_data_out_dir, _pgm, prefix=prefix)
+            pjwrite.dump_pgm_data(_data_out_dir, _pgm, prefix=prefix)
 
         # original implmn had buttons
         # _data_out_dir = values["-VALUES-SAVE-DUMMY-"] # directory for saving data files
@@ -543,7 +544,7 @@ def call_gui():
 
             if _script_out_fp:
                 with open(_script_out_fp, "w") as script_out:
-                    pjio.write_text_output(script_out, _cmd_history)
+                    pjwrite.write_text_output(script_out, _cmd_history)
 
         # original implmn had a button
         # elif event == "-SCRIPT-SAVE-DUMMY-":
@@ -561,9 +562,9 @@ def call_gui():
                 except ec.InvalidMCMCChainLength as e:
                     sg.popup_error("Invalid MCMC chain length")
 
-                all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length)
+                all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length)
 
-                all_sims_spec_strs_list = pjio.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, write2file=False)
+                all_sims_spec_strs_list = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, write2file=False)
 
                 # enabling and updating spin element
                 window["-ITH-INF-"].update(values=[x for x in range(1, len(all_sims_model_spec_list) + 1)])
@@ -621,9 +622,9 @@ def call_gui():
             except Exception as e:
                 sg.popup_error("MCMC chain length must be a number")
 
-            all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
+            all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
 
-            _ = pjio.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
+            _ = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
             
         # original implmn had buttons
         # elif event == "-INFERENCE-SAVE-TO-DUMMY-":

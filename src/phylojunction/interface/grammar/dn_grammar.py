@@ -9,6 +9,9 @@ import interface.grammar.make_dn_discrete_sse as make_dnsse
 import utility.exception_classes as ec
 # from user_interface.dn_discrete_sse import make_discrete_SSE_dn # https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 class PJDnGrammar():
 
     dn_grammar_dict: ty.Dict[str, ty.Tuple[str, ...]]
@@ -24,7 +27,7 @@ class PJDnGrammar():
         "exponential":
             tuple(["n", "nr", "rate", "rate_parameterization"]),
         "gamma":
-            tuple(["n", "nr", "shape", "scale"]),
+            tuple(["n", "nr", "shape", "scale", "rate_parameterization"]),
         "unif":
             tuple(["n", "nr", "min", "max"]),
         "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin", "meh",
@@ -135,7 +138,7 @@ class PJDnGrammar():
                             _ln_log_space = False
 
             # making sure essential parameters of distribution have been specified
-            for par_obj, par_name in ((_ln_mean, "mean"), (_ln_sd, "standard deviation")):
+            for par_obj, par_name in ((_ln_mean, "mean"), (_ln_sd, "sd")):
                 if not par_obj:
                     raise ec.DnInitMisspec("\"" + dnpar.DnLogNormal.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
 
@@ -183,7 +186,7 @@ class PJDnGrammar():
                         _norm_sd = [float(v) for v in _extracted_val]
 
             # making sure essential parameters of distribution have been specified
-            for par_obj, par_name in ((_norm_mean, "mean"), (_norm_sd, "standard deviation")):
+            for par_obj, par_name in ((_norm_mean, "mean"), (_norm_sd, "sd")):
                 if not par_obj:
                     raise ec.DnInitMisspec("\"" + dnpar.DnNormal.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
 
@@ -236,7 +239,7 @@ class PJDnGrammar():
 
             # making sure essential parameters of distribution have been specified
             if not _exp_scale_or_rate:
-                raise ec.DnInitMisspec("\"" + dnpar.DnExponential.DN_NAME + "\"", "Parameter \"scale-or-rate\" is missing.")
+                raise ec.DnInitMisspec("\"" + dnpar.DnExponential.DN_NAME + "\"", "Parameter \"rate\" is missing.")
 
             # return dnpar.DnExponential(pars, parent_node_tracker)
             return dnpar.DnExponential(_exp_n_draws, _exp_n_repl, _exp_scale_or_rate, _exp_rate_parameterization, parent_node_tracker)
@@ -290,7 +293,7 @@ class PJDnGrammar():
                             _gamma_rate_parameterization = False
 
             # making sure essential parameters of distribution have been specified
-            for par_obj, par_name in ((_gamma_scale_or_rate, "scale-or-rate"), (_gamma_shape, "shape")):
+            for par_obj, par_name in ((_gamma_shape, "shape"), (_gamma_scale_or_rate, "scale")):
                 if not par_obj:
                     raise ec.DnInitMisspec("\"" + dnpar.DnGamma.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
 
@@ -334,7 +337,7 @@ class PJDnGrammar():
                         _unif_max = [float(v) for v in _extracted_val]
 
             # making sure essential parameters of distribution have been specified
-            for par_obj, par_name in ((_unif_min, "min value"), (_unif_max, "max value")):
+            for par_obj, par_name in ((_unif_min, "min"), (_unif_max, "max")):
                 if not par_obj:
                     raise ec.DnInitMisspec("\"" + dnpar.DnUnif.DN_NAME + "\"", "Parameter \"" + par_name + "\" is missing.")
 

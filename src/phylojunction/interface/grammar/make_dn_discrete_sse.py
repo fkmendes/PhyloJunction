@@ -8,6 +8,8 @@ import calculation.discrete_sse as sseobj
 import pgm.pgm as pgm
 import utility.exception_classes as ec
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
 
 def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> pgm.DistributionPGM:
 

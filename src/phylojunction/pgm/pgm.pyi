@@ -9,22 +9,42 @@ from abc import ABC, abstractmethod
 # pj imports
 from data.tree import AnnotatedTree
 
+# code for @abstract attribute
+R = ty.TypeVar('R')
+def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
+    class DummyAttribute:
+        pass
+
+    _obj = ty.cast(ty.Any, obj)
+    if obj is None:
+        _obj = DummyAttribute()
+    _obj.__is_abstract_attribute__ = True
+    return ty.cast(R, _obj)
+
 class ProbabilisticGraphicalModel:
-    node_dict: Incomplete
-    node_name_val_dict: Incomplete
+    node_dict: ty.Dict[NodePGM, ty.Any]
+    node_name_val_dict: ty.Dict[str, NodePGM]
     n_nodes: int
     sample_size: int
     def __init__(self) -> None: ...
-    def add_node(self, node_pgm) -> None: ...
+    def add_node(self, node_pgm: NodePGM) -> None: ...
     def get_node_pgm_by_name(self, node_name): ...
     def get_display_str_by_name(self, node_name, sample_idx: Incomplete | None = ..., repl_size: int = ...): ...
-    def get_sorted_node_pgm_list(self): ...
+    def get_sorted_node_pgm_list(self) -> ty.List[NodePGM]: ...
 
 class DistributionPGM(ABC, metaclass=abc.ABCMeta):
 
     @property
     @abstractmethod
     def DN_NAME(self):
+        pass
+
+    @abstract_attribute
+    def n_draws(self):
+        pass
+
+    @abstract_attribute
+    def n_repl(self):
         pass
 
     @abstractmethod

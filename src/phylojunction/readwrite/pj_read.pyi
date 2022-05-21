@@ -1,0 +1,3 @@
+import typing as ty
+
+def read_text_file(fp_string: str) -> ty.List[str]: ...

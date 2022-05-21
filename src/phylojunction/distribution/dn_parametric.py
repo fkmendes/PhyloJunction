@@ -10,6 +10,7 @@ import pgm.pgm as pgm
 import calculation.math_utils as mu
 import utility.exception_classes as ec
 import utility.helper_functions as pjh
+import inference.revbayes.rb_dn_parametric as rbpar
 
 class DnLogNormal(pgm.DistributionPGM):
     
@@ -49,33 +50,19 @@ class DnLogNormal(pgm.DistributionPGM):
         return lognorm.rvs(s=math.exp(sd_param), loc=math.exp(mean_param), scale=1.0, size=n_draws)
 
     # validation of pars happens in phylojunction_grammar
-    # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float], bool]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
     def __init__(self, n_draws: int, n_repl: int, ln_mean: ty.List[float], ln_sd: ty.List[float], ln_log_space: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
         self.param_dict = dict()
-
-        # so mypy won't complain...
-        # if isinstance(pars[0], int) and isinstance(pars[1], int) and isinstance(pars[4], bool):
-        #     self.n_draws = pars[0]
-        #     self.n_repl = pars[1]
-        #     self.param_dict["log_space"] = pars[4]
         self.n_draws = n_draws
         self.n_repl = n_repl
         self.ln_mean_arg = ln_mean
         self.ln_sd_arg = ln_sd
         self.ln_log_space = ln_log_space
 
-        # makes sure these parameters are lists, or converts them into list
-        # also multiplying element (when only one is provided) if necessary
-        # check_sample_size_return = self.check_sample_size(pars[2:4])
-        # if isinstance(check_sample_size_return, list):
-        #     self.vectorized_params = check_sample_size_return
         check_sample_size_return = self.check_sample_size([self.ln_mean_arg, self.ln_sd_arg]) # one element per parameter
         if isinstance(check_sample_size_return, list):
             self.vectorized_params = check_sample_size_return
 
         # params
-        # self.param_dict["mean_param"] = self.vectorized_params[0]
-        # self.param_dict["sd_param"] = self.vectorized_params[1]
         self.ln_mean_list = ty.cast(ty.List[float], self.vectorized_params[0])
         self.ln_sd_list = ty.cast(ty.List[float], self.vectorized_params[1])
 
@@ -90,35 +77,16 @@ class DnLogNormal(pgm.DistributionPGM):
         sampled_values: ty.List[float] = list()
 
         try:
-            # mean_params = self.param_dict["mean_param"]
-            # sd_params = self.param_dict["sd_param"]
-            # log_space = self.param_dict["log_space"]
-
-            # so mypy won't complain
-            # if isinstance(mean_params, list) and isinstance(sd_params, list):
-                # use single provided mean and sd for all (n_draws * n_repl) draws
-                # if len(mean_params) == 1 and len(sd_params) == 1:
             if len(self.ln_mean_list) == 1 and len(self.ln_sd_list) == 1:
-                # so mypy won't complain
-                # if isinstance(mean_params[0], (int, float)) and isinstance(sd_params[0], (int, float)) and isinstance(log_space, bool):
-                #     return ty.cast(ty.List, DnLogNormal.draw_ln(self.n_draws * self.n_repl, mean_params[0], sd_params[0], log_space=log_space).tolist())
                 return ty.cast(ty.List[float], DnLogNormal.draw_ln(self.n_draws * self.n_repl, self.ln_mean_list[0], self.ln_sd_list[0], log_space=self.ln_log_space).tolist())
 
             # (DnLogNormal sould have taken care of checking dimensions)
             # otherwise, use one mean and sd for each n_repl draws for each simulation
             else:
-                # for i in range(len(mean_params)):
                 for i in range(len(self.ln_mean_list)):
                     # so mypy won't complain             
-                    # for some reason, just checking type like below won't work here (like it does for DnGamma)
-                    # ... no clue why (I'm still calling isinstance() just to be safe)
-                    # mypy is only satisfied if I forcefully cast into float
-                    # if isinstance(mean_params[i], (int, float)) and isinstance(sd_params[i], (int, float)) and isinstance(log_space, bool):
-                    #     mean_param = ty.cast(float, mean_params[i])
-                    #     sd_param = ty.cast(float, sd_params[i])
-                    #     repl = ty.cast(ty.List, DnLogNormal.draw_ln(self.n_repl, mean_param, sd_param, log_space=log_space).tolist())
-                        repl = ty.cast(ty.List, DnLogNormal.draw_ln(self.n_repl, self.ln_mean_list[i], self.ln_sd_list[i], log_space=self.ln_log_space).tolist())
-                        sampled_values += repl
+                    repl = ty.cast(ty.List, DnLogNormal.draw_ln(self.n_repl, self.ln_mean_list[i], self.ln_sd_list[i], log_space=self.ln_log_space).tolist())
+                    sampled_values += repl
 
                 return sampled_values
 
@@ -131,41 +99,7 @@ class DnLogNormal(pgm.DistributionPGM):
 
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        rev_str_list: ty.List[str] = []
-
-        log_space = self.param_dict["log_space"]
-        real_mean_list = self.param_dict["mean_param"] # one per simulation
-        real_sd_list = self.param_dict["sd_param"] # one per simulation
-
-        # so mypy won't complain
-        if isinstance(real_mean_list, list) and \
-            isinstance(real_sd_list, list) and \
-            isinstance(self.parent_node_tracker, dict):
-            real_mean_list = [math.exp(float(i)) for i in real_mean_list]
-            real_sd_list = [math.exp(float(i)) for i in real_sd_list]
-        
-            # real_mean_list and real_sd_list will have n_sim values inside, even if they are all the same
-            for ith_sim in range(self.n_draws):
-                ith_sim_str = "dnLognormal(mean="
-
-                # if we can find a node that holds the value of the mean, we use it
-                try:
-                    ith_sim_str += self.parent_node_tracker["mean"] # returns NodePGM, and we grab its name
-                except:
-                    ith_sim_str += str(real_mean_list[ith_sim])
-
-                ith_sim_str += ", sd="
-
-                # if we can find a node that holds the value of the sd, we use it
-                try:
-                    ith_sim_str += self.parent_node_tracker["sd"] # returns NodePGM, and we grab its name
-                except:
-                    ith_sim_str += str(real_sd_list[ith_sim])
-                ith_sim_str += ")"
-
-                rev_str_list.append(ith_sim_str)
-
-        return rev_str_list
+        return rbpar.get_ln_rev_inference_spec_info(self.n_draws, self.param_dict, self.parent_node_tracker)
 
 ##############################################################################
 
@@ -689,7 +623,7 @@ if __name__ == "__main__":
     # can also be called from phylojunction/
     # $ python3 distribution/dn_parametric.py
     # or
-    # $ python3 -m distribution.dn_parametric.py
+    # $ python3 -m distribution.dn_parametric
     #
     # can also be called from VS Code, if open folder is phylojuction/
 

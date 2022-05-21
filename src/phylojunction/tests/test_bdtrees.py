@@ -94,7 +94,7 @@ if __name__ == '__main__':
     # or
     # $ python3 -m tests.test_bdtrees
     # or, for a specific test
-    # $ python3 -m unittest tests.test_bdtrees.TestBDTrees.test_expected_size_bd for that specific tes
+    # $ python3 -m unittest tests.test_bdtrees.TestBDTrees.test_expected_size_bd for that specific test
     #
     # can also be called from VS Code, if open folder is phylojuction/
 

@@ -14,14 +14,32 @@ from data.tree import AnnotatedTree
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
+# code for @abstract attribute
+R = ty.TypeVar('R')
+def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
+    class DummyAttribute:
+        pass
+
+    _obj = ty.cast(ty.Any, obj)
+    if obj is None:
+        _obj = DummyAttribute()
+    _obj.__is_abstract_attribute__ = True
+    return ty.cast(R, _obj)
+
 class ProbabilisticGraphicalModel():
+    
+    node_dict: ty.Dict[NodePGM, ty.Any]
+    node_name_val_dict: ty.Dict[str, NodePGM]
+    n_nodes: int
+    sample_size: int
+
     def __init__(self):
         self.node_dict = dict() # keys are proper PGM nodes, values are their values
         self.node_name_val_dict = dict() # keys are StochasticNodePGM names, vals are StochasticNodePGM objects
-        self.n_nodes: int = 0
-        self.sample_size: int = 0 # how many simulations will be run
+        self.n_nodes = 0
+        self.sample_size = 0 # how many simulations will be run
 
-    def add_node(self, node_pgm):
+    def add_node(self, node_pgm: NodePGM) -> None:
         # check that nodes carry the right number of values (the number of simulations)
         if isinstance(node_pgm, StochasticNodePGM):
             
@@ -82,8 +100,9 @@ class ProbabilisticGraphicalModel():
         if node_name in self.node_name_val_dict:
             return str(self.node_name_val_dict[node_name]) # calls __str__() of NodePGM
 
-    def get_sorted_node_pgm_list(self):
-        node_pgm_list = [node_pgm for node_pgm in self.node_dict]
+
+    def get_sorted_node_pgm_list(self) -> ty.List[NodePGM]:
+        node_pgm_list: ty.List[NodePGM] = [node_pgm for node_pgm in self.node_dict]
         node_pgm_list.sort()
 
         return node_pgm_list
@@ -91,6 +110,20 @@ class ProbabilisticGraphicalModel():
 ##############################################################################
 
 class DistributionPGM(ABC):
+
+    @property
+    @abstractmethod
+    def DN_NAME(self):
+        pass
+
+    @abstract_attribute
+    def n_draws(self):
+        pass
+
+    @abstract_attribute
+    def n_repl(self):
+        pass
+
     @abstractmethod
     def __init__(self):
         pass

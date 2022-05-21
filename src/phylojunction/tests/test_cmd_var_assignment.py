@@ -8,6 +8,9 @@ import pgm.pgm as pgm
 import interface.cmd_parse as cmd
 import interface.cmd_parse_utils as cmdu
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 class TestVarAssignment(unittest.TestCase):
     def test_var_assignment(self):
         """
