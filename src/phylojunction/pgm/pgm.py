@@ -19,7 +19,6 @@ R = ty.TypeVar('R')
 def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
     class DummyAttribute:
         pass
-
     _obj = ty.cast(ty.Any, obj)
     if obj is None:
         _obj = DummyAttribute()
@@ -27,7 +26,6 @@ def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
     return ty.cast(R, _obj)
 
 class ProbabilisticGraphicalModel():
-    
     node_dict: ty.Dict[NodePGM, ty.Any]
     node_name_val_dict: ty.Dict[str, NodePGM]
     n_nodes: int

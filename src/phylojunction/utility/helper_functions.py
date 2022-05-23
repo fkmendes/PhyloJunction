@@ -8,6 +8,7 @@ from collections import defaultdict
 # pj imports
 import utility.exception_classes as ec
 
+
 def print_progress(idx: int, iterator_len: int) -> None:
     """Print progress bar on iteration for longer tests
 
@@ -104,19 +105,21 @@ def verify_or_convert2_vector(param_list: ty.Union[int, float, str, ty.List[ty.U
 
 
 def get_ellapsed_time_in_minutes(start: float, end: float) -> int:
-        """Calculate ellapsed time
+    """Calculate ellapsed time
 
-        Args:
-            start (float): Start of time window
-            end (float): End of time window
+    Args:
+        start (float): Start of time window
+        end (float): End of time window
 
-        Returns:
-            int: Ellapsed time in minutes in time window
-        """
-        ellapsed_minutes, ellapsed_secs = divmod(end-start, 60) # returns (min, sec)
+    Returns:
+        int: Ellapsed time in minutes in time window
+    """
+    ellapsed_minutes, ellapsed_secs = divmod(end-start, 60) # returns (min, sec)
 
-        # return int(ellapsed_minutes * 60 + ellapsed_secs) # in seconds
-        return int(ellapsed_minutes)
+    # return int(ellapsed_minutes * 60 + ellapsed_secs) # in seconds
+    return int(ellapsed_minutes)
+
+
 
 ##############################################################################
 

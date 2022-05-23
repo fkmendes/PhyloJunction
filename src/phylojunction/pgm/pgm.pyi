@@ -7,14 +7,12 @@ from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 
 # pj imports
-from data.tree import AnnotatedTree
+# from data.tree import AnnotatedTree
 
-# code for @abstract attribute
 R = ty.TypeVar('R')
+class DummyAttribute:
+    pass
 def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
-    class DummyAttribute:
-        pass
-
     _obj = ty.cast(ty.Any, obj)
     if obj is None:
         _obj = DummyAttribute()

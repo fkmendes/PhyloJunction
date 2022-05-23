@@ -23,7 +23,7 @@ class DnLogNormal(pgm.DistributionPGM):
     ln_log_space: bool
     vectorized_params: ty.List[ty.List[ty.Union[int, float, str]]]
     param_dict: ty.Dict[str, ty.Union[bool, ty.List[ty.Union[int, float, str]]]]
-    parent_node_tracker: ty.Optional[ty.Dict[str, str]]
+    parent_node_tracker: ty.Optional[ty.Dict[str, str]] = dict()
 
     @staticmethod
     def draw_ln(n_draws: int, mean_param: float, sd_param: float, scale: float=1.0, log_space: bool=True) -> ty.Union[np.float64, np.ndarray]:
@@ -50,7 +50,7 @@ class DnLogNormal(pgm.DistributionPGM):
         return lognorm.rvs(s=math.exp(sd_param), loc=math.exp(mean_param), scale=1.0, size=n_draws)
 
     # validation of pars happens in phylojunction_grammar
-    def __init__(self, n_draws: int, n_repl: int, ln_mean: ty.List[float], ln_sd: ty.List[float], ln_log_space: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
+    def __init__(self, n_draws: int, n_repl: int, ln_mean: ty.List[float], ln_sd: ty.List[float], ln_log_space: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
         self.param_dict = dict()
         self.n_draws = n_draws
         self.n_repl = n_repl
@@ -99,7 +99,7 @@ class DnLogNormal(pgm.DistributionPGM):
 
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        return rbpar.get_ln_rev_inference_spec_info(self.n_draws, self.param_dict, self.parent_node_tracker)
+        return rbpar.get_ln_rev_inference_spec_info(self.n_draws, self.ln_mean_list, self.ln_sd_list, self.parent_node_tracker)
 
 ##############################################################################
 
@@ -135,7 +135,7 @@ class DnNormal(pgm.DistributionPGM):
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float]]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
-    def __init__(self, n_draws: int, n_repl: int, norm_mean_param: ty.List[float], norm_sd_param: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
+    def __init__(self, n_draws: int, n_repl: int, norm_mean_param: ty.List[float], norm_sd_param: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
         self.param_dict = dict()
 
         # so mypy won't complain...
@@ -210,34 +210,7 @@ class DnNormal(pgm.DistributionPGM):
 
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        rev_str_list: ty.List[str] = []
-
-        real_mean_list = self.param_dict["mean_param"] # one per simulation
-        real_sd_list = self.param_dict["sd_param"] # one per simulation
-
-        # so mypy won't complain
-        if isinstance(real_mean_list, list) and isinstance(real_sd_list, list) and isinstance(self.parent_node_tracker, dict):
-            for ith_sim in range(self.n_draws):
-                ith_sim_str = "dnNormal(mean="
-
-                # if we can find a node that holds the value of the mean, we use it
-                try:
-                    ith_sim_str += self.parent_node_tracker["mean"] # returns NodePGM, and we grab its name
-                except:
-                    ith_sim_str += str(real_mean_list[ith_sim])
-
-                ith_sim_str += ", sd="
-
-                # if we can find a node that holds the value of the sd, we use it
-                try:
-                    ith_sim_str += self.parent_node_tracker["sd"] # returns NodePGM, and we grab its name
-                except:
-                    ith_sim_str += str(real_sd_list[ith_sim])
-                ith_sim_str += ")"
-
-                rev_str_list.append(ith_sim_str)
-
-        return rev_str_list
+        return rbpar.get_normal_rev_inference_spec_info(self.n_draws, self.norm_mean_param_list, self.norm_sd_param_list, self.parent_node_tracker)
 
 ##############################################################################
 
@@ -245,9 +218,9 @@ class DnExponential(pgm.DistributionPGM):
 
     DN_NAME = "Exponential"
 
-    n_draws: int = 1
-    n_repl: int = 1
-    exp_scale_or_rate_list: ty.List[float] = []
+    n_draws: int
+    n_repl: int
+    exp_scale_or_rate_list: ty.List[float]
     exp_rate_parameterization: bool = True
     vectorized_params: ty.List[ty.List[ty.Union[int, float, str]]]
     param_dict: ty.Dict[str, ty.Union[bool, ty.List[ty.Union[int, float, str]]]]
@@ -273,7 +246,7 @@ class DnExponential(pgm.DistributionPGM):
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float], bool]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
-    def __init__(self, n_draws: int, n_repl: int, scale_or_rate_param: ty.List[float], rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
+    def __init__(self, n_draws: int, n_repl: int, scale_or_rate_param: ty.List[float], rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
         self.param_dict = dict()
 
         # so mypy won't complain...
@@ -348,32 +321,7 @@ class DnExponential(pgm.DistributionPGM):
 
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        rev_str_list: ty.List[str] = []
-
-        scale_or_rate_list = self.param_dict["scale_or_rate_param"]
-        rate_parameterization = self.param_dict["rate_parameterization"] # True is the default in PJ
-
-        # so mypy won't complain
-        if isinstance(scale_or_rate_list, list) and isinstance(self.parent_node_tracker, dict):
-            
-            # if user wants scale parameterization in PJ, we need to invert it
-            # for use with rev
-            if not rate_parameterization:
-                scale_or_rate_list = [1.0/float(v) for v in scale_or_rate_list]
-
-            for ith_sim in range(self.n_draws):
-                ith_sim_str = "dnExponential(lambda="
-
-                # if we can find a node that holds the value of the rate, we use it
-                try:
-                    ith_sim_str += self.parent_node_tracker["rate"] # key: arg in PJ syntax, value: NodePGM name passed as arg
-                except:
-                    ith_sim_str += str(scale_or_rate_list[ith_sim])
-                ith_sim_str += ")"
-
-                rev_str_list.append(ith_sim_str)
-
-        return rev_str_list
+        return rbpar.get_exponential_rev_inference_spec_info(self.n_draws, self.exp_scale_or_rate_param_list, self.exp_rate_parameterization, self.parent_node_tracker)
 
 ##############################################################################
 
@@ -411,7 +359,7 @@ class DnGamma(pgm.DistributionPGM):
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float], bool]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
-    def __init__(self, n_draws: int, n_repl: int, shape_param: ty.List[float], scale_or_rate_param: ty.List[float], rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
+    def __init__(self, n_draws: int, n_repl: int, shape_param: ty.List[float], scale_or_rate_param: ty.List[float], rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
         self.param_dict = dict()
 
         # so mypy won't complain...
@@ -490,9 +438,7 @@ class DnGamma(pgm.DistributionPGM):
 
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        rev_str_list: ty.List[str] = []
-
-        return rev_str_list
+        return rbpar.get_gamma_rev_inference_spec_info(self.n_draws, self.gamma_shape_param_list, self.gamma_scale_or_rate_param_list, self.gamma_rate_parameterization, self.parent_node_tracker)
 
 ##############################################################################
 
@@ -528,7 +474,7 @@ class DnUnif(pgm.DistributionPGM):
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float]]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
-    def __init__(self, n_draws: int, n_repl: int, min_param: ty.List[float], max_param: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
+    def __init__(self, n_draws: int, n_repl: int, min_param: ty.List[float], max_param: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
         self.param_dict = dict()
 
         # so mypy won't complain...
@@ -602,17 +548,7 @@ class DnUnif(pgm.DistributionPGM):
 
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        rev_str_list: ty.List[str] = []
-
-        min_list = self.param_dict["min_param"]
-        max_list = self.param_dict["max_param"]
-
-        # so mypy won't complain
-        if isinstance(min_list, list) and isinstance(max_list, list):
-            for ith_sim in range(self.n_draws):
-                rev_str_list.append("dnUniform(lower=" + str(min_list[ith_sim]) + ", upper=" + str(max_list[ith_sim]) + ")")
-
-        return rev_str_list
+        return rbpar.get_unif_rev_inference_spec_info(self.n_draws, self.min_param_list, self.max_param_list, self.parent_node_tracker)
 
 ##############################################################################
 
@@ -631,9 +567,11 @@ if __name__ == "__main__":
     n_draws = 3
     n_repl = 1
 
-    ln2 = DnLogNormal(n_draws, n_repl, [-2, -2.1, -2.2], [0.1, 0.2, 0.15], True)
-    ln3 = DnLogNormal(n_draws, n_repl, [-2], [0.1], True)
-    ln4 = DnLogNormal(n_draws, n_repl, [-2], [0.1], True)
+    dummy_parent_node_tracker: ty.Dict[str, str] = dict()
+
+    ln2 = DnLogNormal(n_draws, n_repl, [-2, -2.1, -2.2], [0.1, 0.2, 0.15], True, dummy_parent_node_tracker)
+    ln3 = DnLogNormal(n_draws, n_repl, [-2], [0.1], True, dummy_parent_node_tracker)
+    ln4 = DnLogNormal(n_draws, n_repl, [-2], [0.1], True, dummy_parent_node_tracker)
 
     print(ln2.generate())
     print(ln3.generate())
