@@ -1,5 +1,3 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
 import unittest
 import math
 import statistics
@@ -42,7 +40,6 @@ class TestClaSSETrees(unittest.TestCase):
         fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
         
         cls.event_handler = sseobj.MacroEvolEventHandler(fig_rates_manager)
-
 
 
     def test_tree_size_state_count_max_taxa_classe(self):
@@ -451,16 +448,31 @@ class TestClaSSETrees(unittest.TestCase):
                                 msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
     
 if __name__ == '__main__':
-    # can be called from tests/
-    # $ python3 test_classetrees.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_classetrees.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_dn_discrete_sse_classe.py
+    # 
     # or
-    # $ python3 -m tests.test_classetrees
-    # or, for a specific test
-    # $ python3 -m unittest tests.test_classetrees.TestClaSSETrees.test_tree_size_state_count_max_taxa_classe
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_classe
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_classe.TestClaSSETrees.test_tree_size_state_count_max_taxa_classe
 
     unittest.main()

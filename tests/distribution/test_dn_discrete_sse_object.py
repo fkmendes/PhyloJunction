@@ -1,6 +1,5 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
 import unittest
+
 # pj imports
 import utility.helper_functions as pjh
 import calculation.discrete_sse as sseobj
@@ -64,16 +63,31 @@ class TestDnSSEObject(unittest.TestCase):
             self.assertTrue(tr.tree_died)
 
 if __name__ == '__main__':
-    # can be called from tests/
-    # $ python3 test_dn_sse_object.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_dn_sse_object.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_dn_discrete_sse_object.py
+    # 
     # or
-    # $ python3 -m tests.test_dn_sse_object
-    # or, for a specific test
-    # $ python3 -m unittest tests.test_dn_sse_object.TestDnSSEObject.test_dnsse_vectorization
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_object
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_object.TestDnSSEObject.test_dnsse_vectorization
 
     unittest.main()

@@ -1,5 +1,3 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
 import unittest
 import math
 import statistics
@@ -12,7 +10,7 @@ import distribution.dn_discrete_sse as distsse
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-class TestYuleTrees(unittest.TestCase):
+class TestYuleTimeHetTrees(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -186,4 +184,31 @@ class TestYuleTrees(unittest.TestCase):
                                 msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
 
 if __name__ == '__main__':
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
+    # 
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_dn_discrete_sse_yule_timehet.py
+    # 
+    # or
+    #
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_yule_timehet
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_yule_timehet.TestYuleTimeHetTrees.test_tree_size_state_count_max_taxa_timehet_yule
+
     unittest.main()

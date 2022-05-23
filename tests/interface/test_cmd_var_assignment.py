@@ -1,5 +1,3 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
 import unittest
 import re
 
@@ -83,16 +81,31 @@ class TestVarAssignment(unittest.TestCase):
         self.assertEqual(d_node_pgm.value, ["1", "2", "3", "4", "5", "6"])
 
 if __name__ == "__main__":
-    # can be called from tests/
-    # $ python3 test_cmd_var_assignment.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_cmd_var_assignment.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_cmd_var_assignment
+    # 
     # or
-    # $ python3 -m tests.test_cmd_var_assignment
-    # or, for a specific test
-    # $ python3 -m unittest tests.cmd_var_assignment.TestVarAssignment.test_var_assignment
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_cmd_var_assignment
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.test_cmd_var_assignment.TestVarAssignment.test_var_assignment
 
     unittest.main()

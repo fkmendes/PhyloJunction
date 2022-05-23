@@ -1,11 +1,12 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/calculation/)
 import unittest
 
 # pj imports
 import calculation.discrete_sse as sseobj
 
-class TestEvent(unittest.TestCase):
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
+class TestMacroEvolEvent(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -148,16 +149,31 @@ class TestEvent(unittest.TestCase):
         self.assertAlmostEqual(obs_proportion_birth_s1, expected_proportion_birth_s1, msg="Proportion of event is off by more than 0.01", delta=0.01)
 
 if __name__ == '__main__':
-    # can be called from tests/
-    # $ python3 test_events.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_events.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_macroevol_events.py
+    # 
     # or
-    # $ python3 -m tests.test_events
-    # or, for a specific test
-    # $ python3 -m unittest tests.test_events.TestEvent.test_total_rate_single_epoch_bd
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_macroevol_events
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.distribution.test_macroevol_events.TestMacroEvolEvent.test_total_rate_single_epoch_bd
     
     unittest.main()

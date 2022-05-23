@@ -1,5 +1,3 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
 import unittest
 from dendropy import Tree, Node, Taxon
 
@@ -142,16 +140,31 @@ class TestAnnotateTree(unittest.TestCase):
     #     self.bifurcating_tree_two_states.get_gcf(node_attr="state")
 
 if __name__ == '__main__':
-    # can be called from tests/
-    # $ python3 test_tree_annot.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_tree_annot.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_tree_annot.py
+    # 
     # or
-    # $ python3 -m tests.test_tree_annot
-    # or, for a specific test
-    # $ python3 -m unittest tests.test_tree_annot.TestAnnotateTree.test_root_origin_age_rootedge_length
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_tree_annot
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.distribution.test_tree_annot.TestAnnotateTree.test_root_origin_age_rootedge_length
 
     unittest.main()

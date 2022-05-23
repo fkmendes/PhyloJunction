@@ -1,11 +1,12 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
 import unittest
 
 # pj imports
 import interface.cmd_parse_utils as cmdu
 
-class TestCommandParse(unittest.TestCase):
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
+class TestCommandParseUtils(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -37,16 +38,31 @@ class TestCommandParse(unittest.TestCase):
             self.assertEqual(v, token_dict3[k])
 
 if __name__ == "__main__":
-    # can be called from tests/
-    # $ python3 test_cmd_parse_utils.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_cmd_parse_utils.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_cmd_parse_utils.py
+    # 
     # or
-    # $ python3 -m tests.test_cmd_parse_utils
-    # or, for a specific test
-    # $ python3 -m unittest tests.test_cmd_parse_utils.TestCommandParse.test_tokenizer
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_cmd_parse_utils
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.distribution.test_cmd_parse_utils.TestCommandParseUtils.test_tokenizer
 
     unittest.main()

@@ -1,6 +1,3 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/tests/)
-
 import unittest
 import pandas as pd
 import io
@@ -113,15 +110,31 @@ class TestDataDump(unittest.TestCase):
         self.assertEqual("\n".join(str(i) for i in tree_data_df["replicate"]), "0\n1\n0\n1\n0\n1\n0\n1\n0\n1")
 
 if __name__ == "__main__":
-    # can be called from tests/
-    # $ python3 test_data_dump.py
+    # Assuming you opened the PhyloJunction/ (repo root) folder
+    # on VSCode and that you want to run this as a standalone script,
+    # i.e., "Run Without Debugging", you will need to configure your
+    # launch.json to have:
     # 
-    # can also be called from phylojunction/
-    # $ python3 tests/test_data_dump.py
+    # "env": {"PYTHONPATH": "${workspaceRoot}/src/phylojunction/"}
+    # 
+    # and your settings.json to have:
+    #   
+    # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
+    # 
+    # If you want to run this as a standalone from PhyloJunction/
+    # on the terminal, remember to add "src/phylojunction" to
+    # PYTHONPATH (system variable), or to set it if it does not
+    # exist -- don't forget to export it!
+    # 
+    # Then you can do:
+    # $ python3 tests/distribution/test_data_dump.py
+    # 
     # or
-    # $ python3 -m tests.test_data_dump.py
-    # or, for a specific test
-    # $ python3 -m unittest tests.test_data_dump.TestDataDump.test_bisse_data_dump for that specific test
     #
-    # can also be called from VS Code, if open folder is phylojuction/
+    # $ python3 -m tests.distribution.test_data_dump
+    #
+    # or 
+    #
+    # $ python3 -m unittest tests.test_data_dump.TestDataDump.test_bisse_data_dump for that specific test
+
     unittest.main()
