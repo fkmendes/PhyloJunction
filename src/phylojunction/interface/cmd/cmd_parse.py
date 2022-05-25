@@ -8,7 +8,7 @@ import typing as ty
 import pgm.pgm as pgm
 # import user_interface.phylojunction_inference as pjinf
 # import user_interface.phylojunction_io as pjio
-import interface.cmd_parse_utils as cmdu
+import interface.cmd.cmd_parse_utils as cmdu
 import interface.grammar.dn_grammar as dngrammar
 import interface.grammar.det_fn_grammar as detgrammar
 import utility.exception_classes as ec

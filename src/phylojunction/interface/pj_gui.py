@@ -1,4 +1,4 @@
-"""pj.py: PhyloJunction's GUI"""
+"""pj_gui.py: PhyloJunction's GUI"""
 
 # NOTE: running the GUI from a conda environment messes up the fonts
 
@@ -18,7 +18,7 @@ import pgm.pgm as pgm
 import inference.revbayes.rb_inference as rbinf
 import readwrite.pj_write as pjwrite
 import readwrite.pj_read as pjread
-import interface.cmd_parse as cmd
+import interface.cmd.cmd_parse as cmd
 import utility.exception_classes as ec
 import data.tree as pjdt
 
@@ -48,6 +48,8 @@ def _delete_fig_agg(_fig_agg):
 # Entry point #
 ###############
 def call_gui():
+    
+    sg.theme("LightGray2")
     
     def _get_scaling():
     # called before window created
@@ -640,8 +642,6 @@ def call_gui():
 
 
     window.close()
-
-sg.theme("LightGray2")
 
 # call GUI
 if __name__ == "__main__":

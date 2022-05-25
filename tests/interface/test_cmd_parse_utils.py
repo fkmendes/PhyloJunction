@@ -1,7 +1,7 @@
 import unittest
 
 # pj imports
-import interface.cmd_parse_utils as cmdu
+import interface.cmd.cmd_parse_utils as cmdu
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

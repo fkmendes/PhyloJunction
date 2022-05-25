@@ -111,3 +111,30 @@ mypy interface/grammar/dn_grammar.py
 
 Note that calling `mypy` on modules that depend on other modules within the same package (e.g., `helper_functions.py` is in the same package as, and depends on `exception_classes.py`) requires guiding `mypy`'s import discovery.
 This is what the flags `--namespace-packages` together with `--explicit-package-bases` do (they are necessary even when an `__init__.py` is present in the same folder as the modules being type checked).
+
+## Editable pip install for developers
+
+Building and installing PhyloJunction is done using `setuptools`, which is specified in `pyproject.toml`.
+Instructions for `setuptools` are provided in `setup.cfg`.
+
+Start by cloning the PhyloJunction repository, and going to its root (i.e., the
+`PhyloJunction` folder).
+
+If you are on an Apple machine that obstrusively curtails file system access, run the following command:
+
+```
+python3 -m pip install --user -e .
+```
+
+The `--user` flag is the way around said restrictions.
+This will tell `pip` to place the entry point executables (`pjcli` and `pjgui`) in  `/Users/user_name/Library/Python/3.9/bin/` if you are using Python 3.9, say.
+Remember to add this path to the PATH system variable if you want to call the executables from anywhere on your file system.
+Another option is to run the following command:
+
+```
+python3 -m pip install --prefix ~/.local/bin -e .
+```
+
+Which creates directories `bin/` (placing the executables therein) and `lib/python3.9/site-packages/` (placing the egg-link therein) inside `~/.local`.
+This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
+

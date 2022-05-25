@@ -5,8 +5,8 @@ from statistics import mean, stdev
 
 # pj imports
 import pgm.pgm as pgm
-import interface.cmd_parse as cmd
-import interface.cmd_parse_utils as cmdu
+import interface.cmd.cmd_parse as cmd
+import interface.cmd.cmd_parse_utils as cmdu
 import utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
