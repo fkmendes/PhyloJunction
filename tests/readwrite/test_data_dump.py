@@ -127,14 +127,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/distribution/test_data_dump.py
+    # $ python3 tests/readwrite/test_data_dump.py
     # 
     # or
     #
-    # $ python3 -m tests.distribution.test_data_dump
+    # $ python3 -m tests.readwrite.test_data_dump
     #
     # or 
     #
-    # $ python3 -m unittest tests.test_data_dump.TestDataDump.test_bisse_data_dump for that specific test
+    # $ python3 -m unittest tests.readwrite.test_data_dump.TestDataDump.test_bisse_data_dump
 
     unittest.main()

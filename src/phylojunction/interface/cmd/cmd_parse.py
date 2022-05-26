@@ -1,4 +1,3 @@
-import sys
 import re
 import io
 import typing as ty
@@ -15,24 +14,29 @@ import phylojunction.utility.exception_classes as ec
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-def script2pgm(script_file_path) -> pgm.ProbabilisticGraphicalModel:
-    """Go through lines in file object and populate probabilistic graphical model
+def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pgm.ProbabilisticGraphicalModel:
+    """Go through lines in file object or specification string and populate probabilistic graphical model
 
     Args:
-        script_file_path (str): Path to script .pj file
+        script_file_path_or_model_spec (str): Path to script .pj file or full string specifying model directly
     """
 
-    pgm_obj = pgm.ProbabilisticGraphicalModel()
-
-    with open(script_file_path, "r") as f:
-        for line in f:
-
-            print("reading line: " + line)
+    def _execute_spec_lines(all_lines_list: ty.List[str], pgm_obj: pgm.ProbabilisticGraphicalModel) -> None:
+        for line in all_lines_list:
             # clear padding whitespaces
             line = line.lstrip().rstrip()
 
-            ok_cmd_line = cmdline2pgm(pgm_obj, line)
+            _ = cmdline2pgm(pgm_obj, line)
 
+    pgm_obj = pgm.ProbabilisticGraphicalModel()
+
+    if in_pj_file:
+        with open(script_file_path_or_model_spec, "r") as infile:
+            all_lines_list = infile.read().splitlines()
+    
+    # side-effect: populates pgm_obj
+    _execute_spec_lines(all_lines_list, pgm_obj)
+        
     # debugging
     # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():
     #     print("\nnode name = " + node_pgm_name)
@@ -300,7 +304,6 @@ def parse_deterministic_function_assignment(pgm_obj: pgm.ProbabilisticGraphicalM
             create_add_det_nd_pgm(det_nd_name, det_fn_obj, parent_pgm_nodes)
 
 
-
 if __name__ == "__main__":
 
     script_str1 = "a <- 1.0"
@@ -402,65 +405,35 @@ if __name__ == "__main__":
     script_str34 = script_str23 + "\ntr ~ discrete_sse(n=1, meh=meh, start_state=[0], stop=\"size\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str35 = script_str23 + "\ntr ~ discrete_sse(n=1, meh=meh, start_state=[0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
 
-
-    file_handle1 = io.StringIO(script_str1)
-    file_handle2 = io.StringIO(script_str2)
-    file_handle3 = io.StringIO(script_str3)
-    file_handle4 = io.StringIO(script_str4)
-    file_handle5 = io.StringIO(script_str5)
-    file_handle6 = io.StringIO(script_str6)
-    file_handle6_2 = io.StringIO(script_str6_2)
-    file_handle7 = io.StringIO(script_str7)
-    file_handle8 = io.StringIO(script_str8)
-    file_handle9 = io.StringIO(script_str9)
-    file_handle10 = io.StringIO(script_str10)
-    file_handle11 = io.StringIO(script_str11)
-    file_handle12 = io.StringIO(script_str12)
-    file_handle13 = io.StringIO(script_str13)
-    file_handle14 = io.StringIO(script_str14)
-    file_handle15 = io.StringIO(script_str15)
-    file_handle16 = io.StringIO(script_str16)
-    file_handle17 = io.StringIO(script_str17)
-    file_handle18 = io.StringIO(script_str18)
-    file_handle19 = io.StringIO(script_str19)
-    file_handle20 = io.StringIO(script_str20)
-    file_handle21 = io.StringIO(script_str21)
-    file_handle22 = io.StringIO(script_str22)
-    file_handle23 = io.StringIO(script_str23)
-    file_handle24 = io.StringIO(script_str24)
-    file_handle25 = io.StringIO(script_str25)
-    file_handle26 = io.StringIO(script_str26)
-    file_handle27 = io.StringIO(script_str27)
-
     file_handle_exception = io.StringIO(script_str35)
 
     # script2pgm(file_handle_exception)
 
-    script2pgm(file_handle1)
-    script2pgm(file_handle2)
-    script2pgm(file_handle3)
-    script2pgm(file_handle4)
-    script2pgm(file_handle5)
-    script2pgm(file_handle6)
-    script2pgm(file_handle6_2)
-    script2pgm(file_handle7)
-    script2pgm(file_handle8)
-    script2pgm(file_handle9)
-    script2pgm(file_handle10)
-    script2pgm(file_handle11)
-    script2pgm(file_handle12)
-    script2pgm(file_handle13)
-    script2pgm(file_handle14)
-    script2pgm(file_handle15)
-    script2pgm(file_handle16)
-    script2pgm(file_handle17)
-    script2pgm(file_handle18)
-    script2pgm(file_handle19)
-    script2pgm(file_handle20)
-    script2pgm(file_handle21)
-    script2pgm(file_handle22)
-    script2pgm(file_handle23)
-    script2pgm(file_handle24)
-    script2pgm(file_handle25)
-    script2pgm(file_handle26) # will cause error if you generate rev script
-    script2pgm(file_handle27)
+    # script2pgm(file_handle1)
+    # script2pgm(file_handle2)
+    # script2pgm(file_handle3)
+    # script2pgm(file_handle4)
+    # script2pgm(file_handle5)
+    # script2pgm(file_handle6)
+    # script2pgm(file_handle6_2)
+    # script2pgm(file_handle7)
+    # script2pgm(file_handle8)
+    # script2pgm(file_handle9)
+    # script2pgm(file_handle10)
+    # script2pgm(file_handle11)
+    # script2pgm(file_handle12)
+    # script2pgm(file_handle13)
+    # script2pgm(file_handle14)
+    # script2pgm(file_handle15)
+    # script2pgm(file_handle16)
+    # script2pgm(file_handle17)
+    # script2pgm(file_handle18)
+    # script2pgm(file_handle19)
+    # script2pgm(file_handle20)
+    # script2pgm(file_handle21)
+    # script2pgm(file_handle22)
+    # script2pgm(file_handle23)
+    # script2pgm(file_handle24)
+    # script2pgm(file_handle25)
+    # script2pgm(file_handle26) # will cause error if you generate rev script
+    # script2pgm(file_handle27)

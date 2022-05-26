@@ -93,19 +93,19 @@ if __name__ == "__main__":
     # "python.analysis.extraPaths": [ "${workspaceFolder}/src/phylojunction/" ]
     # 
     # If you want to run this as a standalone from PhyloJunction/
-    # on the terminal, remember to add "src/phylojunction" to
+    # on the terminal, remember to add "src/" to
     # PYTHONPATH (system variable), or to set it if it does not
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/distribution/test_cmd_var_assignment
+    # $ python3 tests/interface/test_cmd_var_assignment
     # 
     # or
     #
-    # $ python3 -m tests.distribution.test_cmd_var_assignment
+    # $ python3 -m tests.interface.test_cmd_var_assignment
     #
     # or 
     #
-    # $ python3 -m unittest tests.test_cmd_var_assignment.TestVarAssignment.test_var_assignment
+    # $ python3 -m unittest tests.interface.test_cmd_var_assignment.TestVarAssignment.test_var_assignment
 
     unittest.main()

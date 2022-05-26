@@ -77,7 +77,8 @@ Your `settings.json` will look like this:
 }
 ```
 
-## 
+If VSCode refuses to find the tests, one thing that might be set up wrong is the Python interpreter VSCode is using.
+Unit tests usually have many dependencies -- if those dependencies are not found because the wrong interpreter is used (the native one that comes with the machine, say, instead of an interpreter installed with Homebrew), then the tests will not be found.
 
 ## Type checking
 

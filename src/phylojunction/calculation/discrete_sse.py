@@ -1,9 +1,8 @@
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/calculation/)
 import typing as ty
 import numpy as np
 import enum
 import random
+import math
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
@@ -375,6 +374,80 @@ class MacroEvolEventHandler():
 
 ##############################################################################
 
+class StateIntoPatternConverter:
+    """Stash and machinery for checking and converting character compound-states into bit patterns,
+    and vice-versa
+    
+    For example, if we are thinking about regions as characters, then compound-state means different ranges (e.g., "A", "AB"),
+    while "state" is the number of different values a single character can take.
+    In the case of 1-character-1-region, then the number of states is 2, because a species is either present or not in a region.
+    """
+
+    # e.g., for 2 states
+    # Region | compound-state  | Bit pattern 
+    # --------------------------------------
+    # Dead   |        0        | 000
+    # A      |        1        | 100
+    # B      |        2        | 010
+    # C      |        3        | 001
+    # AB     |        4        | 110
+    # AC     |        5        | 101
+    # BC     |        6        | 011
+    # ABC    |        7        | 111
+
+    n_char: int
+    n_states_per_char: int
+    n_states: int
+    int2set_dict: ty.Dict[str, str] = dict()
+    set2int_dict: ty.Dict[str, str] = dict()
+
+    def __init__(self, n_characters: int, n_states_per_char: int) -> None:
+        self.n_char = n_characters
+        self.n_states_per_char = n_states_per_char
+        self.n_states = int(n_states_per_char ** n_characters)
+
+        # side-effect
+        self.populate_dicts()
+
+    def populate_dicts(self) -> None:
+        """Non-recursively generate all bit patterns for a given number of characters and states per characters
+
+        Note that if we are thinking about regions as characters, then "compound state" means the range (e.g., "AB"),
+        and state is the number of options per character (e.g., binary if present/absent in a region)
+        """
+        # non-recursive method
+        _list_for_sorting = [[] for i in range(self.n_char + 1)]
+        for compound_state_idx in range(self.n_states):
+            _bit_pattern = [0 for i in range(self.n_char)]
+            _z = compound_state_idx
+
+            for bit_idx in range(self.n_char-1, -1, -1):
+                _v = self.n_states_per_char ** bit_idx # n_states_per_char here is present/absent for regions (i.e., binary state)
+                
+                if _z >= _v:
+                    _bit_pattern[bit_idx] = 1
+                    _z -= _v
+                
+                else:
+                    _bit_pattern[bit_idx] = 0
+
+            _bit_pattern_str = "".join(str(b) for b in _bit_pattern)
+            _n_bits_on = sum(_bit_pattern)
+            _list_for_sorting[_n_bits_on].append(_bit_pattern_str)
+
+        # will store all bit patterns after sorting first by number of bits that are on and then by the decimal value underlying the bit pattern
+        sorted_list_patterns = [] 
+        for list_of_patterns in _list_for_sorting:
+            sorted_list_patterns.extend(list_of_patterns)
+
+        # getting the other dict by reversing this one
+        self.int2set_dict = dict((str(idx), bit_pattern) for idx, bit_pattern in enumerate(sorted_list_patterns))
+        for k, v in self.int2set_dict.items():
+            self.set2int_dict[v] = k
+
+
+##############################################################################
+
 if __name__ == "__main__":
     # can be called from calculation/
     # $ python3 discrete_sse.py
@@ -387,8 +460,15 @@ if __name__ == "__main__":
     # can also be called from VS Code, if open folder is phylojuction/
     
     # yule, one state, one epoch
-    arp = AtomicSSERateParameter(1.0, MacroevolEvent.W_SPECIATION, name="lambda")
-    print(arp)
-    rates_t0_s0 = [ arp ]
-    matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice        
-    fig_rates_manager = FIGRatesManager(matrix_atomic_rate_params, 1)
+    # arp = AtomicSSERateParameter(1.0, MacroevolEvent.W_SPECIATION, name="lambda")
+    # print(arp)
+    # rates_t0_s0 = [ arp ]
+    # matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice        
+    # fig_rates_manager = FIGRatesManager(matrix_atomic_rate_params, 1)
+
+    n_characters = 3 # regions A and B
+    n_states_per_char = 2 # presence/absence
+    svc = StateIntoPatternConverter(n_characters, n_states_per_char)
+
+    print(svc.int2set_dict)
+    print(svc.set2int_dict)
