@@ -8,8 +8,8 @@ import matplotlib.ticker as mticker # type: ignore
 from abc import ABC, abstractmethod
 
 # pj imports
-import utility.exception_classes as ec
-from data.tree import AnnotatedTree
+import phylojunction.utility.exception_classes as ec
+from phylojunction.data.tree import AnnotatedTree
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

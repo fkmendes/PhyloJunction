@@ -4,8 +4,8 @@ import typing as ty
 import re
 
 # pj imports
-import pgm.pgm as pgm
-import utility.exception_classes as ec
+import phylojunction.pgm.pgm as pgm
+import phylojunction.utility.exception_classes as ec
 
 # general
 cannot_start_with_this_regex = re.compile('[\(\[\{|^&+\-%*/=!><_~0-9]')

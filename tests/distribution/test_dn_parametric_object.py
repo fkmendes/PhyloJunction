@@ -5,7 +5,7 @@ import math
 from statistics import mean
 
 # pj imports
-import distribution.dn_parametric as dnpar
+import phylojunction.distribution.dn_parametric as dnpar
 
 class TestParametricDns(unittest.TestCase):
 

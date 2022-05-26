@@ -1,6 +1,3 @@
-import sys
-sys.path.extend(["../", "../phylojunction"])
-import os
 import typing as ty
 import numpy as np
 import pandas as pd # type: ignore

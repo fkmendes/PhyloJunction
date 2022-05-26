@@ -1,8 +1,10 @@
 import dendropy as dp # type: ignore
-import pgm.pgm as pgm
-import calculation.discrete_sse as sseobj
 import typing as ty
-from data.tree import AnnotatedTree
+
+# pj imports
+import phylojunction.pgm.pgm as pgm
+import phylojunction.calculation.discrete_sse as sseobj
+from phylojunction.data.tree import AnnotatedTree
 
 class DnSSE(pgm.DistributionPGM):
     DN_NAME: str

@@ -1,9 +1,9 @@
 import unittest
 
 # pj imports
-import utility.helper_functions as pjh
-import calculation.discrete_sse as sseobj
-import distribution.dn_discrete_sse as distsse
+import phylojunction.utility.helper_functions as pjh
+import phylojunction.calculation.discrete_sse as sseobj
+import phylojunction.distribution.dn_discrete_sse as distsse
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

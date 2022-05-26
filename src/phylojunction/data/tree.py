@@ -10,8 +10,8 @@ import matplotlib.collections as mpcollections # type: ignore
 from matplotlib.figure import Figure # type: ignore
 
 # pj imports
-import utility.exception_classes as ec
-import utility.helper_functions as pjh
+import phylojunction.utility.exception_classes as ec
+import phylojunction.utility.helper_functions as pjh
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

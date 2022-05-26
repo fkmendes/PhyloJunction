@@ -1,6 +1,8 @@
 import numpy as np
-import pgm.pgm as pgm
 import typing as ty
+
+# pj imports
+import phylojunction.pgm.pgm as pgm
 
 class DnLogNormal(pgm.DistributionPGM):
     DN_NAME: str

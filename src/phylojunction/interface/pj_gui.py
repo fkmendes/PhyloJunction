@@ -14,16 +14,16 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
 from matplotlib.figure import Figure # type: ignore
 
 # pj imports
-import pgm.pgm as pgm
-import inference.revbayes.rb_inference as rbinf
-import readwrite.pj_write as pjwrite
-import readwrite.pj_read as pjread
-import interface.cmd.cmd_parse as cmd
-import utility.exception_classes as ec
-import data.tree as pjdt
+import phylojunction.pgm.pgm as pgm
+import phylojunction.inference.revbayes.rb_inference as rbinf
+import phylojunction.readwrite.pj_write as pjwrite
+import phylojunction.readwrite.pj_read as pjread
+import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.utility.exception_classes as ec
+import phylojunction.data.tree as pjdt
 
 __author__ = "Fabio K. Mendes"
-__email__ = "f.mendes@wustl.edu"
+__email__ = "f.mendphylojunctiones@wustl.edu"
 
 def _add_to_clipboard(text):
     import tempfile

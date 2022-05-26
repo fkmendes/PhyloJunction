@@ -1,12 +1,11 @@
 import sys
-sys.path.extend(["../../", "../", "../phylojunction"])
 import typing as ty
 
 # pj imports
-import distribution.dn_parametric as dnpar
-import pgm.pgm as pgm
-import interface.grammar.make_dn_discrete_sse as make_dnsse
-import utility.exception_classes as ec
+import phylojunction.distribution.dn_parametric as dnpar
+import phylojunction.pgm.pgm as pgm
+import phylojunction.interface.grammar.make_dn_discrete_sse as make_dnsse
+import phylojunction.utility.exception_classes as ec
 # from user_interface.dn_discrete_sse import make_discrete_SSE_dn # https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 
 __author__ = "Fabio K. Mendes"

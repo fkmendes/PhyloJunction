@@ -1,36 +1,37 @@
 import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/interface/)
 import re
 import io
 import typing as ty
 
 # pj imports
-import pgm.pgm as pgm
+import phylojunction.pgm.pgm as pgm
 # import user_interface.phylojunction_inference as pjinf
 # import user_interface.phylojunction_io as pjio
-import interface.cmd.cmd_parse_utils as cmdu
-import interface.grammar.dn_grammar as dngrammar
-import interface.grammar.det_fn_grammar as detgrammar
-import utility.exception_classes as ec
+import phylojunction.interface.cmd.cmd_parse_utils as cmdu
+import phylojunction.interface.grammar.dn_grammar as dngrammar
+import phylojunction.interface.grammar.det_fn_grammar as detgrammar
+import phylojunction.utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-def script2pgm(file_handle) -> None:
+def script2pgm(script_file_path) -> pgm.ProbabilisticGraphicalModel:
     """Go through lines in file object and populate probabilistic graphical model
 
     Args:
-        file_handle (file object): Path to script .txt file
+        script_file_path (str): Path to script .pj file
     """
 
     pgm_obj = pgm.ProbabilisticGraphicalModel()
 
-    for line in file_handle:
+    with open(script_file_path, "r") as f:
+        for line in f:
 
-        # clear padding whitespaces
-        line = line.lstrip().rstrip()
+            print("reading line: " + line)
+            # clear padding whitespaces
+            line = line.lstrip().rstrip()
 
-        cmdline2pgm(pgm_obj, line)
+            ok_cmd_line = cmdline2pgm(pgm_obj, line)
 
     # debugging
     # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():
@@ -51,8 +52,9 @@ def script2pgm(file_handle) -> None:
     #     print(all_sims_mcmc_logging_spec_list[i])
 
     # pjio.output_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix="test")
+    return pgm_obj
 
-def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str):
+def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
     """Update ProbabilisticGraphicalModel object using user-entered command line in PJ's language
 
     Args:

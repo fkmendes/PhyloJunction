@@ -1,12 +1,10 @@
-import sys
-sys.path.extend(["../../", "../", "../phylojunction"])
 import typing as ty
 
 # pj imports
-import distribution.dn_discrete_sse as dnsse
-import calculation.discrete_sse as sseobj
-import pgm.pgm as pgm
-import utility.exception_classes as ec
+import phylojunction.distribution.dn_discrete_sse as dnsse
+import phylojunction.calculation.discrete_sse as sseobj
+import phylojunction.pgm.pgm as pgm
+import phylojunction.utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

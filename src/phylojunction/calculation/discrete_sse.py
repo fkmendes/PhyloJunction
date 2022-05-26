@@ -6,7 +6,7 @@ import enum
 import random
 
 # pj imports
-import utility.exception_classes as ec
+import phylojunction.utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

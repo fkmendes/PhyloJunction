@@ -2,7 +2,7 @@ import unittest
 from dendropy import Tree, Node, Taxon
 
 # pj imports
-from data.tree import AnnotatedTree
+from phylojunction.data.tree import AnnotatedTree
 
 class TestAnnotateTree(unittest.TestCase): 
     

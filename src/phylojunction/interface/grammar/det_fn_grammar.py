@@ -1,12 +1,10 @@
-import sys
-sys.path.extend(["../../", "../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/interface/grammar/)
 import typing as ty
 
 # pj imports
-import calculation.discrete_sse as sseobj
-import utility.exception_classes as ec
-import interface.grammar.det_fn_discrete_sse as detsse
-import pgm.pgm as pgm
+import phylojunction.calculation.discrete_sse as sseobj
+import phylojunction.utility.exception_classes as ec
+import phylojunction.interface.grammar.det_fn_discrete_sse as detsse
+import phylojunction.pgm.pgm as pgm
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

@@ -1,8 +1,8 @@
 import unittest
 
 # pj imports
-import utility.helper_functions as pjh
-import calculation.math_utils as pjmath
+import phylojunction.utility.helper_functions as pjh
+import phylojunction.calculation.math_utils as pjmath
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

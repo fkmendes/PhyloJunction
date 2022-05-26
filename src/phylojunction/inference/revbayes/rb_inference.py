@@ -4,9 +4,9 @@ import typing as ty
 import numpy as np
 
 # pj imports
-import inference.revbayes.rb_dn_parametric as rbpar
-import pgm.pgm as pgm
-import utility.exception_classes as ec
+import phylojunction.inference.revbayes.rb_dn_parametric as rbpar
+import phylojunction.pgm.pgm as pgm
+import phylojunction.utility.exception_classes as ec
 
 def get_mcmc_logging_spec_list(a_node_pgm_name: str, moves_str: str, n_sim: int, mcmc_chain_length: int , prefix: str, results_dir: str) -> ty.List[str]:
     """Generate list of strings where each element (one per simulation) will configure RevBayes' MCMC (moves) and logging inside a .Rev script

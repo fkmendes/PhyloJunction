@@ -6,11 +6,11 @@ import numpy as np
 from scipy.stats import expon, lognorm, norm, gamma, uniform # type: ignore
 
 # pj imports
-import pgm.pgm as pgm
-import calculation.math_utils as mu
-import utility.exception_classes as ec
-import utility.helper_functions as pjh
-import inference.revbayes.rb_dn_parametric as rbpar
+import phylojunction.pgm.pgm as pgm
+import phylojunction.calculation.math_utils as mu
+import phylojunction.utility.exception_classes as ec
+import phylojunction.utility.helper_functions as pjh
+import phylojunction.inference.revbayes.rb_dn_parametric as rbpar
 
 class DnLogNormal(pgm.DistributionPGM):
     

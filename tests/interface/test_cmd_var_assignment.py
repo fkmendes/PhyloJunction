@@ -2,9 +2,9 @@ import unittest
 import re
 
 # pj imports
-import pgm.pgm as pgm
-import interface.cmd.cmd_parse as cmd
-import interface.cmd.cmd_parse_utils as cmdu
+import phylojunction.pgm.pgm as pgm
+import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.interface.cmd.cmd_parse_utils as cmdu
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

@@ -1,7 +1,7 @@
 import unittest
 
 # pj imports
-import calculation.discrete_sse as sseobj
+import phylojunction.calculation.discrete_sse as sseobj
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

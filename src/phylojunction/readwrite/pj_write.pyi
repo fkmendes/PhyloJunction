@@ -1,6 +1,8 @@
 import pandas as pd # type: ignore
-import pgm.pgm as pgm
 import typing as ty
+
+# pj imports
+import phylojunction.pgm.pgm as pgm
 
 def write_text_output(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> None: ...
 def write_data_df(outfile_handle: ty.IO, data_df: pd.DataFrame, format: str = ...) -> None: ...

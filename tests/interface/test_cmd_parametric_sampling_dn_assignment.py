@@ -4,10 +4,10 @@ import math
 from statistics import mean
 
 # pj imports
-import pgm.pgm as pgm
-import interface.cmd.cmd_parse as cmd
-import interface.cmd.cmd_parse_utils as cmdu
-import utility.exception_classes as ec
+import phylojunction.pgm.pgm as pgm
+import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.interface.cmd.cmd_parse_utils as cmdu
+import phylojunction.utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

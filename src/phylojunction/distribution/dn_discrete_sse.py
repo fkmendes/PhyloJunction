@@ -13,12 +13,12 @@ import dendropy as dp # type: ignore
 # from matplotlib.pyplot import draw
 
 # pj imports
-import pgm.pgm as pgm
-import calculation.discrete_sse as sseobj
-import utility.helper_functions as pjh
-import utility.exception_classes as ec
-from data.tree import AnnotatedTree
-import distribution.dn_parametric as dnpar
+import phylojunction.pgm.pgm as pgm
+import phylojunction.calculation.discrete_sse as sseobj
+import phylojunction.utility.helper_functions as pjh
+import phylojunction.utility.exception_classes as ec
+from phylojunction.data.tree import AnnotatedTree
+import phylojunction.distribution.dn_parametric as dnpar
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

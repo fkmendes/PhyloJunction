@@ -3,10 +3,10 @@ import pandas as pd
 import io
 
 # pj imports
-import calculation.discrete_sse as sseobj
-import pgm.pgm as pgm
-import readwrite.pj_write as pjwrite
-import distribution.dn_discrete_sse as dnsse
+import phylojunction.calculation.discrete_sse as sseobj
+import phylojunction.pgm.pgm as pgm
+import phylojunction.readwrite.pj_write as pjwrite
+import phylojunction.distribution.dn_discrete_sse as dnsse
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

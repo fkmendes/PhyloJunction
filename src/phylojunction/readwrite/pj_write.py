@@ -1,13 +1,11 @@
-import sys
-sys.path.extend(["../", "../phylojunction"])
 import os
 import typing as ty
 import numpy as np
 import pandas as pd # type: ignore
 
 # pj imports
-from data.tree import AnnotatedTree
-import pgm.pgm as pgm
+from phylojunction.data.tree import AnnotatedTree
+import phylojunction.pgm.pgm as pgm
 
 def write_text_output(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> None:
     content_string = "\n".join(content_string_list)

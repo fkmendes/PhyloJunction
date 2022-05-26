@@ -1,12 +1,11 @@
 import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/utility/)
 import time
 import typing as ty
 import numpy as np # type: ignore
 from collections import defaultdict
 
 # pj imports
-import utility.exception_classes as ec
+import phylojunction.utility.exception_classes as ec
 
 
 def print_progress(idx: int, iterator_len: int) -> None:
