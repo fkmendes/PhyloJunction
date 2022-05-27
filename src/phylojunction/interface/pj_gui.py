@@ -254,7 +254,7 @@ def call_gui():
         [ sg.Frame(
             layout = [
             
-            [ sg.Input(key="-CMD-", font=("Helvetica", 16), text_color="white", background_color="gray20", focus=True, do_not_clear=False, size=(111,1))  ]
+                [ sg.Input(key="-CMD-", font=("Helvetica", 16), text_color="white", background_color="gray20", focus=True, do_not_clear=False, size=(111,1))  ]
             
             ],
             title="Command prompt",
@@ -279,7 +279,7 @@ def call_gui():
         ],
 
         # sg.Input(key="-SCRIPT-READ-", enable_events=True, visible=False), # dummy element to trigger file browse
-        # sg.FileBrowse(button_text="Open script file", target="-SCRIPT-READ-", font=("Helvetica", 14), button_color="skyblue1"),
+        # sg.FileBrowse(button_text="Open script file", target="-SCRIPT-READ-", font=("Helvetica", 14), button_color="skyblue1"),        
         [
             sg.Text("Save with prefix", font=("Helvetica", 14)), sg.Input(size=(10, 1), font=("Helvetica", 14), key="-PREFIX-")
         ]
@@ -305,7 +305,7 @@ def call_gui():
         [
             sg.Frame(
             layout = [
-                [ sg.Multiline(key="-INFERENCE-SPEC-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,36)) ]
+                [ sg.Multiline(key="-INFERENCE-SPEC-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,34)) ]
             ],
             title="Inference specification",
             relief=sg.RELIEF_FLAT,
@@ -344,9 +344,11 @@ def call_gui():
     ###############
     # Main window #
     ###############
-    window = sg.Window("PhyloJunction", tabgrp, finalize=True, resizable=True, keep_on_top=False, element_justification="c") 
+    
+    # margins=(0,0)
+    window = sg.Window("PhyloJunction", tabgrp, finalize=True, resizable=True, keep_on_top=False, element_justification="c", location=(0,0)) 
     window['-CMD-'].Widget.config(insertbackground="white")
-    # window.Size = (1000, 750)
+    window.Size = (1050, 760)
 
     _fig_agg = None
     _fig = Figure(figsize=(11,4.5))
