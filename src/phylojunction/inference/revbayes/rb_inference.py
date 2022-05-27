@@ -52,7 +52,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
         tuple: Tuple containing three lists, with strings to be printed to files (2) and directory names (1)
     """
     
-    all_nodes_all_sims_spec_list: ty.List[ty.List[str]] = [[]]
+    all_nodes_all_sims_spec_list: ty.List[ty.List[str]] = []
     all_nodes_moves_str: str = str()
     sorted_node_pgm_list: ty.List[pgm.NodePGM] = pgm_obj.get_sorted_node_pgm_list()
     node_pgm_name: str = str()
@@ -180,7 +180,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                     
 
             # one item per pgm_node, each item with n_sim items
-            all_nodes_all_sims_spec_list.append(node_inference_spec_list)
+            all_nodes_all_sims_spec_list.append(node_inference_spec_list) # 1D: nodes, 2D: sims
 
             ##############################
             # MCMC move/operator weights #
@@ -194,20 +194,20 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
 
     # finished looking at all nodes and all simulations, time to reorganize
     all_sims_model_spec_list = ["" for i in range(n_sim)] # 1D: simulations, 2D: nodes
-    line_sep: str = ""
+    line_sep: str = "" # spacing between node specification lines
     
     try:
-        # 1D: nodes, 2D: sims
+        # if there is more than one node, we will add empty lines between their specificatoin
         if len(all_nodes_all_sims_spec_list[0]) > 1:
             line_sep = "\n\n"
     # will be an empty list if deterministic for now
     except: pass
     
     # converting into, 1D: sims, 2D: nodes
-    for jth_node_pgm_list_all_sims in all_nodes_all_sims_spec_list:
+    for j, jth_node_pgm_list_all_sims in enumerate(all_nodes_all_sims_spec_list):
         for i, ith_sim_this_node_str in enumerate(jth_node_pgm_list_all_sims):
-            # if there are > 1 nodes and we are not looking at the last one
-            if len(all_nodes_all_sims_spec_list) > 1 and i < (len(jth_node_pgm_list_all_sims) - 1): 
+            # if there are > 1 nodes and we are not looking at the last node
+            if len(all_nodes_all_sims_spec_list) > 1 and j < (len(all_nodes_all_sims_spec_list)-1): 
                 all_sims_model_spec_list[i] += ith_sim_this_node_str + line_sep
             
             # if it's the last one, we avoid end lines

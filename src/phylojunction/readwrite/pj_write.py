@@ -80,7 +80,7 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
     return data_df_names_list, data_df_list
 
 
-def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str=None) -> None:
+def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="") -> None:
     """Write stochastic-node sampled values in specified directory 
     
     Args:
@@ -150,10 +150,10 @@ def get_write_inference_rev_scripts(all_sims_model_spec_list: ty.List[str], all_
 
             yield _ith_string
 
-    _n_sim: int = len(all_sims_model_spec_list)
+    _n_sim = len(all_sims_model_spec_list)
     _inference_root_dir, _scripts_dir, _results_dir = dir_list
 
-    _prefix: str
+    _prefix = str()
     if _prefix: _prefix += "_"
     else: _prefix = ""         
 
