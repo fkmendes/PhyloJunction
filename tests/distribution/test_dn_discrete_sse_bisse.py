@@ -42,7 +42,7 @@ class TestBiSSETrees(unittest.TestCase):
         """
 
         stop_condition = "size"
-        stop_condition_value = 50 # 50 living taxa
+        stop_condition_value = [50] # 50 living taxa
 
         start_at_origin = True
 
@@ -207,7 +207,7 @@ class TestBiSSETrees(unittest.TestCase):
         """
 
         stop_condition = "age"
-        stop_condition_value = 3.0 # 3.0 time units
+        stop_condition_value = [3.0] # 3.0 time units
 
         start_at_origin = True
 
@@ -389,6 +389,6 @@ if __name__ == '__main__':
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_bisse.TestBDTrees.test_tree_size_state_count_max_taxa_bisse
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_bisse.TestBiSSETrees.test_tree_size_state_count_max_taxa_bisse
 
     unittest.main()

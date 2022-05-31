@@ -36,7 +36,7 @@ class TestBDTrees(unittest.TestCase):
         """
         # setting up stopping conditions
         stop_condition = "age"
-        stop_condition_value = 5.0 ## 5 time units
+        stop_condition_value = [5.0] ## 5 time units
         start_at_origin = True
 
         # simulation initialization

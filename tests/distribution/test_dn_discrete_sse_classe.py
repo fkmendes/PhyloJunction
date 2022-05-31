@@ -49,7 +49,7 @@ class TestClaSSETrees(unittest.TestCase):
         """
         
         stop_condition = "size"
-        stop_condition_value = 50 # 50 living taxa
+        stop_condition_value = [50] # 50 living taxa
 
         start_at_origin = True
 
@@ -252,7 +252,7 @@ class TestClaSSETrees(unittest.TestCase):
         """
 
         stop_condition = "age"
-        stop_condition_value = 3.0 # 3.0 time units
+        stop_condition_value = [3.0] # 3.0 time units
         
         start_at_origin = True
 

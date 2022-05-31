@@ -1,0 +1,6 @@
+import phylojunction.pgm.pgm as pgm
+import phylojunction.calculation.discrete_sse as sseobj
+import typing as ty
+
+def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]): ...
+def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler: ...

@@ -1,4 +1,3 @@
-import sys
 import typing as ty
 
 # pj imports
@@ -45,27 +44,6 @@ class PJDnGrammar():
         return False
 
     @classmethod
-    def extract_value_from_nodepgm(cls, val_list: ty.List[ty.Union[str, pgm.NodePGM]]) -> ty.List[str]:
-        """
-        Return copy of val_list if all elements are strings representing values.
-        When elements are StochasticNodePGMs, replaces those objects by their values cast to string (their values must be within a list).
-        If StochasticNodePGMs objects do not have .value field or if they cannot be string-fied, 
-        raise exception.
-        """
-        extracted_val_list: ty.List[str] = []
-        for v in val_list:
-            if isinstance(v, str):
-                extracted_val_list.append(v)
-            
-            elif isinstance(v, pgm.StochasticNodePGM):
-                try:
-                    extracted_val_list.extend([str(i) for i in v.value])
-                except:
-                    raise ec.VariableMisspec(str(v))
-
-        return extracted_val_list
-
-    @classmethod
     def init_return_discrete_SSE_dn(cls, dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> pgm.DistributionPGM:
         # dn_param_dict is validated inside
         return make_dnsse.make_discrete_SSE_dn(dn_param_dict) # returns dnssewrap
@@ -107,7 +85,7 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name 
                     
-                    _extracted_val = cls.extract_value_from_nodepgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
+                    _extracted_val = pgm.extract_value_from_nodepgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
 
                     if not cls.grammar_check("lognormal", arg):
                         raise ec.NotAParameterError(arg)
@@ -162,7 +140,7 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name
                     
-                    _extracted_val = cls.extract_value_from_nodepgm(val)
+                    _extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("normal", arg):
                         raise ec.NotAParameterError(arg)
@@ -210,7 +188,7 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name # needed for building inference specifications
                     
-                    _extracted_val = cls.extract_value_from_nodepgm(val)
+                    _extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("exponential", arg):
                         raise ec.NotAParameterError(arg)
@@ -262,7 +240,7 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name
                     
-                    _extracted_val = cls.extract_value_from_nodepgm(val)
+                    _extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("gamma", arg):
                         raise ec.NotAParameterError(arg)
@@ -317,7 +295,7 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_pgm_name # needed for building inference specifications
                     
-                    _extracted_val = cls.extract_value_from_nodepgm(val)
+                    _extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("unif", arg):
                         raise ec.NotAParameterError(arg)

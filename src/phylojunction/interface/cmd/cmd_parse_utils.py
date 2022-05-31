@@ -106,6 +106,7 @@ def parse_val_vector(vec_str: str) -> ty.List[str]:
     Returns:
         (str): Vector of strings, each being one of the values inside the vector being specified by \'vec_str\'
     """
+    
     if len(re.findall(vector_value_regex, vec_str)) > 2:
         raise ec.ScriptSyntaxError(vec_str, "Something went wrong during variable assignment. If a vector of values is specified, there can only be one left and one right squared brackets. Exiting...")
 

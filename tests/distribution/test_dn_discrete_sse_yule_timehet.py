@@ -61,7 +61,7 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         runtime_limit = 3600 # 1h
 
         stop_condition = "age"
-        stop_condition_value = 3.0 ## 3.0 time units
+        stop_condition_value = [3.0] # 3.0 time units
 
         start_at_origin = True
 

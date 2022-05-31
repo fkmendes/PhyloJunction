@@ -41,7 +41,7 @@ class TestDnSSEObject(unittest.TestCase):
         ########
         n_sim = 10
         stop_condition = "age"
-        stop_condition_value = 4.0 # 4.0 time units
+        stop_condition_value = [4.0] # 4.0 time units
         start_at_origin = True
         start_states_list = [0 for i in range(n_sim)]
 

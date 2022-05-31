@@ -362,7 +362,6 @@ class DeterministicNodePGM(NodePGM):
     def populate_operator_weight(self):
         pass
 
-##############################################################################
 
 ############
 # Plotting #
@@ -398,6 +397,29 @@ def get_histogram_gcf(axes: plt.Axes, values_list: ty.List[float], sample_idx: t
     
     axes.axes.xaxis.set_ticklabels([np.round(i,decimals=2) for i in bins])
 
+
+####################
+# Helper functions #
+####################
+def extract_value_from_nodepgm(val_list: ty.List[ty.Union[str, NodePGM]]) -> ty.List[str]:
+    """
+    Return copy of val_list if all elements are strings representing values.
+    When elements are StochasticNodePGMs, replaces those objects by their values cast to string (their values must be within a list).
+    If StochasticNodePGMs objects do not have .value field or if they cannot be string-fied, 
+    raise exception.
+    """
+    extracted_val_list: ty.List[str] = []
+    for v in val_list:
+        if isinstance(v, str):
+            extracted_val_list.append(v)
+        
+        elif isinstance(v, StochasticNodePGM) and v.value:
+            try:
+                extracted_val_list.extend([str(i) for i in v.value])
+            except:
+                raise ec.VariableMisspec(str(v))
+
+    return extracted_val_list # will be empty if DeterministicNodePGM is in val_list
 
 
 if __name__ == "__main__":

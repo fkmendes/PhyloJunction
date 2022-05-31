@@ -70,7 +70,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
     """
 
     # skip comments
-    if cmd_line.startswith("#"): return
+    if cmd_line.startswith("#"): return ""
 
     ##################################
     # Checking command line is valid #

@@ -33,7 +33,7 @@ class TestYuleTrees(unittest.TestCase):
         """
         # setting up stopping conditions
         stop_condition = "size"
-        stop_condition_value = 20 ## 20 species
+        stop_condition_value = [20] ## 20 species
         start_at_origin = True
 
         # simulation initialization
@@ -58,7 +58,7 @@ class TestYuleTrees(unittest.TestCase):
             pjh.print_progress(i , n_batches)
 
         # parsing results
-        exp_age = pjmath.exp_root_height_yule_ntaxa(1.0, stop_condition_value)
+        exp_age = pjmath.exp_root_height_yule_ntaxa(1.0, stop_condition_value[0])
         
         extant_count_set = set()
         batch_cis = list()
@@ -103,7 +103,7 @@ class TestYuleTrees(unittest.TestCase):
         """
         # setting up stopping conditions
         stop_condition = "age"
-        stop_condition_value = 2.0 ## 2 time units
+        stop_condition_value = [2.0] ## 2 time units
         start_at_origin = True
 
         # simulation initialization

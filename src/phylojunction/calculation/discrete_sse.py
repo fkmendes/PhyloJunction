@@ -224,7 +224,7 @@ class MacroEvolEventHandler():
 
     slice_t_ends: ty.List[ty.Optional[float]]
 
-    def __init__(self, a_fig_rates_manager: FIGRatesManager):
+    def __init__(self, a_fig_rates_manager: FIGRatesManager) -> None:
         self.fig_rates_manager = a_fig_rates_manager
         self.state_count = self.fig_rates_manager.state_count
         self.n_time_slices = self.fig_rates_manager.n_time_slices
@@ -251,7 +251,7 @@ class MacroEvolEventHandler():
                     self.str_representation += ", ".join(str(v) for v in ar.value) + "\n"
 
     # this function deals with vectorization
-    def total_rate(self, a_time: float, state_representation_dict: ty.Dict[int, ty.Set[str]], value_idx: int=0, departing_state: ty.Optional[int]=None, debug: bool=False):
+    def total_rate(self, a_time: float, state_representation_dict: ty.Dict[int, ty.Set[str]], value_idx: int=0, departing_state: ty.Optional[int]=None, debug: bool=False) -> ty.Union[float, ty.Tuple[float, ty.List[float]]]:
         """Calculate total rate for either any event, or for events conditioned on a specific state.
 
         Args:
@@ -415,8 +415,9 @@ class StateIntoPatternConverter:
         Note that if we are thinking about regions as characters, then "compound state" means the range (e.g., "AB"),
         and state is the number of options per character (e.g., binary if present/absent in a region)
         """
+        
         # non-recursive method
-        _list_for_sorting = [[] for i in range(self.n_char + 1)]
+        _list_for_sorting: ty.List[ty.List[str]] = [[] for i in range(self.n_char + 1)]
         for compound_state_idx in range(self.n_states):
             _bit_pattern = [0 for i in range(self.n_char)]
             _z = compound_state_idx
@@ -435,8 +436,8 @@ class StateIntoPatternConverter:
             _n_bits_on = sum(_bit_pattern)
             _list_for_sorting[_n_bits_on].append(_bit_pattern_str)
 
-        # will store all bit patterns after sorting first by number of bits that are on and then by the decimal value underlying the bit pattern
-        sorted_list_patterns = [] 
+        # will store all bit patterns after sorting first by number of bits that are on, and then by the decimal value underlying the bit pattern
+        sorted_list_patterns: ty.List[str] = [] 
         for list_of_patterns in _list_for_sorting:
             sorted_list_patterns.extend(list_of_patterns)
 

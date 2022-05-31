@@ -5,6 +5,7 @@ import numpy as np # type: ignore
 from collections import defaultdict
 
 # pj imports
+import phylojunction.pgm.pgm as pgm
 import phylojunction.utility.exception_classes as ec
 
 

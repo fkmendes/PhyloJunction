@@ -348,7 +348,7 @@ def call_gui():
     # margins=(0,0)
     window = sg.Window("PhyloJunction", tabgrp, finalize=True, resizable=True, keep_on_top=False, element_justification="c", location=(0,0)) 
     window['-CMD-'].Widget.config(insertbackground="white")
-    window.Size = (1050, 760)
+    # window.Size = (1050, 760) # resolution-dependent
 
     _fig_agg = None
     _fig = Figure(figsize=(11,4.5))

@@ -26,7 +26,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     _n_repl: int = 1
     _event_handler: sseobj.MacroEvolEventHandler = sseobj.MacroEvolEventHandler(sseobj.FIGRatesManager([[]], 1))
     _stop: str
-    _stop_value: float
+    _stop_values_list: ty.List[float] = []
     origin: bool = True
     cond_spn: bool = False
     cond_surv: bool = True
@@ -38,10 +38,21 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # NOTE: val is a list!
     for arg, val in dn_param_dict.items():
         if val:
-            first_val = val[0] 
+            _extracted_val = pgm.extract_value_from_nodepgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
+
+            ############################
+            # Non-vectorized arguments #
+            ############################
+            # ... thus using only the first value!
+            _first_val: ty.Union[str, pgm.NodePGM]
+            if len(_extracted_val) >= 1:
+                _first_val = _extracted_val[0] 
+            # DeterministicNodePGM is in val, e.g., val = [pgm.DeterministicNodePGM]
+            else:
+                _first_val = val[0]
             
-            if arg == "meh" and isinstance(first_val, pgm.NodePGM):
-                nodepgm_val = first_val.value
+            if arg == "meh" and isinstance(_first_val, pgm.NodePGM):
+                nodepgm_val = _first_val.value
                 
                 if isinstance(nodepgm_val, sseobj.MacroEvolEventHandler):
                 # there should be only one event handler always, but it will be in list
@@ -49,9 +60,10 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
             elif arg in ("n", "nr", "runtime_limit"):
                 try:
-                    if isinstance(first_val, str):
-                        int_val = int(first_val) # no vectorization allowed here
-                except: raise ec.FunctionArgError(arg, "Was expecting an integer. Distribution discrete_sse() could not be initialized.")
+                    if isinstance(_first_val, str):
+                        int_val = int(_first_val) # no vectorization allowed here
+                except:
+                    raise ec.FunctionArgError(arg, "Was expecting an integer. Distribution discrete_sse() could not be initialized.")
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
                 if arg == "n": _n = int_val
@@ -59,26 +71,16 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                 if arg == "nr": _n_repl = int_val
 
             elif arg == "stop":
-                if isinstance(first_val, str):
-                    _stop = first_val.replace("\"", "")
+                if isinstance(_first_val, str):
+                    _stop = _first_val.replace("\"", "")
 
-            # TODO: vectorize stop_value when stop is "age"
-            elif arg == "stop_value":
-                try:
-                    if isinstance(first_val, str):
-                        stop_val = float(first_val)
-                except: raise ec.FunctionArgError(arg, "Was expecting a float. Distribution discrete_sse() could not be initialized.")
-
-                _stop_value = stop_val
-
-            # TODO deal with vectorization later
             elif arg in ("origin", "cond_spn", "cond_surv"):
-                if first_val != "\"true\"" and first_val != "\"false\"":
+                if _first_val != "\"true\"" and _first_val != "\"false\"":
                     raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\". Distribution discrete_sse() could not be initialized.")
 
                 else:
-                    if isinstance(first_val, str):
-                        parsed_val = first_val.replace("\"", "")
+                    if isinstance(_first_val, str):
+                        parsed_val = _first_val.replace("\"", "")
 
                     if arg == "origin" and parsed_val == "true": origin = True
                     elif arg == "origin" and parsed_val == "false": origin = False
@@ -87,28 +89,51 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                     elif arg == "cond_surv" and parsed_val == "true": cond_surv = True
                     elif arg == "cond_surv" and parsed_val == "false": cond_surv = False
 
-            elif arg == "start_state":
-                _start_states_list = [int(v) for v in val if isinstance(v, str)]
-
             # if user specified epsilon, we use it, otherwise default is used
             elif arg == "eps":
                 try:
-                    if isinstance(first_val, str):
-                        float_val = float(first_val) # no vectorization allowed here
+                    if isinstance(_first_val, str):
+                        float_val = float(_first_val) # no vectorization allowed here
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting a double. Distribution discrete_sse() could not be initialized.")
 
                 eps = float_val
+
+            #####################
+            # Vectorized values #
+            #####################
+            elif arg == "stop_value":
+                _is_negative = False
+                try:
+                    _stop_values_list = [float(v) for v in _extracted_val if isinstance(v, str)]
+                    
+                    for sv in _stop_values_list:
+                        if sv < 0.0:
+                            _is_negative = True
+
+                except:
+                    if _is_negative:
+                        raise ec.FunctionArgError(arg, "Stop value cannot be negative. Distribution discrete_sse() could not be initialized.")
+
+                    raise ec.FunctionArgError(arg, "Was expecting number for stopping value(s). Distribution discrete_sse() could not be initialized.")
+
+
+            elif arg == "start_state":
+                try:
+                    _start_states_list = [int(v) for v in _extracted_val if isinstance(v, str)]
+                except:
+                    raise ec.FunctionArgError(arg, "Was expecting integers for starting states. Distribution discrete_sse() could not be initialized.")
+
     
     # making sure essential parameters of distribution have been specified
     if not any(_event_handler.fig_rates_manager.atomic_rate_params_matrix):
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"meh\" is missing.")
-    if not _stop_value:
+    if not _stop_values_list:
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
         
     return dnsse.DnSSE(
         _event_handler,
-        _stop_value,
+        _stop_values_list,
         n=_n,
         n_replicates=_n_repl,
         stop=_stop,

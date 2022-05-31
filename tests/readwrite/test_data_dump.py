@@ -51,7 +51,7 @@ class TestDataDump(unittest.TestCase):
         n_sim = 5
         n_repl = 2
         stop_condition = "size"
-        stop_condition_value = 50 # 50 living taxa
+        stop_condition_value = [50] # 50 living taxa
         start_at_origin = True
         start_states_list = [0 for i in range(n_sim)]
 

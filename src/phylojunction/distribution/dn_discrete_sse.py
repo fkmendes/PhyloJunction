@@ -65,7 +65,7 @@ class DnSSE(pgm.DistributionPGM):
     n_repl: int
     with_origin: bool
     stop: str
-    stop_val: float
+    stop_val: ty.List[float]
     condition_on_speciation: bool
     condition_on_survival: bool
     events: sseobj.MacroEvolEventHandler
@@ -80,13 +80,13 @@ class DnSSE(pgm.DistributionPGM):
     debug: bool
 
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
-    def __init__(self, event_handler: sseobj.MacroEvolEventHandler, stop_value: float, n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
+    def __init__(self, event_handler: sseobj.MacroEvolEventHandler, stop_value: ty.List[float]=[], n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
                 start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=False,
                 seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
-        self.n_repl = n_replicates # number of replicate trees (in plate) for a given simulation
+        self.n_repl = int(n_replicates) # number of replicate trees (in plate) for a given simulation
         self.with_origin = origin
         self.stop = stop
         self.stop_val = stop_value
@@ -105,12 +105,12 @@ class DnSSE(pgm.DistributionPGM):
         self.seed_age = self.events.seed_age # used just for verifying inputs
 
         # other specs
-        self.seeds = seeds_list
+        self.seeds = seeds_list # for randomization (this functionality is not working)
         self.epsilon = epsilon
         self.runtime_limit = runtime_limit
         self.debug = debug
 
-        # dealing with vectorization
+        # checking number of provided values, and vectorizing if necessary
         self.check_sample_size()
 
         # making sure inputs are ok
@@ -124,9 +124,47 @@ class DnSSE(pgm.DistributionPGM):
             raise ec.DnInitMisspec(self.DN_NAME, "If you specified more than a single time slice, you need to provide a maximum age as stopping condition to anchor the absolute slice ages. Exiting...")
         if self.n_time_slices > 1 and not self.seed_age:
             raise ec.DnInitMisspec(self.DN_NAME, "When providing time-slice age ends, you must specify a seed (origin or root) age to anchor the tree and ensure the tree spans those slices. Exiting...")
-        if self.stop == "age" and self.seed_age and self.seed_age != self.stop_val:
-            raise ec.DnInitMisspec(self.DN_NAME, "The max. stopping age for the simulation must match the specified seed (origin or root) age. Exiting...")
-
+        if self.stop == "age" and self.seed_age:
+            # TODO: make sure seed age in FIGManager is vectorized and that in script, the same variable is used for both FIGRateManager and stop condition value in the spec of this distribution
+            for idx, a_stop_val in enumerate(self.stop_val):
+                # TODO: will need to do self.seed_age[idx] later when vectorization is added
+                if a_stop_val != self.seed_age:
+                    raise ec.DnInitMisspec(self.DN_NAME, "The max. stopping age(s) for the simulation must match the specified seed (origin or root) age(s). Exiting...")
+        
+        # the checks below are also carried out at the grammar level, but we do it again
+        # in case distribution is used without a script
+        if self.stop == "size":
+            for idx, a_stop_val in enumerate(self.stop_val):
+                # must be a number
+                if not isinstance(a_stop_val, (int, float)):
+                    raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) must be a number. Exiting...")
+                # it is a number...
+                else:
+                    # can be a int-convertible float
+                    if isinstance(a_stop_val, float):
+                        if a_stop_val.is_integer():
+                            self.stop_val[idx] = int(a_stop_val)
+                        # float must be convertible to integer
+                        else: 
+                            raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) could not be converted to integer. Exiting...")
+                    # ideally should be int
+                    elif isinstance(a_stop_val, int):
+                        self.stop_val[idx] = a_stop_val
+                    # once self.stop_val[idx] is initialized, it must be >= 0
+                    if self.stop_val[idx] < 0:
+                        raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be negative. Exiting...")
+        
+        if self.stop == "age":
+            for idx, a_stop_val in enumerate(self.stop_val):
+                # must be an integer
+                if not isinstance(a_stop_val, float):
+                    raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (tree height) must be an integer. Exiting...")
+                else:
+                    self.stop_val[idx] = a_stop_val
+                    # must be >= 0
+                    if self.stop_val[idx] < 0.0:
+                        raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (tree height) cannot be negative. Exiting...")
+                
 
     #########################
     # Vectorization methods #
@@ -135,7 +173,9 @@ class DnSSE(pgm.DistributionPGM):
         # changing atomic_rate_params_matrix here should affect fig_rates_manager
         atomic_rate_params_matrix = self.events.fig_rates_manager.atomic_rate_params_matrix # 1D: time slices, 2D: list of atomic rate params
 
-        # rate parameters
+        ############################
+        # Checking rate parameters #
+        ############################
         # k-th time slice
         for k, list_atomic_rate_params in enumerate(atomic_rate_params_matrix):
             for arp in list_atomic_rate_params:
@@ -148,18 +188,27 @@ class DnSSE(pgm.DistributionPGM):
                 elif n_val > 1 and n_val < self.n_sim:
                     raise ec.DimensionalityError(self.DN_NAME)
 
-        # starting state
+        ############################
+        # Checking starting states #
+        ############################
         if len(self.start_states) > self.n_sim or (len(self.start_states) > 1 and len(self.start_states) < self.n_sim):
             raise ec.DimensionalityError(self.DN_NAME)
 
         # multiplying starting states if only one was passed and the number of simulations is > 1
         elif len(self.start_states) < self.n_sim and len(self.start_states) == 1:
-            # try:
             self.start_states = [int(self.start_states[0]) for i in range(self.n_sim)]
-            # except:
-            #    self.start_states = [self.start_states for i in range(self.n_sim)]
 
-        return None
+        ########################
+        # Checking stop values #
+        ########################
+        if len(self.stop_val) > self.n_sim or (len(self.stop_val) > 1 and len(self.stop_val) < self.n_sim):
+            raise ec.DimensionalityError(self.DN_NAME)
+
+        # multiplying stop values if only one was passed and the number of simulations is > 1
+        elif len(self.stop_val) < self.n_sim and len(self.stop_val) == 1:
+            self.stop_val = [float(self.stop_val[0]) for i in range(self.n_sim)]
+
+        return None # dummy return
 
 
     ######################
@@ -327,11 +376,12 @@ class DnSSE(pgm.DistributionPGM):
         return last_chosen_node, cumulative_node_count
 
 
-    def simulate(self, a_start_state: int, value_idx: int=0, a_seed: ty.Optional[int]=None) -> AnnotatedTree:
+    def simulate(self, a_start_state: int, a_stop_value: ty.Union[int, float], value_idx: int=0, a_seed: ty.Optional[int]=None) -> AnnotatedTree:
         """Sample (simulate) tree with states at its terminal nodes]
 
         Args:
-            a_start_state (int): State at seed node (origin or root).
+            a_start_state (int): State at seed node (origin or root)
+            a_stop_value (float): Value to stop simulation with (number of tips or tree height)
 
         Returns:
             (dendropy.Tree): One simulated tree.
@@ -364,11 +414,11 @@ class DnSSE(pgm.DistributionPGM):
         last_chosen_node = None
         tr = dp.Tree()
 
-        if self.stop == "age":
-            t_stop = float(self.stop_val)
+        if self.stop == "age" and isinstance(a_stop_value, float):
+            t_stop = a_stop_value
 
-        elif self.stop == "size":
-            max_obs_nodes = int(self.stop_val)
+        elif self.stop == "size" and isinstance(a_stop_value, int):
+            max_obs_nodes = a_stop_value
 
         # simulation starts at origin
         if self.with_origin:
@@ -547,14 +597,14 @@ class DnSSE(pgm.DistributionPGM):
         # (11) got out of while loop because met stop condition
         # 'at' is scoped to simulate_a_tree() function
         if self.stop == "age":
-            at = AnnotatedTree(tr, self.events.state_count, start_at_origin=self.with_origin, max_age=self.stop_val, slice_t_ends=self.slice_t_ends, slice_age_ends=self.events.slice_age_ends)
+            at = AnnotatedTree(tr, self.events.state_count, start_at_origin=self.with_origin, max_age=a_stop_value, slice_t_ends=self.slice_t_ends, slice_age_ends=self.events.slice_age_ends)
         elif self.stop == "size":
             at = AnnotatedTree(tr, self.events.state_count, start_at_origin=self.with_origin)
 
         if self.debug:
+            # print(at.tree)
             # print(at.tree.as_string(schema="nexus", suppress_annotations=True, suppress_internal_taxon_labels=True))
             print(at.tree.as_string(schema="newick", suppress_annotations=False, suppress_internal_taxon_labels=True))
-            # print(at.tree)
 
         return at
     ### END simulation loop ###
@@ -577,14 +627,10 @@ class DnSSE(pgm.DistributionPGM):
             # simulate!
             repl_size = 0
             while repl_size < self.n_repl:
-                # TODO: make stop_value (when stop is "age") a parameter, and
-                # vectorize it, passing it to .simulate as self.stop_value[ith_sim]
-                #
-                # This is so we can put a prior on origin or root ages
-                tr = self.simulate(self.start_states[ith_sim], value_idx=ith_sim)
+                tr = self.simulate(self.start_states[ith_sim], self.stop_val[ith_sim], value_idx=ith_sim)
 
                 # check if tr has right specs
-                if self.is_tr_ok(tr):
+                if self.is_tr_ok(tr, self.stop_val[ith_sim]):
                     output.append(tr)
                     repl_size += 1
 
@@ -605,11 +651,12 @@ class DnSSE(pgm.DistributionPGM):
     #########################
     # Output health methods #
     #########################
-    def is_tr_ok(self, ann_tr: AnnotatedTree) -> bool:
+    def is_tr_ok(self, ann_tr: AnnotatedTree, a_stop_value: ty.Union[int, float]) -> bool:
         """Check that simulated tree meets stop conditions, so that it can be returned
 
         Args:
-            a_tree (AnnotatedTree): A tree with extra annotations.
+            a_tree (AnnotatedTree): A tree with extra annotations
+            a_stop_value [int or float]: Value specified for stopping simulation
 
         Returns:
             bool: If tree meets stop condition value.
@@ -622,7 +669,7 @@ class DnSSE(pgm.DistributionPGM):
             if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:
                 return False
 
-            if self.condition_on_survival and (ann_tr.n_extant_obs_nodes + ann_tr.n_sa_obs_nodes) != self.stop_val:
+            if self.condition_on_survival and (ann_tr.n_extant_obs_nodes + ann_tr.n_sa_obs_nodes) != a_stop_value:
                 return False
 
             # if conditions are not specified, returns all trees
@@ -636,13 +683,13 @@ class DnSSE(pgm.DistributionPGM):
         elif self.stop == "age":
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
                 # tree is ok if either it reached the max age by epsilon, or if its age is smaller than max age
-                if abs(self.stop_val - ann_tr.origin_age) <= self.epsilon or ann_tr.origin_age < self.stop_val:
+                if abs(a_stop_value - ann_tr.origin_age) <= self.epsilon or ann_tr.origin_age < a_stop_value:
                     return True
-                elif ann_tr.origin_age > self.stop_val:
+                elif ann_tr.origin_age > a_stop_value:
                     return False
 
             elif not ann_tr.with_origin and isinstance(ann_tr.root_age, float):
-                if self.stop_val >= ann_tr.root_age:
+                if a_stop_value >= ann_tr.root_age:
                     return True
                 else:
                     return False
