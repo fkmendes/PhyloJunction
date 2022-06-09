@@ -51,6 +51,69 @@ def call_gui():
     
     sg.theme("LightGray2")
     
+    ###################
+    # Inner functions #
+    ###################
+    def _parse_cmd_lines(cmd_line_list, cmd_line_hist, a_pgm, wdw):
+        valid_cmd_line = None
+        
+        for line in cmd_line_list:
+            line = line.strip() # removing whitespaces from left and right
+            
+            try:
+                valid_cmd_line = cmd.cmdline2pgm(a_pgm, line)
+        
+            except Exception as e:
+                if not event == "Simulate":
+                    if e.__context__:
+                        wdw["-ERROR_MSG-"].Update(e.__context__) # __context__ catches the innermost exception message
+                    else:
+                        wdw["-ERROR_MSG-"].Update(e)
+
+            if valid_cmd_line:
+                cmd_line_hist.append(valid_cmd_line)
+                wdw["-HIST-"].update("\n".join(cmd_line_hist))
+                wdw["-PGM-NODES-"].update([node_name for node_name in _pgm.node_name_val_dict])
+
+
+    def _initialize_axes():
+        ax = _fig.add_axes([0.25, 0.2, 0.5, 0.6])
+        ax.patch.set_alpha(0.0)
+        ax.xaxis.set_ticks([])
+        ax.yaxis.set_ticks([])
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+
+        return ax
+
+
+    def _clean_disable_everything(cmd_line_hist):
+        """
+        Destroy PGM object, reset all panels (except history panel).
+        History panel is updated with 'reset PGM' line.
+        """
+        pgm_obj = pgm.ProbabilisticGraphicalModel() # new PGM
+
+        window["-COPY-VALUE-"].update(disabled=True)
+        window["-COPY-ALL-"].update(disabled=True)
+        window["-PGM-NODES-"].update([])
+        window["-PGM-NODE-DISPLAY-"].update("")
+        cmd_line_hist.append("\n" + "- ~ -  reset model above  - ~ -" + "\n")
+        window["-HIST-"].update("\n".join(cmd_line_hist))
+
+        _fig.clf() # clear everything
+        ax = _initialize_axes()
+        _fig.canvas.draw() # updates canvas
+
+        return pgm_obj, ax
+
+
+    def _draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
+        return node_pgm.get_gcf(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+
+
     def _get_scaling():
     # called before window created
         root = sg.tk.Tk()
@@ -82,10 +145,14 @@ def call_gui():
         else:
             display_node_pgm_str =  pgm_obj.get_display_str_by_name(node_pgm.node_pgm_name)
 
-        wdw["-PGM_NODE_DISPLAY-"].update(display_node_pgm_str)
+        wdw["-PGM-NODE-DISPLAY-"].update(display_node_pgm_str)
 
     
     def _selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+        """
+        Plot pgm node on '_axes' (Axes object) scoped to 'call_gui()',
+        then update canvas with new plot
+        """
         try:
             # if a tree
             if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
@@ -97,12 +164,17 @@ def call_gui():
                 else:
                     _draw_node_pgm(_axes, node_pgm, sample_idx=sample_idx, repl_size=repl_size)
         # when it's deterministic
-        except: _draw_node_pgm(_axes, node_pgm)
+        except:
+            _draw_node_pgm(_axes, node_pgm)
 
         fig_obj.canvas.draw()
 
     
     def _do_selected_node(pgm_obj, wdw, fig_obj, node_pgm_name, do_all_samples=True):
+        """
+        Given selected node name, display its string representation and
+        plot it on canvas if possible
+        """
         node_pgm, sample_size, repl_size = _selected_node_read(pgm_obj, node_pgm_name)
 
         # updates spin window with number of elements in this node_pgm
@@ -160,30 +232,6 @@ def call_gui():
     # above just in case...
     # sg.set_options(scaling=scaling)
 
-    ###################
-    # Inner functions #
-    ###################
-    def _parse_cmd_lines(cmd_line_list, cmd_line_hist, _pgm, wdw):
-        valid_cmd_line = None
-        
-        for line in cmd_line_list:
-            line = line.strip() # removing whitespaces from left and right
-            
-            try:
-                valid_cmd_line = cmd.cmdline2pgm(_pgm, line)
-        
-            except Exception as e:
-                if not event == "Simulate":
-                    if e.__context__:
-                        wdw["-ERROR_MSG-"].Update(e.__context__) # __context__ catches the innermost exception message
-                    else:
-                        wdw["-ERROR_MSG-"].Update(e)
-
-            if valid_cmd_line:
-                cmd_line_hist.append(valid_cmd_line)
-                wdw["-HIST-"].update("\n".join(cmd_line_hist))
-                wdw["-PGM-NODES-"].update([node_name for node_name in _pgm.node_name_val_dict])
-
     ##############
     # GUI layout #
     ##############
@@ -201,7 +249,7 @@ def call_gui():
           sg.Frame(
             layout = [
                 [
-                  sg.Multiline(key="-PGM_NODE_DISPLAY-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,6))
+                  sg.Multiline(key="-PGM-NODE-DISPLAY-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,6))
                 ]
             ],
             title="Node value",
@@ -225,29 +273,45 @@ def call_gui():
             sg.Push()
         ],
 
-        [ sg.Push(), sg.Canvas(key="-CANVAS-", background_color="white", size=(1200,450)), sg.Push(),
+        [ sg.Push(),
+        
+          sg.Canvas(key="-CANVAS-", background_color="white", size=(1200,450)),
+          
+          sg.Push(),
 
-          sg.Frame(
+          sg.Column(
               layout = [
-                    [
-                        sg.Column(
-                            layout = [
-                                [ sg.Checkbox("Copy all", key="-COPY-ALL-", default=False, font=("helvetica 14")) ],
-                                [ sg.Button("Copy values", key="-COPY-VALUE-", size=(10,1), disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ], 
-                                [ sg.Radio("All samples", "-WHICH-SAMPLES-", key="-ALL-SAMPLES-", default=True, enable_events=True, disabled=True, font=("helvetica 14")) ],
-                                [ sg.Radio("One sample", "-WHICH-SAMPLES-", key="-ONE-SAMPLE-", default=False, enable_events=True, disabled=True, font=("helvetica 14")) ],
-                                [ sg.Text("Sample #", font=("helvetica 14")) ],
-                                [ sg.Spin([x for x in range(1, 1)], 1, key="-ITH-SAMPLE-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
-                                [ sg.Text("Tree #", font=("helvetica 14"), size=(8,1)) ],
-                                [ sg.Spin([x for x in range(1, 1)], 1, key="-ITH-REPL-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ]
-                            ],
-                            element_justification="center"
-                        )
+                    
+                    [ sg.Button("Destroy model", key="-DESTROY-PGM-", enable_events=True, disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ],
+
+                    [ sg.VPush() ],
+
+                    [ sg.Frame(
+                        layout = [
+                            [
+                                sg.Column(
+                                    layout = [
+                                        [ sg.Checkbox("Copy all", key="-COPY-ALL-", default=False, font=("helvetica 14")) ],
+                                        [ sg.Button("Copy values", key="-COPY-VALUE-", size=(10,1), disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ], 
+                                        [ sg.Radio("All samples", "-WHICH-SAMPLES-", key="-ALL-SAMPLES-", default=True, enable_events=True, disabled=True, font=("helvetica 14")) ],
+                                        [ sg.Radio("One sample", "-WHICH-SAMPLES-", key="-ONE-SAMPLE-", default=False, enable_events=True, disabled=True, font=("helvetica 14")) ],
+                                        [ sg.Text("Sample #", font=("helvetica 14")) ],
+                                        [ sg.Spin([x for x in range(1, 1)], 1, key="-ITH-SAMPLE-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
+                                        [ sg.Text("Tree #", font=("helvetica 14"), size=(8,1)) ],
+                                        [ sg.Spin([x for x in range(1, 1)], 1, key="-ITH-REPL-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ]
+                                    ],
+                                    element_justification="center"
+                                )
+                            ]
+                        ],
+                        title="Selected node",
+                        font="helvetica 14"
+                    )
                     ]
-                ],
-              title="Selected node",
-              font="helvetica 14"
+              ],
+              element_justification="center"
           ),
+
           sg.Push()
         ],
 
@@ -352,27 +416,17 @@ def call_gui():
 
     _fig_agg = None
     _fig = Figure(figsize=(11,4.5))
-    _axes = _fig.add_axes([0.25, 0.2, 0.5, 0.6])
-    _axes.patch.set_alpha(0.0)
-    _axes.xaxis.set_ticks([])
-    _axes.yaxis.set_ticks([])
-    _axes.spines['left'].set_visible(False)
-    _axes.spines['bottom'].set_visible(False)
-    _axes.spines['right'].set_visible(False)
-    _axes.spines['top'].set_visible(False)
+    _axes = _initialize_axes()
 
     # Link matplotlib to PySimpleGUI Graph
     _fig_agg = FigureCanvasTkAgg(_fig, window["-CANVAS-"].TKCanvas)
     plot_widget = _fig_agg.get_tk_widget()
     plot_widget.grid(row=0, column=0)
 
-    def _draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
-        return node_pgm.get_gcf(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
-
     ##############
     # Event loop #
     ##############
-    _pgm = pgm.ProbabilisticGraphicalModel()
+    _pgm: pgm.ProbabilisticGraphicalModel = pgm.ProbabilisticGraphicalModel()
     _cmd_history: ty.List[str] = []
     _cmd_line: str = ""
     _script_out_fp: str = ""
@@ -409,12 +463,20 @@ def call_gui():
             if values["-COPY-ALL-"]:
                 value_str = _pgm.get_display_str_by_name(node_pgm.node_pgm_name)
             else:
-                value_str = values['-PGM_NODE_DISPLAY-']
+                value_str = values['-PGM-NODE-DISPLAY-']
             
             pyperclip.copy(str(value_str)) # requires xclip (Linux) / pbcopy (OS X) are installed
 
         elif event == "Simulate":
             pass
+
+        ####################
+        # Destroying model #
+        ####################
+        elif event == "-DESTROY-PGM-":
+            # _pgm and _axes are overwritten with new clean objects
+            # _cmd_history is updated inside
+            _pgm, _axes = _clean_disable_everything(_cmd_history) # clean figure, reset axes
 
         ####################################
         # Select node in "Created node(s)" #
@@ -430,7 +492,7 @@ def call_gui():
                 try:
                     if isinstance(_pgm.get_node_pgm_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
                         do_all_samples = False
-                except: pass # the value of the node _pgm might be an AtomicSSERateParameter, which is not subscriptable, so we pass
+                except: pass # the value of the node_pgm might be an AtomicSSERateParameter, which is not subscriptable, so we pass
                 
                 node_pgm = _do_selected_node(_pgm, window, _fig, selected_node_pgm_name, do_all_samples=do_all_samples)
                 
@@ -514,6 +576,10 @@ def call_gui():
             cmd_lines = pjread.read_text_file(_script_in_fp)
 
             _parse_cmd_lines(cmd_lines, _cmd_history, _pgm, window)
+
+            # it model has at least one node, we can destroy it
+            if _pgm.n_nodes >= 1:
+                window["-DESTROY-PGM-"].update(disabled=False)
 
         # original implmn had buttons
         # script_in_fp = values["-SCRIPT-READ-"]
@@ -641,6 +707,10 @@ def call_gui():
             cmd_lines = [cl for cl in re.split("\n", _cmd_line) if cl] # in case the user enters multiple lines, also ignores empty lines
 
             _parse_cmd_lines(cmd_lines, _cmd_history, _pgm, window)
+
+            # it model has at least one node, we can destroy it
+            if _pgm.n_nodes >= 1:
+                window["-DESTROY-PGM-"].update(disabled=False)
 
 
     window.close()

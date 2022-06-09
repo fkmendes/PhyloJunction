@@ -11,7 +11,7 @@ __email__ = "f.mendes@wustl.edu"
 class TestSSEStopConditions(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         # not state-dependent (just state 0, and no transition)
         rates_t0_s0 = [ sseobj.AtomicSSERateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
     
@@ -20,7 +20,7 @@ class TestSSEStopConditions(unittest.TestCase):
         
         fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, 1)
 
-        cls.event_handler = sseobj.MacroEvolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
 
     def test_tree_size_stop_condition(self):

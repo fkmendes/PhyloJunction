@@ -132,9 +132,12 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                 # elif isinstance(node_pgm, DeterministicNodePGM):
                 #     pj2rev_deterministic(node_pgm) # will determine which class inside, and convert it to rev
 
-            ###########################
-            # Clamped stochastic node #
-            ###########################
+            ############################
+            # Clamped stochastic node, #
+            # e.g.,                    #
+            # x <- 1.0,                #
+            # x <- [1, 2]              #
+            ############################
             else:
                 n_vals = len(node_pgm.value)
                 n_sim = pgm_obj.sample_size
@@ -151,8 +154,15 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                     # Important #
                     #############
                     # in PJ, we assume that if a node has the same number of (clamped) assigned values
-                    # as the the sample size (n_draws) of stochastic nodes, then we take each of its
-                    # values and split them among the sample-sized-rev scripts
+                    # as the the sample size (n_draws) of stochastic nodes (or if there are no stochastic
+                    # nodes added to the PGM at all yet, see above code), then we take each of its
+                    # values and split them among the sample-sized-rev scripts, e.g., if we do:
+                    #
+                    # clamped_node <- [1, 2] # with no other node in the PGM
+                    # 
+                    # Then we will have:
+                    # clamped_node <- 1 # first .Rev script
+                    # clamped_node <- 2 # second .Rev script
                     if n_vals == n_sim:
                         node_inference_spec_str = node_pgm_name + " <- " + node_pgm.value[ith_sim]
 

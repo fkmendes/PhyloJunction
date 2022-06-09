@@ -24,7 +24,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # all remaining args must be specified
     _n: int = 1
     _n_repl: int = 1
-    _event_handler: sseobj.MacroEvolEventHandler = sseobj.MacroEvolEventHandler(sseobj.FIGRatesManager([[]], 1))
+    _event_handler: sseobj.MacroevolEventHandler = sseobj.MacroevolEventHandler(sseobj.FIGRatesManager([[]], 1))
     _stop: str
     _stop_values_list: ty.List[float] = []
     origin: bool = True
@@ -54,7 +54,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
             if arg == "meh" and isinstance(_first_val, pgm.NodePGM):
                 nodepgm_val = _first_val.value
                 
-                if isinstance(nodepgm_val, sseobj.MacroEvolEventHandler):
+                if isinstance(nodepgm_val, sseobj.MacroevolEventHandler):
                 # there should be only one event handler always, but it will be in list
                     _event_handler = nodepgm_val
 
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
 
-    event_handler = sseobj.MacroEvolEventHandler(fig_rates_manager)
+    event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
     det_nd_pgm = pgm.DeterministicNodePGM("events", value=event_handler, parent_nodes=None)
 

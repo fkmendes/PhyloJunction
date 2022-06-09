@@ -24,7 +24,7 @@ class TestYuleTrees(unittest.TestCase):
         
         fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, 1)
 
-        cls.event_handler = sseobj.MacroEvolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
 
     def test_expected_root_height_yule(self):

@@ -115,7 +115,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
             return sseobj.AtomicSSERateParameter(name=sse_rate_name, val=list(value), event=event_type)
 
 
-def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroEvolEventHandler:
+def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroevolEventHandler:
 
     if not det_fn_param_dict:
         raise ec.NoSpecificationError(message="Cannot initialize SSE stash without specifications. Exiting...")
@@ -196,4 +196,4 @@ def make_MacroEvolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[
     # fig_rates_manager = FIGRatesManager(_matrix_det_node_atomic_rate_params, _n_states)
     fig_rates_manager = sseobj.FIGRatesManager(_matrix_atomic_rate_params, _n_states, seed_age_for_time_slicing=_seed_age_for_time_slicing, list_time_slice_age_ends=_time_slice_age_ends)
         
-    return sseobj.MacroEvolEventHandler(fig_rates_manager)
+    return sseobj.MacroevolEventHandler(fig_rates_manager)

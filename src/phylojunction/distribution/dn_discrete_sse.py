@@ -43,7 +43,7 @@ class DnSSE(pgm.DistributionPGM):
         stop (str): If "age", stops when origin or root age is equal to 'stop_condition_value'. If "size", stops when tree has 'stop_condition_value' observable nodes.
         stop_val (float): Either maximum tree age, or maximum count of observable nodes.
         start_at_origin (bool): Simulation starts at origin (i.e., seed = origin).
-        events (MacroEvolEventHandler): Object holding all parameter values we need to simulate.
+        events (MacroevolEventHandler): Object holding all parameter values we need to simulate.
         start_states (int): List of integer representing the starting states of all n_sim simulations.
         state_count (int): Number of discrete states (obtained from 'events').
         n_time_slices (int): Number of time slices (obtained from 'events').
@@ -68,7 +68,7 @@ class DnSSE(pgm.DistributionPGM):
     stop_val: ty.List[float]
     condition_on_speciation: bool
     condition_on_survival: bool
-    events: sseobj.MacroEvolEventHandler
+    events: sseobj.MacroevolEventHandler
     start_states: ty.List[int]
     state_count: int
     n_time_slices: int
@@ -80,7 +80,7 @@ class DnSSE(pgm.DistributionPGM):
     debug: bool
 
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
-    def __init__(self, event_handler: sseobj.MacroEvolEventHandler, stop_value: ty.List[float]=[], n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
+    def __init__(self, event_handler: sseobj.MacroevolEventHandler, stop_value: ty.List[float]=[], n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
                 start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=False,
                 seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
 
@@ -262,6 +262,7 @@ class DnSSE(pgm.DistributionPGM):
         cumulative_node_count += 1
         left_label = "nd" + str(cumulative_node_count)
         left_child = dp.Node(taxon=dp.Taxon(label=left_label), label=left_label, edge_length=0.0)
+        left_child.is_sa = False
         left_child.alive = True
         left_child.state = left_arriving_state
         left_child.annotations.add_bound_attribute("state")
@@ -270,6 +271,7 @@ class DnSSE(pgm.DistributionPGM):
         cumulative_node_count += 1
         right_label = "nd" + str(cumulative_node_count)
         right_child = dp.Node(taxon=dp.Taxon(label=right_label), label=right_label, edge_length=0.0)
+        right_child.is_sa = False
         right_child.alive = True
         right_child.state = right_arriving_state
         right_child.annotations.add_bound_attribute("state")
@@ -285,12 +287,13 @@ class DnSSE(pgm.DistributionPGM):
         state_representation_dict[chosen_node.state].remove(chosen_node.label) # state of parent is now irrelevant
         chosen_node.alive = False
         untargetable_node_set.add(chosen_node.label) # cannot pick parent anymore!
-        # (3) mark parent node as the last node to under go even
+        # (3) mark parent node as the last node to undergo event
         #     will use this node to undo last event when number of species
         #     go beyond maximum
         last_node2speciate = chosen_node
 
         return last_node2speciate, cumulative_node_count
+
 
     def execute_death(self, chosen_node, state_representation_dict: ty.Dict[int, ty.Set[str]], untargetable_node_set, debug=False) -> dp.Node:
         """Execute lineage death (side-effect)
@@ -318,31 +321,89 @@ class DnSSE(pgm.DistributionPGM):
         return last_node2die
 
 
-    def execute_anatrans(self, chosen_node, state_representation_dict: ty.Dict[int, ty.Set[str]], macroevol_atomic_param, debug=False) -> None:
+    def execute_anatrans(self, chosen_node: dp.Node, state_representation_dict: ty.Dict[int, ty.Set[str]], macroevol_rate_param: sseobj.AtomicSSERateParameter, debug: bool=False) -> None:
         """Execute anagenetic trait-state transition on path to chosen node (side-effect)
 
         Args:
             chosen_node (dendropy.Node): Node that will undergo anagenetic trait-state transition.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            macroevol_atomic_param (AtomicRateParameter): Atomic rate parameter containing departing/arriving state.
+            macroevol_rate_param (AtomicRateParameter): Atomic rate parameter containing departing/arriving state.
             debug (bool): If 'true', prints debugging messages. Defaults to False.
         """
 
         if debug:
-            print("TRANSITION of node " + chosen_node.label + " from state " + str(chosen_node.state) + " to state " + str(macroevol_atomic_param.arriving_states[0]))
+            print("TRANSITION of node " + chosen_node.label + " from state " + str(chosen_node.state) + " to state " + str(macroevol_rate_param.arriving_states[0]))
 
         # old state is not represented anymore
         state_representation_dict[chosen_node.state].remove(chosen_node.label)
 
         # new state gets assigned
-        arriving_state = macroevol_atomic_param.arriving_states[0]
+        arriving_state = macroevol_rate_param.arriving_states[0]
         chosen_node.state = arriving_state
 
         # new state is now represented
         state_representation_dict[chosen_node.state].add(chosen_node.label)
 
 
-    def execute_event(self, tr_namespace, macroevol_atomic_param, chosen_node, state_representation_dict: ty.Dict[int, ty.Set[str]], untargetable_node_set, cumulative_node_count, last_chosen_node, debug=False) -> ty.Tuple[dp.Node, int]:
+    def execute_sample_ancestor(self, tr_namespace: dp.TaxonNamespace, chosen_node: dp.Node, state_representation_dict: ty.Dict[int, ty.Set[str]], untargetable_node_set, macroevol_rate_param: sseobj.AtomicSSERateParameter, debug: bool=False):
+        """Execute sampling of direct lineage ancestor
+
+        Args:
+            tr_namespace (dendropy.TaxonNamespace): 
+            chosen_node (dendropy.Node): Node that will undergo event.
+            state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
+            macroevol_rate_param (AtomicRateParameter): Atomic rate parameter containing departing/arriving state.
+            debug (bool): If 'true', prints debugging messages. Defaults to False.
+        """
+        
+        if debug:
+            print("ANCESTOR-SAMPLING of node " + chosen_node.label + " , keeping state " + str(chosen_node.state))
+        
+        # modeling sampled ancestor as bifurcating event, one child is the same as parent lineage,
+        # second child is a terminal node that will never be elongated (branch length = 0.0)
+
+        # doing lineage that remains alive
+        left_label = chosen_node.label # gets parent's label (parent's label will change below)
+        left_child = dp.Node(taxon=dp.Taxon(label=left_label), label=left_label, edge_length=0.0)
+        left_child.is_sa = False
+        left_child.is_sa_desc = True
+        left_child.is_sa_parent = False
+        left_child.alive = True
+        left_child.state = chosen_node.state # gets parent's state
+        left_child.annotations.add_bound_attribute("state")
+        # we don't update state_representation_dict, because parent's label is already there
+
+        # doing sampled ancestor
+        cumulative_sa_count += 1
+        right_label = "sa" + str(cumulative_sa_count)
+        right_child = dp.Node(taxon=dp.Taxon(label=right_label), label=right_label, edge_length=0.0)
+        right_child.is_sa = True
+        left_child.is_sa_desc = False
+        left_child.is_sa_parent = False
+        right_child.alive = False
+        right_child.state = chosen_node.state # gets parent's state
+        right_child.annotations.add_bound_attribute("state")
+        state_representation_dict[right_child.state].add(right_child.label) # sampled ancestor represents state
+        # the way we're implementing sampled ancestors here, they cannot be picked for events;
+        # it is their sister lineage that can be picked (their parent is becomes a dummy node)
+        untargetable_node_set.add(chosen_node.label)
+
+        # updating parent node
+        # (1) adding both children
+        chosen_node.add_child(left_child)
+        tr_namespace.add_taxon(left_child)
+        chosen_node.add_child(right_child)
+        tr_namespace.add_taxon(right_child)
+        # (2) update parent's label
+        chosen_node.label = "dummy" + str(cumulative_sa_count)
+        # note that here, we do not remove parent's label from targeted nodes,
+        # because left child will now have that label and should be targetable
+        # (3) parent label cannot be targeted anymore
+        chosen_node.alive = False
+        untargetable_node_set.add(chosen_node.label) # cannot pick parent!
+
+
+    def execute_event(self, tr_namespace, macroevol_atomic_param: sseobj.AtomicSSERateParameter, chosen_node: dp.Node, state_representation_dict: ty.Dict[int, ty.Set[str]], untargetable_node_set, cumulative_node_count, last_chosen_node, debug: bool=False) -> ty.Tuple[dp.Node, int]:
         """Execute event on chosen node and bookkeep things
 
         Args:

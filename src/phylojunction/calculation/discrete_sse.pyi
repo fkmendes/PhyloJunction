@@ -29,7 +29,7 @@ class FIGRatesManager:
     def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[AtomicSSERateParameter]]): ...
     def atomic_rate_params_at_time(self, atomic_rate_params_matrix, a_time: float): ...
 
-class MacroEvolEventHandler:
+class MacroevolEventHandler:
     slice_t_ends: ty.List[ty.Optional[float]]
     fig_rates_manager: Incomplete
     state_count: Incomplete

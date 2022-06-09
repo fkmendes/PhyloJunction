@@ -48,7 +48,7 @@ class TestYuleTimeHetTrees(unittest.TestCase):
 
         fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states, seed_age_for_time_slicing=cls.seed_age_for_time_slicing, list_time_slice_age_ends=cls.time_slice_age_ends)
 
-        cls.event_handler = sseobj.MacroEvolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
 
     def test_tree_size_state_count_max_taxa_timehet_yule(self):

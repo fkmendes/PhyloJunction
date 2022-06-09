@@ -17,7 +17,7 @@ class TestMacroEvolEvent(unittest.TestCase):
         
         bd_matrix_atomic_rate_params = [ cls.bd_rates_t0_s0 ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         bd_fig_rates_manager = sseobj.FIGRatesManager(bd_matrix_atomic_rate_params, total_n_states)
-        cls.bd_event_handler = sseobj.MacroEvolEventHandler(bd_fig_rates_manager)
+        cls.bd_event_handler = sseobj.MacroevolEventHandler(bd_fig_rates_manager)
         cls.bd_state_representation_dict = { 0: ["nd3", "nd4", "nd5", "nd6"] }
 
 
@@ -34,7 +34,7 @@ class TestMacroEvolEvent(unittest.TestCase):
         
         bisse_matrix_atomic_rate_params = [ bisse_rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
         bisse_fig_rates_manager = sseobj.FIGRatesManager(bisse_matrix_atomic_rate_params, total_n_states)
-        cls.bisse_event_handler = sseobj.MacroEvolEventHandler(bisse_fig_rates_manager)
+        cls.bisse_event_handler = sseobj.MacroevolEventHandler(bisse_fig_rates_manager)
         cls.bisse_state_representation_dict = { 0: ["nd3"], 1: ["nd4", "nd5", "nd6"] }
 
     def test_total_rate_single_epoch_bd(self):

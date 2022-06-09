@@ -28,7 +28,7 @@ class TestBDTrees(unittest.TestCase):
 
         fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
 
-        cls.event_handler = sseobj.MacroEvolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
     def test_expected_size_bd(self):
         """

@@ -43,7 +43,7 @@ class TestDataDump(unittest.TestCase):
         
         fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
 
-        meh = sseobj.MacroEvolEventHandler(fig_rates_manager)
+        meh = sseobj.MacroevolEventHandler(fig_rates_manager)
         
         ########
         # Tree #

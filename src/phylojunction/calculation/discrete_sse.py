@@ -10,7 +10,7 @@ import phylojunction.utility.exception_classes as ec
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-MacroevolEvent = enum.Enum("Macroevol. event", ["W_SPECIATION", "BW_SPECIATION", "ASYM_SPECIATION", "EXTINCTION", "ANAGENETIC_TRANSITION"], start=0)
+MacroevolEvent = enum.Enum("Macroevol. event", ["W_SPECIATION", "BW_SPECIATION", "ASYM_SPECIATION", "EXTINCTION", "ANAGENETIC_TRANSITION", "ANCESTOR_SAMPLING"], start=0)
 
 ##############################################################################
 
@@ -61,6 +61,11 @@ class AtomicSSERateParameter():
         self.str_representation += "   Associated event:    " + str(self.event) + "\n\n"
 
         # making sure inputs are ok
+        if self.event == MacroevolEvent.EXTINCTION and \
+            len(set(self.arriving_states)) != 1 and \
+                not self.departing_state in self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Extinction requires the departing and arriving states to be the same. Exiting...")
+
         if self.event == MacroevolEvent.W_SPECIATION and \
             len(set(self.arriving_states)) != 1 and \
                 not self.departing_state in self.arriving_states:
@@ -81,6 +86,11 @@ class AtomicSSERateParameter():
             len(set(self.arriving_states)) != 1 and \
                 self.departing_state in self.arriving_states:
             raise ec.SSEAtomicRateMisspec(message="State transition requires the departing and arriving states to be different. Exiting...")
+
+        if self.event == MacroevolEvent.ANCESTOR_SAMPLING and \
+            len(set(self.arriving_states)) != 1 and \
+                not self.departing_state in self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Ancestor sapmling requires the departing and arriving states to be the same. Exiting...")
 
     def __str__(self):
         return self.str_representation
@@ -114,7 +124,7 @@ class FIGRatesManager:
 
     # NOTE: This class is flexible in that it allows different parameter
     # numbers per time slice, for whatever that is worth. However, the
-    # user interface has a check inside make_MacroEvolEventHandler()
+    # user interface has a check inside make_MacroevolEventHandler()
     # that forces the user to specify the same number of parameters in
     # all time slices
 
@@ -207,7 +217,7 @@ class FIGRatesManager:
 
 ##############################################################################
 
-class MacroEvolEventHandler():
+class MacroevolEventHandler():
     """Class for sampling of discrete-state macroevolutionary events
 
     Some of the methods in this class are vector-aware (through parameter
@@ -218,7 +228,7 @@ class MacroEvolEventHandler():
 
     # NOTE: This class depends on FIGRatesManager, which allows different
     # parameter numbers per time slice, for whatever that is worth. However,
-    # the user interface has a check inside make_MacroEvolEventHandler()
+    # the user interface has a check inside make_MacroevolEventHandler()
     # that forces the user to specify the same number of parameters in
     # all time slices
 
@@ -232,7 +242,7 @@ class MacroEvolEventHandler():
         self.slice_age_ends = self.fig_rates_manager.slice_age_ends
         self.slice_t_ends = self.fig_rates_manager.slice_t_ends
 
-        self.str_representation = "MacroEvolEventHandler"
+        self.str_representation = "MacroevolEventHandler"
         # state s
         for s, atomic_rates_state_mat in self.fig_rates_manager.atomic_rate_params_dict.items():
             self.str_representation += "\n  State " + str(s) + ":\n"
