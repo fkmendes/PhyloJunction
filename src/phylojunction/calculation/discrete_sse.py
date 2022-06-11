@@ -90,7 +90,7 @@ class AtomicSSERateParameter():
         if self.event == MacroevolEvent.ANCESTOR_SAMPLING and \
             len(set(self.arriving_states)) != 1 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Ancestor sapmling requires the departing and arriving states to be the same. Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling requires the departing and arriving states to be the same. Exiting...")
 
     def __str__(self):
         return self.str_representation
