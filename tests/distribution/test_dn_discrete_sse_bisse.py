@@ -16,13 +16,13 @@ class TestBiSSETrees(unittest.TestCase):
     def setUpClass(cls):
         total_n_states = 2
 
-        rates_t0_s0 = [ sseobj.AtomicSSERateParameter(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.AtomicSSERateParameter(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                        sseobj.AtomicSSERateParameter(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
+        rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                        sseobj.MacroevolStateDependentRateParameter(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
+                        sseobj.MacroevolStateDependentRateParameter(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
 
-        rates_t0_s1 = [ sseobj.AtomicSSERateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                        sseobj.AtomicSSERateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                        sseobj.AtomicSSERateParameter(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
+        rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
+                        sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
+                        sseobj.MacroevolStateDependentRateParameter(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
 
         rates_t0 = rates_t0_s0 + rates_t0_s1
 
@@ -40,7 +40,6 @@ class TestBiSSETrees(unittest.TestCase):
         Test if BiSSE trees simulated here have similar root ages and number of tips for both states
         as BiSSE trees simulated with diversitree
         """
-
         stop_condition = "size"
         stop_condition_value = [50] # 50 living taxa
 
@@ -50,7 +49,6 @@ class TestBiSSETrees(unittest.TestCase):
         n_batches = i = 100
         n_sim = 100
         start_states_list = [0 for i in range(n_sim)]
-        # seeds_list = [i+1 for i in range(n_sim)]
 
         # simulations
         sim_batches = list()

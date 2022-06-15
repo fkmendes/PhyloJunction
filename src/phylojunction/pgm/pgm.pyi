@@ -6,8 +6,6 @@ import numpy as np
 from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 
-# pj imports
-# from data.tree import AnnotatedTree
 
 R = ty.TypeVar('R')
 class DummyAttribute:

@@ -1,6 +1,4 @@
 from __future__ import annotations
-import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/pgm/)
 import typing as ty
 import numpy as np
 import matplotlib.pyplot as plt # type: ignore
@@ -9,7 +7,7 @@ from abc import ABC, abstractmethod
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
-from phylojunction.data.tree import AnnotatedTree
+import phylojunction.data.tree as pjtr
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -171,7 +169,7 @@ class NodePGM(ABC):
         # self.full_length = self.length * self.repl_size # total number of values
         self.param_of = None
 
-        if isinstance(self.value, (list, np.ndarray)) and not isinstance(self.value[0], AnnotatedTree):
+        if isinstance(self.value, (list, np.ndarray)) and not isinstance(self.value[0], pjtr.AnnotatedTree):
             self.flatten_and_extract_values()
 
     # side-effect updates self.value
@@ -302,10 +300,10 @@ class StochasticNodePGM(NodePGM):
         # if list 
         if super().__len__() >= 1 and isinstance(self.value, list):
             # if tree, we only plot one
-            if isinstance(self.value[0], AnnotatedTree):
+            if isinstance(self.value[0], pjtr.AnnotatedTree):
                 
                 # so mypy won't complain
-                if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], AnnotatedTree):
+                if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], pjtr.AnnotatedTree):
                     
                     if self.value[0].state_count > 1:
                         self.value[sample_idx*repl_size + repl_idx].get_gcf(axes, node_attr=branch_attr)
@@ -332,7 +330,7 @@ class StochasticNodePGM(NodePGM):
         if isinstance(self.value, (list, np.ndarray)):
             if isinstance(self.value[0], (int, float, str, np.float64)):
                 self.operator_weight = 1 # this is a scalar random variable
-            # has objects like AtomicSSERateParameter inside list of values
+            # has objects like MacroevolStateDependentRateParameter inside list of values
             else:
                 # TODO: later see how rev moves 2D-arrays and tree nodes
                 # print("value has objects inside")

@@ -12,8 +12,8 @@ class TestMacroEvolEvent(unittest.TestCase):
     def setUpClass(cls):
         # birth-death
         total_n_states = 1
-        cls.bd_rates_t0_s0 = [ sseobj.AtomicSSERateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                            sseobj.AtomicSSERateParameter(name="mu", val=0.5, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
+        cls.bd_rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                            sseobj.MacroevolStateDependentRateParameter(name="mu", val=0.5, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
         
         bd_matrix_atomic_rate_params = [ cls.bd_rates_t0_s0 ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         bd_fig_rates_manager = sseobj.FIGRatesManager(bd_matrix_atomic_rate_params, total_n_states)
@@ -23,12 +23,12 @@ class TestMacroEvolEvent(unittest.TestCase):
 
         # BiSSE
         total_n_states = 2
-        cls.bisse_rates_t0_s0 = [ sseobj.AtomicSSERateParameter(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                                  sseobj.AtomicSSERateParameter(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                                  sseobj.AtomicSSERateParameter(name="q01", val=0.5, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
-        cls.bisse_rates_t0_s1 = [ sseobj.AtomicSSERateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                                  sseobj.AtomicSSERateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                                  sseobj.AtomicSSERateParameter(name="q10", val=0.5, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
+        cls.bisse_rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                                  sseobj.MacroevolStateDependentRateParameter(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
+                                  sseobj.MacroevolStateDependentRateParameter(name="q01", val=0.5, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
+        cls.bisse_rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
+                                  sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
+                                  sseobj.MacroevolStateDependentRateParameter(name="q10", val=0.5, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
 
         bisse_rates_t0 = cls.bisse_rates_t0_s0 + cls.bisse_rates_t0_s1
         

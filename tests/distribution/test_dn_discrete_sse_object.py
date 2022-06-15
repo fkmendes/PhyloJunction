@@ -23,10 +23,10 @@ class TestDnSSEObject(unittest.TestCase):
         total_n_states = 2
 
         l = [ 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-        lrate = sseobj.AtomicSSERateParameter(name="lambda0", val=l, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
+        lrate = sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=l, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
         
         mu = [ 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0, 10.0, 10.0 ]
-        murate = sseobj.AtomicSSERateParameter(name="mu0", val=mu, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
+        murate = sseobj.MacroevolStateDependentRateParameter(name="mu0", val=mu, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
         
         rates_t0 = [ lrate, murate ]
 

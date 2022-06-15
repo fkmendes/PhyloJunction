@@ -2,9 +2,9 @@ import unittest
 from dendropy import Tree, Node, Taxon
 
 # pj imports
-from phylojunction.data.tree import AnnotatedTree
+import phylojunction.data.tree as pjtr
 
-class TestAnnotateTree(unittest.TestCase): 
+class TestAnnotateTree(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
@@ -34,12 +34,12 @@ class TestAnnotateTree(unittest.TestCase):
 
         total_state_count = 1
 
-        cls.tree_root = AnnotatedTree(tr_root, total_state_count, start_at_origin=False, epsilon=1e-12)
-        cls.tree_origin = AnnotatedTree(tr_origin, total_state_count, start_at_origin=True, epsilon=1e-12)
-        cls.tree_no_spn = AnnotatedTree(tr_no_spn, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
-        cls.tree_no_spn_dead = AnnotatedTree(tr_no_spn_dead, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
-        cls.tree_no_spn_built = AnnotatedTree(tr_no_spn_built, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
-        cls.tree_no_spn_dead_built = AnnotatedTree(tr_no_spn_dead_built, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
+        cls.tree_root = pjtr.AnnotatedTree(tr_root, total_state_count, start_at_origin=False, epsilon=1e-12)
+        cls.tree_origin = pjtr.AnnotatedTree(tr_origin, total_state_count, start_at_origin=True, epsilon=1e-12)
+        cls.tree_no_spn = pjtr.AnnotatedTree(tr_no_spn, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
+        cls.tree_no_spn_dead = pjtr.AnnotatedTree(tr_no_spn_dead, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
+        cls.tree_no_spn_built = pjtr.AnnotatedTree(tr_no_spn_built, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
+        cls.tree_no_spn_dead_built = pjtr.AnnotatedTree(tr_no_spn_dead_built, total_state_count, start_at_origin=True, max_age=1.0, epsilon=1e-12)
 
         # for testing the parsing of states into AnnotatedTree member dictionary
         origin_node3 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
@@ -61,7 +61,7 @@ class TestAnnotateTree(unittest.TestCase):
 
         total_state_count = 2
 
-        cls.bifurcating_tree_two_states = AnnotatedTree(bif_tr_two_states, total_state_count, start_at_origin=True, epsilon=1e-12)
+        cls.bifurcating_tree_two_states = pjtr.AnnotatedTree(bif_tr_two_states, total_state_count, start_at_origin=True, epsilon=1e-12)
 
     def test_root_origin_age_rootedge_length(self):
         """

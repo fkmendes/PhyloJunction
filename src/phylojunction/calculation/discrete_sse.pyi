@@ -3,7 +3,7 @@ from _typeshed import Incomplete
 
 MacroevolEvent: Incomplete
 
-class AtomicSSERateParameter:
+class MacroevolStateDependentRateParameter:
     value: ty.List[float]
     name: Incomplete
     state_tuple: Incomplete
@@ -25,8 +25,8 @@ class FIGRatesManager:
     slice_age_ends: Incomplete
     atomic_rate_params_dict: Incomplete
     epsilon: Incomplete
-    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[AtomicSSERateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
-    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[AtomicSSERateParameter]]): ...
+    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
+    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]]): ...
     def atomic_rate_params_at_time(self, atomic_rate_params_matrix, a_time: float): ...
 
 class MacroevolEventHandler:

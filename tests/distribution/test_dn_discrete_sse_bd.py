@@ -19,8 +19,8 @@ class TestBDTrees(unittest.TestCase):
         total_n_states = 1
 
         # not state-dependent (just state 0, and no transition)
-        rates_t0_s0 = [ sseobj.AtomicSSERateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.AtomicSSERateParameter(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
+        rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                        sseobj.MacroevolStateDependentRateParameter(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
 
         # original implementation
         # matrix_atomic_rate_params = [ [rates_t0_s0] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix

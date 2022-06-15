@@ -492,7 +492,7 @@ def call_gui():
                 try:
                     if isinstance(_pgm.get_node_pgm_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
                         do_all_samples = False
-                except: pass # the value of the node_pgm might be an AtomicSSERateParameter, which is not subscriptable, so we pass
+                except: pass # the value of the node_pgm might be an MacroevolStateDependentRateParameter, which is not subscriptable, so we pass
                 
                 node_pgm = _do_selected_node(_pgm, window, _fig, selected_node_pgm_name, do_all_samples=do_all_samples)
                 

@@ -22,18 +22,18 @@ class TestDataDump(unittest.TestCase):
         total_n_states = 2
 
         l0 = [ 1.0, 1.1, 0.9, 0.95, 1.05 ]
-        l0rate = sseobj.AtomicSSERateParameter(name="lambda0", val=l0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
+        l0rate = sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=l0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
 
         mu0 = [ 0.23, 0.24, 0.25, 0.26, 0.27 ]
-        mu0rate = sseobj.AtomicSSERateParameter(name="mu0", val=mu0, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
+        mu0rate = sseobj.MacroevolStateDependentRateParameter(name="mu0", val=mu0, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
         
-        q01rate = sseobj.AtomicSSERateParameter(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1])
+        q01rate = sseobj.MacroevolStateDependentRateParameter(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1])
         
         rates_t0_s0 = [ l0rate, mu0rate, q01rate ]
 
-        l1rate = sseobj.AtomicSSERateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1])
-        mu1rate = sseobj.AtomicSSERateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1])
-        q10rate = sseobj.AtomicSSERateParameter(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0])
+        l1rate = sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1])
+        mu1rate = sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1])
+        q10rate = sseobj.MacroevolStateDependentRateParameter(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0])
         
         rates_t0_s1 = [ l1rate, mu1rate, q10rate ]
         

@@ -14,7 +14,7 @@ MacroevolEvent = enum.Enum("Macroevol. event", ["W_SPECIATION", "BW_SPECIATION",
 
 ##############################################################################
 
-class AtomicSSERateParameter():
+class MacroevolStateDependentRateParameter():
     """Main class for discrete-state macroevolutionary parameters
 
     Supports vectorization of values only.
@@ -61,10 +61,8 @@ class AtomicSSERateParameter():
         self.str_representation += "   Associated event:    " + str(self.event) + "\n\n"
 
         # making sure inputs are ok
-        if self.event == MacroevolEvent.EXTINCTION and \
-            len(set(self.arriving_states)) != 1 and \
-                not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Extinction requires the departing and arriving states to be the same. Exiting...")
+        if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Extinction only takes a departing state (and no arriving states). Exiting...")
 
         if self.event == MacroevolEvent.W_SPECIATION and \
             len(set(self.arriving_states)) != 1 and \
@@ -87,10 +85,8 @@ class AtomicSSERateParameter():
                 self.departing_state in self.arriving_states:
             raise ec.SSEAtomicRateMisspec(message="State transition requires the departing and arriving states to be different. Exiting...")
 
-        if self.event == MacroevolEvent.ANCESTOR_SAMPLING and \
-            len(set(self.arriving_states)) != 1 and \
-                not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling requires the departing and arriving states to be the same. Exiting...")
+        if self.event == MacroevolEvent.ANCESTOR_SAMPLING and self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling only takes a departing state (and no arriving states). Exiting...")
 
     def __str__(self):
         return self.str_representation
@@ -113,7 +109,7 @@ class FIGRatesManager:
     """Stash for discrete-state macroevolutionary parameters and time slices
 
     At the moment, this class does not care about vectorization. It manipulates
-    whole instances of AtomicSSERateParameters, which _then in turn_
+    whole instances of MacroevolStateDependentRateParameter, which _then in turn_
     contain multiple values if vectors have been passed by user.
 
     Later, vectorization of seed ages for time slicing and time slices themselves
@@ -128,7 +124,7 @@ class FIGRatesManager:
     # that forces the user to specify the same number of parameters in
     # all time slices
 
-    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[AtomicSSERateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float]=None, list_time_slice_age_ends: ty.Optional[ty.List[float]]=None, epsilon: float=1e-12):
+    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float]=None, list_time_slice_age_ends: ty.Optional[ty.List[float]]=None, epsilon: float=1e-12):
         # how do we need to access parameters and values during simulation?
         # we probably need two types of parameter containers.
         # type 1: records "high-level" governing parameters, rho, sigma, phi
@@ -153,7 +149,7 @@ class FIGRatesManager:
             if self.seed_age:
                 self.slice_t_ends = [self.seed_age - age_end for age_end in self.slice_age_ends] # no need to append seed_age, because self.slice_age_ends already has 0.0 in it
 
-        self.atomic_rate_params_dict: ty.Dict[int, ty.List[ty.List[AtomicSSERateParameter]]] = dict((s, [[] for j in range(self.n_time_slices)]) for s in range(self.state_count))
+        self.atomic_rate_params_dict: ty.Dict[int, ty.List[ty.List[MacroevolStateDependentRateParameter]]] = dict((s, [[] for j in range(self.n_time_slices)]) for s in range(self.state_count))
         self.init_atomic_rate_param_dict(matrix_atomic_rate_params) # side effect: initializes self.atomic_rate_params_dict
         # self.atomic_rate_params_dict =
         # { state0:
@@ -165,7 +161,7 @@ class FIGRatesManager:
         self.epsilon = epsilon
 
 
-    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[AtomicSSERateParameter]]):
+    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]]):
         # original implementation (2nd dimension were states, rather than all rates from all states together)
         # for k, s_state_list in enumerate(matrix_atomic_rate_params):
 
@@ -471,7 +467,7 @@ if __name__ == "__main__":
     # can also be called from VS Code, if open folder is phylojuction/
     
     # yule, one state, one epoch
-    # arp = AtomicSSERateParameter(1.0, MacroevolEvent.W_SPECIATION, name="lambda")
+    # arp = MacroevolStateDependentRateParameter(1.0, MacroevolEvent.W_SPECIATION, name="lambda")
     # print(arp)
     # rates_t0_s0 = [ arp ]
     # matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice        

@@ -13,7 +13,7 @@ class TestSSEStopConditions(unittest.TestCase):
     @classmethod
     def setUp(cls):
         # not state-dependent (just state 0, and no transition)
-        rates_t0_s0 = [ sseobj.AtomicSSERateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
+        rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
     
         # original implementation
         matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice

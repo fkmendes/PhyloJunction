@@ -17,19 +17,19 @@ class TestClaSSETrees(unittest.TestCase):
         total_n_states = 3
 
         # calling state 0 "1" to match R unit test
-        rates_t0_s1 = [ sseobj.AtomicSSERateParameter(name="lambda1", val=0.9, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.AtomicSSERateParameter(name="mu1", val=0.6, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                        sseobj.AtomicSSERateParameter(name="q13", val=0.9, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,2]) ]
+        rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=0.9, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                        sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.6, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
+                        sseobj.MacroevolStateDependentRateParameter(name="q13", val=0.9, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,2]) ]
         
-        rates_t0_s2 = [ sseobj.AtomicSSERateParameter(name="lambda2", val=0.7, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                        sseobj.AtomicSSERateParameter(name="mu2", val=0.4, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                        sseobj.AtomicSSERateParameter(name="q23", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,2]) ]
+        rates_t0_s2 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda2", val=0.7, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
+                        sseobj.MacroevolStateDependentRateParameter(name="mu2", val=0.4, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
+                        sseobj.MacroevolStateDependentRateParameter(name="q23", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,2]) ]
         
-        rates_t0_s3 = [ sseobj.AtomicSSERateParameter(name="lambda312", val=1.2, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,1]),
-                        sseobj.AtomicSSERateParameter(name="lambda313", val=0.9, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,2]),
-                        sseobj.AtomicSSERateParameter(name="lambda323", val=0.7, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,1,2]),
-                        sseobj.AtomicSSERateParameter(name="q31", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]),
-                        sseobj.AtomicSSERateParameter(name="q32", val=0.6, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,1]) ]
+        rates_t0_s3 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda312", val=1.2, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,1]),
+                        sseobj.MacroevolStateDependentRateParameter(name="lambda313", val=0.9, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,2]),
+                        sseobj.MacroevolStateDependentRateParameter(name="lambda323", val=0.7, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,1,2]),
+                        sseobj.MacroevolStateDependentRateParameter(name="q31", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]),
+                        sseobj.MacroevolStateDependentRateParameter(name="q32", val=0.6, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,1]) ]
         
         rates_t0 = rates_t0_s1 + rates_t0_s2 + rates_t0_s3
 
