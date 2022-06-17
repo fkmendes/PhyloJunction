@@ -21,6 +21,7 @@ class AnnotatedTree(dp.Tree):
     origin_node: ty.Optional[dp.Node] # can be None
     origin_age: ty.Optional[float] # can be None
     root_node: ty.Optional[dp.Node] # can be None
+    brosc_node: ty.Optional[dp.Node] # can be None
     root_age: ty.Optional[float] # can be None
     tree_read_as_newick_by_dendropy: bool
     tree: dp.Tree
@@ -28,6 +29,7 @@ class AnnotatedTree(dp.Tree):
     seed_age: float
     epsilon: float
     tree_died: bool
+    no_event: bool
     state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
@@ -50,11 +52,13 @@ class AnnotatedTree(dp.Tree):
                 slice_t_ends: ty.List[ty.Optional[float]]=[],
                 slice_age_ends: ty.Optional[ty.List[float]]=None,
                 sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[sa.SampledAncestor]]]=None,
+                tree_died: ty.Optional[bool]=None,
                 epsilon: float=1e-12):
 
         self.with_origin = start_at_origin
         self.origin_node = None
         self.root_node = None
+        self.brosc_node = None
         self.tree_read_as_newick_by_dendropy = False
         self.tree = a_tree
         self.state_count = total_state_count
@@ -68,40 +72,96 @@ class AnnotatedTree(dp.Tree):
         self.slice_t_ends = slice_t_ends
         self.slice_age_ends = slice_age_ends
         self.sa_lineage_dict = sa_lineage_dict
+        self.tree_died = tree_died
+        self.no_event = True
 
         try:
             self.tree.seed_node.alive
         except:
             self.tree_read_as_newick_by_dendropy = True
 
+        ########### Initializing important class members ############
+        # When there is an origin:                                  #
+        #                                                           #
+        # (1) origin_age                                            #
+        # (2) root_age (if there is one)                            #
+        # (3) origin_edge (the edge that has the origin on one end) #
+        # (4) tree_died (flag signaling all tips went extinct)      #
+        #############################################################
         if self.with_origin:
             # making sure this is indeed origin...
             if len(self.tree.seed_node.child_nodes()) > 1:
                 raise ec.AnnotatedTreeMisspec("Tree was specified as starting from origin, but it started from root. Exiting...")
 
             self.origin_node = self.tree.seed_node
-            self.origin_age = self.seed_age
-            # if origin underwent birth event and there is a root
-            if len(self.tree.seed_node.child_nodes()) > 0:
-                self.root_node = self.tree.seed_node.child_nodes()[0] # origin always have root child
-                self.root_edge_length = self.root_node.edge_length
-                self.root_age = self.origin_age - self.root_edge_length # returns 0.0 if tree dies (TODO: revisit this...)
+            self.root_age = 0.0
 
-            # fixes root label if tree has only origin + root
+            origin_children = [nd for nd in self.tree.nodes() if nd.label != "origin"]
+            origin_children_labels = tuple([nd.label for nd in origin_children])
+            
+            # if there is a brosc node, we get it
+            try: self.brosc_node = [nd for nd in origin_children if nd.label == "brosc"][0]
+            except: pass
+
+            # Case (a): no events took place, tree may or may not have gone extinct
+            #
+            # [origin] --- [brosc] ... [max age] (died)
+            # [origin] ------ [brosc at max age] (survived)
+            if self.origin_node.num_child_nodes() == 1 and origin_children_labels[0] == "brosc":
+                self.origin_age = self.origin_edge_length = origin_children[0].edge_length # will have been set at stop_condition check in simulate()
+
+            # Case (b): at least one event took place (root may or not have been born)
+            # and tree may or not have died
+            elif len(origin_children) > 1:
+                self.no_event = False
+                
+                # Case (b.1) There is a root
+                #
+                # [origin] --- [root + children] ............. [stop condition] (died)
+                # [origin] ---------------- [root + children at stop condition] (survived)
+                if "root" in origin_children_labels:
+                    self.origin_age = self.seed_age
+                    self.root_node = [nd for nd in self.origin_node.child_nodes() if nd.label == "root"][0] # there might be sampled ancestors before root, making sure...
+                    # TODO: now that I allow sampled ancestors between the root and the origin, I need to
+                    # recur from the root up to the origin getting all branch lengths to get the origin_edge_length
+                    self.origin_edge_length = self.root_node.edge_length
+                    self.root_age = self.origin_age - self.origin_edge_length # returns 0.0 if tree dies (TODO: revisit this...)
+                
+                # Case (b.2) There is no root, so event(s) must have been ancestor sampling
+                #
+                # [origin] --- [ancestor sampling(s)] --- [brosc] ... [max age] (died)
+                # [origin] --- [ancestor sampling(s)] ------ [brosc at max age] (survived)
+                else:
+                    for nd in self.tree.seed_node.leaf_nodes():
+                        if not nd.is_sa and abs(nd.edge_length) > self.epsilon:
+                            self.origin_age = 0.0
+                            self.origin_age = self.recursively_find_node_age(nd, self.origin_age)
+                            self.origin_edge_length = self.brosc_node.edge_length
+
+            else:
+                print("\n\nShould not be here\n\n")
+                print(self.tree.as_string(schema="newick"))
+                print("origin children = ")
+                print(origin_children)
+
+            # debugging
+            # print("\nFinished initializing some class members:")
+            # print("origin_age = " + str(self.origin_age))
+            # print("origin_edge_length = " + str(self.origin_edge_length))
+            # print("root_age = " + str(self.root_age))
+
+            # if tree_died flag was not passed upon initialization, we need to sort this out
+            if max_age:
+                if not isinstance(self.tree_died, bool) and (max_age - self.origin_age) > self.epsilon:
+                    self.tree_died = True
+            else:
+                self.tree_died = False # no way to tell, we assume tree did not die
+
+            # a bit of cleaning for printing the tree
             if self.tree_read_as_newick_by_dendropy and len(self.tree.leaf_nodes()) == 1:
                 self.root_node.label = str(self.root_node.taxon).replace("\'", "")
 
-            # the tree might have died later, but if this is satisfied, it is certainly dead already
-            if max_age:
-                # if no root was ever added and we ended up with just the origin and the subtending branch
-                # and this branch matches the maximum tree age
-                if not self.root_node and (abs(self.origin_age - max_age) > self.epsilon):
-                    self.tree_died = True
-                # a root node was added, but it has no children, and the root edge matches the maximum
-                # tree age
-                elif self.root_node and not self.root_node.child_nodes() and (abs(self.root_edge_length - max_age) > self.epsilon):
-                    self.tree_died = True
-
+        # starting at root
         else:
             if len(self.tree.seed_node.child_nodes()) == 1:
                 raise ec.AnnotatedTreeMisspec("Tree was specified as not starting from origin, but it starts from the origin. Exiting...")
@@ -109,20 +169,20 @@ class AnnotatedTree(dp.Tree):
             # and there is a root edge, we need to add an origin node and update everything accordingly
             if len(self.tree.seed_node.child_nodes()) == 2 and self.tree.seed_node.edge_length:
                 self.root_node = self.tree.seed_node
-                self.root_edge_length = self.root_node.edge_length
+                self.origin_edge_length = self.root_node.edge_length
                 self.origin_node = dp.Node(taxon=dp.Taxon(label="origin"), label="origin", edge_length=0.0)
                 self.origin_node.alive = False
                 self.origin_node.add_child(self.root_node)
                 self.tree.seed_node = self.origin_node
                 self.seed_age = self.tree.max_distance_from_root()
                 self.origin_age = self.seed_age
-                self.root_age = self.origin_age - self.root_edge_length
+                self.root_age = self.origin_age - self.origin_edge_length
 
             else:
                 self.origin_age = None
                 self.root_node = self.tree.seed_node
                 self.root_age = self.tree.max_distance_from_root()
-                self.root_edge_length = 0.0
+                self.origin_edge_length = 0.0
 
                 # fixes root label if tree has only origin + root
                 if self.tree_read_as_newick_by_dendropy and len(self.tree.leaf_nodes()) == 1:
@@ -133,17 +193,18 @@ class AnnotatedTree(dp.Tree):
         ###############
 
         # side-effect initializes:
-        #   self.n_extant_obs_nodes
-        #   self.n_extinct_obs_nodes
-        #   self.extant_obs_nodes_labels
-        #   self.extinct_obs_nodes_labels
-        self.n_extant_obs_nodes = 0
-        self.n_extinct_obs_nodes = 0
-        self.n_sa_obs_nodes = 0
-        self.count_observable_nodes()
-        # TODO: self.count_sampled_ancestors()
+        #   self.n_extant_terminal_nodes
+        #   self.n_extinct_terminal_nodes
+        #   self.extant_terminal_nodes_labels
+        #   self.extinct_terminal_nodes_labels
+        self.n_extant_terminal_nodes = 0
+        self.n_extinct_terminal_nodes = 0
+        self.n_sa = 0
 
-        self.count_observable_node_states() # initializes self.state_count_dict
+        self.count_terminal_nodes()
+        self.count_sampled_ancestors()
+
+        self.count_terminal_node_states() # initializes self.state_count_dict
 
         self.populate_node_age_height_dicts() # initializes self.node_heights_dict and self.node_ages_dict
 
@@ -153,12 +214,11 @@ class AnnotatedTree(dp.Tree):
     #            self.sa_obs_nodes_labels
     def count_sampled_ancestors(self) -> None:
         """Count sampled ancestor nodes, store count and node labels into class members (side-effect)"""
-        
         sa_obs_nodes_labels_list: ty.List[str] = []
         
         if isinstance(self.sa_lineage_dict, dict):
             for _, sa_list in self.sa_lineage_dict.items():
-                self.n_sa_obs_nodes += len(sa_list)
+                self.n_sa += len(sa_list)
                 sa_obs_nodes_labels_list.extend([sa.label for sa in sa_list])
 
         self.sa_obs_nodes_labels = tuple(sa_obs_nodes_labels_list)
@@ -167,61 +227,53 @@ class AnnotatedTree(dp.Tree):
     # side-effect:
     # populates: self.extant_obs_nodes_labels
     #            self.self.extinct_obs_nodes_labels
-    def count_observable_nodes(self) -> None:
+    def count_terminal_nodes(self) -> None:
         """Count extant and extinct nodes, store counts and node labels into class members (side-effect)"""
-        
-        # print("doing a separate tree now, counting observable nodes")
 
         # nd.distance_from_root() gives distance to seed!
         extant_obs_nodes_labels_list: ty.List[str] = []
         extinct_obs_nodes_labels_list: ty.List[str] = []
 
-        # tree died before first speciation event
+        #################################################################
+        # Annoying case: Tree died before stop condition was met;       #
+        # We do not count SAs, and do count the only terminal node left #
+        # that underwent extinction                                     #
+        #################################################################
         if self.tree_died:
             self.n_extinct_obs_nodes = 1
 
-            if self.root_node:
-                extinct_obs_nodes_labels_list.append(self.root_node.label)
+            if self.brosc_node:
+                extinct_obs_nodes_labels_list.append(self.brosc_node.label)
 
-        # tree did not die before first speciation event
+        # tree did not die before stop condition was met
         else:
             for nd in self.tree:
-                # [original code] root (un-speciated) survived all the way to max age, did not go extinct
-                # if nd == self.root_node and not self.root_node.child_nodes():
-                #     self.n_extant_obs_nodes = 1
-                #     extant_obs_nodes_labels_list.append(nd.label)
-                #     break
 
-                # [original code] root (un-speciated) survived all the way to max age, did not go extinct
-                if nd == self.origin_node and not self.origin_node.child_nodes():
-                    self.n_extant_obs_nodes = 1
-                    extant_obs_nodes_labels_list.append(nd.label)
-                    break
-
-                elif nd.is_leaf():
+                # an extant terminal node is a leaf whose path to the origin/root
+                # has maximal length (equal to the age of the origin/root)
+                if nd.is_leaf() and not (nd.edge_length < self.epsilon):
                     # nd.distance_from_root() returns distance to seed
-                    # checks that distance from seed to node is maximal
                     if (abs(self.seed_age - nd.distance_from_root()) <= self.epsilon):
                         if self.tree_read_as_newick_by_dendropy:
-                            self.n_extant_obs_nodes += 1
+                            self.n_extant_terminal_nodes += 1
                             extant_obs_nodes_labels_list.append(nd.taxon.label)
                         # if tree was created via simulation (and .alive a member of Node)
                         elif nd.alive:
-                            self.n_extant_obs_nodes += 1
+                            self.n_extant_terminal_nodes += 1
                             # nd.taxon = nd.label
                             extant_obs_nodes_labels_list.append(nd.label)
 
-                    # if distance is not maximal
+                    # if terminal node' s path is not maximal
                     else:
                         if self.tree_read_as_newick_by_dendropy:
-                            self.n_extinct_obs_nodes += 1
+                            self.n_extinct_terminal_nodes += 1
                             extinct_obs_nodes_labels_list.append(nd.taxon.label)
                         # if tree was created via simulation (and .alive a member of Node)
                         elif not nd.alive:
-                            self.n_extinct_obs_nodes += 1
-                            # nd.taxon = nd.label
+                            self.n_extinct_terminal_nodes += 1
                             extinct_obs_nodes_labels_list.append(nd.label)
 
+                # a bit of cleaning for printing the tree
                 elif not nd.is_leaf() and not self.tree_read_as_newick_by_dendropy:
                     # remove internal node labels from taxon namespace, for Nexus printing
                     try:
@@ -232,9 +284,8 @@ class AnnotatedTree(dp.Tree):
                         # print("    tree was " + self.tree.as_string(schema="newick"))
                         print(self.tree.taxon_namespace)
 
-        # used when stop condition is max age
-        # if speciation events happened, but tree eventually died before max age
-        if self.n_extant_obs_nodes == 0:
+        # if max_age was not provided, this will be necessary
+        if self.n_extant_terminal_nodes == 0:
             self.tree_died = True
 
         self.extant_obs_nodes_labels = tuple(extant_obs_nodes_labels_list)
@@ -243,7 +294,7 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates self.state_count_dict, {state (int): count (int), ... }
-    def count_observable_node_states(self) -> None:
+    def count_terminal_node_states(self) -> None:
         for nd in self.tree:
             if nd.label in self.extant_obs_nodes_labels:
                 try:
@@ -252,6 +303,15 @@ class AnnotatedTree(dp.Tree):
                 # or the tree might have been created by hand and no states were
                 # defined (e.g., Yule or birth-death processes)
                 except: pass
+
+
+    def recursively_find_node_age(self, a_node: dp.Node, running_age_sum: float) -> float:
+        # stop recursion
+        if a_node == self.tree.seed_node:
+            return running_age_sum
+
+        # recur
+        return self.recursively_find_node_age(a_node.parent_node, running_age_sum + a_node.edge_length)
 
 
     def name_internal_nodes(self):

@@ -63,6 +63,8 @@ class DnSSE(pgm.DistributionPGM):
     n_sim: int
     n_repl: int
     with_origin: bool
+    root_is_born: bool
+    tree_died: bool
     stop: str
     stop_val: ty.List[float]
     condition_on_speciation: bool
@@ -88,6 +90,8 @@ class DnSSE(pgm.DistributionPGM):
         self.n_sim = int(n)
         self.n_repl = int(n_replicates) # number of replicate trees (in plate) for a given simulation
         self.with_origin = origin
+        self.root_is_born = False
+        self.tree_died = False
         self.stop = stop
         self.stop_val = stop_value
         self.condition_on_speciation = condition_on_speciation
@@ -269,8 +273,8 @@ class DnSSE(pgm.DistributionPGM):
 
         # if first speciation event (root must created)
         if chosen_node.label == "origin":
-            # creating root node (at the moment root edge = 0.0)
-            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=0.0)
+            # creating root node, we must create the root_edge (edge_length)
+            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=event_t)
             root_node.state = chosen_node.state # root takes origin state
             root_node.annotations.add_bound_attribute("state")
             root_node.alive = False # we will pick the root as the first event
@@ -278,6 +282,7 @@ class DnSSE(pgm.DistributionPGM):
             root_node.is_sa_dummy_parent = False
             root_node.is_sa_lineage = False
             tr_namespace.add_taxon(root_node)
+            self.root_is_born = True
             # state_representation_dict[root_node.state].add(root_node.label)
 
             # updating origin
@@ -334,6 +339,8 @@ class DnSSE(pgm.DistributionPGM):
         if chosen_node.is_sa_lineage:
             self.update_sa_lineage_dict(event_t, chosen_node.label)
 
+        print("executed whole birth code")
+
         return last_node2speciate, cumulative_node_count
 
 
@@ -362,6 +369,17 @@ class DnSSE(pgm.DistributionPGM):
         # if chosen node was on a lineage with SAs, we update the SAs info
         if chosen_node.is_sa_lineage:
             self.update_sa_lineage_dict(event_t, chosen_node.label)
+
+        # origin went extinct, we slap a brosc node
+        if chosen_node.label == "origin":
+            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"), label="brosc", edge_length=event_t)
+            brosc_node.alive = False
+            brosc_node.is_sa = False
+            brosc_node.is_sa_dummy_parent = False
+            brosc_node.is_sa_lineage = False
+            brosc_node.state = chosen_node.state
+            untargetable_node_set.add(brosc_node.label)
+            chosen_node.add_child(brosc_node)
 
         last_node2die = chosen_node
 
@@ -410,6 +428,29 @@ class DnSSE(pgm.DistributionPGM):
         # modeling sampled ancestor as bifurcating event, one child is the same as parent lineage,
         # second child is a terminal node that will never be elongated (branch length = 0.0)
 
+        if chosen_node.label == "origin":
+            # ancestor sampling event took place before root was born
+            # so we create a replacement for the root, the 'brosc_node'
+            # before-root-origin-single-child
+            # this is the node that will undergo the ancestor sampling event
+            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"), label="brosc", edge_length=0.0)
+            brosc_node.alive = True
+            brosc_node.is_sa = False
+            brosc_node.is_sa_dummy_parent = False
+            brosc_node.is_sa_lineage = True
+            brosc_node.state = chosen_node.state
+            brosc_node.annotations.add_bound_attribute("state")
+            state_representation_dict[chosen_node.state].add(brosc_node.label) # this node is alive and can be selected
+            tr_namespace.add_taxon(brosc_node)
+            
+            # updating origin
+            chosen_node.alive = False # origin is no longer alive
+            untargetable_node_set.add("origin") # and cannot be targeted
+            state_representation_dict[chosen_node.state].remove(chosen_node.label)
+            chosen_node.add_child(brosc_node)
+
+            chosen_node = brosc_node # we will execute the ancestor sampling on this new chosen_node
+
         # doing lineage that remains alive
         left_label = chosen_node.label # gets parent's label (parent's label will change below)
         left_child = dp.Node(taxon=dp.Taxon(label=left_label), label=left_label, edge_length=0.0)
@@ -431,7 +472,7 @@ class DnSSE(pgm.DistributionPGM):
         right_child.alive = False
         right_child.state = chosen_node.state # gets parent's state
         right_child.annotations.add_bound_attribute("state")
-        state_representation_dict[right_child.state].add(right_child.label) # sampled ancestor represents state
+        # state_representation_dict[right_child.state].add(right_child.label) # I don't think sampled ancestor represents state
         # the way we're implementing sampled ancestors here, they cannot be picked for events;
         # it is their sister lineage that can be picked (their parent is becomes a dummy node)
         untargetable_node_set.add(right_child.label) # cannot pick sampled ancestor to undergo event the way its implemented
@@ -576,6 +617,17 @@ class DnSSE(pgm.DistributionPGM):
 
         # simulation starts at origin
         if self.with_origin:
+            # brosc: before-root-origin-single-child
+            # node that might be necessary for tying process off if a speciation never happens
+            # before the process either dies, or reaches stop condition
+            #
+            # note that brosc can become an sa lineage node if ancestor sampling happens, but
+            # a root is never born 
+            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"), label="brosc", edge_length=0.0)
+            brosc_node.is_sa = False
+            brosc_node.is_sa_dummy_parent = False
+            brosc_node.is_sa_lineage = False
+
             # origin node will be the seed_node
             origin_node = dp.Node(taxon=dp.Taxon(label="origin"), label="origin", edge_length=0.0)
             origin_node.state = start_state
@@ -600,6 +652,7 @@ class DnSSE(pgm.DistributionPGM):
             root_node.is_sa_dummy_parent = False
             root_node.is_sa_lineage = False
             untargetable_node_set.add("root")
+            self.root_is_born = True
 
             # we will actually start off with the left and right nodes being targetable
             left_node = dp.Node(taxon=dp.Taxon(label="nd1"), label="nd1", edge_length=0.0)
@@ -678,8 +731,16 @@ class DnSSE(pgm.DistributionPGM):
                 extend_all_living_nodes(t_to_next_event - excess_t)
 
                 if _next_max_t == t_stop:
-                    reached_stop_condition = True
                     self.update_sa_lineage_dict(t_stop) # updates SA info for plotting
+                    
+                    # if origin is the only node (root always has children), we slap finish node at end of process
+                    if self.with_origin and tr.seed_node.alive and len(tr.seed_node.child_nodes()) == 0:
+                        brosc_node.edge_length = t_stop # we make origin edge length the max age of the tree
+                        brosc_node.alive = True
+                        tr.seed_node.add_child(brosc_node)
+
+                    reached_stop_condition = True
+                    
                     break
 
                 # goes back to top of while-loop restarting at next time slice
@@ -693,8 +754,17 @@ class DnSSE(pgm.DistributionPGM):
                 # with a single time slice)
                 if self.stop == "age" and (latest_t > t_stop):
                     extend_all_living_nodes(t_stop - (latest_t - t_to_next_event), end=True)
+                    
                     self.update_sa_lineage_dict(t_stop) # updates SA info for plotting
+
+                    # if origin is the only node (root always has children), we slap brosc node at end of process
+                    if self.with_origin and tr.seed_node.alive and len(tr.seed_node.child_nodes()) == 0:
+                        brosc_node.edge_length = t_stop
+                        brosc_node.alive = True
+                        tr.seed_node.add_child(brosc_node)
+                    
                     reached_stop_condition = True
+                    
                     break
 
                 # elongate all lineages
@@ -739,8 +809,12 @@ class DnSSE(pgm.DistributionPGM):
                 #
                 # check if all lineages went extinct, stop!
                 if current_node_target_count == 0:
-                    reached_stop_condition = True
+                    self.tree_died = True
+
                     self.update_sa_lineage_dict(latest_t) # updates SA info for plotting
+                    
+                    reached_stop_condition = True
+
                     break
 
                 # check tree grew beyond its max taxon count, stop!
@@ -754,8 +828,15 @@ class DnSSE(pgm.DistributionPGM):
                     last_chosen_node.alive = True # parent is back alive
                     untargetable_node_set.remove(last_chosen_node.label) # we must add parent back so it can be extended
                     state_representation_dict[last_chosen_node.state].add(last_chosen_node.label) # won't use it again, but to be safe
+                    
                     self.update_sa_lineage_dict(t_stop) # updates SA info for plotting
+                    
+                    # TODO:
+                    # if birth event on root and max_obs_nodes = 1, need 
+                    # to remove children, but switch root with brosc
+
                     reached_stop_condition = True
+                    
                     break
 
         # (11) got out of while loop because met stop condition
@@ -796,6 +877,10 @@ class DnSSE(pgm.DistributionPGM):
                 # check if tr has right specs
                 if self.is_tr_ok(tr, self.stop_val[ith_sim]):
                     output.append(tr)
+                    
+                    print("\ntree is ok")
+                    print(tr.tree.as_string(schema="newick"))
+
                     repl_size += 1
 
                 # tree not good, stay in while loop
@@ -833,7 +918,7 @@ class DnSSE(pgm.DistributionPGM):
             if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:
                 return False
 
-            if self.condition_on_survival and (ann_tr.n_extant_obs_nodes + ann_tr.n_sa_obs_nodes) != a_stop_value:
+            if self.condition_on_survival and (ann_tr.n_extant_terminal_nodes + ann_tr.n_sa) != a_stop_value:
                 return False
 
             # if conditions are not specified, returns all trees

@@ -67,7 +67,7 @@ class TestBDTrees(unittest.TestCase):
         batch_cis = list()
         in_ci_count = 0
         for i, batch in enumerate(sim_batches):
-            n_extant_obs_nodes = [ann_tr.n_extant_obs_nodes for ann_tr in batch]
+            n_extant_obs_nodes = [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
             stdevs = statistics.stdev(n_extant_obs_nodes)
             sterr = stdevs / math.sqrt(n_sim)
             diff = 1.96 * sterr

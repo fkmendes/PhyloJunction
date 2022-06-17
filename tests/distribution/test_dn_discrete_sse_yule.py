@@ -65,7 +65,7 @@ class TestYuleTrees(unittest.TestCase):
         in_ci_count = 0
         for i, batch in enumerate(sim_batches):
             extant_count_set = extant_count_set.union(
-                set(ann_tr.n_extant_obs_nodes for ann_tr in batch)
+                set(ann_tr.n_extant_terminal_nodes for ann_tr in batch)
             )
             root_ages = [ann_tr.root_age for ann_tr in batch]
             stdevs = statistics.stdev(root_ages)
@@ -132,7 +132,7 @@ class TestYuleTrees(unittest.TestCase):
         batch_cis = list()
         in_ci_count = 0
         for i, batch in enumerate(sim_batches):
-            n_extant_obs_nodes = [ann_tr.n_extant_obs_nodes for ann_tr in batch]
+            n_extant_obs_nodes = [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
             stdevs = statistics.stdev(n_extant_obs_nodes)
             sterr = stdevs / math.sqrt(n_sim)
             diff = 1.96 * sterr

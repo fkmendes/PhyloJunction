@@ -41,7 +41,7 @@ class TestSSEStopConditions(unittest.TestCase):
         dnsse = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)
         trs = dnsse.generate()
 
-        tr_sizes = [ann_tr.n_extant_obs_nodes for ann_tr in trs]
+        tr_sizes = [ann_tr.n_extant_terminal_nodes for ann_tr in trs]
         self.assertEqual(tr_sizes, stop_condition_value)
 
 

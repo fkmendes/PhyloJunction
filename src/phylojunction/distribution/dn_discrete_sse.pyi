@@ -11,6 +11,8 @@ class DnSSE(pgm.DistributionPGM):
     n_sim: int
     n_repl: int
     with_origin: bool
+    root_is_born: bool
+    tree_died: bool
     stop: str
     stop_val: float
     condition_on_speciation: bool

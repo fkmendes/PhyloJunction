@@ -146,14 +146,16 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         n_ci_overlap_count = 0
         root_age_ci_overlap_count = 0
         for i, batch in enumerate(sim_batches):
-            ns = [ann_tr.n_extant_obs_nodes for ann_tr in batch]
+            ns = [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
             root_ages = [ann_tr.root_age for ann_tr in batch]
 
             mean_n = statistics.mean(ns)
             mean_root_ages = statistics.mean(root_ages)
 
             # print("mean_n = " + str(mean_n))
+            # print("mean_n MASTER = " + str(n_mean_master[i]))
             # print("mean_root_ages = " + str(mean_root_ages))
+            # print("mean_root_ages MASTER = " + str(root_ages_mean_maxt_master[i]))
 
             stdevs_n = statistics.stdev(ns)
             stdevs_root_ages = statistics.stdev(root_ages)
