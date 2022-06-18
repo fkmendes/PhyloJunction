@@ -11,16 +11,16 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
     def setUpClass(cls):
 
         ##############################################################################################
-        # Tree 1: origin + SA then extinction;                                                       #
+        # Tree 1: origin + SA then survive until with max age;                                       #
         # Note that the way "execute_sample_ancestor" is implemented when it happens before a proper #
         # birth event (giving rise to the root), the origin instead undergoes a "fake birth" event,  #
         # where a 'dummy node' is made its child, and two children are added to the dummy node:      # 
         #                                                                                            #
         # (1) SA,                                                                                    #
-        # (2) A node between the origin and the root                                                 #
+        # (2) A node between the origin and the root (the "brosc" node)                              #
         #                                                                                            #
         # Then (2) stays alive and potentially undergoes another birth event when the root would     #
-        # be created. In this Tree 1, however, (2) goes extinct                                      #
+        # be created. In this Tree 1, however, (2) stays alive and does not undergo a birth event    #
         ##############################################################################################       
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
@@ -52,11 +52,10 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
         dummy_node.add_child(sa_node)
         dummy_node.add_child(brosc_node)
 
-        # no spn: no root, tree dies before that happens
-        # dead: bw_origin_root_node undergoes extinction before birth event starting the root
-        tr_sa_no_spn_dead_built = Tree(seed_node=origin_node)
+        # no spn: no root
+        tr_sa_no_spn_built = Tree(seed_node=origin_node)
 
-        print("tr_sa_no_spn_dead_built.seed_age = " + str(tr_sa_no_spn_dead_built.max_distance_from_root()))
+        print("tr_sa_no_spn_built.seed_age = " + str(tr_sa_no_spn_built.max_distance_from_root()))
 
         total_state_count = 1
 
@@ -65,8 +64,8 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
         sa = pjsa.SampledAncestor("sa1", "bw_origin_root", sa_global_time, time_to_lineage_node=time_to_sa_lineage_node)
         sa_lineage_dict = { "bw_origin_root": [sa] }
         
-        cls.tree_sa_no_spn_dead_built = pjtr.AnnotatedTree(
-            tr_sa_no_spn_dead_built,
+        cls.tree_sa_no_spn_built = pjtr.AnnotatedTree(
+            tr_sa_no_spn_built,
             total_state_count,
             start_at_origin=True,
             max_age=2.0,
@@ -78,12 +77,16 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
         Test counting of extant, extinct and SA nodes
         """
         
-        # tree starting at root
-        # extant nodes
-        print(self.tree_sa_no_spn_dead_built.n_extant_terminal_nodes) # should be 1
-        print(self.tree_sa_no_spn_dead_built.n_extinct_terminal_nodes) # should be 0
-        print(self.tree_sa_no_spn_dead_built.n_sa) # should be 1
+        # Tree 1: origin + SA then survive until with max age
+        self.assertEqual(self.tree_sa_no_spn_built.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
+        self.assertEqual(self.tree_sa_no_spn_built.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
+        self.assertEqual(self.tree_sa_no_spn_built.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
 
+        # Tree 2: origin + SA + SA then survive until with max age
+
+        # Tree 3: origin + SA then extinction before max age
+
+        # Tree 4: origin + SA + SA then extinction before max age
 
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder

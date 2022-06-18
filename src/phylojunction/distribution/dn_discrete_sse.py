@@ -272,7 +272,7 @@ class DnSSE(pgm.DistributionPGM):
                 " into daughters with states " + str(left_arriving_state) + " and " + str(right_arriving_state))
 
         # if first speciation event (root must created)
-        if chosen_node.label == "origin":
+        if chosen_node.label in ("origin", "brosc"):
             # creating root node, we must create the root_edge (edge_length)
             root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=event_t)
             root_node.state = chosen_node.state # root takes origin state
@@ -285,11 +285,12 @@ class DnSSE(pgm.DistributionPGM):
             self.root_is_born = True
             # state_representation_dict[root_node.state].add(root_node.label)
 
-            # updating origin
-            chosen_node.alive = False # origin is no longer alive
-            untargetable_node_set.add("origin") # and cannot be targeted
-            state_representation_dict[chosen_node.state].remove(chosen_node.label)
-            chosen_node.add_child(root_node)
+            # updating origin or brosc node
+            chosen_node.alive = False # origin/brosc is no longer alive
+            untargetable_node_set.add(chosen_node.label) # cannot be targeted            
+            state_representation_dict[chosen_node.state].remove(chosen_node.label) # and does not represent state
+            
+            chosen_node.add_child(root_node) # finally link root to origin/brosc
 
             # now make chosen_node be the root, so the rest of the birth event can be executed
             chosen_node = root_node
@@ -338,8 +339,6 @@ class DnSSE(pgm.DistributionPGM):
         # (4) if chosen node was on a lineage with SAs, we update the SAs info
         if chosen_node.is_sa_lineage:
             self.update_sa_lineage_dict(event_t, chosen_node.label)
-
-        print("executed whole birth code")
 
         return last_node2speciate, cumulative_node_count
 
@@ -624,6 +623,8 @@ class DnSSE(pgm.DistributionPGM):
             # note that brosc can become an sa lineage node if ancestor sampling happens, but
             # a root is never born 
             brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"), label="brosc", edge_length=0.0)
+            brosc_node.state = start_state
+            brosc_node.annotations.add_bound_attribute("state")
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = False
@@ -827,16 +828,25 @@ class DnSSE(pgm.DistributionPGM):
                     last_chosen_node.clear_child_nodes() # delete last created children
                     last_chosen_node.alive = True # parent is back alive
                     untargetable_node_set.remove(last_chosen_node.label) # we must add parent back so it can be extended
+                    
+                    # edge case where birth happens on root, and we want just a single lineage;
+                    # (only makes sense if starting at origin, if starting at root, two lineages already exist)
+                    # we will replace the root node with a brosc node
+                    if self.with_origin and max_obs_nodes == 1:
+                        # getting root attributes
+                        brosc_node.state = last_chosen_node.state
+                        brosc_node.edge_length = last_chosen_node.edge_length
+                        brosc_node.alive = last_chosen_node.alive # should be True
+                        last_chosen_node.parent_node.add_child(brosc_node) # connecting brosc to origin
+                        last_chosen_node.parent_node.remove_child(last_chosen_node) # removing root
+                        last_chosen_node = brosc_node
+                    
                     state_representation_dict[last_chosen_node.state].add(last_chosen_node.label) # won't use it again, but to be safe
                     
                     self.update_sa_lineage_dict(t_stop) # updates SA info for plotting
-                    
-                    # TODO:
-                    # if birth event on root and max_obs_nodes = 1, need 
-                    # to remove children, but switch root with brosc
 
                     reached_stop_condition = True
-                    
+
                     break
 
         # (11) got out of while loop because met stop condition
@@ -877,10 +887,6 @@ class DnSSE(pgm.DistributionPGM):
                 # check if tr has right specs
                 if self.is_tr_ok(tr, self.stop_val[ith_sim]):
                     output.append(tr)
-                    
-                    print("\ntree is ok")
-                    print(tr.tree.as_string(schema="newick"))
-
                     repl_size += 1
 
                 # tree not good, stay in while loop
