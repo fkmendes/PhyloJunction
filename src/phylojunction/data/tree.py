@@ -101,7 +101,7 @@ class AnnotatedTree(dp.Tree):
             
             # if there is a brosc node, we get it
             try: self.brosc_node = [nd for nd in origin_children if nd.label == "brosc"][0]
-            except: pass
+            except: pass # self.brosc_node will remain None
 
             # Case (a): no events took place, tree may or may not have gone extinct
             #
@@ -150,12 +150,34 @@ class AnnotatedTree(dp.Tree):
             # print("origin_edge_length = " + str(self.origin_edge_length))
             # print("root_age = " + str(self.root_age))
 
-            # if tree_died flag was not passed upon initialization, we need to sort this out
-            if max_age:
-                if not isinstance(self.tree_died, bool) and (max_age - self.origin_age) > self.epsilon:
+            ##################################################
+            # Figuring out if tree died, when tree_died flag #
+            # was not passed upon initialization             #
+            #                                                #
+            # Recall that self.tree_died = False by default  #
+            ##################################################
+            if not isinstance(self.tree_died, bool):
+                if max_age and (max_age - self.origin_age) > self.epsilon:
                     self.tree_died = True
-            else:
-                self.tree_died = False # no way to tell, we assume tree did not die
+            
+                # no max_age, but there is a brosc_node who is dead
+                elif not self.brosc_node == None and not self.brosc_node.alive:
+                    self.tree_died = True
+
+                elif self.brosc_node == None:
+                    for nd in self.origin_node.leaf_iter():
+                        # if tree was read in instead of built, dendropy's Node instance
+                        # might not have .alive attribute
+                        try:
+                            if not nd.alive:
+                                self.tree_died = True
+                                
+                                break # break out of for-loop
+                        except:
+                            pass
+                
+                # no way to tell, we assume tree did not die, and let
+                # self.tree_died be False
 
             # a bit of cleaning for printing the tree
             if self.tree_read_as_newick_by_dendropy and len(self.tree.leaf_nodes()) == 1:
@@ -202,6 +224,7 @@ class AnnotatedTree(dp.Tree):
         self.n_sa = 0
 
         self.count_terminal_nodes()
+
         self.count_sampled_ancestors()
 
         self.count_terminal_node_states() # initializes self.state_count_dict
@@ -240,7 +263,7 @@ class AnnotatedTree(dp.Tree):
         # that underwent extinction                                     #
         #################################################################
         if self.tree_died:
-            self.n_extinct_obs_nodes = 1
+            self.n_extinct_terminal_nodes = 1
 
             if self.brosc_node:
                 extinct_obs_nodes_labels_list.append(self.brosc_node.label)
@@ -263,7 +286,7 @@ class AnnotatedTree(dp.Tree):
                             # nd.taxon = nd.label
                             extant_obs_nodes_labels_list.append(nd.label)
 
-                    # if terminal node' s path is not maximal
+                    # if terminal node's path is not maximal
                     else:
                         if self.tree_read_as_newick_by_dendropy:
                             self.n_extinct_terminal_nodes += 1
