@@ -27,6 +27,7 @@ class AnnotatedTree(dp.Tree):
     tree: dp.Tree
     state_count: int
     seed_age: float
+    max_age: ty.Optional[float]
     epsilon: float
     tree_died: bool
     no_event: bool
@@ -63,6 +64,7 @@ class AnnotatedTree(dp.Tree):
         self.tree = a_tree
         self.state_count = total_state_count
         self.seed_age = self.tree.max_distance_from_root()
+        self.max_age = max_age
         self.epsilon = epsilon
         self.tree_died = False
         self.state_count_dict = dict((int(s), 0) for s in range(self.state_count))
@@ -165,7 +167,7 @@ class AnnotatedTree(dp.Tree):
                     self.tree_died = True
 
                 elif self.brosc_node == None:
-                    for nd in self.origin_node.leaf_iter():
+                    for nd in self.origin_node.leaf_node_iter():
                         # if tree was read in instead of built, dendropy's Node instance
                         # might not have .alive attribute
                         try:
@@ -263,20 +265,22 @@ class AnnotatedTree(dp.Tree):
         # that underwent extinction                                     #
         #################################################################
         if self.tree_died:
-            self.n_extinct_terminal_nodes = 1
+            self.n_extinct_terminal_nodes = 1 # brosc node
 
             if self.brosc_node:
                 extinct_obs_nodes_labels_list.append(self.brosc_node.label)
 
-        # tree did not die before stop condition was met
+        ###################################################
+        # Tree did not die before stop condition was met, #
+        # no "brosc" node                                 #
+        ###################################################
         else:
-            for nd in self.tree:
-
+            for nd in self.tree.leaf_node_iter():
                 # an extant terminal node is a leaf whose path to the origin/root
                 # has maximal length (equal to the age of the origin/root)
-                if nd.is_leaf() and not (nd.edge_length < self.epsilon):
+                if not (nd.edge_length < self.epsilon):
                     # nd.distance_from_root() returns distance to seed
-                    if (abs(self.seed_age - nd.distance_from_root()) <= self.epsilon):
+                    if abs(self.seed_age - nd.distance_from_root()) <= self.epsilon:
                         if self.tree_read_as_newick_by_dendropy:
                             self.n_extant_terminal_nodes += 1
                             extant_obs_nodes_labels_list.append(nd.taxon.label)
@@ -296,15 +300,13 @@ class AnnotatedTree(dp.Tree):
                             self.n_extinct_terminal_nodes += 1
                             extinct_obs_nodes_labels_list.append(nd.label)
 
-                # a bit of cleaning for printing the tree
-                elif not nd.is_leaf() and not self.tree_read_as_newick_by_dendropy:
-                    # remove internal node labels from taxon namespace, for Nexus printing
+                # remove internal node labels from taxon namespace, for Nexus printing
+                elif not self.tree_read_as_newick_by_dendropy:
                     try:
-                        # print("trying to remove taxon label " +  nd.label)
-                        self.tree.taxon_namespace.remove_taxon_label(nd.label, is_case_sensitive=True)
+                        if not nd.is_sa:
+                            # print("trying to remove taxon label " +  nd.label)
+                            self.tree.taxon_namespace.remove_taxon_label(nd.label, is_case_sensitive=True)
                     except:
-                        # print("... but failed")
-                        # print("    tree was " + self.tree.as_string(schema="newick"))
                         print(self.tree.taxon_namespace)
 
         # if max_age was not provided, this will be necessary
