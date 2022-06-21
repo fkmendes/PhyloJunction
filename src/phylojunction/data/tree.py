@@ -156,10 +156,10 @@ class AnnotatedTree(dp.Tree):
             # Figuring out if tree died, when tree_died flag #
             # was not passed upon initialization             #
             #                                                #
-            # Recall that self.tree_died = True by default  #
+            # Recall that self.tree_died = True by default   #
             ##################################################
             if not isinstance(self.tree_died, bool):
-
+                # with max_age
                 if max_age and (max_age - self.origin_age) <= self.epsilon:
                     self.tree_died = False
             
@@ -176,17 +176,11 @@ class AnnotatedTree(dp.Tree):
 
                     # no brosc_node
                     elif self.brosc_node == None:
-                        # we scan all tips
-                        for nd in self.origin_node.leaf_iter():
-                            # if tree was read in instead of built, dendropy's Node instance
-                            # might not have .alive attribute
-                            try:
-                                if not nd.is_sa and nd.alive:
-                                    self.tree_died = False
-
-                                    break # break out of for-loop
-                            except:
-                                pass
+                        try:
+                            self.tree_died = self.has_tree_died(self.origin_node)
+                        # will get here if node doesn't have .alive
+                        except:
+                            pass
                     
                     # no way to tell, we assume tree died
                     # else:
@@ -215,9 +209,31 @@ class AnnotatedTree(dp.Tree):
 
             else:
                 self.origin_age = None
+                self.origin_edge_length = 0.0
+                
                 self.root_node = self.tree.seed_node
                 self.root_age = self.tree.max_distance_from_root()
-                self.origin_edge_length = 0.0
+                root_children = [nd for nd in self.tree.nodes() if nd.label != "root"]
+                root_children_labels = tuple([nd.label for nd in root_children])
+
+                ##################################################
+                # Figuring out if tree died, when tree_died flag #
+                # was not passed upon initialization             #
+                #                                                #
+                # Recall that self.tree_died = True by default   #
+                ##################################################
+                if not isinstance(self.tree_died, bool):
+                    # with max_age
+                    if max_age and (max_age - self.root_age) <= self.epsilon:
+                        self.tree_died = False
+            
+                    # no max_age
+                    else:
+                        try:
+                            self.tree_died = self.has_tree_died(self.origin_node)
+                        # will get here if node doesn't have .alive
+                        except:
+                            pass
 
                 # fixes root label if tree has only origin + root
                 if self.tree_read_as_newick_by_dendropy and len(self.tree.leaf_nodes()) == 1:
@@ -244,6 +260,21 @@ class AnnotatedTree(dp.Tree):
 
         self.populate_node_age_height_dicts() # initializes self.node_heights_dict and self.node_ages_dict
 
+
+    def has_tree_died(origin_or_root_node) -> bool:
+        """Scan all terminal nodes and returns boolean to store in self.tree_died
+        
+        Depends on nodes having .alive
+        """
+        # we scan all tips
+        for nd in origin_or_root_node.leaf_iter():
+            # if tree was read in instead of built, dendropy's Node instance
+            # might not have .alive attribute
+            try:
+                if not nd.is_sa and nd.alive:
+                    return False
+            except:
+                return True
 
     # side-effect:
     # populates: self.n_sa_obs_nodes
@@ -291,7 +322,7 @@ class AnnotatedTree(dp.Tree):
                 # has maximal length (equal to the age of the origin/root)
                 if not nd.is_sa:
                 # if not (nd.edge_length < self.epsilon):
-                    
+
                     # nd.distance_from_root() returns distance to seed
                     if abs(self.seed_age - nd.distance_from_root()) <= self.epsilon:
                         if self.tree_read_as_newick_by_dendropy:

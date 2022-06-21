@@ -5,7 +5,7 @@ from dendropy import Tree, Node, Taxon
 import phylojunction.data.tree as pjtr
 import phylojunction.data.sampled_ancestor as pjsa
 
-class TestAnnotateTreeWithSAs(unittest.TestCase):
+class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
     def test_node_counting_oneSA_no_spn_survives(self):
         """
@@ -565,14 +565,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/data/test_tree_annot_with_sas.py
+    # $ python3 tests/data/test_tree_annot_with_sas_from_origin.py
     # 
     # or
     #
-    # $ if not isinstance(self.tree_died, bool)
+    # $ python3 -m tests.data.test_tree_annot_with_sas_from_origin
     #
     # or 
     #
-    # $ python3 -m unittest tests.data.test_tree_annot_with_sas.TestAnnotateTreeWithSAs.test_node_counting_oneSA_no_spn_survives
+    # $ python3 -m unittest tests.data.test_tree_annot_with_sas_from_origin.TestAnnotateTreeWithSAsFromOrigin.test_node_counting_oneSA_no_spn_survives
 
     unittest.main()
