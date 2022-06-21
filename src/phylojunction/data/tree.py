@@ -123,7 +123,7 @@ class AnnotatedTree(dp.Tree):
                 # [origin] ---------------- [root + children at stop condition] (survived)
                 if "root" in origin_children_labels:
                     self.origin_age = self.seed_age
-                    self.root_node = [nd for nd in self.origin_node.child_nodes() if nd.label == "root"][0] # there might be sampled ancestors before root, making sure...
+                    self.root_node = [nd for nd in origin_children if nd.label == "root"][0] # there might be sampled ancestors before root, making sure...
                     # TODO: now that I allow sampled ancestors between the root and the origin, I need to
                     # recur from the root up to the origin getting all branch lengths to get the origin_edge_length
                     self.origin_edge_length = self.root_node.edge_length
@@ -167,13 +167,13 @@ class AnnotatedTree(dp.Tree):
                     self.tree_died = True
 
                 elif self.brosc_node == None:
-                    for nd in self.origin_node.leaf_node_iter():
+                    for nd in self.origin_node.leaf_iter():
                         # if tree was read in instead of built, dendropy's Node instance
                         # might not have .alive attribute
                         try:
-                            if not nd.alive:
+                            if not nd.is_sa and not nd.alive:
                                 self.tree_died = True
-                                
+
                                 break # break out of for-loop
                         except:
                             pass
