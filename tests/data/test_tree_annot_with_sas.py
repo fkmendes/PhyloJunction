@@ -69,7 +69,7 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
 
         # debugging
         # print("tr_sa_no_spn_survives.seed_age = " + str(tr_sa_no_spn_survives.max_distance_from_root()))
-        print(tr_sa_no_spn_survives.as_string(schema="newick"))
+        # print(tr_sa_no_spn_survives.as_string(schema="newick"))
 
         total_state_count = 1
 
@@ -449,7 +449,7 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
         (i) until the end of the process at max_age and no other events, 
         (ii) there is no max_age
 
-        To see it on icytree: ((sa1:0.0,(sp1:0.5,sp2:0.5)root:0.5)dummy1:1.0)origin:0.0;
+        To see it on icytree: ((sa1:0.0,(sp1:0.25,sp2:0.5)root:0.5)dummy1:1.0)origin:0.0;
         """
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
@@ -483,8 +483,8 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
         dummy_node.add_child(root_node)
 
         # left child of root node
-        extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.5)
-        extant_sp1.alive = True
+        extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.25)
+        extant_sp1.alive = False
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -509,7 +509,7 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
 
         # debugging
         # print("tr_sa_with_root_survives.seed_age = " + str(tr_sa_with_root_survives.max_distance_from_root()))
-        # print(tr_sa_with_root_survives.as_string(schema="newick"))
+        print(tr_sa_with_root_survives.as_string(schema="newick"))
 
         total_state_count = 1
 
@@ -537,12 +537,12 @@ class TestAnnotateTreeWithSAs(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extant_terminal_nodes, 2, "Count of terminal extant nodes should be 2.")
-        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
+        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
+        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
 
-        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extant_terminal_nodes, 2, "Count of terminal extant nodes should be 2.")
-        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
+        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
+        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
 
         # TODO: add asserts for origin_edge_length
