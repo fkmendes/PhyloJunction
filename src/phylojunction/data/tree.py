@@ -124,9 +124,7 @@ class AnnotatedTree(dp.Tree):
                 if "root" in origin_children_labels:
                     self.origin_age = self.seed_age
                     self.root_node = [nd for nd in origin_children if nd.label == "root"][0] # there might be sampled ancestors before root, making sure...
-                    # TODO: now that I allow sampled ancestors between the root and the origin, I need to
-                    # recur from the root up to the origin getting all branch lengths to get the origin_edge_length
-                    self.origin_edge_length = self.root_node.edge_length
+                    self.origin_edge_length = self.recursively_find_node_age(self.root_node, 0.0)
                     self.root_age = self.origin_age - self.origin_edge_length # returns 0.0 if tree dies (TODO: revisit this...)
                 
                 # Case (b.2) There is no root, so event(s) must have been ancestor sampling
@@ -136,9 +134,9 @@ class AnnotatedTree(dp.Tree):
                 else:
                     for nd in self.tree.seed_node.leaf_nodes():
                         if not nd.is_sa and abs(nd.edge_length) > self.epsilon:
-                            self.origin_age = 0.0
-                            self.origin_age = self.recursively_find_node_age(nd, self.origin_age)
-                            self.origin_edge_length = self.brosc_node.edge_length
+                            self.origin_age = self.recursively_find_node_age(nd, 0.0)
+                            
+                    self.origin_edge_length = self.recursively_find_node_age(self.brosc_node, 0.0)
 
             else:
                 print("\n\nShould not be here\n\n")

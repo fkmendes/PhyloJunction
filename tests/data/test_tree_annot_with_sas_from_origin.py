@@ -98,12 +98,12 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         self.assertEqual(ann_tr_sa_no_spn_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_sa_no_spn_survives_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
         self.assertEqual(ann_tr_sa_no_spn_survives_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(ann_tr_sa_no_spn_survives_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
 
         self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
         self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-
-        # TODO: add asserts for origin_edge_length
+        self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
 
     
     def test_node_counting_twoSAs_no_spn_survives(self):
@@ -213,12 +213,12 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
+        self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
 
         self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
-
-        # TODO: add asserts for origin_edge_length
+        self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
 
 
     def test_node_counting_oneSA_no_spn_dies(self):
@@ -306,12 +306,12 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         self.assertEqual(ann_tr_sa_no_spn_dies_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
         self.assertEqual(ann_tr_sa_no_spn_dies_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_sa_no_spn_dies_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(ann_tr_sa_no_spn_dies_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
 
         self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
         self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-
-        # TODO: add asserts for origin_edge_length
+        self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
 
 
     def test_node_counting_twoSAs_no_spn_dies(self):
@@ -421,12 +421,12 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
         self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
+        self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
 
         self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
         self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
-
-        # TODO: add asserts for origin_edge_length
+        self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
 
 
     def test_node_counting_oneSA_with_root_survives(self):
@@ -509,7 +509,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         # debugging
         # print("tr_sa_with_root_survives.seed_age = " + str(tr_sa_with_root_survives.max_distance_from_root()))
-        print(tr_sa_with_root_survives.as_string(schema="newick"))
+        # print(tr_sa_with_root_survives.as_string(schema="newick"))
 
         total_state_count = 1
 
@@ -540,12 +540,12 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(ann_tr_sa_with_root_survives_max_age.origin_edge_length, 1.5, "Length of origin edge should be 1.5.")
 
         self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-
-        # TODO: add asserts for origin_edge_length
+        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.origin_edge_length, 1.5, "Length of origin edge should be 1.5.")
 
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder
