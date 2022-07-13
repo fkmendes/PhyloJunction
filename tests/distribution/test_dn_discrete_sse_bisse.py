@@ -41,7 +41,7 @@ class TestBiSSETrees(unittest.TestCase):
         as BiSSE trees simulated with diversitree
         """
         stop_condition = "size"
-        stop_condition_value = [50] # 50 living taxa
+        stop_condition_value = [ 50 ] # 50 living taxa
 
         start_at_origin = True
 
@@ -160,6 +160,10 @@ class TestBiSSETrees(unittest.TestCase):
             mean_n1 = statistics.mean(n1s)
             mean_root_ages = statistics.mean(root_ages)
 
+            # print("mean n0 = " + str(mean_n0) + ", diversitree mean n0 = " + str(n0_mean_maxtaxa_divtree[i]))
+            # print("mean n1 = " + str(mean_n1) + ", diversitree mean n1 = " + str(n1_mean_maxtaxa_divtree[i]))
+            # print("mean root age = " + str(mean_root_ages) + ", diversitree mean root age = " + str(root_ages_mean_maxtaxa_divtree[i]))
+
             stdevs_n0 = statistics.stdev(n0s)
             stdevs_n1 = statistics.stdev(n1s)
             stdevs_root_ages = statistics.stdev(root_ages)
@@ -205,7 +209,7 @@ class TestBiSSETrees(unittest.TestCase):
         """
 
         stop_condition = "age"
-        stop_condition_value = [3.0] # 3.0 time units
+        stop_condition_value = [ 3.0 ] # 3.0 time units
 
         start_at_origin = True
 

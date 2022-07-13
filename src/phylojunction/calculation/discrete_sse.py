@@ -361,8 +361,8 @@ class MacroevolEventHandler():
                 ws.append( (atomic_rate_param.value[value_idx] / denominator) )
 
         if debug:
-            print("    The following events are allowed:")
-            print("\n    ".join(str(ap) for ap in all_states_atomic_rate_params))
+            print("    \nThe following events are allowed:")
+            print("   " + "   ".join(str(ap) for ap in all_states_atomic_rate_params))
 
         return random.choices( [ atomic_param for atomic_param in all_states_atomic_rate_params ], weights=ws)
 
