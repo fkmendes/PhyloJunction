@@ -116,6 +116,8 @@ class FIGRatesManager:
     might become vectorized.
     """
 
+    seed_age: ty.Optional[float]
+    slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
 
     # NOTE: This class is flexible in that it allows different parameter
@@ -124,7 +126,12 @@ class FIGRatesManager:
     # that forces the user to specify the same number of parameters in
     # all time slices
 
-    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float]=None, list_time_slice_age_ends: ty.Optional[ty.List[float]]=None, epsilon: float=1e-12):
+    def __init__(self,
+                 matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]],
+                 total_state_count: int,
+                 seed_age_for_time_slicing: ty.Optional[float]=None,
+                 list_time_slice_age_ends: ty.Optional[ty.List[float]]=None,
+                 epsilon: float=1e-12):
         # how do we need to access parameters and values during simulation?
         # we probably need two types of parameter containers.
         # type 1: records "high-level" governing parameters, rho, sigma, phi
@@ -228,15 +235,21 @@ class MacroevolEventHandler():
     # that forces the user to specify the same number of parameters in
     # all time slices
 
+    fig_rates_manager: FIGRatesManager
+    state_count: int
+    n_time_slices: int
+    seed_age: ty.Optional[float]
+    slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
+    str_representation: str
 
     def __init__(self, a_fig_rates_manager: FIGRatesManager) -> None:
         self.fig_rates_manager = a_fig_rates_manager
         self.state_count = self.fig_rates_manager.state_count
         self.n_time_slices = self.fig_rates_manager.n_time_slices
         self.seed_age = self.fig_rates_manager.seed_age
-        self.slice_age_ends = self.fig_rates_manager.slice_age_ends
         self.slice_t_ends = self.fig_rates_manager.slice_t_ends
+        self.slice_age_ends = self.fig_rates_manager.slice_age_ends
 
         self.str_representation = "MacroevolEventHandler"
         # state s
@@ -366,10 +379,10 @@ class MacroevolEventHandler():
 
         return random.choices( [ atomic_param for atomic_param in all_states_atomic_rate_params ], weights=ws)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.str_representation
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.str_representation
 
     def get_gcf(self):

@@ -249,7 +249,7 @@ class NodePGM(ABC):
         return 1
 
     @abstractmethod
-    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: int=0, repl_size: int=1, branch_attr: ty.Optional[str]="state") -> None:
+    def plot_node(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: int=0, repl_size: int=1, branch_attr: ty.Optional[str]="state") -> None:
         pass
 
     @abstractmethod
@@ -287,7 +287,12 @@ class StochasticNodePGM(NodePGM):
     def __lt__(self, other):
         return super().__lt__(other)
 
-    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: int=0, repl_size: int=1, branch_attr: ty.Optional[str]="state") -> None:
+    def plot_node(self,
+                axes: plt.Axes,
+                sample_idx: ty.Optional[int]=None,
+                repl_idx: int=0,
+                repl_size: int=1,
+                branch_attr: ty.Optional[str]="state") -> None:
         """_summary_
 
         Args:
@@ -306,9 +311,9 @@ class StochasticNodePGM(NodePGM):
                 if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], pjtr.AnnotatedTree):
                     
                     if self.value[0].state_count > 1:
-                        self.value[sample_idx*repl_size + repl_idx].get_gcf(axes, node_attr=branch_attr)
+                        self.value[sample_idx*repl_size + repl_idx].plot_node(axes, node_attr=branch_attr)
                     else:
-                        self.value[sample_idx*repl_size + repl_idx].get_gcf(axes)
+                        self.value[sample_idx*repl_size + repl_idx].plot_node(axes)
             
             # not a tree
             else:
@@ -317,14 +322,15 @@ class StochasticNodePGM(NodePGM):
                 
                 # one sample
                 if not sample_idx == None and self.sampling_dn:
-                    get_histogram_gcf(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
+                    plot_node_histogram(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
                 # all samples
                 else:
-                    get_histogram_gcf(axes, hist_vals, repl_size=repl_size)
+                    plot_node_histogram(axes, hist_vals, repl_size=repl_size)
         
         # if scalar
         elif isinstance(self.value, (int, float, str)):
-            return get_histogram_gcf(axes, [float(self.value)])
+            # return
+            plot_node_histogram(axes, [float(self.value)])
 
     def populate_operator_weight(self):
         if isinstance(self.value, (list, np.ndarray)):
@@ -353,9 +359,13 @@ class DeterministicNodePGM(NodePGM):
     def __lt__(self, other) -> bool:
         return super().__lt__(other)
 
-    def get_gcf(self, axes: plt.Axes, sample_idx: ty.Optional[int]=None, repl_idx: ty.Optional[int]=0, repl_size: ty.Optional[int]=1, branch_attr: ty.Optional[str]="state") -> None:
-        # return get_blank_gcf(axes)
-        pass
+    def plot_node(self,
+                axes: plt.Axes,
+                sample_idx: ty.Optional[int]=None,
+                repl_idx: ty.Optional[int]=0,
+                repl_size: ty.Optional[int]=1,
+                branch_attr: ty.Optional[str]="state") -> None:
+        plot_blank(axes)
 
     def populate_operator_weight(self):
         pass
@@ -364,7 +374,7 @@ class DeterministicNodePGM(NodePGM):
 ############
 # Plotting #
 ############
-def get_histogram_gcf(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
+def plot_node_histogram(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
 
     values_list_to_plot = list()
     # if not sample_idx == None:
@@ -376,7 +386,7 @@ def get_histogram_gcf(axes: plt.Axes, values_list: ty.List[float], sample_idx: t
         values_list_to_plot = [float(v) for v in values_list]
 
     # figure canvas was created outside main loop in GUI
-    axes.cla() 
+    axes.cla()
     counts, bins, _ = axes.hist(values_list_to_plot, histtype='stepfilled', color="steelblue", edgecolor="none", alpha=0.3) 
     
     axes.spines['left'].set_visible(True)
@@ -394,6 +404,16 @@ def get_histogram_gcf(axes: plt.Axes, values_list: ty.List[float], sample_idx: t
     plt.yticks(np.linspace(0, max(counts.tolist()), 5))
     
     axes.axes.xaxis.set_ticklabels([np.round(i,decimals=2) for i in bins])
+
+def plot_blank(axes: plt.Axes) -> None:
+    axes.cla()
+    axes.patch.set_alpha(0.0)
+    axes.xaxis.set_ticks([])
+    axes.yaxis.set_ticks([])
+    axes.spines['left'].set_visible(False)
+    axes.spines['bottom'].set_visible(False)
+    axes.spines['right'].set_visible(False)
+    axes.spines['top'].set_visible(False)
 
 
 ####################

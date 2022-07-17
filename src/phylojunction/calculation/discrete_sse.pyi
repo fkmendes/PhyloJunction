@@ -17,12 +17,12 @@ class MacroevolStateDependentRateParameter:
     def get_gcf(self) -> None: ...
 
 class FIGRatesManager:
-    slice_t_ends: ty.List[ty.Optional[float]]
     atomic_rate_params_matrix: Incomplete
-    state_count: Incomplete
-    seed_age: Incomplete
+    state_count: int
+    seed_age_for_time_slicing: ty.Optional[float]
     n_time_slices: int
-    slice_age_ends: Incomplete
+    slice_age_ends: ty.List[float]
+    slice_t_ends: ty.List[ty.Optional[float]]
     atomic_rate_params_dict: Incomplete
     epsilon: Incomplete
     def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
@@ -30,12 +30,12 @@ class FIGRatesManager:
     def atomic_rate_params_at_time(self, atomic_rate_params_matrix, a_time: float): ...
 
 class MacroevolEventHandler:
+    fig_rates_manager: FIGRatesManager
+    state_count: int
+    n_time_slices: int
+    seed_age: float
+    slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
-    fig_rates_manager: Incomplete
-    state_count: Incomplete
-    n_time_slices: Incomplete
-    seed_age: Incomplete
-    slice_age_ends: Incomplete
     str_representation: str
     def __init__(self, a_fig_rates_manager: FIGRatesManager) -> None: ...
     def total_rate(self, a_time: float, state_representation_dict: ty.Dict[int, ty.Set[str]], value_idx: int = ..., departing_state: ty.Optional[int] = ..., debug: bool = ...): ...

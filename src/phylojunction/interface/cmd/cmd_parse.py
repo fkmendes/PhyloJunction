@@ -1,9 +1,11 @@
 import re
 import io
 import typing as ty
+import matplotlib.pyplot as plt # type: ignore
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
+import phylojunction.data.tree as pjtr
 # import user_interface.phylojunction_inference as pjinf
 # import user_interface.phylojunction_io as pjio
 import phylojunction.interface.cmd.cmd_parse_utils as cmdu
@@ -30,25 +32,46 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
 
     pgm_obj = pgm.ProbabilisticGraphicalModel()
 
+    all_lines_list: ty.List[str] = []
+
     if in_pj_file:
         with open(script_file_path_or_model_spec, "r") as infile:
             all_lines_list = infile.read().splitlines()
+
+    else:
+        all_lines_list = script_file_path_or_model_spec.split("\n")
     
     # side-effect: populates pgm_obj
     _execute_spec_lines(all_lines_list, pgm_obj)
         
     # debugging
-    # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():
-    #     print("\nnode name = " + node_pgm_name)
-    #     print(node_pgm.value)
-    
-    #     if node_pgm_name == "tr":
-    #         fig = plt.Figure(figsize=(11,4.5))
-    #         axes = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-    #         node_pgm.get_gcf(axes)
-            # print("node_pgm name = " + node_pgm_name)
-            # print("node_pgm vals = " + str(node_pgm))
+    # seeing trees in script strings in main()
+    # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():    
+    #     if node_pgm_name == "trs":
+    #         fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
+    #                                  # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
+    #         ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+    #         ax.patch.set_alpha(0.0)
+    #         ax.xaxis.set_ticks([])
+    #         ax.yaxis.set_ticks([])
+    #         ax.spines['left'].set_visible(False)
+    #         ax.spines['bottom'].set_visible(False)
+    #         ax.spines['right'].set_visible(False)
+    #         ax.spines['top'].set_visible(False)
+    #
+    #         print(node_pgm.value[0].tree.as_string(schema="newick"))
+    #
+    #         pjtr.plot_ann_tree(
+    #             node_pgm.value[0],
+    #             ax,
+    #             use_age=False,
+    #             start_at_origin=True,
+    #             sa_along_branches=True
+    #         )
+            
+    #         plt.show()
 
+    # debugging
     # as if we had clicked "See" in the inference tab
     # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, "./inference_test/", mcmc_chain_length=1000, prefix="test")
     # for i, ith_sim_model_spec in enumerate(all_sims_model_spec_list):
@@ -56,6 +79,7 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
     #     print(all_sims_mcmc_logging_spec_list[i])
 
     # pjio.output_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix="test")
+    
     return pgm_obj
 
 def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
@@ -350,6 +374,38 @@ if __name__ == "__main__":
     script_str26 = "a <- [1,2,3]\nb <- [a, 4, 5, 6]"
     script_str27 = "rv9 ~ exponential(n=5, rate=[0.8, 0.9, 1.0, 1.1, 1.2], clamp=\"true\")"
 
+    script_str28 = \
+        "birth_rate := sse_rate(name=\"lambda\", value=1.0, states=[0,0,0], event=\"w_speciation\")\n" + \
+        "death_rate := sse_rate(name=\"mu\", value=0.5, states=[0], event=\"extinction\")\n" + \
+        "fossil_rate := sse_rate(name=\"psi\", value=0.8, states=[0], event=\"anc_sampling\")\n" + \
+        "meh := sse_wrap(flat_rate_mat=[birth_rate,death_rate,fossil_rate], n_states=1, n_epochs=1)\n" + \
+        "trs ~ discrete_sse(n=5, meh=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"true\", cond_surv=\"true\")"
+
+    script_str29 = \
+        "w_birth_rate0 <- 1.0\n" + \
+        "death_rate0 <- 0.2\n" + \
+        "trans_rate_01 <- 0.5\n" + \
+        "w_birth_rate1 <- 0.6\n" + \
+        "death_rate1 <- 0.4\n" + \
+        "trans_rate_10 <- 0.1\n" + \
+        "b_birth_rate_201 <- 2.0\n" + \
+        "b_birth_rate_202 <- 1.0\n" + \
+        "b_birth_rate_212 <- 1.0\n" + \
+        "trans_rate_20 <- 0.6\n" + \
+        "trans_rate_21 <- 0.6\n" + \
+        "det_w_birth_rate0 := sse_rate(name=\"birth_rate0\", value=w_birth_rate0, states=[0,0,0], event=\"w_speciation\")\n" + \
+        "det_death_rate0 := sse_rate(name=\"death_rate0\", value=death_rate0, states=[0], event=\"extinction\")\n" + \
+        "det_trans_rate_01 := sse_rate(name=\"q01\", value=trans_rate_01, states=[0,1], event=\"transition\")\n" + \
+        "det_w_birth_rate1 := sse_rate(name=\"birth_rate0\", value=w_birth_rate0, states=[1,1,1], event=\"w_speciation\")\n" + \
+        "det_death_rate1 := sse_rate(name=\"death_rate0\", value=death_rate0, states=[1], event=\"extinction\")\n" + \
+        "det_trans_rate_10 := sse_rate(name=\"q10\", value=trans_rate_01, states=[1,0], event=\"transition\")\n" + \
+        "det_b_birth_rate201 := sse_rate(name=\"birth_rate_20\", value=b_birth_rate_201, states=[2,0,1], event=\"bw_speciation\")\n" + \
+        "det_b_birth_rate202 := sse_rate(name=\"birth_rate_201\", value=b_birth_rate_202, states=[2,0,2], event=\"bw_speciation\")\n" + \
+        "det_b_birth_rate212 := sse_rate(name=\"birth_rate_201\", value=b_birth_rate_212, states=[2,1,2], event=\"bw_speciation\")\n" + \
+        "det_trans_rate_20 := sse_rate(name=\"q20\", value=trans_rate_20, states=[2,0], event=\"transition\")\n" + \
+        "det_trans_rate_21 := sse_rate(name=\"q21\", value=trans_rate_21, states=[2,1], event=\"transition\")\n" + \
+        "meh := sse_wrap(flat_rate_mat=[det_w_birth_rate0, det_death_rate0, det_trans_rate_01, det_w_birth_rate1, det_death_rate1, det_trans_rate_10, det_b_birth_rate201, det_b_birth_rate202, det_b_birth_rate212, det_trans_rate_20, det_trans_rate_21], n_states=3, n_epochs=1)"
+
     # for copying and pasting in GUI:
     #
     # vectorized atomic rate parameter
@@ -437,3 +493,4 @@ if __name__ == "__main__":
     # script2pgm(file_handle25)
     # script2pgm(file_handle26) # will cause error if you generate rev script
     # script2pgm(file_handle27)
+    script2pgm(script_str29, in_pj_file=False)

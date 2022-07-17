@@ -515,7 +515,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         root_node.alive = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
-        root_node.is_sa_lineage = False
+        root_node.is_sa_lineage = True
         
         dummy_node.add_child(sa_node)
         dummy_node.add_child(root_node)
@@ -552,7 +552,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         total_state_count = 1
 
         sa_global_time = 1.0
-        time_to_sa_lineage_node = 1.0
+        time_to_sa_lineage_node = 0.5
         # TODO: when birth-event happens on brosc_node and it gets swapped with a root node,
         # we need to update the SAs older than the root to have "root" as their lineage nodes
         sa = pjsa.SampledAncestor("sa1", "root", sa_global_time, time_to_lineage_node=time_to_sa_lineage_node)
@@ -593,6 +593,8 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
         self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.origin_edge_length, 1.5, "Length of origin edge should be 1.5.")
 
+        
+
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder
     # on VSCode and that you want to run this as a standalone script,
@@ -622,3 +624,4 @@ if __name__ == "__main__":
     # $ python3 -m unittest tests.data.test_tree_annot_with_sas_from_origin.TestAnnotateTreeWithSAsFromOrigin.test_node_counting_oneSA_no_spn_survives_max_age
 
     unittest.main()
+

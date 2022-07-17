@@ -1,0 +1,22 @@
+# constant-node variable ('birth_rate0', etc.) assignment
+birth_rate0 <- 1.0
+death_rate0 <- 0.2
+trans_rate_01 <- 0.5
+birth_rate1 <- 0.6
+death_rate1 <- 0.4
+trans_rate_10 <- 0.1
+
+# deterministic-node variable ('det_birth_rate0', etc.) assignment
+det_birth_rate0 := sse_rate(name="lambda0", value=birth_rate0, states=[0,0,0], event="w_speciation")
+det_death_rate0 := sse_rate(name="mu0", value=death_rate0, states=[0], event="extinction")
+det_trans_rate_01 := sse_rate(name="q01", value=trans_rate_01, states=[0,1], event="transition")
+
+det_birth_rate1 := sse_rate(name="lambda1", value=birth_rate1, states=[1,1,1], event="w_speciation")
+det_death_rate1 := sse_rate(name="mu1", value=death_rate1, states=[1], event="extinction")
+det_trans_rate_10 := sse_rate(name="q10", value=trans_rate_10, states=[1,0], event="transition")
+
+# deterministic-node variable ('meh') assignment
+meh := sse_wrap(flat_rate_mat=[det_birth_rate0, det_death_rate0, det_trans_rate_01, det_birth_rate1, det_death_rate1, det_trans_rate_10], n_states=2, n_epochs=1) 
+
+# stochastic-node variable ('trs') assignment
+trs ~ discrete_sse(n=5, meh=meh, start_state=[0], stop="age", stop_value=3.0, origin="true", cond_spn="true", cond_surv="true")

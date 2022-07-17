@@ -111,7 +111,7 @@ def call_gui():
 
 
     def _draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
-        return node_pgm.get_gcf(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+        return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
 
     def _get_scaling():

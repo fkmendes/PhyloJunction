@@ -1,0 +1,35 @@
+# constant-node variable ('w_birth_rate0', etc.) assignment
+w_birth_rate0 <- 1.0
+death_rate0 <- 0.2
+trans_rate_02 <- 0.5
+
+w_birth_rate1 <- 0.6
+death_rate1 <- 0.4
+trans_rate_12 <- 0.1
+
+b_birth_rate_201 <- 2.0
+b_birth_rate_202 <- 1.0
+b_birth_rate_212 <- 1.0
+trans_rate_20 <- 0.6
+trans_rate_21 <- 0.6
+
+# deterministic-node variable ('det_w_birth_rate0', etc.) assignment
+det_w_birth_rate0 := sse_rate(name="lambda0", value=w_birth_rate0, states=[0,0,0], event="w_speciation")
+det_death_rate0 := sse_rate(name="mu0", value=death_rate0, states=[0], event="extinction")
+det_trans_rate_02 := sse_rate(name="q02", value=trans_rate_02, states=[0,2], event="transition")
+
+det_w_birth_rate1 := sse_rate(name="lambda1", value=w_birth_rate0, states=[1,1,1], event="w_speciation")
+det_death_rate1 := sse_rate(name="mu1", value=death_rate0, states=[1], event="extinction")
+det_trans_rate_12 := sse_rate(name="q12", value=trans_rate_12, states=[1,2], event="transition")
+
+det_b_birth_rate201 := sse_rate(name="lambda201", value=b_birth_rate_201, states=[2,0,1], event="bw_speciation")
+det_b_birth_rate202 := sse_rate(name="lambda202", value=b_birth_rate_202, states=[2,0,2], event="bw_speciation")
+det_b_birth_rate212 := sse_rate(name="lambda212", value=b_birth_rate_212, states=[2,1,2], event="bw_speciation")
+det_trans_rate_20 := sse_rate(name="q20", value=trans_rate_20, states=[2,0], event="transition")
+det_trans_rate_21 := sse_rate(name="q21", value=trans_rate_21, states=[2,1], event="transition")
+
+# deterministic-node variable ('meh') assignment
+meh := sse_wrap(flat_rate_mat=[det_w_birth_rate0, det_death_rate0, det_trans_rate_02, det_w_birth_rate1, det_death_rate1, det_trans_rate_12, det_b_birth_rate201, det_b_birth_rate202, det_b_birth_rate212, det_trans_rate_20, det_trans_rate_21], n_states=3, n_epochs=1) 
+
+# stochastic-node variable ('trs') assignment
+trs ~ discrete_sse(n=5, meh=meh, start_state=[2], stop="age", stop_value=3.0, origin="true", cond_spn="true", cond_surv="true")

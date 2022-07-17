@@ -381,7 +381,7 @@ class DnSSE(pgm.DistributionPGM):
         last_node2speciate = chosen_node
         # (4) if chosen node was on a lineage with SAs, we update the SAs info
         if chosen_node.is_sa_lineage:
-            self.update_sa_lineage_dict(event_t, sa_lineage_dict, chosen_node.label, debug=debug)
+            self.update_sa_lineage_dict(event_t, sa_lineage_dict, [chosen_node.label], debug=debug)
 
         return last_node2speciate, cumulative_node_count
 
@@ -419,7 +419,7 @@ class DnSSE(pgm.DistributionPGM):
 
         # if chosen node was on a lineage with SAs, we update the SAs info
         if chosen_node.is_sa_lineage:
-            self.update_sa_lineage_dict(event_t, sa_lineage_dict, chosen_node.label)
+            self.update_sa_lineage_dict(event_t, sa_lineage_dict, [chosen_node.label])
 
         ###########################################################
         # Special case: origin went extinct, we slap a brosc node #
@@ -506,11 +506,14 @@ class DnSSE(pgm.DistributionPGM):
 
 
     def execute_sample_ancestor(self,
-                                    tr_namespace: dp.TaxonNamespace,
-                                    chosen_node: dp.Node,
-                                    state_representation_dict: ty.Dict[int, ty.Set[str]],
-                                    sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-                                    untargetable_node_set, cumulative_sa_count: int, event_t: float, debug: bool=False) -> int:
+                                tr_namespace: dp.TaxonNamespace,
+                                chosen_node: dp.Node,
+                                state_representation_dict: ty.Dict[int, ty.Set[str]],
+                                sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                                untargetable_node_set,
+                                cumulative_sa_count: int,
+                                event_t: float,
+                                debug: bool=False) -> int:
         """Execute sampling of direct lineage ancestor (side-effect and return)
 
         Args:
@@ -609,6 +612,7 @@ class DnSSE(pgm.DistributionPGM):
         # (3) parent label cannot be targeted anymore
         chosen_node.alive = False
         chosen_node.is_sa_dummy_parent = True
+        chosen_node.is_sa_lineage = False # left child will always be the sa_lineage
         untargetable_node_set.add(chosen_node.label) # cannot pick parent!
 
         return cumulative_sa_count
@@ -617,34 +621,45 @@ class DnSSE(pgm.DistributionPGM):
     def update_sa_lineage_dict(self,
                                 a_time: float,
                                 sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-                                sa_lineage_node_label: ty.Optional[str]=None, 
+                                sa_lineage_node_labels: ty.List[str], 
                                 debug: bool=False) -> None:
         """Update sa_lineage_dict (side-effect) when lineage node undergoes event and at tree stop condition
         
         This function is called every time a node (whose subtending branch has sampled ancestors, by asking if
         the node .is_sa_lineage == True) undergoes an event, and when the tree reaches its stop condition.
+        
+        When this function is called because a single node undergoes an event, then 'sa_lineage_node_label' will
+        have a single element. When this function is called because the process reached its stop condition,
+        then 'sa_lineage_node_label' will have the labels of all terminal nodes for which .is_sa_lineage == True.
+
         By updating the dictionary as the tree is built, we don't have to do tree traversals later to get
         sampled ancestor times for plotting (when initializing an AnnotatedTree).
 
         Args:
             a_time (float): Either the time of the last event an SA lineage node undergoes, or the simulation end time.
             sa_lineage_dict (dict): .
-            sa_lineage_node_label (str): Label of node whose subtending branch has SAs.
+            sa_lineage_node_labels (str): List of node labels, whose subtending branch has SAs.
         """
 
         if debug:
-            print("\n>> Updating SA lineage dictionary. Key is \'" + sa_lineage_node_label + "\' and time being added is " + str(a_time) + "\n   SA lineage dict:")
+            print("\n>> Updating SA lineage dictionary. Keys are is \'" + ", ".join(sa_label for sa_label in sa_lineage_node_labels) + \
+                  "\' and time being added is " + str(a_time) + "\n   SA lineage dict:")
             print("      " + "\n      ".join(k + " has in its lineage " + ", ".join(sa.label for sa in sas) for k, sas in sa_lineage_dict.items()))
 
-        if isinstance(sa_lineage_node_label, str):
+        for sa_lineage_node_label in sa_lineage_node_labels:
             sa_list = sa_lineage_dict[sa_lineage_node_label]
             
             for sa in sa_list:
                 sa.time_to_lineage_node = a_time - sa.global_time
+        # if isinstance(sa_lineage_node_label, str):
+        #     sa_list = sa_lineage_dict[sa_lineage_node_label]
+            
+        #     for sa in sa_list:
+        #         sa.time_to_lineage_node = a_time - sa.global_time
 
-        for _, sa_list in sa_lineage_dict.items():
-            for sa in sa_list:
-                sa.time_to_lineage_node = a_time - sa.global_time
+        # for _, sa_list in sa_lineage_dict.items():
+        #     for sa in sa_list:
+        #         sa.time_to_lineage_node = a_time - sa.global_time
 
 
     def execute_event(self,
@@ -872,7 +887,8 @@ class DnSSE(pgm.DistributionPGM):
                 extend_all_living_nodes(t_to_next_event - excess_t)
 
                 if _next_max_t == t_stop:
-                    self.update_sa_lineage_dict(t_stop, sa_lineage_dict) # updates SA info for plotting
+                    sa_lineage_node_labels = [nd.label for nd in living_nodes if nd.is_sa_lineage]
+                    self.update_sa_lineage_dict(t_stop, sa_lineage_dict, sa_lineage_node_labels) # updates SA info for plotting
                     
                     # if origin is the only node (root always has children), we slap finish node at end of process
                     if self.with_origin and tr.seed_node.alive and len(tr.seed_node.child_nodes()) == 0:
@@ -897,7 +913,8 @@ class DnSSE(pgm.DistributionPGM):
                 if self.stop == "age" and (latest_t > t_stop):
                     extend_all_living_nodes(t_stop - (latest_t - t_to_next_event), end=True)
                     
-                    self.update_sa_lineage_dict(t_stop, sa_lineage_dict) # updates SA info for plotting
+                    sa_lineage_node_labels = [nd.label for nd in living_nodes if nd.is_sa_lineage]
+                    self.update_sa_lineage_dict(t_stop, sa_lineage_dict, sa_lineage_node_labels) # updates SA info for plotting
 
                     # if origin is the only node (root always has children), we slap brosc node at end of process
                     if self.with_origin and tr.seed_node.alive and len(tr.seed_node.child_nodes()) == 0:
@@ -961,7 +978,8 @@ class DnSSE(pgm.DistributionPGM):
                 if current_node_target_count == 0:
                     self.tree_died = True
 
-                    self.update_sa_lineage_dict(latest_t, sa_lineage_dict) # updates SA info for plotting
+                    sa_lineage_node_labels = [nd.label for nd in living_nodes if nd.is_sa_lineage]
+                    self.update_sa_lineage_dict(latest_t, sa_lineage_dict, sa_lineage_node_labels) # updates SA info for plotting
                     
                     reached_stop_condition = True
 
@@ -994,7 +1012,8 @@ class DnSSE(pgm.DistributionPGM):
                     
                     state_representation_dict[last_chosen_node.state].add(last_chosen_node.label) # won't use it again, but to be safe
                     
-                    self.update_sa_lineage_dict(t_stop, sa_lineage_dict) # updates SA info for plotting
+                    sa_lineage_node_labels = [nd.label for nd in living_nodes if nd.is_sa_lineage]
+                    self.update_sa_lineage_dict(t_stop, sa_lineage_dict, sa_lineage_node_labels) # updates SA info for plotting
 
                     reached_stop_condition = True
 
@@ -1003,11 +1022,20 @@ class DnSSE(pgm.DistributionPGM):
         # (11) got out of while loop because met stop condition
         # 'at' is scoped to simulate_a_tree() function
         if self.stop == "age":
-            at = AnnotatedTree(tr, self.events.state_count, start_at_origin=self.with_origin, max_age=a_stop_value, slice_t_ends=self.slice_t_ends, slice_age_ends=self.events.slice_age_ends, sa_lineage_dict=sa_lineage_dict)
+            at = AnnotatedTree(tr,
+                               self.events.state_count,
+                               start_at_origin=self.with_origin,
+                               max_age=a_stop_value,
+                               slice_t_ends=self.slice_t_ends,
+                               slice_age_ends=self.events.slice_age_ends,
+                               sa_lineage_dict=sa_lineage_dict)
         elif self.stop == "size":
             # print(tr.as_string(schema="newick", suppress_internal_taxon_labels=True))
             # print(sa_lineage_dict)
-            at = AnnotatedTree(tr, self.events.state_count, start_at_origin=self.with_origin, sa_lineage_dict=sa_lineage_dict)
+            at = AnnotatedTree(tr,
+                               self.events.state_count,
+                               start_at_origin=self.with_origin,
+                               sa_lineage_dict=sa_lineage_dict)
 
         if self.debug:
             # print(at.tree)

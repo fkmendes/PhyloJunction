@@ -90,6 +90,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
             elif val[0] == "\"asym_speciation\"": event_type = sseobj.MacroevolEvent.ASYM_SPECIATION
             elif val[0] == "\"extinction\"": event_type = sseobj.MacroevolEvent.EXTINCTION
             elif val[0] == "\"transition\"": event_type = sseobj.MacroevolEvent.ANAGENETIC_TRANSITION
+            elif val[0] == "\"anc_sampling\"": event_type = sseobj.MacroevolEvent.ANCESTOR_SAMPLING
 
         elif arg == "states":
             # TODO: raise error if arg is not a string with quotes before and after
