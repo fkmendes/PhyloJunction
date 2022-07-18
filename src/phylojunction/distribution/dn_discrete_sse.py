@@ -291,8 +291,9 @@ class DnSSE(pgm.DistributionPGM):
             # that has happened between the origin/brosc to this moment (when the root is born), we
             # must add this branch length (event_t) now when creating the root (unlike other nodes,
             # which are created with edge_length = 0.0)
-            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=event_t)
-            root_node.state = chosen_node.state # root takes origin state
+            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=event_t) # if edge_length = event_t, fbd unit test passes
+            root_node.state = chosen_node.state # root takes origin or brosc state
+
             root_node.annotations.add_bound_attribute("state")
             root_node.alive = False # we will pick the root as the first event
             root_node.is_sa = False
@@ -324,7 +325,9 @@ class DnSSE(pgm.DistributionPGM):
                 # must add the evolution leading up to the brosc_node to the root node edge length
                 # (note that the brosc_node edge length will always be 0.0 if it resulted from an
                 # ancestor sampling event, but it could be > 0.0 if a state transition event happened)
-                root_node.edge_length += chosen_node.edge_length
+                # root_node.edge_length += chosen_node.edge_length # I think this is wrong,
+                
+                # because the extend_all_lineages() method does extend brosc_node
                 root_node.is_sa_lineage = chosen_node.is_sa_lineage
 
                 # if true, means brosc's parent is a dummy node, and brosc's sister taxon is a SA
@@ -461,6 +464,7 @@ class DnSSE(pgm.DistributionPGM):
             chosen_node (dendropy.Node): Node that will undergo anagenetic trait-state transition.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
             macroevol_rate_param (AtomicRateParameter): Atomic rate parameter containing departing/arriving state.
+            event_t (float): 
             debug (bool): If 'true', prints debugging messages. Defaults to False.
         """
 
@@ -491,7 +495,7 @@ class DnSSE(pgm.DistributionPGM):
             tr_namespace.add_taxon(brosc_node.taxon)
 
             # origin cannot be selected anymore
-            chosen_node.alive = False # origin/brosc node is no longer alive
+            chosen_node.alive = False # origin node is no longer alive
             untargetable_node_set.add(chosen_node.label) # cannot be targeted
             chosen_node.add_child(brosc_node) # brosc is now child of origin
 
@@ -697,11 +701,9 @@ class DnSSE(pgm.DistributionPGM):
         # TODO: this should be come if macroevol_event == MacroevolEvent.SPECIATION or BW-SPECIATION or ASYM-SPECIATION
         #       and then execute_birth deals with them (avoiding code redundancy)
         if macroevol_event == sseobj.MacroevolEvent.W_SPECIATION or macroevol_event == sseobj.MacroevolEvent.BW_SPECIATION or macroevol_event == sseobj.MacroevolEvent.ASYM_SPECIATION:
-            # print("node " + chosen_node.label + " split")
             last_chosen_node, cumulative_node_count = self.execute_birth(tr_namespace, chosen_node, state_representation_dict, sa_lineage_dict, untargetable_node_set, cumulative_node_count, macroevol_rate_param, event_t, debug=debug)
 
         elif macroevol_event == sseobj.MacroevolEvent.EXTINCTION:
-            # print("node " + chosen_node.label + " died")
             self.execute_death(tr_namespace, chosen_node, state_representation_dict, sa_lineage_dict, untargetable_node_set, event_t, debug=debug)
 
         elif macroevol_event == sseobj.MacroevolEvent.ANAGENETIC_TRANSITION:
@@ -1030,8 +1032,6 @@ class DnSSE(pgm.DistributionPGM):
                                slice_age_ends=self.events.slice_age_ends,
                                sa_lineage_dict=sa_lineage_dict)
         elif self.stop == "size":
-            # print(tr.as_string(schema="newick", suppress_internal_taxon_labels=True))
-            # print(sa_lineage_dict)
             at = AnnotatedTree(tr,
                                self.events.state_count,
                                start_at_origin=self.with_origin,
@@ -1102,10 +1102,6 @@ class DnSSE(pgm.DistributionPGM):
             return False
 
         if self.stop == "size":
-            # print("size to stop at = " + str(a_stop_value))
-            # print("n extant terminal = " + str(ann_tr.n_extant_terminal_nodes))
-            # print("n SA = " + str(ann_tr.n_sa))
-
             if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:
                 return False
 
@@ -1114,11 +1110,6 @@ class DnSSE(pgm.DistributionPGM):
 
             # if conditions are not specified, returns all trees
             return True
-
-            # if (ann_tr.n_extant_obs_nodes + ann_tr.n_sa_obs_nodes) in (self.stop_val, 0):
-            #     return True
-            # else:
-            #     return False
 
         elif self.stop == "age":
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
@@ -1136,4 +1127,5 @@ class DnSSE(pgm.DistributionPGM):
 
         # stop condition is neither "size" nor "age", and no conditioning was violated
         # then something is off...
+
         return False

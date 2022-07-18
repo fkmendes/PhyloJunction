@@ -157,6 +157,7 @@ class FIGRatesManager:
                 self.slice_t_ends = [self.seed_age - age_end for age_end in self.slice_age_ends] # no need to append seed_age, because self.slice_age_ends already has 0.0 in it
 
         self.atomic_rate_params_dict: ty.Dict[int, ty.List[ty.List[MacroevolStateDependentRateParameter]]] = dict((s, [[] for j in range(self.n_time_slices)]) for s in range(self.state_count))
+        
         self.init_atomic_rate_param_dict(matrix_atomic_rate_params) # side effect: initializes self.atomic_rate_params_dict
         # self.atomic_rate_params_dict =
         # { state0:

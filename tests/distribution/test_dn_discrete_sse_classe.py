@@ -252,7 +252,7 @@ class TestClaSSETrees(unittest.TestCase):
         """
 
         stop_condition = "age"
-        stop_condition_value = [3.0] # 3.0 time units
+        stop_condition_value = [ 3.0 ] # 3.0 time units
         
         start_at_origin = True
 
@@ -280,7 +280,7 @@ class TestClaSSETrees(unittest.TestCase):
 
 
         # "expectations" from diversitree
-        n1_ci_width_maxtaxa_divtree = [
+        n1_ci_width_maxt_divtree = [
             0.731574225125986,   0.8090309214852, 0.959189135666057, 0.998047953342783, 0.892722522071747,  1.03000873115844, 0.806696522362604, 0.880679145645994,  1.15464033212324,  1.14764230446159,
              1.03824887228837, 0.800891320638916,   1.0207369918175,  1.00445038310571, 0.942868265271753, 0.968016264993998, 0.908748429145684,  1.23574240132167, 0.783296856404087,  1.09984618649127,
             0.857372859261348,  1.09106666666667,   0.8544895235511, 0.964305191641247,  1.02011904949938,  1.01240606617517,  1.12440994429447, 0.961298569539131,  1.06718464393114,   1.1636121614276,
@@ -293,7 +293,7 @@ class TestClaSSETrees(unittest.TestCase):
             0.877697745079234, 0.831940133821314,  1.08393923121626,  1.02224699934838, 0.901460112116656, 0.927463511765593, 0.853378478919423, 0.826077462555065,  1.28995774357225,  0.878784666744391
             ]
 
-        n1_mean_maxtaxa_divtree = [
+        n1_mean_maxt_divtree = [
             4.26, 4.18,  4.3,  4.1, 4.61, 4.86, 3.64, 3.75, 4.77, 4.91,
             4.98, 4.01, 4.64, 4.86,  3.9, 4.54, 4.59, 4.87, 4.22, 4.92,
             4.42, 4.89, 4.06, 4.42, 4.61, 4.69, 5.28, 4.84, 4.52, 4.87,
@@ -306,7 +306,7 @@ class TestClaSSETrees(unittest.TestCase):
             4.26, 3.94, 4.04, 4.99, 4.09, 4.45, 4.65, 4.29, 4.91, 4.72
             ]
 
-        n2_ci_width_maxtaxa_divtree = [
+        n2_ci_width_maxt_divtree = [
             1.06410404594948,  1.06500074149924, 1.03852540681779, 1.24258154149848, 1.16587761438205, 1.26522976617377, 1.26087178370741, 1.12459628599095, 1.27347600723771, 1.51335058273443,
             1.42398329124234, 0.954726677477313,  1.2168083198568, 1.14084626466319, 1.23366816814365,  1.1991405434011, 1.33817392537198, 1.65504481260091, 1.18165522394767, 1.41974637143115,
             1.36060418843092,  1.35864775554091, 1.20673883929483, 1.43129893058259, 1.24618633494921, 1.35977829208896, 1.16809382769666, 1.17017154988558, 1.29083733156647, 1.38589569243253,
@@ -319,7 +319,7 @@ class TestClaSSETrees(unittest.TestCase):
             1.26318552201579,  1.30591066008407, 1.35129775020051, 1.28362505554867, 1.28038029388526, 1.39444270755254, 1.27947077127438, 1.01394761604375, 1.54161875253962, 1.16561964168888
             ]
 
-        n2_mean_maxtaxa_divtree = [
+        n2_mean_maxt_divtree = [
             5.86, 5.52, 5.84, 5.51, 7.03, 6.92, 5.01, 5.74, 6.87, 7.14,
             6.62, 5.51, 5.94, 6.17, 6.33, 5.94, 6.15, 7.01, 6.58, 7.07,
             6.85, 7.36, 5.95, 6.19, 6.83, 6.48, 6.24, 5.82, 5.86, 6.68,
@@ -332,7 +332,7 @@ class TestClaSSETrees(unittest.TestCase):
             6.14, 5.97, 5.23, 6.91, 6.45,  6.5, 6.45, 5.84, 7.21, 7.08
             ]
 
-        n3_ci_width_maxtaxa_divtree = [
+        n3_ci_width_maxt_divtree = [
             0.438087780512471, 0.456891908176951, 0.451458017780371, 0.487236327450939, 0.499727208008772, 0.554217702913054,  0.48162918633666,  0.40394909370245,  0.50595862968181, 0.488099668576661,
              0.46623637131759, 0.429793850513701, 0.513136138432733, 0.510174578953226, 0.497637926061253, 0.500095911609044, 0.551198797846543, 0.585351002701487,  0.45637778963123, 0.519822869598458,
             0.480681576703142, 0.470069917859852, 0.448037031297795, 0.560289823991733, 0.503991436515352, 0.482116378087492, 0.486586819518668, 0.592274028851954, 0.531103050359354, 0.533290439184177,
@@ -345,7 +345,7 @@ class TestClaSSETrees(unittest.TestCase):
             0.514435181102105, 0.465257411536774,  0.48127455529641, 0.423751928573425, 0.535758683805244,  0.46978503573228, 0.513695431519141, 0.494041915368943, 0.645674134904635, 0.476575208009071
             ]
 
-        n3_mean_maxtaxa_divtree = [
+        n3_mean_maxt_divtree = [
             1.79, 2.02, 2.26, 2.11, 2.38, 2.38, 1.89, 1.93, 2.27, 2.02,
             2.41, 2.14, 2.12, 2.35, 1.91, 2.43, 2.48, 2.49, 2.05, 2.42,
             2.16, 2.16, 2.13,  2.3, 2.29,  2.3, 2.28,  2.6, 2.03, 2.53,
@@ -358,7 +358,7 @@ class TestClaSSETrees(unittest.TestCase):
              2.0, 2.04, 1.97, 2.05, 2.27, 2.15, 2.14,  2.3, 2.42, 2.13
             ]
 
-        root_ages_ci_width_maxtaxa_divtree = [
+        root_ages_ci_width_maxt_divtree = [
              0.12692952540925, 0.139613278777909, 0.109372133047407,  0.13921837456182, 0.130103817029074,  0.12840913500313, 0.135702021259288, 0.145513306197362, 0.150240697805724, 0.136045062144244,
             0.131087019568962, 0.126804012902848, 0.162174213602609, 0.118286685685816, 0.134569812219664, 0.114935903194279, 0.144151991158098, 0.144582552987022, 0.142140594220997, 0.127828897449516,
             0.114272855840606, 0.117214680734728, 0.141983187822582, 0.132333333755836, 0.149592079996444, 0.137316210918328, 0.120096073307902, 0.123477608172767, 0.124910846181645, 0.143964549733037,
@@ -371,7 +371,7 @@ class TestClaSSETrees(unittest.TestCase):
             0.152143911819712, 0.137530614439772, 0.156173156758097, 0.134162533913284,    0.124308565664, 0.144581241284565, 0.122850528054223, 0.134561134236951, 0.131863194311972, 0.129588495403706
             ]
 
-        root_ages_mean_maxtaxa_divtree = [
+        root_ages_mean_maxt_divtree = [
             2.30377832723862, 2.20167662640125, 2.39642037011796, 2.18675638484214, 2.34127075710877, 2.28923877812535, 2.26994948684771, 2.20526460927574, 2.28081926157237, 2.24673458487209,
             2.36760192753108, 2.38237932086301, 2.15922109041031, 2.37026031935458, 2.15352354984275, 2.36563301173885, 2.23545011262783, 2.16473497963318, 2.27202660871667, 2.33970854822697,
             2.36897102719439, 2.34310561113993, 2.25327013030979, 2.32036037211262, 2.24623415370481, 2.20779920139833, 2.27324547965023, 2.33040604856689, 2.25541116116714, 2.15750551391841,
@@ -400,6 +400,14 @@ class TestClaSSETrees(unittest.TestCase):
             mean_n2 = statistics.mean(n2s)
             mean_n3 = statistics.mean(n3s)
             mean_root_ages = statistics.mean(root_ages)
+
+            # debugging
+            # print("batch " + str(i) + ", tree = ")
+            # print(batch[0].tree.as_string(schema="newick", suppress_annotations=False))
+            # print("PJ's vs. diversitree mean state 0 count: " + str(mean_n1) + " <-> " + str(n1_mean_maxt_divtree[i]))
+            # print("PJ's vs. diversitree mean state 1 count: " + str(mean_n2) + " <-> " + str(n2_mean_maxt_divtree[i]))
+            # print("PJ's vs. diversitree mean state 2 count: " + str(mean_n3) + " <-> " + str(n3_mean_maxt_divtree[i]))
+            # print("PJ's vs. diversitree mean root age: " + str(mean_root_ages) + " <-> " + str(root_ages_mean_maxt_divtree[i]))
             
             stdevs_n1 = statistics.stdev(n1s)
             stdevs_n2 = statistics.stdev(n2s)
@@ -411,21 +419,21 @@ class TestClaSSETrees(unittest.TestCase):
             sterr_n3 = stdevs_n3 / math.sqrt(n_sim)
             sterr_root_ages = stdevs_root_ages / math.sqrt(n_sim)
             
-            n1_ci_width_maxtaxa = 1.96 * sterr_n1
-            n2_ci_width_maxtaxa = 1.96 * sterr_n2
-            n3_ci_width_maxtaxa = 1.96 * sterr_n3
+            n1_ci_width_maxt = 1.96 * sterr_n1
+            n2_ci_width_maxt = 1.96 * sterr_n2
+            n3_ci_width_maxt = 1.96 * sterr_n3
             root_ages_ci_width_maxtaxa = 1.96 * sterr_root_ages
 
-            if abs(mean_n1 - n1_mean_maxtaxa_divtree[i]) <= (n1_ci_width_maxtaxa + n1_ci_width_maxtaxa_divtree[i]):
+            if abs(mean_n1 - n1_mean_maxt_divtree[i]) <= (n1_ci_width_maxt + n1_ci_width_maxt_divtree[i]):
                 n1_ci_overlap_count += 1
 
-            if abs(mean_n2 - n2_mean_maxtaxa_divtree[i]) <= (n2_ci_width_maxtaxa + n2_ci_width_maxtaxa_divtree[i]):
+            if abs(mean_n2 - n2_mean_maxt_divtree[i]) <= (n2_ci_width_maxt + n2_ci_width_maxt_divtree[i]):
                 n2_ci_overlap_count += 1
 
-            if abs(mean_n3 - n3_mean_maxtaxa_divtree[i]) <= (n3_ci_width_maxtaxa + n3_ci_width_maxtaxa_divtree[i]):
+            if abs(mean_n3 - n3_mean_maxt_divtree[i]) <= (n3_ci_width_maxt + n3_ci_width_maxt_divtree[i]):
                 n3_ci_overlap_count += 1
 
-            if abs(mean_root_ages - root_ages_mean_maxtaxa_divtree[i]) <= (root_ages_ci_width_maxtaxa + root_ages_ci_width_maxtaxa_divtree[i]):
+            if abs(mean_root_ages - root_ages_mean_maxt_divtree[i]) <= (root_ages_ci_width_maxtaxa + root_ages_ci_width_maxt_divtree[i]):
                 root_age_ci_overlap_count += 1
 
         # [==== * ====][.... + ....] if we take '+' to be the "truth" of the '*' interval, + cannot be more than '====' away from '*' 95% of the time
@@ -473,6 +481,6 @@ if __name__ == '__main__':
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_classe.TestClaSSETrees.test_tree_size_state_count_max_taxa_classe
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_classe.TestClaSSETrees.test_tree_size_state_count_max_t_classe
 
     unittest.main()
