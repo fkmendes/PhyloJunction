@@ -285,13 +285,7 @@ class DnSSE(pgm.DistributionPGM):
         # Special case: first speciation event (root must created) #
         ############################################################
         if chosen_node.label in ("origin", "brosc"):
-            # at this point, the origin was chosen to undergo a birth event, but this node
-            # will never be extended (the origin always has an origin_edge_length = 0.0);
-            # the root does NOT exist yet here; for us to account for the evolution (branch length)
-            # that has happened between the origin/brosc to this moment (when the root is born), we
-            # must add this branch length (event_t) now when creating the root (unlike other nodes,
-            # which are created with edge_length = 0.0)
-            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=event_t) # if edge_length = event_t, fbd unit test passes
+            root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root")
             root_node.state = chosen_node.state # root takes origin or brosc state
 
             root_node.annotations.add_bound_attribute("state")
@@ -310,7 +304,14 @@ class DnSSE(pgm.DistributionPGM):
             state_representation_dict[chosen_node.state].remove(chosen_node.label) # and does not represent state
 
             # updating origin
-            if chosen_node.label == "origin": 
+            if chosen_node.label == "origin":
+                # at this point, the origin was chosen to undergo a birth event, but this node
+                # will never be extended (the origin always has an origin_edge_length = 0.0);
+                # the root does NOT exist yet here; for us to account for the evolution (branch length)
+                # that has happened between the origin/brosc to this moment (when the root is born), we
+                # must add this branch length (event_t) now when creating the root (unlike other nodes,
+                # which are created with edge_length = 0.0)
+                root_node.edge_length = event_t # if edge_length = event_t, fbd unit test passes
                 chosen_node.add_child(root_node) # finally link root to origin
 
             # root replaces brosc (dummy_node might or not exist)
@@ -326,6 +327,11 @@ class DnSSE(pgm.DistributionPGM):
                 # (note that the brosc_node edge length will always be 0.0 if it resulted from an
                 # ancestor sampling event, but it could be > 0.0 if a state transition event happened)
                 # root_node.edge_length += chosen_node.edge_length # I think this is wrong,
+                
+                # print("brosc underwent birth, and it has edge_length = " + str(chosen_node.edge_length))
+                
+                # print("tree height should be = " + str(event_t))
+                root_node.edge_length = chosen_node.edge_length
                 
                 # because the extend_all_lineages() method does extend brosc_node
                 root_node.is_sa_lineage = chosen_node.is_sa_lineage
@@ -566,9 +572,11 @@ class DnSSE(pgm.DistributionPGM):
 
             chosen_node = brosc_node # we will execute the ancestor sampling on this new chosen_node
 
+            # print("\n\nMust have a sampled ancestor before the root!")
+
         # doing lineage that remains alive
-        left_label = chosen_node.label # gets parent's label (parent's label will change below)
-        left_child = dp.Node(taxon=dp.Taxon(label=left_label), label=left_label, edge_length=0.0)
+        parent_label = chosen_node.label # gets parent's label (parent's label will change below)
+        left_child = dp.Node(taxon=dp.Taxon(label=parent_label), label=parent_label, edge_length=0.0)
         left_child.is_sa = False
         left_child.is_sa_lineage = True
         left_child.is_sa_dummy_parent = False
@@ -597,11 +605,11 @@ class DnSSE(pgm.DistributionPGM):
         # to class member that stashes it, or initializing #
         # class member                                     #
         ####################################################
-        sa = SampledAncestor(right_label, left_label, event_t)
+        sa = SampledAncestor(right_label, parent_label, event_t)
         try:
-            sa_lineage_dict[left_label].append(sa)
+            sa_lineage_dict[parent_label].append(sa)
         except:
-            sa_lineage_dict[left_label] = [sa]
+            sa_lineage_dict[parent_label] = [sa]
 
         # updating parent node
         # (1) adding both children
@@ -1063,6 +1071,7 @@ class DnSSE(pgm.DistributionPGM):
             # simulate!
             repl_size = 0
             while repl_size < self.n_repl:
+                # print("\n\nsimulation #" + str(ith_sim))
                 tr = self.simulate(self.start_states[ith_sim], self.stop_val[ith_sim], value_idx=ith_sim)
 
                 # check if tr has right specs
@@ -1101,6 +1110,9 @@ class DnSSE(pgm.DistributionPGM):
         if self.condition_on_survival and ann_tr.tree_died:
             return False
 
+        if self.condition_on_speciation and not isinstance(ann_tr.root_node, dp.Node):
+            return False
+
         if self.stop == "size":
             if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:
                 return False
@@ -1115,8 +1127,12 @@ class DnSSE(pgm.DistributionPGM):
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
                 # tree is ok if either it reached the max age by epsilon, or if its age is smaller than max age
                 if abs(a_stop_value - ann_tr.origin_age) <= self.epsilon or ann_tr.origin_age < a_stop_value:
+                    # print("    tree was accepted!")
+                    # print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True))
                     return True
                 elif ann_tr.origin_age > a_stop_value:
+                    # print("    tree was rejected, origin_age = " + str(ann_tr.origin_age))
+                    # print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True))
                     return False
 
             elif not ann_tr.with_origin and isinstance(ann_tr.root_age, float):

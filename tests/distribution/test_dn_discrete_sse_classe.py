@@ -249,6 +249,8 @@ class TestClaSSETrees(unittest.TestCase):
         """
         Test if ClaSSE (GeoSSE) trees simulated here have similar root ages and number of tips for the three states 
         (A, B, AB) as ClaSSE trees simulated with diversitree
+
+        Note: condition_on_speciation=False to match diversitree!
         """
 
         stop_condition = "age"
@@ -268,7 +270,7 @@ class TestClaSSETrees(unittest.TestCase):
             # print("Doing batch " + str(n_batches - i))
             sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
                 start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                condition_on_speciation=True, condition_on_survival=True,
+                condition_on_speciation=False, condition_on_survival=True,
                 debug=False)
 
             trs = sse_sim.generate()

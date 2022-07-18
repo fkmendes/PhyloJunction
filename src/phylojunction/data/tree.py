@@ -110,6 +110,9 @@ class AnnotatedTree(dp.Tree):
             # [origin] ------ [brosc at max age] (survived)
             if self.origin_node.num_child_nodes() == 1 and origin_children_labels[0] == "brosc":
                 self.origin_age = self.origin_edge_length = origin_children[0].edge_length # will have been set at stop_condition check in simulate()
+                # print("Without root:")
+                # print("  origin_edge_length = " + str(self.origin_edge_length))
+                # print("  root_age = " + str(self.root_age))
 
             # Case (b): at least one event took place (root may or not have been born)
             # and tree may or not have died
@@ -125,6 +128,9 @@ class AnnotatedTree(dp.Tree):
                     self.root_node = [nd for nd in origin_children if nd.label == "root"][0] # there might be sampled ancestors before root, making sure...
                     self.origin_edge_length = self.recursively_find_node_age(self.root_node, 0.0)
                     self.root_age = self.origin_age - self.origin_edge_length # returns 0.0 if tree dies (TODO: revisit this...)
+                    # print("With root:")
+                    # print("  origin_edge_length = " + str(self.origin_edge_length))
+                    # print("  root_age = " + str(self.root_age))
                 
                 # Case (b.2) There is no root, so event(s) must have been ancestor sampling
                 #
@@ -136,12 +142,15 @@ class AnnotatedTree(dp.Tree):
                             self.origin_age = self.recursively_find_node_age(nd, 0.0)
                             
                     self.origin_edge_length = self.recursively_find_node_age(self.brosc_node, 0.0)
+                    # print("Without root:")
+                    # print("  origin_edge_length = " + str(self.origin_edge_length))
+                    # print("  root_age = " + str(self.root_age))
 
             else:
                 print("\n\nShould not be here\n\n")
                 print(self.tree.as_string(schema="newick"))
-                print("origin children = ")
-                print(origin_children)
+                # print("origin children = ")
+                # print(origin_children)
 
             # debugging
             # print("\nFinished initializing some class members:")
