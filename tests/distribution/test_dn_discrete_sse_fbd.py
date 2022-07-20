@@ -30,95 +30,100 @@ class TestFBDTrees(unittest.TestCase):
         cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
     
-    def test_tree_size_sa_count_max_taxa_fbd(self):
-        """
-        Test if FBD trees simulated here have similar root ages and number of sampled ancestors
-        as trees simulated with FossilSim
-        """
+    # NOTE: activate this test after I eventually implement the GSM approach as a block in
+    # dn_discrete_sse.is_tr_ok()
+    # def test_tree_size_sa_count_max_taxa_fbd(self):
+    #     """
+    #     Test if FBD trees simulated here have similar root ages and number of sampled ancestors
+    #     as trees simulated with FossilSim
+    
+    #     Note: FossilSim builds on top of TreeSim, which uses the GSA approach (see Stadler, 2011).
+    #     PhyloJunction uses what that paper refers to as SSA (simple sampling approach).
+    #     """
 
-        stop_condition = "size"
-        stop_condition_value = [ 10 ] # 10 taxa
+    #     stop_condition = "size"
+    #     stop_condition_value = [ 10 ] # 10 taxa
 
-        start_at_origin = True
+    #     start_at_origin = True
 
-        # simulation initialization
-        n_batches = i = 100
-        n_sim = 100
-        start_states_list = [0 for i in range(n_sim)]
+    #     # simulation initialization
+    #     n_batches = i = 100
+    #     n_sim = 100
+    #     start_states_list = [0 for i in range(n_sim)]
 
-        # simulations
-        sim_batches = list()
-        for i in range(n_batches):
-            # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=100, stop=stop_condition, origin=start_at_origin,
-                                    start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                                    condition_on_speciation=True, condition_on_survival=True,
-                                    debug=False)
+    #     # simulations
+    #     sim_batches = list()
+    #     for i in range(n_batches):
+    #         # print("Doing batch " + str(n_batches - i))
+    #         sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=100, stop=stop_condition, origin=start_at_origin,
+    #                                 start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
+    #                                 condition_on_speciation=True, condition_on_survival=True,
+    #                                 debug=False)
 
-            trs = sse_sim.generate()
+    #         trs = sse_sim.generate()
 
-            sim_batches.append(trs)
+    #         sim_batches.append(trs)
 
-            # printing progress
-            pjh.print_progress(i , n_batches)
+    #         # printing progress
+    #         pjh.print_progress(i , n_batches)
 
-        n_sa_mean_maxtaxa_fossilsim = [
-            11.79, 11.43, 12.31, 11.86, 13.68, 11.66, 11.75, 11.7, 11.82, 12.38, 11.98, 12.36, 11.95, 12.93, 11.88, 11.39, 11.44, 11.86, 13.44, 10.6, 12.51, 10.84, 11.73, 12.21, 11.81, 11.73, 12.26, 12.11, 12, 12.6, 11.77, 12.97, 12.35, 11.2, 11.58, 11.06, 11.66, 12.77, 12.48, 11.33, 11.79, 10.97, 13.07, 11.86, 12.33, 12.28, 13.29, 11.29, 12.66, 11.6, 12.35, 11.26, 11.77, 11.69, 11.92, 11.3, 12.24, 11.4, 12.84, 11.8, 11.34, 12.29, 12.21, 12.32, 11.44, 11.65, 13.44, 12.05, 12.22, 11.61, 11.89, 10.98, 11.78, 11.9, 12.22, 13.22, 9.65, 12.55, 11.21, 12.72, 11.86, 10.57, 12.34, 11.67, 12.22, 11.75, 12.85, 11.86, 11.55, 12.26, 11.82, 12.35, 11.59, 12.7, 11.93, 12.52, 11.47, 12.49, 11.33, 12.63
-        ]
+    #     n_sa_mean_maxtaxa_fossilsim = [
+    #         11.79, 11.43, 12.31, 11.86, 13.68, 11.66, 11.75, 11.7, 11.82, 12.38, 11.98, 12.36, 11.95, 12.93, 11.88, 11.39, 11.44, 11.86, 13.44, 10.6, 12.51, 10.84, 11.73, 12.21, 11.81, 11.73, 12.26, 12.11, 12, 12.6, 11.77, 12.97, 12.35, 11.2, 11.58, 11.06, 11.66, 12.77, 12.48, 11.33, 11.79, 10.97, 13.07, 11.86, 12.33, 12.28, 13.29, 11.29, 12.66, 11.6, 12.35, 11.26, 11.77, 11.69, 11.92, 11.3, 12.24, 11.4, 12.84, 11.8, 11.34, 12.29, 12.21, 12.32, 11.44, 11.65, 13.44, 12.05, 12.22, 11.61, 11.89, 10.98, 11.78, 11.9, 12.22, 13.22, 9.65, 12.55, 11.21, 12.72, 11.86, 10.57, 12.34, 11.67, 12.22, 11.75, 12.85, 11.86, 11.55, 12.26, 11.82, 12.35, 11.59, 12.7, 11.93, 12.52, 11.47, 12.49, 11.33, 12.63
+    #     ]
 
-        n_sa_ci_width_maxtaxa_fossilsim = [
-            1.33379389560741, 1.24593720418313, 1.56990316319771, 1.11572807519475, 1.12088433773778, 1.20861690315247, 1.23313962442756, 1.28887585503685, 1.20931019723283, 1.27989681149724, 1.2932279844629, 1.32948845877661, 1.17248886622183, 1.41481811716081, 1.28519152744726, 1.18057597926956, 1.32504457801893, 1.31732008581242, 1.39633926241354, 1.14048736702492, 1.39471956502033, 1.11144201101019, 1.30216129336553, 1.20928292233977, 1.30062271891956, 1.14213804186126, 1.51504195308115, 1.22572874485328, 1.4264935607243, 1.37016038285577, 1.37718152878708, 1.19350802242631, 1.3215418451509, 1.47464518588114, 1.19504325503897, 1.25170581886068, 1.34910349222262, 1.68878193914425, 1.42961298485452, 1.17568814046769, 1.19637868333542, 1.18698769304249, 1.53782837886036, 1.21750969813407, 1.30905657199636, 1.22356935449223, 1.30705118584707, 1.29960793404096, 1.25677968722534, 1.44218465033316, 1.30350754473916, 1.20327547850512, 1.25295608184417, 1.08421663868249, 1.4198625262804, 1.2987731273643, 1.26536470504265, 1.40318103254748, 1.44640815676613, 1.40179763377622, 1.23025538549333, 1.34162600518094, 1.2137669947629, 1.32900970255862, 1.17643547492698, 1.21347283580323, 1.59701279932633, 1.10009136443343, 1.27223370955071, 1.25760534285754, 1.44538162672309, 1.10838639362623, 1.2651990962419, 1.30800234763327, 1.27680062023731, 1.49751380007469, 0.910574177831402, 1.51625933924193, 1.3502750690212, 1.33721810796999, 1.00406398765872, 1.2727444940249, 1.42246736498397, 1.20083338805123, 1.23477643075149, 1.25311711545669, 1.33410806280163, 1.18717238389836, 1.43094101975595, 1.33650406265561, 1.14265604181617, 1.40466666666667, 1.25920880658684, 1.27403807246919, 1.31680007057206, 1.37707586317141, 1.31980242843428, 1.29847282418675, 1.15739282838279, 1.27894901992048
-        ]
+    #     n_sa_ci_width_maxtaxa_fossilsim = [
+    #         1.33379389560741, 1.24593720418313, 1.56990316319771, 1.11572807519475, 1.12088433773778, 1.20861690315247, 1.23313962442756, 1.28887585503685, 1.20931019723283, 1.27989681149724, 1.2932279844629, 1.32948845877661, 1.17248886622183, 1.41481811716081, 1.28519152744726, 1.18057597926956, 1.32504457801893, 1.31732008581242, 1.39633926241354, 1.14048736702492, 1.39471956502033, 1.11144201101019, 1.30216129336553, 1.20928292233977, 1.30062271891956, 1.14213804186126, 1.51504195308115, 1.22572874485328, 1.4264935607243, 1.37016038285577, 1.37718152878708, 1.19350802242631, 1.3215418451509, 1.47464518588114, 1.19504325503897, 1.25170581886068, 1.34910349222262, 1.68878193914425, 1.42961298485452, 1.17568814046769, 1.19637868333542, 1.18698769304249, 1.53782837886036, 1.21750969813407, 1.30905657199636, 1.22356935449223, 1.30705118584707, 1.29960793404096, 1.25677968722534, 1.44218465033316, 1.30350754473916, 1.20327547850512, 1.25295608184417, 1.08421663868249, 1.4198625262804, 1.2987731273643, 1.26536470504265, 1.40318103254748, 1.44640815676613, 1.40179763377622, 1.23025538549333, 1.34162600518094, 1.2137669947629, 1.32900970255862, 1.17643547492698, 1.21347283580323, 1.59701279932633, 1.10009136443343, 1.27223370955071, 1.25760534285754, 1.44538162672309, 1.10838639362623, 1.2651990962419, 1.30800234763327, 1.27680062023731, 1.49751380007469, 0.910574177831402, 1.51625933924193, 1.3502750690212, 1.33721810796999, 1.00406398765872, 1.2727444940249, 1.42246736498397, 1.20083338805123, 1.23477643075149, 1.25311711545669, 1.33410806280163, 1.18717238389836, 1.43094101975595, 1.33650406265561, 1.14265604181617, 1.40466666666667, 1.25920880658684, 1.27403807246919, 1.31680007057206, 1.37707586317141, 1.31980242843428, 1.29847282418675, 1.15739282838279, 1.27894901992048
+    #     ]
 
-        root_ages_mean_maxtaxa_fossilsim = [
-            3.06158475192417, 3.32709888885735, 3.1214987606465, 3.2038958126961, 3.03141896233894, 3.46974124531352, 3.50598379407897, 3.17238009650997, 3.2730016625159, 3.28443930284859, 3.42614433739572, 3.1799702838571, 3.19976981581782, 3.47522343843126, 3.183949056896, 3.16728712301645, 3.28761041840292, 3.11426523229198, 3.58531310345, 2.94317680635375, 3.29449840365967, 3.28878994083599, 3.23802550455375, 3.22190113550461, 3.36282308204269, 3.54382048378497, 3.20440286112108, 3.3090674701662, 3.34275889007505, 3.12691938172564, 3.33182999768509, 3.43457794037564, 3.27309332225342, 3.20495251252992, 3.43589418010246, 3.24701970302327, 3.28278784848371, 3.44945343469407, 3.19295764870201, 3.22819435797767, 3.28178198407458, 3.39723970249208, 3.60982901913729, 3.33668733806059, 3.44476782122808, 3.32025918256223, 3.51571270353605, 2.98238129728412, 3.46001154879427, 3.34857910267609, 3.58346899764418, 3.42406958205434, 3.50028638328715, 3.23462859507321, 3.26271504845709, 3.40853305622832, 2.97400800063136, 3.16754353212038, 3.64684379585319, 3.58176312946842, 3.1133520652582, 3.19872729959642, 3.12828002043412, 3.32382912239342, 3.26820188009603, 3.37489591781346, 3.62748409916923, 3.29571394856256, 3.30896200621846, 3.06386390733467, 3.32127490587135, 3.10097762840498, 3.20307109196218, 3.33146391677673, 3.26885893364074, 3.48889690295416, 2.64522072444859, 3.66406943536744, 3.05953473561372, 3.20892751670681, 3.51632147125951, 3.168446136035, 3.15701055536265, 3.23219303029446, 3.25490487429717, 3.31696905343935, 3.25640838754555, 3.04585612546581, 3.01576569359621, 3.90536299984387, 3.52072820067763, 3.2701692005532, 3.56062136501843, 3.36883225323135, 3.12855041294481, 3.53681433150419, 3.05565680557827, 3.54836816485227, 2.85258012676722, 3.53368111295637
-        ]
+    #     root_ages_mean_maxtaxa_fossilsim = [
+            
+    #     ]
 
-        root_ages_ci_width_maxtaxa_fossilsim = [
-            0.408647553505562, 0.509592298750689, 0.38409696476414, 0.409577052775503, 0.343181507630708, 0.425925871023221, 0.440410622940826, 0.373512788035978, 0.423466332276909, 0.446359844966612, 0.39550978128479, 0.362226738238393, 0.433430020093021, 0.441539771069205, 0.386224196961461, 0.416661593610685, 0.476251662617177, 0.394567481807831, 0.401871801250315, 0.377139877102328, 0.361005260062301, 0.47457693912755, 0.494768499892774, 0.364915372943971, 0.420463635827272, 0.470143983528569, 0.395008062847314, 0.450118684986919, 0.473402295787168, 0.374673879265125, 0.435951339487528, 0.422889389606616, 0.400228202075088, 0.427262159720166, 0.469923951198503, 0.418199242842914, 0.391065817814109, 0.473126296469968, 0.482313867304151, 0.467750693540001, 0.417134096093507, 0.460851228415337, 0.548406647618856, 0.402711017600549, 0.473654696487989, 0.449154692120125, 0.403322820470335, 0.454830338414632, 0.453998441357947, 0.485982655331107, 0.421788588327507, 0.441012302705562, 0.493085692361023, 0.3967052365066, 0.400791691564759, 0.462200455705074, 0.372325916558093, 0.437067833644792, 0.469982650720636, 0.549914384317812, 0.376250577728838, 0.399247826476163, 0.381805266058534, 0.399376308077217, 0.419076282996469, 0.406647571777729, 0.503686696621813, 0.402734834181398, 0.409564416715385, 0.414961924085472, 0.482648165564663, 0.379673919691292, 0.40496599740129, 0.438897720965336, 0.420990053026926, 0.501251156477642, 0.301854144258771, 0.483862166647989, 0.418853230258794, 0.395362614193838, 0.365611355058353, 0.532996409564814, 0.387043185904377, 0.403102021917312, 0.358345071423213, 0.360662145626226, 0.394681747797261, 0.346148061927539, 0.414274968052868, 0.525565802883034, 0.473154548027078, 0.456245337946746, 0.430655387821212, 0.362858201816026, 0.424946940315028, 0.444499780064382, 0.431266924028455, 0.399629131019165, 0.355152164986533, 0.473725519301307
-        ]
+    #     root_ages_ci_width_maxtaxa_fossilsim = [
+            
+    #     ]
 
-        # parsing simulations
-        n_sa_ci_overlap_count = 0
-        root_age_ci_overlap_count = 0
-        for i, batch in enumerate(sim_batches):
-            n_sas = [ann_tr.n_sa for ann_tr in batch]
-            root_ages = [ann_tr.root_age for ann_tr in batch]
+    #     # parsing simulations
+    #     n_sa_ci_overlap_count = 0
+    #     root_age_ci_overlap_count = 0
+    #     for i, batch in enumerate(sim_batches):
+    #         n_sas = [ann_tr.n_sa for ann_tr in batch]
+    #         root_ages = [ann_tr.root_age for ann_tr in batch]
 
-            mean_sa = statistics.mean(n_sas)
-            mean_root_ages = statistics.mean(root_ages)
+    #         mean_sa = statistics.mean(n_sas)
+    #         mean_root_ages = statistics.mean(root_ages)
 
-            # debugging
-            # print("PJ's vs. FossilSim mean sa count: " + str(mean_sa) + " <-> " + str(n_sa_mean_maxtaxa_fossilsim[i]))
-            # print("PJ's vs. FossilSim mean root age: " + str(mean_root_ages) + " <-> " + str(root_ages_mean_maxtaxa_fossilsim[i]))
+    #         # debugging
+    #         # print("PJ's vs. FossilSim mean sa count: " + str(mean_sa) + " <-> " + str(n_sa_mean_maxtaxa_fossilsim[i]))
+    #         # print("PJ's vs. FossilSim mean root age: " + str(mean_root_ages) + " <-> " + str(root_ages_mean_maxtaxa_fossilsim[i]))
 
-            stdevs_n_sa = statistics.stdev(n_sas)
-            stdevs_root_ages = statistics.stdev(root_ages)
+    #         stdevs_n_sa = statistics.stdev(n_sas)
+    #         stdevs_root_ages = statistics.stdev(root_ages)
 
-            sterr_n_sa = stdevs_n_sa / math.sqrt(n_sim)
-            sterr_root_ages = stdevs_root_ages / math.sqrt(n_sim)
+    #         sterr_n_sa = stdevs_n_sa / math.sqrt(n_sim)
+    #         sterr_root_ages = stdevs_root_ages / math.sqrt(n_sim)
 
-            n_sa_ci_width_maxtaxa = 1.96 * sterr_n_sa
-            root_ages_ci_width_maxtaxa = 1.96 * sterr_root_ages
+    #         n_sa_ci_width_maxtaxa = 1.96 * sterr_n_sa
+    #         root_ages_ci_width_maxtaxa = 1.96 * sterr_root_ages
 
-            if abs(mean_sa - n_sa_mean_maxtaxa_fossilsim[i]) <= (n_sa_ci_width_maxtaxa + n_sa_ci_width_maxtaxa_fossilsim[i]):
-                n_sa_ci_overlap_count += 1
+    #         if abs(mean_sa - n_sa_mean_maxtaxa_fossilsim[i]) <= (n_sa_ci_width_maxtaxa + n_sa_ci_width_maxtaxa_fossilsim[i]):
+    #             n_sa_ci_overlap_count += 1
 
-            if abs(mean_root_ages - root_ages_mean_maxtaxa_fossilsim[i]) <= (root_ages_ci_width_maxtaxa + root_ages_ci_width_maxtaxa_fossilsim[i]):
-                root_age_ci_overlap_count += 1
+    #         if abs(mean_root_ages - root_ages_mean_maxtaxa_fossilsim[i]) <= (root_ages_ci_width_maxtaxa + root_ages_ci_width_maxtaxa_fossilsim[i]):
+    #             root_age_ci_overlap_count += 1
 
-        # [==== * ====][.... + ....] if we take '+' to be the "truth" of the '*' interval, + cannot be more than '====' away from '*' 95% of the time
-        # then abs('+' - '*') can be at most ('====' + '....'). '....' can be added because we still are guaranteed to see '+' falling within that range
-        # 95% of the time
+    #     # [==== * ====][.... + ....] if we take '+' to be the "truth" of the '*' interval, + cannot be more than '====' away from '*' 95% of the time
+    #     # then abs('+' - '*') can be at most ('====' + '....'). '....' can be added because we still are guaranteed to see '+' falling within that range
+    #     # 95% of the time
 
-        print("\n95% CIs of simulations here and from FossilSim overlapped " + str(n_sa_ci_overlap_count) + " times for the sampled ancestor count.")
-        print("\n95% CIs of simulations here and from FossilSim overlapped " + str(root_age_ci_overlap_count) + " times for root age.")
-        exp_count = int(0.95 * n_batches)
-        a_delta = math.ceil(0.07 * exp_count)
-        self.assertAlmostEqual(n_sa_ci_overlap_count, exp_count,
-                                msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
-        self.assertAlmostEqual(root_age_ci_overlap_count, exp_count,
-                                msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
+    #     print("\n95% CIs of simulations here and from FossilSim overlapped " + str(n_sa_ci_overlap_count) + " times for the sampled ancestor count.")
+    #     print("\n95% CIs of simulations here and from FossilSim overlapped " + str(root_age_ci_overlap_count) + " times for root age.")
+    #     exp_count = int(0.95 * n_batches)
+    #     a_delta = math.ceil(0.07 * exp_count)
+    #     self.assertAlmostEqual(n_sa_ci_overlap_count, exp_count,
+    #                             msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
+    #     self.assertAlmostEqual(root_age_ci_overlap_count, exp_count,
+    #                             msg="Mean absolute difference must be 1.96 * (stderr_python + stderr_divtree) apart " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
 
     def test_tree_size_sa_count_max_t_fbd(self):
         """
@@ -144,7 +149,7 @@ class TestFBDTrees(unittest.TestCase):
             # print("Doing batch " + str(n_batches - i))
             sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=100, stop=stop_condition, origin=start_at_origin,
                                     start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                                    condition_on_speciation=True, condition_on_survival=True,
+                                    condition_on_speciation=False, condition_on_survival=True,
                                     debug=False)
 
             trs = sse_sim.generate()
@@ -259,11 +264,11 @@ if __name__ == '__main__':
 
     # event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 
-    # stop_condition = "size"
-    # # stop_condition = "age"
+    # # stop_condition = "size" # don't use this against FossilSim, PJ does not have GSA implemented
+    # stop_condition = "age"
         
-    # stop_condition_value = [ 10 ] # 10 living taxa
-    # # stop_condition_value = [ 3.0 ] # origin age 
+    # # stop_condition_value = [ 10 ] # 10 living taxa
+    # stop_condition_value = [ 3.0 ] # origin age 
 
     # start_at_origin = True
 
@@ -293,7 +298,7 @@ if __name__ == '__main__':
     # root_age = float()
     # origin_age = float()
     # for tr in trs:
-    #     # print(tr.tree.as_string(schema="newick"))
+    #     print(tr.tree.as_string(schema="newick"))
     #     # print(tr.n_sa)
     #     # print(str(tr.root_age) + "\n")
     #     n_sa += tr.n_sa
@@ -305,7 +310,5 @@ if __name__ == '__main__':
     # print("mean leaves = " + str(n_leaves / n_sim))
     # print("mean root age = " + str(root_age / n_sim))
     # print("mean origin age = " + str(origin_age / n_sim))
-    # print("mean leaves / mean sa = " + str(n_leaves / n_sa))
-    # print("mean sa / mean root age = " + str(n_sa / root_age))
 
-    unittest.main()
+    # unittest.main()
