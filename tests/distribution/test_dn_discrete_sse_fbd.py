@@ -149,7 +149,7 @@ class TestFBDTrees(unittest.TestCase):
             # print("Doing batch " + str(n_batches - i))
             sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=100, stop=stop_condition, origin=start_at_origin,
                                     start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                                    condition_on_speciation=False, condition_on_survival=True,
+                                    condition_on_speciation=True, condition_on_survival=True,
                                     debug=False)
 
             trs = sse_sim.generate()
@@ -180,6 +180,7 @@ class TestFBDTrees(unittest.TestCase):
         # parsing simulations
         n_sa_ci_overlap_count = 0
         root_age_ci_overlap_count = 0
+        global_mean_sa = 0.0
         for i, batch in enumerate(sim_batches):
             n_sas = [ann_tr.n_sa for ann_tr in batch]
             root_ages = [ann_tr.root_age for ann_tr in batch]
@@ -188,8 +189,9 @@ class TestFBDTrees(unittest.TestCase):
             mean_root_ages = statistics.mean(root_ages)
 
             # debugging
-            # print("PJ's vs. FossilSim mean sa count: " + str(mean_sa) + " <-> " + str(n_sa_mean_maxt_fossilsim[i]))
-            # print("PJ's vs. FossilSim mean root age: " + str(mean_root_ages) + " <-> " + str(root_ages_mean_maxt_fossilsim[i]))
+            print("PJ's vs. FossilSim mean sa count: " + str(mean_sa) + " <-> " + str(n_sa_mean_maxt_fossilsim[i]))
+            print("PJ's vs. FossilSim mean root age: " + str(mean_root_ages) + " <-> " + str(root_ages_mean_maxt_fossilsim[i]))
+            global_mean_sa += mean_sa
 
             stdevs_n_sa = statistics.stdev(n_sas)
             stdevs_root_ages = statistics.stdev(root_ages)
@@ -209,6 +211,9 @@ class TestFBDTrees(unittest.TestCase):
         # [==== * ====][.... + ....] if we take '+' to be the "truth" of the '*' interval, + cannot be more than '====' away from '*' 95% of the time
         # then abs('+' - '*') can be at most ('====' + '....'). '....' can be added because we still are guaranteed to see '+' falling within that range
         # 95% of the time
+
+        print("PJ global mean sa = " + str(global_mean_sa / 100.0))
+        print("FossilSim global mean sa = " + str(statistics.mean(n_sa_mean_maxt_fossilsim)))
 
         print("\n95% CIs of simulations here and from FossilSim overlapped " + str(n_sa_ci_overlap_count) + " times for the sampled ancestor count.")
         print("\n95% CIs of simulations here and from FossilSim overlapped " + str(root_age_ci_overlap_count) + " times for root age.")
@@ -294,21 +299,21 @@ if __name__ == '__main__':
     # # print(trs[0].tree.as_string(schema="newick"))
 
     # n_sa = float()
-    # n_leaves = float()
+    # n_extant = float()
     # root_age = float()
     # origin_age = float()
     # for tr in trs:
     #     print(tr.tree.as_string(schema="newick"))
     #     # print(tr.n_sa)
-    #     # print(str(tr.root_age) + "\n")
+    #     print(str(tr.root_age) + "\n")
     #     n_sa += tr.n_sa
-    #     n_leaves += tr.n_extant_terminal_nodes
+    #     n_extant += tr.n_extant_terminal_nodes
     #     root_age += tr.root_age
     #     origin_age += tr.origin_age
     
     # print("mean sa = " + str(n_sa / n_sim))
-    # print("mean leaves = " + str(n_leaves / n_sim))
+    # print("mean extant count = " + str(n_extant / n_sim))
     # print("mean root age = " + str(root_age / n_sim))
     # print("mean origin age = " + str(origin_age / n_sim))
 
-    # unittest.main()
+    unittest.main()

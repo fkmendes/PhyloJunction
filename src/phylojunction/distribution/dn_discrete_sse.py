@@ -1136,7 +1136,7 @@ class DnSSE(pgm.DistributionPGM):
                     return False
 
             elif not ann_tr.with_origin and isinstance(ann_tr.root_age, float):
-                if a_stop_value >= ann_tr.root_age:
+                if (a_stop_value - ann_tr.root_age) <= self.epsilon:
                     return True
                 else:
                     return False

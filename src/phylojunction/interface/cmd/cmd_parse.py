@@ -36,11 +36,11 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
 
     if in_pj_file:
         with open(script_file_path_or_model_spec, "r") as infile:
-            all_lines_list = infile.read().splitlines()
+            all_lines_list = infile.readlines()
 
     else:
         all_lines_list = script_file_path_or_model_spec.split("\n")
-    
+
     # side-effect: populates pgm_obj
     _execute_spec_lines(all_lines_list, pgm_obj)
         
@@ -93,8 +93,8 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
         str: Command string if there was nothing wrong with it
     """
 
-    # skip comments
-    if cmd_line.startswith("#"): return ""
+    # skip lines without useful commands
+    if cmd_line.startswith("#") or cmd_line.startswith("\n") or not cmd_line: return ""
 
     ##################################
     # Checking command line is valid #
@@ -114,6 +114,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
             "\n    (3) [variable] := [deterministic function]\nExiting...")
 
     elif (assignment_call_count + sampled_as_call_count + deterministic_call_count) == 0:
+        print("command line that caused the bombing = " + cmd_line)
         raise ec.ScriptSyntaxError(cmd_line, "One of the following must be done:\n    (1) [variable] <- [value]\n    (2) [variable] ~ [sampling distribution]" + \
             "\n    (3) [variable] := [deterministic function]\nExiting...")
 

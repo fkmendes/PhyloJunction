@@ -43,7 +43,7 @@ names(spec.df.max.taxa) <- names(spec.df.max.t) <-  c("ntotal", "ntips", "root.a
 ##         ## conditioning on speciation and survival
 ##         ## (FossilSim only returns "valid" trees, which means having size.tr extant tips)
 ##         trs.list.max.taxa[[b]][[i]] = tr.max.taxa # b-th batch, i-th tree with max.taxa
-##         ith.specs.df.max.taxa = get.specs(tr.max.taxa, w.states=FALSE)
+##         ith.specs.df.max.taxa = get.specs(tr.max.taxa, w.states=FALSE, w.sa=TRUE)
 ##         spec.df.max.taxa$root.age[(b-1) * n.batches + i] = ith.specs.df.max.taxa$"tr.h"
 ##         spec.df.max.taxa$ntotal[(b-1) * n.batches + i] = ith.specs.df.max.taxa$"n.total"
 ##         spec.df.max.taxa$ntips[(b-1) * n.batches + i] = ith.specs.df.max.taxa$"n.tips"

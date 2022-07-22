@@ -7,6 +7,9 @@ import pandas as pd # type: ignore
 from phylojunction.data.tree import AnnotatedTree
 import phylojunction.pgm.pgm as pgm
 
+# for debugging
+from tabulate import tabulate # type: ignore
+
 def write_text_output(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> None:
     content_string = "\n".join(content_string_list)
     outfile_handle.write(content_string)
@@ -25,9 +28,9 @@ def write_data_df(outfile_handle: ty.IO, data_df: pd.DataFrame, format="csv") ->
     """
     
     if format == "csv":
-        data_df.to_csv(outfile_handle)
+        data_df.to_csv(outfile_handle, index=False)
     elif format == "tsv":
-        data_df.to_csv(outfile_handle, sep="\t")
+        data_df.to_csv(outfile_handle, sep="\t", index=False)
 
 
 def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]:
@@ -59,13 +62,38 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
             if isinstance(node_val[0], AnnotatedTree):
                 # creating object to hold tree node output
                 tree_data_df = pd.DataFrame() 
-                tree_data_df["simulation"] = np.array([np.repeat(i, n_repl) for i in range(n_sim)]).flatten()
-                tree_data_df["replicate"] = np.array([[i for i in range(n_repl)] for j in range(n_sim)]).flatten()
-                tree_data_df["tree"] = [val.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True).strip("\"").strip() for val in node_val]
+                tree_data_df["simulation"] = np.array([np.repeat(i+1, n_repl) for i in range(n_sim)]).flatten()
+                tree_data_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(n_sim)]).flatten()
+                tree_data_df["tree"] = [
+                    val.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True).strip("\"").strip() \
+                        for val in node_val
+                ]
+                _nrow_tree_data_df = len(tree_data_df.index)
                 
+                tree_data_summary_df = pd.DataFrame()
+                tree_data_summary_df["simulation"] = tree_data_df["simulation"]
+                tree_data_summary_df["replicate"] = tree_data_df["replicate"]
+                dummy_list1 = [ 0 for i in range(_nrow_tree_data_df) ]
+                dummy_list2 = [ 0.0 for i in range(_nrow_tree_data_df) ]
+                tree_data_summary_df["n_total"] = dummy_list1
+                tree_data_summary_df["n_extant"] = dummy_list1
+                tree_data_summary_df["n_extinct"] = dummy_list1
+                tree_data_summary_df["n_sa"] = dummy_list1
+                tree_data_summary_df["origin_age"] = dummy_list2
+                tree_data_summary_df["root_age"] = dummy_list2
+                for idx, val in enumerate(node_val):              
+                    tree_data_summary_df.at[idx, "n_total"] = len(val.tree.leaf_nodes()) - val.n_sa # conservative: should match n_extant + n_extinct!
+                    tree_data_summary_df.at[idx, "n_extant"] = val.n_extant_terminal_nodes
+                    tree_data_summary_df.at[idx, "n_extinct"] = val.n_extinct_terminal_nodes
+                    tree_data_summary_df.at[idx, "n_sa"] = val.n_sa
+                    tree_data_summary_df.at[idx, "origin_age"] = "{:,.4f}".format(val.origin_age)
+                    tree_data_summary_df.at[idx, "root_age"] = "{:,.4f}".format(val.root_age)
+
                 # adding to return
                 data_df_list.append(tree_data_df)
                 data_df_names_list.append("_trs.tsv")
+                data_df_list.append(tree_data_summary_df)
+                data_df_names_list.append("_trs_summaries.tsv")
 
             # can only be scalar at the moment, if not tree
             else:
@@ -73,7 +101,7 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
                 scalar_data_df[rv_name] = node_val
                 
     # we wait until all nodes are seen before adding scalar_data_df to the top of the return list
-    data_df_list = [scalar_data_df] + data_df_list
+    data_df_list = [ scalar_data_df ] + data_df_list
     data_df_names_list = ["_rvs.csv"] + data_df_names_list
 
     # return scalar_data_df, tree_data_df
@@ -97,7 +125,7 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
     # populating data df that will be dumped and their file names
     data_df_names_list: ty.List[str]
     data_df_list: ty.List[pd.DataFrame]
-    data_df_names_list, data_df_list = prep_data_df(sorted_node_pgm_list)
+    data_df_names_list, data_df_list = prep_data_df(sorted_node_pgm_list) # still prefixless
 
     # sort out file path
     if not dir_string.endswith("/"):
@@ -109,6 +137,12 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
 
     # full file paths
     data_df_full_fp_list = [output_file_path + fn for fn in data_df_names_list]
+
+    # debugging
+    # print("data_df_full_fp_list:")
+    # print("    " + "\n    ".join(n for n in data_df_full_fp_list))
+    # print("_trs_summaries.tsv")
+    # print(tabulate(data_df_list[2], headers="keys", tablefmt="pretty"))
     
     # write!
     for idx, full_fp in enumerate(data_df_full_fp_list):

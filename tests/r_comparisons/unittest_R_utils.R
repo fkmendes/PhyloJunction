@@ -4,10 +4,14 @@ get.tr.h <- function(a.tr) {
     max(nodeHeights(a.tr))
 }
 
-get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE) {
-    extant.taxa = getExtant(a.tr)
+get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE, w.root=FALSE) {
+    extant.tip.labels = getExtant(a.tr)
+    n.tips = length(extant.tip.labels) # extant!
     n.total = length(a.tr$tip.label)
-    n.tips = length(getExtant(a.tr))
+    if (w.sa) {
+        n.sa = get.n.sa(a.tr)
+        n.total = n.total - n.sa
+    }
 
     ## root age for all tips, fossil and extant
     tr.h = 0.0
@@ -21,9 +25,7 @@ get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE) {
     ## because SAs can also happen between the origin and the root, and thus be
     ## above the root
         if (w.sa) {
-            extant.tip.labels = getExtant(a.tr)
-
-            if (length(extant.leaves) > 1) {
+            if (n.tips > 1) {
                 sa.labels = list.sa(a.tr) # get SA labels
                 extant.fossil.tip.labels.no.sa = setdiff(a.tr$tip.label, sa.labels) # only non-SA tip labels
                 root.node.nr = findMRCA(a.tr, extant.fossil.tip.labels.no.sa) # get MRCA node number of only non-SA tips
@@ -34,12 +36,17 @@ get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE) {
                 ##     tr.h = max(node.heights.df[,2]) - nodeheight(a.tr, root.node.nr)
                 ## } else {
 
-                ## maximum distance between root and another node
-                an.extant.tip = extant.tip.labels[1]
-                tr.h = max(dist.nodes(a.tr)[root.node.nr,an.extant.tip])
+                ## maximum distance between root and some node (has to be extant node)
+                tr.h = max(dist.nodes(a.tr)[root.node.nr,])
             }
         }
-    } ## just a single tip means root.age remains at  0.0
+    }
+
+    else if (w.root) {
+        tr.h = max(nodeHeights(a.tr)[,2])
+    }
+
+    ## else: just a single tip and starting at origin means root.age remains at  0.0
 
     if (w.states) {
         n.0 = sum(a.tr$tip.state==0 & names(a.tr$tip.state) %in% extant.taxa)
