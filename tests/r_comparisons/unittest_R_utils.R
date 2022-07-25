@@ -15,38 +15,21 @@ get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE, w.root=FALSE) {
 
     ## root age for all tips, fossil and extant
     tr.h = 0.0
-    if (n.tips > 1) {
-        tr.h = get.tr.h(a.tr) # if no SAs, just do this
 
-    ## root age for all tips, fossil and extant, but we gotta remove the
-    ## SAs because their implementation is hacky (they are tips
-    ## and their parent nodes are not true speciation events, so those internal
-    ## nodes cannot really be the root node; this is particularly important
-    ## because SAs can also happen between the origin and the root, and thus be
-    ## above the root
-        if (w.sa) {
-            if (n.tips > 1) {
-                sa.labels = list.sa(a.tr) # get SA labels
-                extant.fossil.tip.labels.no.sa = setdiff(a.tr$tip.label, sa.labels) # only non-SA tip labels
-                root.node.nr = findMRCA(a.tr, extant.fossil.tip.labels.no.sa) # get MRCA node number of only non-SA tips
-                node.heights.df = nodeHeights(a.tr) # all node heights
-
-                ## weird case that seems ot happen occasionally
-                ## if (root.node.nr > nrow(node.heights.df)) {
-                ##     tr.h = max(node.heights.df[,2]) - nodeheight(a.tr, root.node.nr)
-                ## } else {
-
-                ## maximum distance between root and some node (has to be extant node)
-                tr.h = max(dist.nodes(a.tr)[root.node.nr,])
-            }
-        }
-    }
-
-    else if (w.root) {
+    # starting from root
+    if (w.root) {
         tr.h = max(nodeHeights(a.tr)[,2])
     }
+    # starting from origin
+    else {
+        tr.h = get.tr.h(a.tr) # we have extant and extinct tips (n.total doesn't include SAs)
 
-    ## else: just a single tip and starting at origin means root.age remains at  0.0
+        if (w.sa) {
+            sa.labels = list.sa(a.tr) # get SA labels
+            pruned.tr = drop.tip(a.tr, a.tr$tip.label[match(sa.labels, a.tr$tip.label)])
+            tr.h = get.tr.h(pruned.tr)
+        }
+    }
 
     if (w.states) {
         n.0 = sum(a.tr$tip.state==0 & names(a.tr$tip.state) %in% extant.taxa)

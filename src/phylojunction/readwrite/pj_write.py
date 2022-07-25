@@ -86,8 +86,9 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
                     tree_data_summary_df.at[idx, "n_extant"] = val.n_extant_terminal_nodes
                     tree_data_summary_df.at[idx, "n_extinct"] = val.n_extinct_terminal_nodes
                     tree_data_summary_df.at[idx, "n_sa"] = val.n_sa
-                    tree_data_summary_df.at[idx, "origin_age"] = "{:,.4f}".format(val.origin_age)
                     tree_data_summary_df.at[idx, "root_age"] = "{:,.4f}".format(val.root_age)
+                    if val.origin_age:
+                        tree_data_summary_df.at[idx, "origin_age"] = "{:,.4f}".format(val.origin_age)
 
                 # adding to return
                 data_df_list.append(tree_data_df)
