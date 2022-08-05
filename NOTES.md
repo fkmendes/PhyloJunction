@@ -139,3 +139,146 @@ python3 -m pip install --prefix ~/.local/bin -e .
 Which creates directories `bin/` (placing the executables therein) and `lib/python3.9/site-packages/` (placing the egg-link therein) inside `~/.local`.
 This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
 
+## Documentation
+
+PhyloJunction is documented automatically with `sphinx`, so make sure you have this program installed:
+
+```
+pip3 install sphinx
+```
+
+`sphinx` is a Python program that converts docstrings into .rst files, and then from those and other .rst files it creates it can produce .html files for online documentation.
+
+The first time documentation was done, a `docs/` directory was manually created in the git repo's root, `PhyloJunction/`.
+Then:
+
+```
+cd docs/
+sphinx-quickstart
+```
+
+The answer was "yes" for separate source and build folders and "PhyloJunction" for project name.
+
+Then we needed to activate the Napoleon extension of sphinx, so that we can make use of the Google-style documentation strings PhyloJunction uses.
+Inside `source/conf.py` we added:
+
+```
+extensions = [ 'sphinx.ext.napoleon' ]
+```
+
+With the following options (mostly the defaults):
+
+```
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False # not using admonitions                                                                                                                          
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_preprocess_types = False
+napoleon_type_aliases = None
+napoleon_attr_annotations = True
+```
+
+Because PhyloJunction's code is not in `docs/`, but in fact in `src/phylojunction/`, we must tell sphinx via `conf.py`.
+At the top of `conf.py`, add:
+
+```
+import os
+import sys
+sys.path.insert(0, os.path.abspath("../src/phylojunction/"))
+```
+
+### Theme and other configurations
+
+We will use the "Read the Docs" (RTD) theme to document PJ, as it is straightforward and familiar.
+First, install it:
+
+```
+pip3 install sphinx-rtd-theme
+```
+
+And the following must be added to `conf.py`:
+
+```
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+html_theme = "sphinx_rtd_theme"
+```
+
+We will also add a few .rst directives to `conf.py`.
+These work like "macros" that will be available for all .html files rendered by sphinx, and help us replace strings and add hyperlinks to them automatically.
+
+```
+rst_prolog = """
+.. |fkm| replace:: Fabio K. Mendes
+.. |pj| replace:: PhyloJunction"""
+
+# related to installation, requirements and executing 
+rst_prolog += """\
+.. |Python| replace:: Python
+.. _Python: http://www.python.org
+.. |Python3| replace:: Python 3
+.. |dendropy| replace:: DendroPy
+.. _DendroPy: https://dendropy.org/
+.. |msprime| replace:: msprime
+.. _msprime: https://tskit.dev/msprime
+.. |numpy| replace:: Numpy
+.. _NumPy: https://numpy.org/
+.. |scipy| replace:: SciPy
+.. _SciPy: https://scipy.org
+.. |matplotlib| replace:: Matplotlib
+.. _Matplotlib: https://matplotlib.org
+.. |pandas| replace:: pandas
+.. _pandas: https://pandas.pydata.org
+.. |pip| replace:: pip
+.. _pip: https://pypi.python.org/pypi/pip
+.. |pysimplegui| replace:: PySimpleGUI
+.. _PySImpleGUI: https://pysimplegui.org/en/latest/"""
+
+# other
+rst_prolog += """\
+.. _R: https://www.r-project.org
+.. |java| replace:: Java
+.. _Java: https://www.java.com/en
+.. |beast| replace:: BEAST
+.. _BEAST: https://beast.community
+.. |beast2| replace:: BEAST 2
+.. _BEAST 2: https://www.beast2.org
+.. |rb| replace:: RevBayes
+.. _RevBayes: https://revbayes.github.io
+.. |cpp| replace:: C++
+.. _C++: https://isocpp.org/"""
+```
+
+Now that the configuration files are ready, we can call the program that automatically generate .rst files from all docstrings in PJ:
+
+```
+cd docs/
+sphinx-apidoc -o ./source ../src/phylojunction
+```
+
+Do not forget to run this command again if docstrings are updated.
+Finally, we call the command that produces the .html files:
+
+```
+make clean && make html
+```
+
+This command will need to be called every time we want to update the .html files once the .rst files are modified.
+
+### Documentation website structure
+
+The .rst file that will be converted into `index.html`, the welcome page, is `source/index.rst` (the master .rst file).
+This file contains the information for citing and installing PJ.
+
+The remaining .rst files are organized within manually created folders:
+
+* user/index.rst
+* developer/index.rst
+
+These files are included in the website via the `.. toctree::` .rst directive in the master .rst file.

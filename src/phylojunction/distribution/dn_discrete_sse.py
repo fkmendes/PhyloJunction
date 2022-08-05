@@ -28,20 +28,17 @@ class DnSSE(pgm.DistributionPGM):
     The sampling method in this class is a "rising tide" simulator,
     where all living lineages grow together.
 
-    At all times we know:
-        * How many lineages are alive and dead
-        * All the character states represented by living lineages
+    At all times we know: (i) how many lineages are alive and dead, and (ii) all the character states represented by living lineages
 
-    This is _not_ a recursive simulator (in which each lineage would take care of
+    This is not a recursive simulator (in which each lineage would take care of
     growing only itself, and recur upon birth events).
 
     Attributes
-    ----------
         n_sim (int): Number of simulations one wants.
         n_repl (int): Number of (successful) trees per simulation.
         stop (str): If "age", stops when origin or root age is equal to 'stop_condition_value'. If "size", stops when tree has 'stop_condition_value' observable nodes.
         stop_val (float): Either maximum tree age, or maximum count of observable nodes.
-        start_at_origin (bool): Simulation starts at origin (i.e., seed = origin).
+        start_at_origin (bool): Simulation starts at origin (i.e., seed == origin).
         events (MacroevolEventHandler): Object holding all parameter values we need to simulate.
         start_states (int): List of integer representing the starting states of all n_sim simulations.
         state_count (int): Number of discrete states (obtained from 'events').
@@ -54,7 +51,6 @@ class DnSSE(pgm.DistributionPGM):
         debug (bool, optional): Whether to print debugging messages
 
     Methods
-    -------
 
     """
 

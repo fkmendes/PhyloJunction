@@ -109,7 +109,7 @@ class FIGRatesManager:
     """Stash for discrete-state macroevolutionary parameters and time slices
 
     At the moment, this class does not care about vectorization. It manipulates
-    whole instances of MacroevolStateDependentRateParameter, which _then in turn_
+    whole instances of MacroevolStateDependentRateParameter, which then in turn
     contain multiple values if vectors have been passed by user.
 
     Later, vectorization of seed ages for time slicing and time slices themselves
