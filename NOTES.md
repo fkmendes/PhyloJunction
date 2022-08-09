@@ -141,6 +141,12 @@ python3 -m pip install --prefix ~/.local/bin -e .
 Which creates directories `bin/` (placing the executables therein) and `lib/python3.9/site-packages/` (placing the egg-link therein) inside `~/.local`.
 This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
 
+You can test things worked by trying, from any directory:
+
+```
+pjgui
+```
+
 ## Documentation
 
 PhyloJunction is documented automatically with `sphinx`, so make sure you have this program installed:
