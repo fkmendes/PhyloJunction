@@ -58,25 +58,33 @@ class AnnotatedTree(dp.Tree):
                 tree_died: ty.Optional[bool]=None,
                 epsilon: float=1e-12):
 
-        self.with_origin = start_at_origin
         self.origin_node = None
         self.root_node = None
         self.brosc_node = None
         self.tree_read_as_newick_by_dendropy = False
+        self.no_event = True
+
+        # some initial tree specs
         self.tree = a_tree
+        self.with_origin = start_at_origin
+        self.tree_died = tree_died
+
+        # state-related
         self.state_count = total_state_count
+        self.state_count_dict = dict((int(s), 0) for s in range(self.state_count))
+
+        # age related
         self.seed_age = self.tree.max_distance_from_root()
         self.max_age = max_age
-        self.epsilon = epsilon
-        self.tree_died = tree_died
-        self.state_count_dict = dict((int(s), 0) for s in range(self.state_count))
         self.node_heights_dict: ty.Dict[str, float] = dict()
         self.node_ages_dict: ty.Dict[str, float] = dict()
         self.node_attr_dict = pjh.autovivify(2) # populated on demand by populate_nd_attr_dict
         self.slice_t_ends = slice_t_ends
         self.slice_age_ends = slice_age_ends
+        
+        # other
+        self.epsilon = epsilon
         self.sa_lineage_dict = sa_lineage_dict
-        self.no_event = True
 
         try:
             self.tree.seed_node.alive
@@ -259,16 +267,20 @@ class AnnotatedTree(dp.Tree):
         # initializes
         # (i)  self.extant_obs_nodes_labels
         # (ii) self.extinct_obs_nodes_labels
-        self.count_terminal_nodes() 
+        self._count_terminal_nodes() 
 
         # initializes
         # (i)  self.sa_obs_nodes_labels
         # (ii) self.n_sa
-        self.count_sampled_ancestors()
+        self._count_sampled_ancestors()
 
-        self.count_terminal_node_states() # initializes self.state_count_dict
+        # initializes self.state_count_dict
+        self._count_terminal_node_states() 
 
-        self.populate_node_age_height_dicts() # initializes self.node_heights_dict and self.node_ages_dict
+        # initializes
+        # (i)  self.node_heights_dict
+        # (ii) self.node_ages_dict
+        self.populate_node_age_height_dicts()
 
         # prepare for dendropy's Nexus printing
         self.prepare_taxon_namespace_for_nexus_printing()
@@ -298,7 +310,7 @@ class AnnotatedTree(dp.Tree):
     # side-effect:
     # populates: self.n_sa_obs_nodes
     #            self.sa_obs_nodes_labels
-    def count_sampled_ancestors(self) -> None:
+    def _count_sampled_ancestors(self) -> None:
         """Count sampled ancestor nodes, store count and node labels into class members (side-effect)"""
         sa_obs_nodes_labels_list: ty.List[str] = []
         
@@ -313,7 +325,7 @@ class AnnotatedTree(dp.Tree):
     # side-effect:
     # populates: self.extant_obs_nodes_labels
     #            self.self.extinct_obs_nodes_labels
-    def count_terminal_nodes(self) -> None:
+    def _count_terminal_nodes(self) -> None:
         """Count extant and extinct nodes, store counts and node labels into class members (side-effect)"""
 
         # nd.distance_from_root() gives distance to seed!
@@ -381,15 +393,16 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates self.state_count_dict, {state (int): count (int), ... }
-    def count_terminal_node_states(self) -> None:
-        for nd in self.tree:
-            if nd.label in self.extant_obs_nodes_labels:
-                try:
-                    self.state_count_dict[nd.state] += 1
-                # if tree was read as newick, it might not have states defined
-                # or the tree might have been created by hand and no states were
-                # defined (e.g., Yule or birth-death processes)
-                except: pass
+    def _count_terminal_node_states(self) -> None:
+        # NOTE: we are counting ALL leaves, extinct and extant!
+        for nd in self.tree.leaf_node_iter():
+            # if nd.label in self.extant_obs_nodes_labels:
+            try:
+                self.state_count_dict[nd.state] += 1
+            # if tree was read as newick, it might not have states defined
+            # or the tree might have been created by hand and no states were
+            # defined (e.g., Yule or birth-death processes)
+            except: pass
 
 
     def recursively_find_node_age(self, a_node: dp.Node, running_age_sum: float) -> float:

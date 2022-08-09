@@ -141,7 +141,7 @@ def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[
                 try:
                     _n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
                 except:
-                    raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_stash().")
+                    raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_wrap().")
 
             if arg == "seed_age":
                 try:
@@ -150,14 +150,14 @@ def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[
                     _seed_age_for_time_slicing = float(val[0])
                 
                 except:
-                    raise ec.FunctionArgError(arg, "Was expecting a float. Function was sse_stash().")
+                    raise ec.FunctionArgError(arg, "Was expecting a float. Function was sse_wrap().")
 
             if arg == "epoch_age_ends":
                 try:
                     _time_slice_age_ends = [float(v) for v in val if isinstance(v, str)]
 
                 except: 
-                    raise ec.FunctionArgError(arg, "Could not convert epoch bound ages to floats. Function was sse_stash().")
+                    raise ec.FunctionArgError(arg, "Could not convert epoch bound ages to floats. Function was sse_wrap().")
 
                 if len(val) != (_n_time_slices - 1):
                     raise ec.FunctionArgsMismatchError("sse_wrap", "\"sse_wrap\" expects that the number of epoch ends is equal to the number of epochs minus 1")

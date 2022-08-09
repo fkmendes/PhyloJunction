@@ -60,7 +60,9 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
             # trees go in different file
             # TODO: move the tree part of the code here to a separate module
             if isinstance(node_val[0], AnnotatedTree):
-                # creating object to hold tree node output
+                ######################################
+                # DataFrame holding trees themselves #
+                ######################################
                 tree_data_df = pd.DataFrame() 
                 tree_data_df["simulation"] = np.array([np.repeat(i+1, n_repl) for i in range(n_sim)]).flatten()
                 tree_data_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(n_sim)]).flatten()
@@ -68,32 +70,53 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
                     val.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True).strip("\"").strip() \
                         for val in node_val
                 ]
-                _nrow_tree_data_df = len(tree_data_df.index)
                 
-                tree_data_summary_df = pd.DataFrame()
-                tree_data_summary_df["simulation"] = tree_data_df["simulation"]
-                tree_data_summary_df["replicate"] = tree_data_df["replicate"]
-                dummy_list1 = [ 0 for i in range(_nrow_tree_data_df) ]
-                dummy_list2 = [ 0.0 for i in range(_nrow_tree_data_df) ]
-                tree_data_summary_df["n_total"] = dummy_list1
-                tree_data_summary_df["n_extant"] = dummy_list1
-                tree_data_summary_df["n_extinct"] = dummy_list1
-                tree_data_summary_df["n_sa"] = dummy_list1
-                tree_data_summary_df["origin_age"] = dummy_list2
-                tree_data_summary_df["root_age"] = dummy_list2
-                for idx, val in enumerate(node_val):              
-                    tree_data_summary_df.at[idx, "n_total"] = len(val.tree.leaf_nodes()) - val.n_sa # conservative: should match n_extant + n_extinct!
-                    tree_data_summary_df.at[idx, "n_extant"] = val.n_extant_terminal_nodes
-                    tree_data_summary_df.at[idx, "n_extinct"] = val.n_extinct_terminal_nodes
-                    tree_data_summary_df.at[idx, "n_sa"] = val.n_sa
-                    tree_data_summary_df.at[idx, "root_age"] = "{:,.4f}".format(val.root_age)
+                ####################################
+                # DataFrame holding tree summaries #
+                ####################################
+                # initialization and some population
+                _nrow_tree_data_df = len(tree_data_df.index)
+                _int_dummy_list = np.array([0 for i in range(_nrow_tree_data_df)])
+                _float_dummy_list = np.array([0.0 for i in range(_nrow_tree_data_df)])
+                _tree_data_summary_df = pd.DataFrame({
+                    "simulation": tree_data_df["simulation"],
+                    "replicate": tree_data_df["replicate"],
+                    "origin_age": _float_dummy_list,
+                    "root_age": _float_dummy_list,
+                    "n_total": _int_dummy_list,
+                    "n_extant": _int_dummy_list,
+                    "n_extinct": _int_dummy_list,
+                    "n_sa": _int_dummy_list,
+                })
+                # if there is more than one state, we paste another subdataframe to the main one
+                _total_n_states = node_val[0].state_count
+                if _total_n_states > 1:
+                    _n_in_state_subdf_dict = dict()
+
+                    for ith_state in range(_total_n_states):
+                        _n_in_state_subdf_dict["n_" + str(ith_state)] = _int_dummy_list
+                    _n_in_state_subdf = pd.DataFrame(_n_in_state_subdf_dict)
+                    _tree_data_summary_df = pd.concat((_tree_data_summary_df, _n_in_state_subdf), axis=1)
+
+                # populating
+                for idx, val in enumerate(node_val):
+                    _tree_data_summary_df.at[idx, "root_age"] = "{:,.4f}".format(val.root_age)
                     if val.origin_age:
-                        tree_data_summary_df.at[idx, "origin_age"] = "{:,.4f}".format(val.origin_age)
+                        _tree_data_summary_df.at[idx, "origin_age"] = "{:,.4f}".format(val.origin_age)     
+                    _tree_data_summary_df.at[idx, "n_total"] = len(val.tree.leaf_nodes()) - val.n_sa # conservative: should match n_extant + n_extinct!
+                    _tree_data_summary_df.at[idx, "n_extant"] = val.n_extant_terminal_nodes
+                    _tree_data_summary_df.at[idx, "n_extinct"] = val.n_extinct_terminal_nodes
+                    _tree_data_summary_df.at[idx, "n_sa"] = val.n_sa
+                    # if we have more than one state, we will have counts for leaves in the different states
+                    # NOTE: at the moment, all leaves are counted (in the future, maybe just the sampled ones)
+                    if _total_n_states > 1:
+                        for ith_state in range(val.state_count):
+                            _tree_data_summary_df.at[idx, "n_" + str(ith_state)] = val.state_count_dict[ith_state]
 
                 # adding to return
                 data_df_list.append(tree_data_df)
                 data_df_names_list.append("_trs.tsv")
-                data_df_list.append(tree_data_summary_df)
+                data_df_list.append(_tree_data_summary_df)
                 data_df_names_list.append("_trs_summaries.tsv")
 
             # can only be scalar at the moment, if not tree
