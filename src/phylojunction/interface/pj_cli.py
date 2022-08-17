@@ -30,7 +30,7 @@ def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data
     # debugging (looking at model)
     # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():
     #     print("\nnode name = " + node_pgm_name)
-        # print(node_pgm.value)
+    #     print(node_pgm.value)
 
     ################
     # Writing data #
@@ -57,7 +57,7 @@ def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data
 # the function that pjcli application on terminal calls
 def call_cli() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("model", action="store", type=str, help="Path to phylojunction script specifying a model")
+    parser.add_argument("script", action="store", type=str, help="Path to phylojunction script specifying a model")
     parser.add_argument("-d", "--data-output", dest="write_data", action="store_true", default=False, help="Toggle data output")
     parser.add_argument("-i", "--inference-output", dest="write_inference", action="store_true", default=False, help="Toggle inference script output")
     parser.add_argument("-o", "--output-dir", dest="out_dir", type=str, default="./", help="Path to project root directory, where automatic subdirectories will be created")
@@ -66,7 +66,7 @@ def call_cli() -> None:
     args = parser.parse_args()
 
     execute_pj_script(
-        args.model,
+        args.script,
         prefix=args.prefix,
         root_dir=args.out_dir,
         write_data=args.write_data,

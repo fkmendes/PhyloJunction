@@ -3,6 +3,9 @@ import typing as ty
 import numpy as np
 import matplotlib.pyplot as plt # type: ignore
 import matplotlib.ticker as mticker # type: ignore
+import statistics as stat # type: ignore
+import pandas as pd # type: ignore
+from tabulate import tabulate # type: ignore
 from abc import ABC, abstractmethod
 
 # pj imports
@@ -148,7 +151,17 @@ class NodePGM(ABC):
 
     # don't want to allow NodePGM to be initialized
     @abstractmethod
-    def __init__(self, node_name: str, sample_size: int, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, sampled: bool=False, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[NodePGM]]=None):
+    def __init__(self,
+                    node_name: str,
+                    sample_size: int,
+                    value: ty.Optional[ty.List[ty.Any]]=None,
+                    replicate_size: int=1,
+                    call_order_idx: ty.Optional[int]=None,
+                    sampled: bool=False,
+                    deterministic: bool=False,
+                    clamped: bool=False,
+                    parent_nodes: ty.Optional[ty.List[NodePGM]]=None):
+        
         self.node_pgm_name = node_name
         self.value = value
         self.sample_size = sample_size
@@ -170,10 +183,10 @@ class NodePGM(ABC):
         self.param_of = None
 
         if isinstance(self.value, (list, np.ndarray)) and not isinstance(self.value[0], pjtr.AnnotatedTree):
-            self.flatten_and_extract_values()
+            self._flatten_and_extract_values()
 
     # side-effect updates self.value
-    def flatten_and_extract_values(self) -> None:
+    def _flatten_and_extract_values(self) -> None:
         values: ty.List[ty.Any] = []
         
         # so mypy won't complain
@@ -256,6 +269,101 @@ class NodePGM(ABC):
     def populate_operator_weight(self):
         pass
 
+    @abstractmethod
+    def get_node_stats_str(self, start: int, end: int, repl_idx: int) -> str:
+        stats_str = ""
+
+        if isinstance(self.value, list):
+            # could be (i) >= 1 samples with 1 replicate
+            #          (ii) >= 1 samples with > 1 replicates
+            # and we do (end - start) > 1 to make sure (i) doesn't go through
+            if len(self.value) >= 2 and (end - start) > 1:
+                if isinstance(self.value[0], (str, int, float, np.float64)):
+                    # do stuff with the below
+                    repl_values = [float(v) for v in self.value[start:end]]
+                    repl_value_avg = stat.mean(repl_values)
+                    repl_value_sd = stat.stdev(repl_values)
+
+                    # so that it is very explicit what we are averaging over
+                    avg_str, std_str = str(), str()
+
+                    # all samples, all replicates
+                    if (end - start) == len(self.value):
+                        avg_str = "Sample average   = "
+                        std_str = "Sample std. dev. = "
+                    
+                    # one sample (all replicates)
+                    else:
+                        avg_str = "Replicate average   = "
+                        std_str = "Replicate std. dev. = "
+                    
+                    stats_str = \
+                        avg_str + str(repl_value_avg) + "\n" + \
+                        std_str + str(repl_value_sd)
+                
+                # values are objects (e.g., AnnotatedTree), not scalars
+                else:
+                    # do stuff with the below
+                    repl_objs = self.value[start:end]
+                    repl_all_stats_dict: ty.Dict[str, ty.List[float]] = dict()
+                    focal_repl_stats_dict: ty.Dict[str, ty.Union[int, float]] = dict() # focal replicate given by repl_idx above
+                    repl_value_avg_dict: ty.Dict[str, float] = dict() # all replicates
+                    repl_value_sd_dict: ty.Dict[str, float] = dict() # all replicates
+
+                    # reading over all obj replicates and collecting their stats
+                    for idx, repl_obj in enumerate(repl_objs):
+                        obj_stat_dict = repl_obj.get_stats_dict()
+
+                        for st, stat_v in obj_stat_dict.items():
+                            float_stat_v: float = 0.0
+                            
+                            try: 
+                                float_stat_v = float(stat_v)
+                            except:
+                                # TODO: throw cannot convert to float Exception
+                                pass
+                            
+                            try:
+                                repl_all_stats_dict[st].append(float_stat_v)
+                            
+                            except:
+                                repl_all_stats_dict[st] = [ float_stat_v ]
+
+                            # getting focal replicate stats
+                            if idx == repl_idx:
+                                focal_repl_stats_dict = obj_stat_dict
+                    
+                    # now getting means and sds
+                    for st, stat_v_list in repl_all_stats_dict.items():
+                        repl_value_avg_dict[st] = stat.mean(stat_v_list)
+                        repl_value_sd_dict[st] = stat.stdev(stat_v_list)   
+
+                    focal_obj_repl_value_df = pd.DataFrame(focal_repl_stats_dict.items()) # focal replicate
+                    obj_repl_value_avg_df = pd.DataFrame(repl_value_avg_dict.items()) # all replicates
+                    obj_repl_value_sd_df = pd.DataFrame(repl_value_sd_dict.items()) # all replicates
+                    
+                    # putting it all together
+                    obj_repl_stats_df = pd.concat([focal_obj_repl_value_df, obj_repl_value_avg_df.iloc[:,1], obj_repl_value_sd_df.iloc[:,1]], ignore_index=True, axis=1)
+                    repl_stats_str = tabulate(obj_repl_stats_df, headers=["Summary stat.", "This replicate", "Replicates avg.", "Replicates std. dev."], tablefmt="plain", showindex=False).lstrip()
+
+                    stats_str = repl_stats_str
+            
+            # looking at single replicate (from any one sample)
+            elif (end - start) == 1:
+                if isinstance(self.value[0], (str, int, float, np.float64)):
+                    return stats_str
+                
+                # if it's an object (e.g., AnnotatedTree, or SequenceAlignment)
+                else:
+                    obj_stats_dict = self.value[start:end][0].get_stats_dict()
+                    obj_stats_df = pd.DataFrame(obj_stats_dict.items())
+                    stats_str = tabulate(obj_stats_df, headers=["", ""], tablefmt="plain", showindex=False).lstrip()
+            
+        return stats_str
+
+    # rate ~ unif(n=10, nr=10, min=0.0, max=1.0)
+    # det_rate := sse_rate(name="lambda", value=rate, states=[0,0,0], event="w_speciation")
+
 ##############################################################################
 
 class StochasticNodePGM(NodePGM):
@@ -278,6 +386,7 @@ class StochasticNodePGM(NodePGM):
     def sample(self):
         if self.sampling_dn:
             self.value = self.sampling_dn.generate()
+        
         else:
             raise RuntimeError("exiting...")
 
@@ -296,7 +405,7 @@ class StochasticNodePGM(NodePGM):
         """_summary_
 
         Args:
-            axes (_type_): _description_
+            axes (matplotlib.pyplot.Axes): _description_
             sample_idx (int, optional): Which sample to plot. Defaults to 0.
             repl_idx (int, optional): Which tree replicate to plot (one tree is plotted at a time). Defaults to 0.
             repl_size (int, optional): How many scalar random variables to plot at a time. Defaults to 1.
@@ -308,10 +417,10 @@ class StochasticNodePGM(NodePGM):
             if isinstance(self.value[0], pjtr.AnnotatedTree):
                 
                 # so mypy won't complain
-                if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], pjtr.AnnotatedTree):
-                    
+                if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], pjtr.AnnotatedTree):    
                     if self.value[0].state_count > 1:
                         self.value[sample_idx*repl_size + repl_idx].plot_node(axes, node_attr=branch_attr)
+                    
                     else:
                         self.value[sample_idx*repl_size + repl_idx].plot_node(axes)
             
@@ -322,30 +431,39 @@ class StochasticNodePGM(NodePGM):
                 
                 # one sample
                 if not sample_idx == None and self.sampling_dn:
-                    plot_node_histogram(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
+                    _plot_node_histogram(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
+                
                 # all samples
                 else:
-                    plot_node_histogram(axes, hist_vals, repl_size=repl_size)
+                    _plot_node_histogram(axes, hist_vals, repl_size=repl_size)
         
         # if scalar
         elif isinstance(self.value, (int, float, str)):
             # return
-            plot_node_histogram(axes, [float(self.value)])
+            _plot_node_histogram(axes, [float(self.value)])
+
 
     def populate_operator_weight(self):
         if isinstance(self.value, (list, np.ndarray)):
             if isinstance(self.value[0], (int, float, str, np.float64)):
                 self.operator_weight = 1 # this is a scalar random variable
+            
             # has objects like MacroevolStateDependentRateParameter inside list of values
             else:
                 # TODO: later see how rev moves 2D-arrays and tree nodes
                 # print("value has objects inside")
                 # print(self.value)
                 pass
+        
         else:
             # TODO: later see how rev moves 2D-arrays and tree nodes
             raise RuntimeError("Could not determine dimension of StochasticNodePGM when figuring out operator weight. Exiting...")
 
+
+    def get_node_stats_str(self, start: int, end: int, repl_idx: int) -> str:
+        return super().get_node_stats_str(start, end, repl_idx)
+
+    # rv ~ lognormal(n=10, nr=10, mean=0.0, sd=0.1)
 ##############################################################################
 
 class DeterministicNodePGM(NodePGM):
@@ -370,11 +488,14 @@ class DeterministicNodePGM(NodePGM):
     def populate_operator_weight(self):
         pass
 
+    def get_node_stats_str(self, start: int, end: int, repl_idx: int) -> str:
+        return ""
+
 
 ############
 # Plotting #
 ############
-def plot_node_histogram(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
+def _plot_node_histogram(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
 
     values_list_to_plot = list()
     # if not sample_idx == None:

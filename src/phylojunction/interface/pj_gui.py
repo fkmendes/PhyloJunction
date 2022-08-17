@@ -8,6 +8,7 @@ import re
 import PySimpleGUI as sg # type: ignore
 import pyperclip # type: ignore
 import matplotlib.pyplot as plt # type: ignore
+import pickle # type: ignore
 # from screeninfo import get_monitors
 # import pyautogui
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
@@ -25,24 +26,34 @@ import phylojunction.data.tree as pjdt
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendphylojunctiones@wustl.edu"
 
-def _add_to_clipboard(text):
-    import tempfile
-    with tempfile.NamedTemporaryFile("w") as fp:
-        fp.write(text)
-        fp.flush()
-        command = "xclip < {}".format(fp.name)
-        os.system(command)
+########################
+# Deprecated functions #
+########################
+# def _add_to_clipboard(text):
+#     import tempfile
+#     with tempfile.NamedTemporaryFile("w") as fp:
+#         fp.write(text)
+#         fp.flush()
+#         command = "xclip < {}".format(fp.name)
+#         os.system(command)
 
-def _draw_figure(canvas, figure):
-    figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
-    figure_canvas_agg.draw()
-    figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
-    return figure_canvas_agg
+# def _draw_figure(canvas, figure):
+#     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
+#     figure_canvas_agg.draw()
+#     figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
+#     return figure_canvas_agg
 
-def _delete_fig_agg(_fig_agg):
-    _fig_agg.get_tk_widget().forget()
-    plt.close('all')
+# def _delete_fig_agg(fig_agg):
+#     fig_agg.get_tk_widget().forget()
+#     plt.close('all')
 
+# def _get_scaling():
+    # # called before window created
+    #     root = sg.tk.Tk()
+    #     scaling = root.winfo_fpixels('1i')/72
+    #     root.destroy()
+
+    #     return scaling
 
 ###############
 # Entry point #
@@ -54,7 +65,7 @@ def call_gui():
     ###################
     # Inner functions #
     ###################
-    def _parse_cmd_lines(cmd_line_list, cmd_line_hist, a_pgm, wdw):
+    def parse_cmd_lines(cmd_line_list, cmd_line_hist, a_pgm, wdw):
         valid_cmd_line = None
         
         for line in cmd_line_list:
@@ -73,11 +84,11 @@ def call_gui():
             if valid_cmd_line:
                 cmd_line_hist.append(valid_cmd_line)
                 wdw["-HIST-"].update("\n".join(cmd_line_hist))
-                wdw["-PGM-NODES-"].update([node_name for node_name in _pgm.node_name_val_dict])
+                wdw["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
 
 
-    def _initialize_axes():
-        ax = _fig.add_axes([0.25, 0.2, 0.5, 0.6])
+    def initialize_axes():
+        ax = node_display_fig.add_axes([0.25, 0.2, 0.5, 0.6])
         ax.patch.set_alpha(0.0)
         ax.xaxis.set_ticks([])
         ax.yaxis.set_ticks([])
@@ -89,7 +100,7 @@ def call_gui():
         return ax
 
 
-    def _clean_disable_everything(cmd_line_hist):
+    def clean_disable_everything(cmd_line_hist, msg):
         """
         Destroy PGM object, reset all panels (except history panel).
         History panel is updated with 'reset PGM' line.
@@ -98,84 +109,88 @@ def call_gui():
 
         window["-COPY-VALUE-"].update(disabled=True)
         window["-COPY-ALL-"].update(disabled=True)
+        window["-ITH-REPL-"].update(1, values=[1], disabled=True)
+        window["-ITH-SAMPLE-"].update(1, values=[1], disabled=True)
+        window["-ALL-SAMPLES-"].update(True, disabled=True)
+        window["-ONE-SAMPLE-"].update(False, disabled=True)
         window["-PGM-NODES-"].update([])
         window["-PGM-NODE-DISPLAY-"].update("")
-        cmd_line_hist.append("\n" + "- ~ -  reset model above  - ~ -" + "\n")
+        window["-PGM-NODE-STAT-"].update("")
+        
+        cmd_line_hist.append("\n" + msg + "\n")
         window["-HIST-"].update("\n".join(cmd_line_hist))
 
-        _fig.clf() # clear everything
-        ax = _initialize_axes()
-        _fig.canvas.draw() # updates canvas
+        node_display_fig.clf() # clear everything
+        ax = initialize_axes()
+        node_display_fig.canvas.draw() # updates canvas
 
         return pgm_obj, ax
 
 
-    def _draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
+    def draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
         return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
-
-    def _get_scaling():
-    # called before window created
-        root = sg.tk.Tk()
-        scaling = root.winfo_fpixels('1i')/72
-        root.destroy()
-
-        return scaling
-
     
-    def _selected_node_read(pgm_obj, node_pgm_name):
+    def selected_node_read(pgm_obj, node_pgm_name):
         node_pgm = pgm_obj.get_node_pgm_by_name(node_pgm_name)
-        # display_node_pgm_str = pg.get_display_str_by_name(node_pgm_name)
+        # display_node_pgm_value_str = pg.get_display_str_by_name(node_pgm_name)
         sample_size = len(node_pgm) # this is n_sim inside sampling distribution classes
         repl_size = node_pgm.repl_size
         
         return node_pgm, sample_size, repl_size
 
     
-    def _selected_node_display(wdw, pgm_obj, node_pgm, do_all_samples, sample_idx=None, repl_size=1):
-        display_node_pgm_str = str()
+    def selected_node_display(wdw, pgm_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+        display_node_pgm_value_str = str()
+        display_node_pgm_stat_str = str()
 
-        # we care about sample_idx
+        # first we do values
+        # we care about a specific sample and maybe a specific replicate
         if not sample_idx == None and not do_all_samples:
             start = sample_idx * repl_size
-            end = start + repl_size 
-            display_node_pgm_str = node_pgm.get_start2end_str(start, end)
+            end = start + repl_size
+            display_node_pgm_value_str = node_pgm.get_start2end_str(start, end) # values
+            display_node_pgm_stat_str = node_pgm.get_node_stats_str(start, end, repl_idx) # summary stats
         
-        # we get all samples, and call __str__
+        # we get all samples
         else:
-            display_node_pgm_str =  pgm_obj.get_display_str_by_name(node_pgm.node_pgm_name)
+            # just calling __str__
+            display_node_pgm_value_str = pgm_obj.get_display_str_by_name(node_pgm.node_pgm_name)
+            # getting all values
+            display_node_pgm_stat_str = node_pgm.get_node_stats_str(0, len(node_pgm.value), repl_idx) # summary stats
+        
+        wdw["-PGM-NODE-DISPLAY-"].update(display_node_pgm_value_str)
+        wdw["-PGM-NODE-STAT-"].update(display_node_pgm_stat_str)
 
-        wdw["-PGM-NODE-DISPLAY-"].update(display_node_pgm_str)
-
-    
-    def _selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+        
+    def selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
         """
-        Plot pgm node on '_axes' (Axes object) scoped to 'call_gui()',
+        Plot pgm node on 'node_display_fig_axes' (Axes object) scoped to 'call_gui()',
         then update canvas with new plot
         """
         try:
             # if a tree
             if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                _draw_node_pgm(_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
+                draw_node_pgm(node_display_fig_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
             # when not a tree
             else:
                 if do_all_samples: 
-                    _draw_node_pgm(_axes, node_pgm, repl_size=repl_size)
+                    draw_node_pgm(node_display_fig_axes, node_pgm, repl_size=repl_size)
                 else:
-                    _draw_node_pgm(_axes, node_pgm, sample_idx=sample_idx, repl_size=repl_size)
+                    draw_node_pgm(node_display_fig_axes, node_pgm, sample_idx=sample_idx, repl_size=repl_size)
         # when it's deterministic
         except:
-            _draw_node_pgm(_axes, node_pgm)
+            draw_node_pgm(node_display_fig_axes, node_pgm)
 
         fig_obj.canvas.draw()
 
     
-    def _do_selected_node(pgm_obj, wdw, fig_obj, node_pgm_name, do_all_samples=True):
+    def do_selected_node(pgm_obj, wdw, fig_obj, node_pgm_name, do_all_samples=True):
         """
         Given selected node name, display its string representation and
         plot it on canvas if possible
         """
-        node_pgm, sample_size, repl_size = _selected_node_read(pgm_obj, node_pgm_name)
+        node_pgm, sample_size, repl_size = selected_node_read(pgm_obj, node_pgm_name)
 
         # updates spin window with number of elements in this node_pgm
         # window["-ITH-VAL-"].update(values=[x for x in range(1, sample_size + 1)]) # can only select the number of values this node contains
@@ -193,10 +208,10 @@ def call_gui():
         repl_idx = int(wdw["-ITH-REPL-"].get()) - 1 # (offset)
 
         # updating node values on window happens inside
-        _selected_node_display(wdw, pgm_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_size=repl_size)
+        selected_node_display(wdw, pgm_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
     
         # plotting to canvas happens inside
-        _selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+        selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
         return node_pgm
 
@@ -232,13 +247,32 @@ def call_gui():
     # above just in case...
     # sg.set_options(scaling=scaling)
 
-    ##############
-    # GUI layout #
-    ##############
+
+
+
+
+
+    ####################################
+    # ~+~+~+~+~ Layout START ~+~+~+~+~ #
+    ####################################
     
     menu_def = [
-        ["&File", ["&Load script", "&Save history as", "Save &data to", "Save &inference specs. to", "---", "E&xit"]]
+        ["&File", ["&Open script", "&Load model", "---", "&Save data to", "Save &model to", "Save &inference specs. to", "Save &history as", "Save &figure as", "---", "E&xit"]]
     ]
+
+    # gray96
+    node_value_layout = [
+        [
+            sg.Multiline(key="-PGM-NODE-DISPLAY-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,10))
+        ]
+    ]
+
+    node_stat_layout = [
+        [
+            sg.Multiline(key="-PGM-NODE-STAT-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,10))
+        ]
+    ]
+
 
     layout = [
 
@@ -246,31 +280,44 @@ def call_gui():
 
         [ sg.Push(),
 
-          sg.Frame(
+          sg.Frame( 
             layout = [
                 [
-                  sg.Multiline(key="-PGM-NODE-DISPLAY-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,6))
+                    sg.TabGroup(
+                        [
+                            [ sg.Tab("Value(s)", node_value_layout, font=("Helvetica", 14)) ],
+                            [ sg.Tab("Summary stats.", node_stat_layout, font=("Helvetica", 14)) ]
+                        ],
+                        font=("Helvetica", 14),
+                    ),
+
+                    sg.VPush(),
+
+                    sg.Column(
+                        layout = [
+                            [ sg.Radio("All samples", "-WHICH-SAMPLES-", key="-ALL-SAMPLES-", default=True, enable_events=True, disabled=True, font=("helvetica 14")) ],
+                            [ sg.Radio("One sample", "-WHICH-SAMPLES-", key="-ONE-SAMPLE-", default=False, enable_events=True, disabled=True, font=("helvetica 14")) ],
+                            [ sg.Text("Sample #", font=("helvetica 14")) ],
+                            [ sg.Spin([1], initial_value=1, key="-ITH-SAMPLE-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
+                            [ sg.Text("Replicate #", font=("helvetica 14"), size=(8,1)) ],
+                            [ sg.Spin([1], initial_value=1, key="-ITH-REPL-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
+                            [ sg.VPush() ],
+                            [ sg.Button("Copy values", key="-COPY-VALUE-", size=(10,1), disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ],
+                            [ sg.Checkbox("Copy all", key="-COPY-ALL-", default=False, font=("helvetica 14")) ]
+                        ],
+                        element_justification="center",
+                        expand_y="true" # necessary for VPush() to have an effect
+                    )           
                 ]
             ],
-            title="Node value",
-            relief=sg.RELIEF_FLAT,
-            font="helvetica 14"
-            ),
+            title="SELECTED NODE",
+            title_location="n",
+            relief=sg.RELIEF_SOLID,
+            border_width=1,
+            font="helvetica 12 bold"
+          ),
 
-            sg.Push(),
-
-            sg.Frame(
-                layout = [
-                    [
-                    sg.Listbox([], key="-PGM-NODES-", font=("helvetica", 16), enable_events=True, background_color="gray96", size=(12,6))
-                    ]
-                ],
-                title="Created node(s)",
-                relief=sg.RELIEF_FLAT,
-                font="helvetica 14"
-            ),
-
-            sg.Push()
+          sg.Push()
         ],
 
         [ sg.Push(),
@@ -279,37 +326,26 @@ def call_gui():
           
           sg.Push(),
 
-          sg.Column(
-              layout = [
-                    
-                    [ sg.Button("Destroy model", key="-DESTROY-PGM-", enable_events=True, disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ],
-
-                    [ sg.VPush() ],
-
-                    [ sg.Frame(
+          sg.Frame(
+            layout = [
+                [
+                    sg.Column(
+                        # gray96 for Listbox
                         layout = [
-                            [
-                                sg.Column(
-                                    layout = [
-                                        [ sg.Checkbox("Copy all", key="-COPY-ALL-", default=False, font=("helvetica 14")) ],
-                                        [ sg.Button("Copy values", key="-COPY-VALUE-", size=(10,1), disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ], 
-                                        [ sg.Radio("All samples", "-WHICH-SAMPLES-", key="-ALL-SAMPLES-", default=True, enable_events=True, disabled=True, font=("helvetica 14")) ],
-                                        [ sg.Radio("One sample", "-WHICH-SAMPLES-", key="-ONE-SAMPLE-", default=False, enable_events=True, disabled=True, font=("helvetica 14")) ],
-                                        [ sg.Text("Sample #", font=("helvetica 14")) ],
-                                        [ sg.Spin([x for x in range(1, 1)], 1, key="-ITH-SAMPLE-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
-                                        [ sg.Text("Tree #", font=("helvetica 14"), size=(8,1)) ],
-                                        [ sg.Spin([x for x in range(1, 1)], 1, key="-ITH-REPL-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ]
-                                    ],
-                                    element_justification="center"
-                                )
-                            ]
+                            [ sg.Listbox([], key="-PGM-NODES-", font=("helvetica", 16), enable_events=True, background_color="mint cream", size=(15,16)) ],
+                            [ sg.Button("Reset", key="-DESTROY-PGM-", enable_events=True, disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ]
                         ],
-                        title="Selected node",
-                        font="helvetica 14"
+                        element_justification="center",
+                        background_color="mint cream",
                     )
-                    ]
-              ],
-              element_justification="center"
+                ]
+            ],
+            title="MODEL",
+            title_color="steel blue",
+            title_location="n",
+            relief=sg.RELIEF_FLAT,
+            background_color="mint cream",
+            font="helvetica 16 bold"
           ),
 
           sg.Push()
@@ -317,9 +353,7 @@ def call_gui():
 
         [ sg.Frame(
             layout = [
-            
                 [ sg.Input(key="-CMD-", font=("Helvetica", 16), text_color="white", background_color="gray20", focus=True, do_not_clear=False, size=(111,1))  ]
-            
             ],
             title="Command prompt",
             relief=sg.RELIEF_FLAT,
@@ -332,9 +366,7 @@ def call_gui():
 
         [ sg.Frame(
             layout = [
-                
                 [ sg.Multiline(key="-ERROR_MSG-", font="helvetica 16", text_color="red", background_color="gray96", disabled=True, size=(110,5)) ]
-
             ],
             title="Log",
             relief=sg.RELIEF_FLAT,
@@ -344,9 +376,7 @@ def call_gui():
 
         # sg.Input(key="-SCRIPT-READ-", enable_events=True, visible=False), # dummy element to trigger file browse
         # sg.FileBrowse(button_text="Open script file", target="-SCRIPT-READ-", font=("Helvetica", 14), button_color="skyblue1"),        
-        [
-            sg.Text("Save with prefix", font=("Helvetica", 14)), sg.Input(size=(10, 1), font=("Helvetica", 14), key="-PREFIX-")
-        ]
+        [ sg.Text("Save with prefix", font=("Helvetica", 14)), sg.Input(size=(10, 1), font=("Helvetica", 14), key="-PREFIX-") ]
 
         # sg.InputText(key="-VALUES-SAVE-DUMMY-", enable_events=True, visible=False) # dummy element to trigger folder browse
         # sg.FolderBrowse(button_text="Save values in", initial_folder="./", key="-VALUES-SAVE-IN-", font=("Helvetica", 14), button_color=("gold"))
@@ -403,6 +433,13 @@ def call_gui():
             )
         ]
     ]
+    
+    ##################################
+    # ~+~+~+~+~ Layout END ~+~+~+~+~ #
+    ##################################
+
+
+
 
 
     ###############
@@ -414,24 +451,25 @@ def call_gui():
     window['-CMD-'].Widget.config(insertbackground="white")
     # window.Size = (1050, 760) # resolution-dependent
 
-    _fig_agg = None
-    _fig = Figure(figsize=(11,4.5))
-    _axes = _initialize_axes()
+    fig_agg = None
+    node_display_fig = Figure(figsize=(11,4.5))
+    node_display_fig_axes = initialize_axes()
 
     # Link matplotlib to PySimpleGUI Graph
-    _fig_agg = FigureCanvasTkAgg(_fig, window["-CANVAS-"].TKCanvas)
-    plot_widget = _fig_agg.get_tk_widget()
+    fig_agg = FigureCanvasTkAgg(node_display_fig, window["-CANVAS-"].TKCanvas)
+    plot_widget = fig_agg.get_tk_widget()
     plot_widget.grid(row=0, column=0)
+
 
     ##############
     # Event loop #
     ##############
-    _pgm: pgm.ProbabilisticGraphicalModel = pgm.ProbabilisticGraphicalModel()
-    _cmd_history: ty.List[str] = []
-    _cmd_line: str = ""
-    _script_out_fp: str = ""
-    _data_out_dir: str = ""
-    _inf_out_dir: str = ""
+    pgm_obj: pgm.ProbabilisticGraphicalModel = pgm.ProbabilisticGraphicalModel()
+    cmd_history: ty.List[str] = []
+    cmd_line: str = ""
+    script_out_fp: str = ""
+    data_out_dir: str = ""
+    inf_out_dir: str = ""
     while True:
         # general parameters for window
         event, values = window.read()
@@ -440,19 +478,21 @@ def call_gui():
         # Try to read command #
         #######################
         try:
-            _cmd_line = values["-CMD-"]
+            cmd_line = values["-CMD-"]
         # user closed window without typing command line
         except:
             pass
 
+
         ########
         # Quit #
         ########
-        if _cmd_line in ("q()", "quit", "exit", "close", "bye"):
+        if cmd_line in ("q()", "quit", "exit", "close", "bye"):
             event = "Quit"
         
         if event in (None, "Quit", "Quit2", "Exit"):
             break
+
 
         #######################################################
         # Copying value of selected node in "Created node(s)" #
@@ -461,7 +501,7 @@ def call_gui():
             value_str = str()
             
             if values["-COPY-ALL-"]:
-                value_str = _pgm.get_display_str_by_name(node_pgm.node_pgm_name)
+                value_str = pgm_obj.get_display_str_by_name(node_pgm.node_pgm_name)
             else:
                 value_str = values['-PGM-NODE-DISPLAY-']
             
@@ -470,13 +510,15 @@ def call_gui():
         elif event == "Simulate":
             pass
 
+
         ####################
         # Destroying model #
         ####################
         elif event == "-DESTROY-PGM-":
-            # _pgm and _axes are overwritten with new clean objects
-            # _cmd_history is updated inside
-            _pgm, _axes = _clean_disable_everything(_cmd_history) # clean figure, reset axes
+            # pgm_obj and node_display_fig_axes are overwritten with new clean objects
+            # cmd_history is updated inside
+            pgm_obj, node_display_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+
 
         ####################################
         # Select node in "Created node(s)" #
@@ -490,11 +532,11 @@ def call_gui():
 
                 # if selected node is tree, we do not want to show all trees on display by default
                 try:
-                    if isinstance(_pgm.get_node_pgm_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
+                    if isinstance(pgm_obj.get_node_pgm_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
                         do_all_samples = False
                 except: pass # the value of the node_pgm might be an MacroevolStateDependentRateParameter, which is not subscriptable, so we pass
                 
-                node_pgm = _do_selected_node(_pgm, window, _fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_pgm = do_selected_node(pgm_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
                 
                 # we enable value copying as soon as a node is clicked
                 window["-COPY-VALUE-"].update(disabled=False)
@@ -537,6 +579,7 @@ def call_gui():
                 else:
                     window["-ITH-REPL-"].update(disabled=True)
 
+
         #########################################
         # Going through scalars with replicates #
         #########################################
@@ -545,7 +588,8 @@ def call_gui():
             if values["-PGM-NODES-"]:
                 selected_node_pgm_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
-                node_pgm = _do_selected_node(_pgm, window, _fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_pgm = do_selected_node(pgm_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+
 
         #######################
         # Going through trees #
@@ -557,73 +601,110 @@ def call_gui():
             
             # # only updates display if tree node is selected
             # if isinstance(node_pgm.value[0], AnnotatedTree):
-            #     _draw_node_pgm(_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
-            #     _fig.canvas.draw()
+            #     draw_node_pgm(node_display_fig_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
+            #     node_display_fig.canvas.draw()
 
             # if nodes have been created and selected
             if values["-PGM-NODES-"]:
                 selected_node_pgm_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
-                node_pgm = _do_selected_node(_pgm, window, _fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_pgm = do_selected_node(pgm_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+
 
         ##################
         # Reading script #
         ##################
-        elif event == "Load script":
-            _pgm = pgm.ProbabilisticGraphicalModel() # resets _pgm
+        elif event == "Open script":
             _script_in_fp = sg.popup_get_file("Script to load", no_window=True, keep_on_top=True)
             
-            cmd_lines = pjread.read_text_file(_script_in_fp)
+            if _script_in_fp:
+                _, node_display_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+                cmd_lines = pjread.read_text_file(_script_in_fp)
+                parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
 
-            _parse_cmd_lines(cmd_lines, _cmd_history, _pgm, window)
+                # it model has at least one node, destroying is now a possibility
+                if pgm_obj.n_nodes >= 1:
+                    window["-DESTROY-PGM-"].update(disabled=False)
+            
+            else: pass # event canceled by user
 
-            # it model has at least one node, we can destroy it
-            if _pgm.n_nodes >= 1:
-                window["-DESTROY-PGM-"].update(disabled=False)
 
-        # original implmn had buttons
-        # script_in_fp = values["-SCRIPT-READ-"]
-        # elif event == "-SCRIPT-READ-":
+        ###############
+        # Loading PGM #
+        ###############
+        elif event == "Load model":
+            _model_in_fp = sg.popup_get_file("Model to load", no_window=True, keep_on_top=True)
+            
+            if _model_in_fp:
+                _, node_display_fig_axes = clean_disable_everything(cmd_history, "## Loading serialized model at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+                pgm_obj = pjread.read_serialized_pgm(_model_in_fp)
+                window["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
+            
+            else: pass # user canceled event
+
 
         ###############
         # Saving data #
         ###############
         elif event == "Save data to":
             try:
-                _data_out_dir = sg.popup_get_folder("Save to directory", no_window=True, keep_on_top=True)
-            except: pass # canceled
+                data_out_dir = sg.popup_get_folder("Save to directory", no_window=True, keep_on_top=True)
+            
+            except: pass # event canceled by user
+            
+            prefix = values["-PREFIX-"]
+                        
+            # default value is "./"
+            # if data_out_dir:
+            pjwrite.dump_pgm_data(data_out_dir, pgm_obj, prefix=prefix)
+
+
+        ###########################
+        # Saving serialized model #
+        ###########################
+        elif event == "Save model to":
+            try:
+                model_out_dir = sg.popup_get_folder("Save to directory", no_window=True, keep_on_top=True)
+            
+            except: pass # event canceled by user
             
             prefix = values["-PREFIX-"]
             
-            # default value is "./"
-            # if _data_out_dir:
-            pjwrite.dump_pgm_data(_data_out_dir, _pgm, prefix=prefix)
+            # pickling and saving PGM
+            pjwrite.dump_serialized_pgm(model_out_dir, pgm_obj, prefix=prefix)
 
-        # original implmn had buttons
-        # _data_out_dir = values["-VALUES-SAVE-DUMMY-"] # directory for saving data files
-        # elif event == "-VALUES-SAVE-DUMMY-":
 
         ##################
         # Saving history #
         ##################
         elif event == "Save history as":
             try:
-                _script_out_fp = sg.popup_get_file("Save to file", save_as=True, no_window=True, keep_on_top=True) # directory for saving data files
-                # _script_out_fp = values['-SCRIPT-SAVE-DUMMY-'] # file path
+                script_out_fp = sg.popup_get_file("Save to file", save_as=True, no_window=True, keep_on_top=True) # directory for saving data files
+                # script_out_fp = values['-SCRIPT-SAVE-DUMMY-'] # file path
             except: pass # canceled
 
-            if _script_out_fp:
-                with open(_script_out_fp, "w") as script_out:
-                    pjwrite.write_text_output(script_out, _cmd_history)
+            if script_out_fp:
+                with open(script_out_fp, "w") as script_out:
+                    pjwrite.write_text_output(script_out, cmd_history)
 
-        # original implmn had a button
-        # elif event == "-SCRIPT-SAVE-DUMMY-":
+
+        #################
+        # Saving figure #
+        #################
+        elif event == "Save figure as":
+            try:
+                fig_out_fp = sg.popup_get_file("Save figure as", save_as=True, no_window=True, keep_on_top=True) # directory for saving figure
+            except: pass # canceled
+
+            if fig_out_fp:
+                pjwrite.write_fig_to_file(fig_out_fp, node_display_fig)
+
 
         #############################
         # Generating inference spec #
         #############################
         elif event == "-GEN-INF-":
-            if _pgm.n_nodes >= 1:
+            if pgm_obj.n_nodes >= 1:
                 try:
                     mcmc_chain_length = int(values["-CHAIN-"])
                 
@@ -632,7 +713,7 @@ def call_gui():
                 except ec.InvalidMCMCChainLength as e:
                     sg.popup_error("Invalid MCMC chain length")
 
-                all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length)
+                all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(pgm_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length)
 
                 all_sims_spec_strs_list = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, write2file=False)
 
@@ -645,12 +726,14 @@ def call_gui():
             
             else: pass
 
+
         #####################################
         # Rotating through simulation specs #
         #####################################
         elif event == "-ITH-INF-":
             sample_idx = int(window["-ITH-INF-"].get()) - 1 # (offset)
             window["-INFERENCE-SPEC-"].update(all_sims_spec_strs_list[sample_idx])
+
 
         #########################
         # Saving inference spec #
@@ -669,15 +752,16 @@ def call_gui():
         #     except Exception as e:
         #         sg.popup_error("MCMC chain length must be a number")
 
-        #     all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
+        #     all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
 
         #     _ = pjio.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
+
 
         #############################
         # Save-to inference scripts #
         #############################
         elif event == "Save inference specs. to":
-            _inf_out_dir = sg.popup_get_folder("Save to directory", no_window=True, keep_on_top=True) # directory for saving data files
+            inf_out_dir = sg.popup_get_folder("Save to directory", no_window=True, keep_on_top=True) # directory for saving data files
 
             prefix = values["-PREFIX-"]
             try:
@@ -692,28 +776,31 @@ def call_gui():
             except Exception as e:
                 sg.popup_error("MCMC chain length must be a number")
 
-            all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(_pgm, _inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
+            all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(pgm_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
 
             _ = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
             
-        # original implmn had buttons
-        # elif event == "-INFERENCE-SAVE-TO-DUMMY-":
-        # _inf_out_dir = values["-INFERENCE-SAVE-TO-DUMMY-"]
 
         #######################################
         # If no other event, we parse command #
         #######################################
         else: 
-            cmd_lines = [cl for cl in re.split("\n", _cmd_line) if cl] # in case the user enters multiple lines, also ignores empty lines
+            cmd_lines = [cl for cl in re.split("\n", cmd_line) if cl] # in case the user enters multiple lines, also ignores empty lines
 
-            _parse_cmd_lines(cmd_lines, _cmd_history, _pgm, window)
+            parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
 
             # it model has at least one node, we can destroy it
-            if _pgm.n_nodes >= 1:
+            if pgm_obj.n_nodes >= 1:
                 window["-DESTROY-PGM-"].update(disabled=False)
 
 
     window.close()
+
+
+
+
+
+
 
 # call GUI
 if __name__ == "__main__":

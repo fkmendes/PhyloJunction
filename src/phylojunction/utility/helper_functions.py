@@ -29,6 +29,10 @@ def autovivify(levels=1, final=dict) -> ty.DefaultDict:
             defaultdict(lambda: autovivify(levels - 1, final)))
 
 
+def create_str_defaultdict():
+    return defaultdict(str)
+
+
 def verify_or_convert2_vector(param_list: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], dn_name: str, size_to_grow=1) -> ty.List[ty.List[ty.Union[int, float, str]]]:
     """
 

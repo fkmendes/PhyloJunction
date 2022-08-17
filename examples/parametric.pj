@@ -1,0 +1,4 @@
+# stochastic-node variables ('rv1') assignment
+ln_mean ~ exponential(n=5, rate=1.5)
+ln_sd ~ unif(n=5, min=0.05, max=0.15)
+ln_rv ~ lognormal(n=5, nr=2, mean=ln_mean, sd=ln_sd)

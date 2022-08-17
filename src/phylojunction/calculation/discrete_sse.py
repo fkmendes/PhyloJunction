@@ -10,7 +10,15 @@ import phylojunction.utility.exception_classes as ec
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-MacroevolEvent = enum.Enum("Macroevol. event", ["W_SPECIATION", "BW_SPECIATION", "ASYM_SPECIATION", "EXTINCTION", "ANAGENETIC_TRANSITION", "ANCESTOR_SAMPLING"], start=0)
+# MacroevolEvent = enum.Enum("Macroevol. event", ["W_SPECIATION", "BW_SPECIATION", "ASYM_SPECIATION", "EXTINCTION", "ANAGENETIC_TRANSITION", "ANCESTOR_SAMPLING"], start=0)
+
+class MacroevolEvent(enum.Enum):
+    W_SPECIATION = 0
+    BW_SPECIATION = 1
+    ASYM_SPECIATION = 2
+    EXTINCTION = 3
+    ANAGENETIC_TRANSITION = 4
+    ANCESTOR_SAMPLING = 5 
 
 ##############################################################################
 
@@ -93,6 +101,12 @@ class MacroevolStateDependentRateParameter():
 
     def __repr__(self):
         return self.str_representation
+
+    def __len__(self) -> int:
+        if isinstance(self.value, list):
+            return len(self.value)
+        else:
+            return 1
 
     def sample(self):
         super().sample()

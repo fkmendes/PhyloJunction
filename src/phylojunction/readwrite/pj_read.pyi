@@ -1,3 +1,6 @@
 import typing as ty
 
+import phylojunction.pgm.pgm as pgm
+
 def read_text_file(fp_string: str) -> ty.List[str]: ...
+def read_serialized_pgm(fp_string: str) -> pgm.ProbabilisticGraphicalModel: ...

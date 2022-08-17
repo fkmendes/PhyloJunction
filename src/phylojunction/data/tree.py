@@ -2,6 +2,7 @@ import typing as ty
 import dendropy as dp # type: ignore
 import matplotlib # type: ignore
 import numpy as np
+import collections
 # from dendropy import Node, Tree, Taxon 
 
 # plotting tree
@@ -78,7 +79,8 @@ class AnnotatedTree(dp.Tree):
         self.max_age = max_age
         self.node_heights_dict: ty.Dict[str, float] = dict()
         self.node_ages_dict: ty.Dict[str, float] = dict()
-        self.node_attr_dict = pjh.autovivify(2) # populated on demand by populate_nd_attr_dict
+        # self.node_attr_dict = pjh.autovivify(2) # populated on demand by populate_nd_attr_dict, cannot be pickled for some reason...
+        self.node_attr_dict = collections.defaultdict(pjh.create_str_defaultdict) # this one can be pickled
         self.slice_t_ends = slice_t_ends
         self.slice_age_ends = slice_age_ends
         
@@ -493,6 +495,13 @@ class AnnotatedTree(dp.Tree):
         else:
             self.populate_nd_attr_dict([node_attr])
             return plot_ann_tree(self, axes, attr_of_interest=node_attr)
+
+
+    def get_stats_dict(self) -> ty.Dict[str, ty.Union[int, float]]:
+        ks = [ "Origin age", "Root age", "Total taxon count", "Extant taxon count", "Extinct taxon count", "Direct ancestor count" ]
+        vs = [ self.origin_age, self.root_age, (self.n_extant_terminal_nodes + self.n_extinct_terminal_nodes), self.n_extant_terminal_nodes, self.n_extinct_terminal_nodes, self.n_sa]
+        
+        return dict((ks[i], str(vs[i])) for i in range(len(ks)))
 
 
 ###########################

@@ -43,35 +43,38 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
 
     # side-effect: populates pgm_obj
     _execute_spec_lines(all_lines_list, pgm_obj)
-        
-    # debugging
+
+    ###################
+    # Debugging space #
+    ###################
     # seeing trees in script strings in main()
     # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():    
-    #     if node_pgm_name == "trs":
-    #         fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
-    #                                  # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
-    #         ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-    #         ax.patch.set_alpha(0.0)
-    #         ax.xaxis.set_ticks([])
-    #         ax.yaxis.set_ticks([])
-    #         ax.spines['left'].set_visible(False)
-    #         ax.spines['bottom'].set_visible(False)
-    #         ax.spines['right'].set_visible(False)
-    #         ax.spines['top'].set_visible(False)
+        # if node_pgm_name == "trs":
+        #     fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
+        #                              # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
+        #     ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+        #     ax.patch.set_alpha(0.0)
+        #     ax.xaxis.set_ticks([])
+        #     ax.yaxis.set_ticks([])
+        #     ax.spines['left'].set_visible(False)
+        #     ax.spines['bottom'].set_visible(False)
+        #     ax.spines['right'].set_visible(False)
+        #     ax.spines['top'].set_visible(False)
     
-    #         print(node_pgm.value[0].tree.as_string(schema="newick"))
-    #
-    #         pjtr.plot_ann_tree(
-    #             node_pgm.value[0],
-    #             ax,
-    #             use_age=False,
-    #             start_at_origin=True,
-    #             sa_along_branches=True
-    #         )
+        #     print(node_pgm.value[0].tree.as_string(schema="newick"))
+    
+        #     pjtr.plot_ann_tree(
+        #         node_pgm.value[0],
+        #         ax,
+        #         use_age=False,
+        #         start_at_origin=True,
+        #         sa_along_branches=True
+        #     )
             
-    #         plt.show()
+        #     plt.show()
 
-    # debugging
+        # print(node_pgm.get_node_stats_str(0, len(node_pgm.value), 0))
+
     # as if we had clicked "See" in the inference tab
     # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, "./inference_test/", mcmc_chain_length=1000, prefix="test")
     # for i, ith_sim_model_spec in enumerate(all_sims_model_spec_list):
@@ -79,6 +82,10 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
     #     print(all_sims_mcmc_logging_spec_list[i])
 
     # pjio.output_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix="test")
+
+    ##########################
+    # End of debugging space #
+    ##########################
     
     return pgm_obj
 
@@ -452,6 +459,8 @@ if __name__ == "__main__":
         "meh := sse_wrap(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate02_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate12_t0, det_b_birth_rate201_t0, det_b_birth_rate202_t0, det_b_birth_rate212_t0, det_trans_rate20_t0, det_trans_rate21_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate02_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate12_t1, det_b_birth_rate201_t1, det_b_birth_rate202_t1, det_b_birth_rate212_t1, det_trans_rate20_t1, det_trans_rate21_t1], n_states=3, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)\n" + \
         "trs ~ discrete_sse(n=100, meh=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
 
+    script_str36 = "a ~ lognormal(n=2, nr=10, mean=10.0, sd=1.0)"
+
     # for copying and pasting in GUI:
     #
     # vectorized atomic rate parameter
@@ -501,6 +510,7 @@ if __name__ == "__main__":
     # script_str44 = "a ~ lognormal(n=10, mean=0.0, sd=1.0) {"
     # script_str45 = "a <- 1.0.0"
     # 
-    file_handle_exception = io.StringIO(script_str35)
+    
+    # file_handle_exception = io.StringIO(script_str36)
 
-    script2pgm(script_str35, in_pj_file=False)
+    script2pgm(script_str36, in_pj_file=False)
