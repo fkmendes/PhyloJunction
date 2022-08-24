@@ -2,8 +2,8 @@
 
 # NOTE: running the GUI from a conda environment messes up the fonts
 
-from genericpath import isfile
 import os
+from tkinter.ttk import Sizegrip
 import typing as ty
 import re
 import PySimpleGUI as sg # type: ignore
@@ -18,6 +18,7 @@ from tabulate import tabulate # type: ignore
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
 from matplotlib.figure import Figure # type: ignore
 from matplotlib.widgets import Slider, Button, RadioButtons
+from PIL import Image
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -276,13 +277,13 @@ def call_gui():
     # gray96
     node_value_layout = [
         [
-            sg.Multiline(key="-PGM-NODE-DISPLAY-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,10))
+            sg.Multiline(key="-PGM-NODE-DISPLAY-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,9))
         ]
     ]
 
     node_stat_layout = [
         [
-            sg.Multiline(key="-PGM-NODE-STAT-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,10))
+            sg.Multiline(key="-PGM-NODE-STAT-", font=("Courier", 14), disabled=True, background_color="gray96", size=(102,9))
         ]
     ]
 
@@ -303,24 +304,25 @@ def call_gui():
                         ],
                         font=("Helvetica", 14),
                     ),
-
-                    sg.VPush(),
-
+ 
                     sg.Column(
                         layout = [
                             [ sg.Radio("All samples", "-WHICH-SAMPLES-", key="-ALL-SAMPLES-", default=True, enable_events=True, disabled=True, font=("helvetica 14")) ],
                             [ sg.Radio("One sample", "-WHICH-SAMPLES-", key="-ONE-SAMPLE-", default=False, enable_events=True, disabled=True, font=("helvetica 14")) ],
                             [ sg.Text("Sample #", font=("helvetica 14")) ],
                             [ sg.Spin([1], initial_value=1, key="-ITH-SAMPLE-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
-                            [ sg.Text("Replicate #", font=("helvetica 14"), size=(8,1)) ],
-                            [ sg.Spin([1], initial_value=1, key="-ITH-REPL-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ],
-                            [ sg.VPush() ],
-                            [ sg.Button("Copy values", key="-COPY-VALUE-", size=(10,1), disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ],
-                            [ sg.Checkbox("Copy all", key="-COPY-ALL-", default=False, font=("helvetica 14")) ]
+                            [ sg.Text("Replicate #", font=("helvetica 14"), size=(9,1)) ],
+                            [ sg.Spin([1], initial_value=1, key="-ITH-REPL-", enable_events=True, readonly=True, disabled=True, font=("helvetica 14"), size=(8,1)) ]
                         ],
                         element_justification="center",
                         expand_y="true" # necessary for VPush() to have an effect
                     )           
+                ],
+                [
+                    sg.Push(),
+                    sg.Button("Copy values", key="-COPY-VALUE-", size=(10,1), disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")),
+                    sg.Checkbox("Copy all", key="-COPY-ALL-", default=False, font=("helvetica 14")),
+                    sg.Push()
                 ]
             ],
             title="SELECTED NODE",
@@ -336,8 +338,6 @@ def call_gui():
         [ sg.Push(),
         
           sg.Canvas(key="-CANVAS-", background_color="white", size=(1200,450)),
-          
-          sg.Push(),
 
           sg.Frame(
             layout = [
@@ -345,7 +345,7 @@ def call_gui():
                     sg.Column(
                         # gray96 for Listbox
                         layout = [
-                            [ sg.Listbox([], key="-PGM-NODES-", font=("helvetica", 16), enable_events=True, background_color="mint cream", size=(15,16)) ],
+                            [ sg.Listbox([], key="-PGM-NODES-", font=("helvetica", 16), enable_events=True, background_color="mint cream", size=(14,13)) ],
                             [ sg.Button("Reset", key="-DESTROY-PGM-", enable_events=True, disabled=True, disabled_button_color=("gray70", "gray85"), font=("helvetica 14")) ]
                         ],
                         element_justification="center",
@@ -364,7 +364,9 @@ def call_gui():
           sg.Push()
         ],
 
-        [ sg.Frame(
+        [ sg.Push(),
+        
+          sg.Frame(
             layout = [
                 [ sg.Input(key="-CMD-", font=("Helvetica", 16), text_color="white", background_color="gray20", focus=True, do_not_clear=False, size=(111,1))  ]
             ],
@@ -372,31 +374,39 @@ def call_gui():
             relief=sg.RELIEF_FLAT,
             # pad=(5,20),
             font="helvetica 14"
-            )
+            ),
+
+          sg.Push()
         ],
 
         [ sg.Button("Enter command", visible=False, bind_return_key=True) ],
 
-        [ sg.Frame(
-            layout = [
-                [ sg.Multiline(key="-ERROR_MSG-", font="helvetica 16", text_color="red", background_color="gray96", disabled=True, size=(110,3)) ]
-            ],
-            title="Log",
-            relief=sg.RELIEF_FLAT,
-            font="helvetica 14"
-            )
+        [ 
+            sg.Push(),
+            
+            sg.Frame(
+                layout = [
+                    [ sg.Multiline(key="-ERROR_MSG-", font="helvetica 16", text_color="red", background_color="gray96", disabled=True, size=(110,3)) ]
+                ],
+                title="Log",
+                relief=sg.RELIEF_FLAT,
+                font="helvetica 14"
+            ),
+
+            sg.Push()
         ]
     ]
     
 
     layout_history = [
-        [ sg.Frame(
-            layout = [
-                [ sg.Multiline(key="-HIST-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,40)) ]
-            ],
-            title="Command history",
-            relief=sg.RELIEF_FLAT,
-            font="helvetica 14"
+        [ 
+            sg.Frame(
+                layout = [
+                    [ sg.Multiline(key="-HIST-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,40)) ]
+                ],
+                title="Command history",
+                relief=sg.RELIEF_FLAT,
+                font="helvetica 14"
             )
         ]
     ]
@@ -443,7 +453,7 @@ def call_gui():
                         sg.Frame(
                             layout = [
                                 [
-                                    sg.Listbox([], key="-COMPARISON-PGM-NODES-", font=("helvetica", 16), enable_events=True, size=(15,16), background_color="linen")
+                                    sg.Listbox([], key="-COMPARISON-PGM-NODES-", font=("helvetica", 16), enable_events=True, size=(14,13), background_color="linen")
                                 ],
                             ],
                             title="SAMPLED NODES",
@@ -460,7 +470,7 @@ def call_gui():
                         sg.Frame(
                             layout = [
                                 [
-                                    sg.Listbox([], key="-COMPARISON-PGM-NODE-STATS-", font=("helvetica", 16), enable_events=True, size=(15,16))
+                                    sg.Listbox([], key="-COMPARISON-PGM-NODE-STATS-", font=("helvetica", 16), enable_events=True, size=(14,11))
                                 ],
                             ],
                             title="SUMMARY STAT.",
@@ -521,7 +531,7 @@ def call_gui():
                     [ sg.Tab("Infer", layout_infer, font=("Helvetica", 14)) ],
                     [ sg.Tab("Compare", layout_compare, font=("Helvetica", 14)) ],
                     [ sg.Tab("Validate", layout_validate, font=("Helvetica", 14)) ],
-                    [ sg.Tab("Save specs.", layout_save, font=("Helvetica", 14)) ]
+                    [ sg.Tab("Save specs.", layout_save, font=("Helvetica", 14)) ],
                 ],
                 font=("Helvetica", 14)
             )
@@ -539,9 +549,7 @@ def call_gui():
     ###############
     # Main window #
     ###############
-    
-    # margins=(0,0)
-    window = sg.Window("PhyloJunction", tabgrp, finalize=True, resizable=True, keep_on_top=False, element_justification="c", location=(0,0)) 
+    window = sg.Window("PhyloJunction", tabgrp, finalize=True, keep_on_top=True, element_justification="c", location=(0,0), resizable=True) 
     window['-CMD-'].Widget.config(insertbackground="white")
     window["-REPL-AVG-"].set_tooltip("test")
     # window.Size = (1050, 760) # resolution-dependent
@@ -606,7 +614,7 @@ def call_gui():
         if event in (None, "Quit", "Quit2", "Exit"):
             break
 
-
+        if event == "Grip": print("oi")
         #######################################################
         # Copying value of selected node in "Created node(s)" #
         #######################################################

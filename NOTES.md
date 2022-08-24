@@ -135,10 +135,10 @@ Remember to add this path to the PATH system variable if you want to call the ex
 Another option is to run the following command:
 
 ```
-python3 -m pip install --prefix ~/.local/bin -e .
+python3 -m pip install --prefix ~/.local -e .
 ```
 
-Which creates directories `bin/` (placing the executables therein) and `lib/python3.9/site-packages/` (placing the egg-link therein) inside `~/.local`.
+Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.
 This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
 
 You can test things worked by trying, from any directory:
@@ -147,9 +147,15 @@ You can test things worked by trying, from any directory:
 pjgui
 ```
 
+Important note: Sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computar architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+
+### Known issues
+
+* Installing `scipy` for python3.10 under M1 architecture is complicated
+
 ## Icon for launching PJ 
 
-On Linux, you will need to have (or create) `/home/foo/.local/share/applications/.desktop`, and put the following inside:
+On Linux, I created `/home/foo/.local/share/applications/.desktop`, and put the following inside:
 
 ```
 [Desktop Entry]
@@ -166,6 +172,10 @@ Categories=Application;
 The `nohup pjgui &` makes it so a terminal is not invoked upon execution.
 On Linux, the icon will show when searching "PhyloJunction" with the dock (command key).
 You can make it a favorite and pin it to the taskbar.
+
+On Mac OS X, PySimpleGUI provides the `use_custom_titlebar=True` (which automatically means `no_titlebar=True`). 
+These allow `titlebar_icon="some_icon.png"`, which places a .png file on the titlebar, but simultaneously makes the window non-mini/maximizable on Mac OS X.
+So PJ stays cross-platform with windows resizability, I won't be adding any titlebar icons.
 
 ## Documentation
 
