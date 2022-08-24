@@ -75,9 +75,9 @@ class RequireScalarError(Exception):
     def __init__(self, dn_name: str, arg: str) -> None: ...
 
 class ReplicateNumberError(Exception):
-    node_pgm_name: str
+    node_name: str
     message: str
-    def __init__(self, node_pgm_name, message: str = ...) -> None: ...
+    def __init__(self, node_name, message: str = ...) -> None: ...
 
 class DimensionalityWarning(Exception):
     rv_name: str

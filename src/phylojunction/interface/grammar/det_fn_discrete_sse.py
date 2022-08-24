@@ -38,7 +38,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
                 
                 # no plating supported
                 if node_pgm.repl_size > 1:
-                    raise ec.NoPlatingAllowedError("sse_rate", node_pgm.node_pgm_name)
+                    raise ec.NoPlatingAllowedError("sse_rate", node_pgm.node_name)
                 
                 v = node_pgm.value # list (I think before I also allowed numpy.ndarray, but not anymore)
                 

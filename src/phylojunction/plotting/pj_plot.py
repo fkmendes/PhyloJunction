@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt # type: ignore
 import seaborn as sns # type: ignore
 import pandas as pd # type: ignore
 import typing as ty
-from tabulate import tabulate
+from tabulate import tabulate # type: ignore
 
 # pj imports
 import phylojunction.pgm.pgm as pgm

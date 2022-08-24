@@ -14,7 +14,7 @@ import pandas as pd
 import pickle # type: ignore
 # from screeninfo import get_monitors
 # import pyautogui
-from tabulate import tabulate
+from tabulate import tabulate # type: ignore
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
 from matplotlib.figure import Figure # type: ignore
 from matplotlib.widgets import Slider, Button, RadioButtons
@@ -492,9 +492,9 @@ def call_gui():
     ]
 
 
-    ##################
-    # Layout compare #
-    ##################
+    ###################
+    # Layout validate #
+    ###################
     layout_validate = [
         []
     ]

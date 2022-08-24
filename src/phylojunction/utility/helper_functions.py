@@ -29,7 +29,7 @@ def autovivify(levels=1, final=dict) -> ty.DefaultDict:
             defaultdict(lambda: autovivify(levels - 1, final)))
 
 
-def create_str_defaultdict():
+def create_str_defaultdict() -> defaultdict:
     return defaultdict(str)
 
 

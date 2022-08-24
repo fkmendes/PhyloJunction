@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt # type: ignore
 import seaborn as sns # type: ignore
 import pandas as pd # type: ignore
 from matplotlib.figure import Figure # type: ignore
-from tabulate import tabulate
+from tabulate import tabulate # type: ignore
 
 
-def plot_violins(fig: Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xlab: ty.Optional[ty.List[str]]=None, ylab: ty.Optional[ty.List[str]]=None) -> None:
+def plot_violins(fig: Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xlab: ty.Optional[str]=None, ylab: ty.Optional[str]=None) -> None:
     """Draw violin plots on provided Axes object, for one variable (column 1) and two or more factors (column 2)
 
     Args:
