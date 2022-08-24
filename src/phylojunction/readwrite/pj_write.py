@@ -9,6 +9,7 @@ import pickle
 # pj imports
 from phylojunction.data.tree import AnnotatedTree
 import phylojunction.pgm.pgm as pgm
+import phylojunction.interface.cmd.cmd_parse as cmd
 
 # for debugging
 from tabulate import tabulate # type: ignore
@@ -40,127 +41,256 @@ def write_data_df(outfile_handle: ty.IO, data_df: pd.DataFrame, format="csv") ->
         data_df.to_csv(outfile_handle, sep="\t", index=False)
 
 
-# TODO: move prep_data_df to separate file, pj_parse 
-def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]:
+def initialize_scalar_dataframe(sample_size: int, n_repl: int=1, summaries_avg_over_repl: bool=False) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        sample_size (int): Number of samples (i.e., independent full model simulations)
+        n_repl (int, optional):  How many times the scalar variable is replicated. Defaults to 1.
+        summaries_avg_over_repl (bool, optional): Dataframe will hold statistics (avg., st. dev.) summarized over replicates. Defaults to False.
+
+    Returns:
+        pd.DataFrame:  DataFrame with certain columns holding 0 or 0.0 values
+    """
+
+    return_df = pd.DataFrame()
+    
+    # summarizing (avg and stdev, which is why the 2*) over replicates
+    if summaries_avg_over_repl:
+        return_df["sample"] = np.array([(i+1) for i in range(sample_size*2)]).flatten()
+        return_df["summary"] = np.array([summary for x in range(sample_size) for summary in ["average", "std. dev."]])
+    
+    # scalar value for all replicates and all samples
+    else:
+        return_df["sample"] = np.array([np.repeat(i+1, n_repl) for i in range(sample_size)]).flatten()
+        return_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(sample_size)]).flatten()
+
+    return return_df
+
+
+def initialize_tree_dataframe(sample_size: int, n_repl: int=1, summaries: bool=False, summaries_avg_over_repl: bool=False) -> pd.DataFrame:
+    """Initialize pandas DataFrame that will hold some kind of tree information (e.g., Newick string or some summary statistic)
+
+    Args:
+        sample_size (int): Number of samples (i.e., independent full model simulations)
+        n_repl (int, optional): How many times the tree is replicated. Defaults to 1.
+        summaries (bool, optional): Dataframe will hold individual-tree statistics. Defaults to False.
+        summaries_avg_over_repl (bool, optional): Dataframe will hold statistics summarized over replicates. Defaults to False.
+
+    Returns:
+        pd.DataFrame: DataFrame with certain columns holding 0 or 0.0 values
+    """
+
+    return_df = pd.DataFrame()
+
+    # tree summaries
+    if summaries:
+        # summaries for all replicated trees for all samples
+        if not summaries_avg_over_repl:
+            float_dummy_list = np.array([0.0 for i in range(n_repl * sample_size)])
+            int_dummy_list = np.array([0 for i in range(n_repl * sample_size)])
+            return_df["sample"] = np.array([np.repeat(i+1, n_repl) for i in range(sample_size)]).flatten()
+            return_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(sample_size)]).flatten()
+            return_df["origin_age"] = float_dummy_list
+            return_df["root_age"] = float_dummy_list
+            return_df["n_total"] = int_dummy_list
+            return_df["n_extant"] = int_dummy_list
+            return_df["n_extinct"] = int_dummy_list
+            return_df["n_sa"] = int_dummy_list
+    
+        # summarizing stats over replicates
+        else:
+            float_dummy_list = np.array([0.0 for i in range(2 * sample_size)])
+            return_df["sample"] = np.array([i+1 for x in range(sample_size) for i in [x, x]]) # 1, 1, 2, 2, 3, 3...
+            return_df["summary"] = np.array([summary for x in range(sample_size) for summary in ["average", "std. dev."]]) # average, std. dev., average, std. dev....
+            return_df["origin_age"] = float_dummy_list
+            return_df["root_age"] = float_dummy_list
+            return_df["n_total"] = float_dummy_list
+            return_df["n_extant"] = float_dummy_list
+            return_df["n_extinct"] = float_dummy_list
+            return_df["n_sa"] = float_dummy_list
+
+    # tree newick strings, for all replicates and all samples
+    else:
+        return_df["sample"] = np.array([np.repeat(i+1, n_repl) for i in range(sample_size)]).flatten()
+        return_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(sample_size)]).flatten()
+
+    return return_df
+
+
+def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]], ty.List[ty.Dict[str, pd.DataFrame]]]:
     """Return two pandas DataFrame's, with scalar and tree random variables
     
     Arguments
+        sample_size (int): Sample size (each sample is a simulation that can then have replicated nodes)
         node_pgm_list (pgm.NodePGM):
 
     Returns
         (tuple): Tuple with two lists as elements, one with file-suffix strings, another with pandas.DataFrame's   
     """
-    
-    data_df_names_list: ty.List[str] = [] # return
-    data_df_list: ty.List[pd.DataFrame] = [] # return
+
+    sample_size = pgm_obj.sample_size
+    node_pgm_list = pgm_obj.get_sorted_node_pgm_list()
+
+    # tree nodes (one dataframe per different tree node)
+    tree_value_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1].tsv": pd.DataFrame with newick strings, for all replicates and samples, "[tr_node_name2].tsv": ... }
+    tree_summary_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1]_summaries.tsv": pd.DataFrame with summary stats, for all replicates and samples }
+    tree_repl_summary_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1]_replicate_summary.tsv": pd.DataFrame summary stats averaged over replicates, for all samples }
 
     # creating object to hold r.v. values and summaries
-    scalar_data_df = pd.DataFrame()
-    scalar_repl_df = pd.DataFrame()
-    scalar_repl_summary_df = pd.DataFrame()
-    tree_data_df = pd.DataFrame()
-    tree_data_summary_df = pd.DataFrame()
-    tree_repl_summary_df = pd.DataFrame()
-
-    there_is_scalar_repl_df = False
-    there_is_tree_repl_summary_df = False
+    scalar_constant_df: pd.DataFrame = pd.DataFrame()
+    scalar_value_df_dict: ty.Dict[int, pd.DataFrame] = dict() # { # of replicates: pd.DataFrame summary stats averaged over replicates, for all samples ... }
+    scalar_repl_summary_df: pd.DataFrame = pd.DataFrame()
+    
+    # NOTE: we have a separate dataframe for each tree whose replicates are being summarized, but a single one for scalars
+    # because a user might have trees with very different summary stats; scalars always have only average and std. dev.
 
     # main loop: nodes!
     for node_pgm in node_pgm_list:
-        rv_name = node_pgm.node_pgm_name
+        rv_name = node_pgm.node_name
         node_val = node_pgm.value # list
-        n_sim = len(node_pgm)
         n_repl = node_pgm.repl_size
-        
-        # if stochastic node was sampled and at least one value was indeed saved in list
-        if node_pgm.is_sampled and node_val:
 
-            # trees go in separate files
-            if isinstance(node_val[0], AnnotatedTree):
+        # if stochastic node is constant and at least one value was indeed saved in list
+        if isinstance(node_pgm, pgm.StochasticNodePGM) and node_val:
+            ################################
+            # Fixed-value stochastic nodes #
+            ################################
+
+            # scalar constants (no support for replication via 2D-lists yet)
+            if isinstance(node_val[0], (str, int, float, np.float64)) and not node_pgm.is_sampled:                
+                if scalar_constant_df.empty:
+                    scalar_constant_df = initialize_scalar_dataframe(sample_size, n_repl=1, summaries_avg_over_repl=False)
+                
+                if len(node_val) > 1:
+                    scalar_constant_df[rv_name] = node_val
+                # multiply single value up to sample size
+                else:
+                    scalar_constant_df[rv_name] = [node_val[0] for i in range(sample_size)]
+            
+
+            ############################
+            # Sampled stochastic nodes #
+            ############################
+
+            ###########
+            # Scalars #
+            ###########
+            if isinstance(node_val[0], (str, int, float, np.float64)) and node_pgm.is_sampled:
+                
+                #################################################################
+                # DataFrame holding scalar values (replicates if there are any) #
+                # (one per total number of replicates)                          #
+                #################################################################
+                
+                try:
+                    scalar_value_df_dict[n_repl].empty
+                except:
+                    scalar_value_df_dict[n_repl] = initialize_scalar_dataframe(sample_size, n_repl=n_repl, summaries_avg_over_repl=False)
+                    
+                ################################################
+                # DataFrame holding scalar replicate summaries #
+                ################################################
+                if n_repl > 1 and scalar_repl_summary_df.empty:
+                    scalar_repl_summary_df = initialize_scalar_dataframe(sample_size, n_repl=n_repl, summaries_avg_over_repl=True)
+                     
+                # below we populate both replicate-value and replicate-summary dataframes
+                j = 0
+                repls_values_list: ty.List[float] = []
+                repls_avg_sd_list: ty.List[float] = []
+                for i in range(sample_size):
+                    start_idx = i * n_repl
+                    end_idx = start_idx + n_repl
+                    ith_sim_repls = node_val[start_idx:end_idx]
+                    repls_values_list += ith_sim_repls
+
+                    if n_repl > 1:
+                        repls_avg_sd_list.append(stat.mean(ith_sim_repls))
+                        sd = stat.stdev(ith_sim_repls)
+                        
+                        if sd < 1E-10:
+                            repls_avg_sd_list.append(0.0)
+                        
+                        else:
+                            repls_avg_sd_list.append(sd)
+                
+                scalar_value_df_dict[n_repl][rv_name] = repls_values_list # populating replicate-value dataframe and storing it for its number of replicates
+                
+                if n_repl > 1:
+                    scalar_repl_summary_df[rv_name] = repls_avg_sd_list # populating replicate-summary dataframe
+
+
+            #########
+            # Trees #
+            #########
+            elif isinstance(node_val[0], AnnotatedTree):                
+                
                 ######################################
                 # DataFrame holding trees themselves #
+                # (one per tree node)                #
                 ######################################
-                tree_data_df["sample"] = np.array([np.repeat(i+1, n_repl) for i in range(n_sim)]).flatten()
-                tree_data_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(n_sim)]).flatten()
-                tree_data_df["tree"] = [
-                    val.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True).strip("\"").strip() \
-                        for val in node_val
+                try:
+                    tree_value_df_dict[rv_name].empty
+                except:
+                    tree_value_df_dict[rv_name] = initialize_tree_dataframe(sample_size, n_repl=n_repl,
+                                                                            summaries=False,
+                                                                            summaries_avg_over_repl=False)
+                tree_value_df_dict[rv_name][rv_name] = [
+                    ith_val.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True).strip("\"").strip() \
+                        for ith_val in node_val
                 ]
+
                 
                 ####################################
                 # DataFrame holding tree summaries #
+                # (one per tree node)              #
                 ####################################
-                # initialization and some population
-                nrow_tree_data_df = len(tree_data_df.index)
-                int_dummy_list = np.array([0 for i in range(nrow_tree_data_df)])
-                float_dummy_list = np.array([0.0 for i in range(nrow_tree_data_df)])
-                tree_data_summary_df["sample"] = tree_data_df["sample"]
-                tree_data_summary_df["replicate"] = tree_data_df["replicate"]
-                tree_data_summary_df["origin_age"] = float_dummy_list
-                tree_data_summary_df["root_age"] = float_dummy_list
-                tree_data_summary_df["n_total"] = int_dummy_list
-                tree_data_summary_df["n_extant"] = int_dummy_list
-                tree_data_summary_df["n_extinct"] = int_dummy_list
-                tree_data_summary_df["n_sa"] = int_dummy_list
-                
-                # deprecated
-                # tree_data_summary_df = pd.DataFrame({
-                #     "simulation": tree_data_df["simulation"],
-                #     "replicate": tree_data_df["replicate"],
-                #     "origin_age": float_dummy_list,
-                #     "root_age": float_dummy_list,
-                #     "n_total": int_dummy_list,
-                #     "n_extant": int_dummy_list,
-                #     "n_extinct": int_dummy_list,
-                #     "n_sa": int_dummy_list,
-                # })
+                try:
+                    tree_summary_df_dict[rv_name].empty
+                except:
+                    tree_summary_df_dict[rv_name] = initialize_tree_dataframe(sample_size, n_repl=n_repl,
+                                                                                   summaries=True,
+                                                                                   summaries_avg_over_repl=False)
 
-                # if there is more than one state, we paste another subdataframe to the main one
                 total_n_states = node_val[0].state_count
-                if total_n_states > 1:
-                    n_in_state_subdf_dict: ty.Dict[str, np.array] = dict()
 
-                    for ith_state in range(total_n_states):
-                        n_in_state_subdf_dict["n_" + str(ith_state)] = int_dummy_list
+                # populating tree_summary_df_dict, iterating over samples and replicates
+                idx = 0
+                for replicate_tree in node_val:
+                    tree_summary_df_dict[rv_name].at[idx, "root_age"] = "{:,.4f}".format(replicate_tree.root_age)
                     
-                    n_in_state_subdf = pd.DataFrame(n_in_state_subdf_dict)
-                    tree_data_summary_df = pd.concat((tree_data_summary_df, n_in_state_subdf), axis=1)
-
-                # populating tree_data_summary_df
-                for idx, val in enumerate(node_val):
-                    tree_data_summary_df.at[idx, "root_age"] = "{:,.4f}".format(val.root_age)
-                    if val.origin_age:
-                        tree_data_summary_df.at[idx, "origin_age"] = "{:,.4f}".format(val.origin_age)     
-                    tree_data_summary_df.at[idx, "n_total"] = len(val.tree.leaf_nodes()) - val.n_sa # conservative: should match n_extant + n_extinct!
-                    tree_data_summary_df.at[idx, "n_extant"] = val.n_extant_terminal_nodes
-                    tree_data_summary_df.at[idx, "n_extinct"] = val.n_extinct_terminal_nodes
-                    tree_data_summary_df.at[idx, "n_sa"] = val.n_sa
+                    if replicate_tree.origin_age:
+                        tree_summary_df_dict[rv_name].at[idx, "origin_age"] = "{:,.4f}".format(replicate_tree.origin_age)     
+                    
+                    tree_summary_df_dict[rv_name].at[idx, "n_total"] = len(replicate_tree.tree.leaf_nodes()) - replicate_tree.n_sa # conservative: should match n_extant + n_extinct!
+                    tree_summary_df_dict[rv_name].at[idx, "n_extant"] = replicate_tree.n_extant_terminal_nodes
+                    tree_summary_df_dict[rv_name].at[idx, "n_extinct"] = replicate_tree.n_extinct_terminal_nodes
+                    tree_summary_df_dict[rv_name].at[idx, "n_sa"] = replicate_tree.n_sa
+                    
                     # if we have more than one state, we will have counts for leaves in the different states
                     # NOTE: at the moment, all leaves are counted (in the future, maybe just the sampled ones)
                     if total_n_states > 1:
-                        for ith_state in range(val.state_count):
-                            tree_data_summary_df.at[idx, "n_" + str(ith_state)] = val.state_count_dict[ith_state]
+                        for ith_state in range(replicate_tree.state_count):
+                            tree_summary_df_dict[rv_name].at[i, "n_" + str(ith_state)] = replicate_tree.state_count_dict[ith_state]
 
-                # replicates (tree plating)!
+                    idx += 1
+
+
+                ##############################################
+                # DataFrame holding tree replicate summaries #
+                # (one per tree node)                        #
+                ##############################################
                 if n_repl > 1:
-                    ##############################################
-                    # DataFrame holding tree replicate summaries #
-                    ##############################################
-                    there_is_tree_repl_summary_df = True
-                    # initialization and some population
-                    float_dummy_list = np.array([0.0 for i in range(2 * n_sim)])
-                    tree_repl_summary_df["sample"] = np.array([i+1 for x in range(n_sim) for i in [x, x]]) # 1, 1, 2, 2, 3, 3...
-                    tree_repl_summary_df["summary"] = np.array([summary for x in range(n_sim) for summary in ["average", "std. dev."]]) # average, std. dev., average, std. dev....
-                    tree_repl_summary_df["origin_age"] = float_dummy_list
-                    tree_repl_summary_df["root_age"] = float_dummy_list
-                    tree_repl_summary_df["n_total"] = float_dummy_list
-                    tree_repl_summary_df["n_extant"] = float_dummy_list
-                    tree_repl_summary_df["n_extinct"] = float_dummy_list
-                    tree_repl_summary_df["n_sa"] = float_dummy_list
-
+                    try:
+                        tree_repl_summary_df_dict[rv_name].empty
+                    except:
+                        tree_repl_summary_df_dict[rv_name] = initialize_tree_dataframe(sample_size, n_repl=n_repl,
+                                                                         summaries=True,
+                                                                         summaries_avg_over_repl=True)
+                        
                     repls_all_stats_dict: ty.Dict[str, float] = dict() # all replicates
                     j = 0
-                    for i in range(n_sim):
+                    for i in range(sample_size):
                         start_idx = i * n_repl
                         end_idx = start_idx + n_repl
                         ith_sim_repls = node_val[start_idx:end_idx]
@@ -185,86 +315,116 @@ def prep_data_df(node_pgm_list: ty.List[pgm.NodePGM]) -> ty.Tuple[ty.List[str], 
                                     repls_all_stats_dict[st] = [ float_stat_v ]
 
                         if "Origin age" in repls_all_stats_dict:
-                            tree_repl_summary_df.at[j, "origin_age"] = stat.mean(repls_all_stats_dict["Origin age"])
-                            tree_repl_summary_df.at[j+1, "origin_age"] = stat.stdev(repls_all_stats_dict["Origin age"])
-                        tree_repl_summary_df.at[j, "root_age"] = stat.mean(repls_all_stats_dict["Root age"])
-                        tree_repl_summary_df.at[j+1, "root_age"] = stat.stdev(repls_all_stats_dict["Root age"])
-                        tree_repl_summary_df.at[j, "n_total"] = stat.mean(repls_all_stats_dict["Total taxon count"])
-                        tree_repl_summary_df.at[j+1, "n_total"] = stat.stdev(repls_all_stats_dict["Total taxon count"])
-                        tree_repl_summary_df.at[j, "n_extant"] = stat.mean(repls_all_stats_dict["Extant taxon count"])
-                        tree_repl_summary_df.at[j+1, "n_extant"] = stat.stdev(repls_all_stats_dict["Extant taxon count"])
-                        tree_repl_summary_df.at[j, "n_extinct"] = stat.mean(repls_all_stats_dict["Extinct taxon count"])
-                        tree_repl_summary_df.at[j+1, "n_extinct"] = stat.stdev(repls_all_stats_dict["Extinct taxon count"])
-                        tree_repl_summary_df.at[j, "n_sa"] = stat.mean(repls_all_stats_dict["Direct ancestor count"])
-                        tree_repl_summary_df.at[j+1, "n_sa"] = stat.stdev(repls_all_stats_dict["Direct ancestor count"])
+                            tree_repl_summary_df_dict[rv_name].at[j, "origin_age"] = "{:,.5f}".format(stat.mean(repls_all_stats_dict["Origin age"]))
+                            sd = stat.stdev(repls_all_stats_dict["Origin age"])
+                            
+                            if sd < 1E-10:
+                                tree_repl_summary_df_dict[rv_name].at[j+1, "origin_age"] = 0.0
+                            else:
+                                tree_repl_summary_df_dict[rv_name].at[j+1, "origin_age"] = "{:,.5f}".format(sd)
+                            
+                        tree_repl_summary_df_dict[rv_name].at[j, "root_age"] = "{:,.5f}".format(stat.mean(repls_all_stats_dict["Root age"]))
+                        sd = stat.stdev(repls_all_stats_dict["Root age"])
+                            
+                        if sd < 1E-10:
+                                tree_repl_summary_df_dict[rv_name].at[j+1, "root_age"] = 0.0
+                        else:
+                            tree_repl_summary_df_dict[rv_name].at[j+1, "root_age"] = "{:,.5f}".format(sd)
+                        
+                        tree_repl_summary_df_dict[rv_name].at[j, "n_total"] = stat.mean(repls_all_stats_dict["Total taxon count"])
+                        tree_repl_summary_df_dict[rv_name].at[j+1, "n_total"] = "{:,.5f}".format(stat.stdev(repls_all_stats_dict["Total taxon count"]))
+                        tree_repl_summary_df_dict[rv_name].at[j, "n_extant"] = stat.mean(repls_all_stats_dict["Extant taxon count"])
+                        tree_repl_summary_df_dict[rv_name].at[j+1, "n_extant"] = "{:,.5f}".format(stat.stdev(repls_all_stats_dict["Extant taxon count"]))
+                        tree_repl_summary_df_dict[rv_name].at[j, "n_extinct"] = stat.mean(repls_all_stats_dict["Extinct taxon count"])
+                        tree_repl_summary_df_dict[rv_name].at[j+1, "n_extinct"] = "{:,.5f}".format(stat.stdev(repls_all_stats_dict["Extinct taxon count"]))
+                        tree_repl_summary_df_dict[rv_name].at[j, "n_sa"] = stat.mean(repls_all_stats_dict["Direct ancestor count"])
+                        tree_repl_summary_df_dict[rv_name].at[j+1, "n_sa"] = "{:,.5f}".format(stat.stdev(repls_all_stats_dict["Direct ancestor count"]))
                         j += 2
-                
-                # debugging
-                # print(tabulate(tree_repl_summary_df, tablefmt="plain", showindex=False).lstrip())
 
-                ############################
-                # Finally adding to return #
-                ############################
-                data_df_list.append(tree_data_df)
-                data_df_names_list.append("trs.tsv")
-                data_df_list.append(tree_data_summary_df)
-                data_df_names_list.append("trs_summaries.tsv")
-                if there_is_tree_repl_summary_df:
-                    data_df_list.append(tree_repl_summary_df)
-                    data_df_names_list.append("trs_replicate_summary.tsv")
+    # debugging
+    # print("\n\nPrinting dataframe for scalars with fixed value:\n")
+    # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(), tablefmt="pretty", showindex=False).lstrip())
+    
+    # for n_repl, scalar_df in scalar_value_df_dict.items():
+    #     print("\n\nPrinting dataframe with scalars with " + str(n_repl) + " replicate(s):\n")
+    #     print(tabulate(scalar_df, scalar_df.head(), tablefmt="pretty", showindex=False).lstrip())
 
-            # can only be scalar at the moment, if not tree
-            else:
-                scalar_data_df["simulation"] = [i for i in range(n_sim)]
+    # print("\n\nPrinting dataframe with scalar replicate summaries:\n")
+    # print(tabulate(scalar_repl_summary_df, scalar_repl_summary_df.head(), tablefmt="pretty", showindex=False).lstrip())
+    
+    # print("\n\nPrinting dataframe with tree values, with replicates if those exist:\n")
+    # for tr_node_name, tr_df in tree_value_df_dict.items():
+    #     print(tabulate(tr_df, tr_df.head(), tablefmt="plain", showindex=False).lstrip() + "\n")
 
-                # single replicate per sample
-                if n_repl == 1:
-                    scalar_data_df[rv_name] = node_val
+    # print("\n\nPrinting dataframe with tree summaries, with replicates if those exist:\n")
+    # for tr_node_name, tr_df in tree_summary_df_dict.items():
+    #     print(tabulate(tr_df, tr_df.head(), tablefmt="pretty", showindex=False).lstrip() + "\n")
 
-                # replicates (plating)!
-                else:
-                    there_is_scalar_repl_df = True
-                    #############################################
-                    # DataFrame holding scalar replicate values #
-                    #############################################
-                    # initialization and some population
-                    scalar_repl_df["sample"] = np.array([np.repeat(i+1, n_repl) for i in range(n_sim)]).flatten()
-                    scalar_repl_df["replicate"] = np.array([[i+1 for i in range(n_repl)] for j in range(n_sim)]).flatten()
-                    
-                    ################################################
-                    # DataFrame holding scalar replicate summaries #
-                    ################################################
-                    # initialization and some population
-                    scalar_repl_summary_df["sample"] = np.array([i+1 for x in range(n_sim) for i in [x, x]]) # 1, 1, 2, 2, 3, 3...
-                    scalar_repl_summary_df["summary"] = np.array([summary for x in range(n_sim) for summary in ["average", "std. dev."]]) # average, std. dev., average, std. dev....
-                    
-                    # below we populate both replicate-value and replicate-summary dataframes
-                    j = 0
-                    repls_values_list: ty.List[float] = []
-                    repls_avg_sd_list: ty.List[float] = []
-                    for i in range(n_sim):
-                        start_idx = i * n_repl
-                        end_idx = start_idx + n_repl
-                        ith_sim_repls = node_val[start_idx:end_idx]
-                        repls_values_list += ith_sim_repls
-                        repls_avg_sd_list.append(stat.mean(ith_sim_repls))
-                        repls_avg_sd_list.append(stat.stdev(ith_sim_repls))
-                    
-                    scalar_repl_df[rv_name] = repls_values_list # populating replicate-value dataframe
-                    scalar_repl_summary_df[rv_name] = repls_avg_sd_list # populating replicate-summary dataframe
+    # print("\n\nPrinting dataframe with tree summaries summarized over replicates:\n")
+    # for tr_node_name, tr_df in tree_repl_summary_df_dict.items():
+    #     print(tr_node_name)
+    #     print(tabulate(tr_df, tr_df.head(), tablefmt="pretty", showindex=False).lstrip())
 
-    # we wait until all nodes are seen before adding scalar_data_df and potentially scalar_repl_summary_df to the top of the return list
-    scalar_dfs_list: ty.List[pd.DataFrame] = [ scalar_data_df ]
-    scalar_dfs_names_list: ty.List[pd.str] = [ "rvs.csv" ]
-    if there_is_scalar_repl_df:
-        scalar_dfs_list += [ scalar_repl_df, scalar_repl_summary_df ]
-        scalar_dfs_names_list += [ "rvs_replicates.csv", "rvs_replicate_summary.csv" ]
+    ############################
+    # Finally adding to return #
+    ############################
+    scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]] = []
+    tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]] = []
 
-    data_df_list = scalar_dfs_list + data_df_list
-    data_df_names_list = scalar_dfs_names_list + data_df_names_list
+    scalar_output_stash.extend([scalar_constant_df,
+                               scalar_value_df_dict,
+                               scalar_repl_summary_df]
+    )
 
-    # return scalar_data_df, tree_data_df
-    return data_df_names_list, data_df_list
+    tree_output_stash.extend([tree_value_df_dict,
+                             tree_summary_df_dict,
+                             tree_repl_summary_df_dict]
+    )
+
+    return scalar_output_stash, tree_output_stash
+
+
+def prep_data_filepaths_dfs(scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]], tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]]) -> ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]:
+    """Prepare list of file paths and list of pandas dataframes from tuples returned by prep_data_df()
+
+    Args:
+        scalar_output_stash (ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]]): List of either pandas' dataframes, or dictionaries with number of replicates as keys, and pandas' dataframes as values. These contain scalar simulated data.
+        tree_output_stash (ty.List[ty.Dict[str, pd.DataFrame]]): List of dictionaries with tree node names as keys, and pandas' dataframes as values. These contains tree simulated data.
+
+    Returns:
+        ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]: List of filepath strings and pandas' dataframes to be written to disk
+    """
+    
+    output_fp_list: ty.List[str] = []
+    output_df_list: ty.List[pd.DataFrame] = []
+    
+    # scalar variables
+    if not scalar_output_stash[0].empty:
+        output_fp_list.append("scalar_constants.csv")
+        output_df_list.append(scalar_output_stash[0])
+    if scalar_output_stash[1]:
+        for n_repl, df in scalar_output_stash[1].items():
+            output_fp_list.append("scalar_rvs_" + str(n_repl) + "repl.csv")
+            output_df_list.append(df)
+    if not scalar_output_stash[2].empty:
+        output_fp_list.append("scalar_rvs_stats_summary.csv")
+        output_df_list.append(scalar_output_stash[2])
+
+    # tree variables
+    if tree_output_stash[0]:
+        for n_repl, df in tree_output_stash[0].items():
+            output_fp_list.append(n_repl + ".tsv")
+            output_df_list.append(df)
+    if tree_output_stash[1]:
+        for n_repl, df in tree_output_stash[1].items():
+            output_fp_list.append(n_repl + "_stats.csv")
+            output_df_list.append(df)
+    if tree_output_stash[1]:
+        for n_repl, df in tree_output_stash[2].items():
+            output_fp_list.append(n_repl + "_stats_summary.csv")
+            output_df_list.append(df)
+
+    return output_fp_list, output_df_list
 
 
 def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="") -> None:
@@ -281,27 +441,31 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
 
     sorted_node_pgm_list: ty.List[pgm.NodePGM] = pgm_obj.get_sorted_node_pgm_list()
 
-    # populating data df that will be dumped and their file names
-    data_df_names_list: ty.List[str]
-    data_df_list: ty.List[pd.DataFrame]
-    data_df_names_list, data_df_list = prep_data_df(sorted_node_pgm_list) # still prefixless
+    # populating data stashes that will be dumped and their file names
+    scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]]
+    tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]]
+    output_fp_list: ty.List[str]
+    output_df_list: ty.List[pd.DataFrame]
 
+    scalar_output_stash, tree_output_stash = prep_data_df(pgm_obj) # still prefixless
+    output_fp_list, output_df_list = prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)
+    
     # sort out file path
     if not dir_string.endswith("/"):
         dir_string += "/"
     
     output_file_path = dir_string    
+    
     if prefix:
         output_file_path += prefix + "_"
 
     # full file paths
-    data_df_full_fp_list = [output_file_path + fn for fn in data_df_names_list]
+    data_df_full_fp_list = [output_file_path + fn for fn in output_fp_list]
 
     # debugging
-    # print("data_df_full_fp_list:")
-    # print("    " + "\n    ".join(n for n in data_df_full_fp_list))
-    # print("_trs_summaries.tsv")
-    # print(tabulate(data_df_list[2], headers="keys", tablefmt="pretty"))
+    # print("\n\n" + "\n".join(data_df_full_fp_list))
+    # for df in output_df_list:
+    #     print(tabulate(df, df.head(), tablefmt="plain", showindex=False).lstrip())
     
     # write!
     for idx, full_fp in enumerate(data_df_full_fp_list):
@@ -313,7 +477,7 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
             elif full_fp.endswith("tsv"):
                 f = "tsv"
             
-            write_data_df(data_out, data_df_list[idx], format=f)
+            write_data_df(data_out, output_df_list[idx], format=f)
 
 
 def dump_serialized_pgm(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="") -> None:
@@ -349,7 +513,7 @@ def get_write_inference_rev_scripts(all_sims_model_spec_list: ty.List[str], all_
         list of str(s): A list of full .Rev script string specifications, one per simulation
     """
     
-    def _iterate_specs_over_sims(n: int):
+    def iterate_specs_over_sims(n: int):
         """
         Yields:
             (str): String specifying rev script for one simulation
@@ -363,14 +527,14 @@ def get_write_inference_rev_scripts(all_sims_model_spec_list: ty.List[str], all_
             yield _ith_string
 
     n_sim = len(all_sims_model_spec_list)
-    _inference_root_dir, _scripts_dir, _results_dir = dir_list
+    inference_root_dir, scripts_dir, results_dir = dir_list
 
-    _prefix = str()
-    if _prefix: _prefix += "_"
-    else: _prefix = ""         
+    prefix = str()
+    if prefix: prefix += "_"
+    else: prefix = ""         
 
     # return
-    _all_sims_spec_strs_list = [spec_str for spec_str in _iterate_specs_over_sims(n_sim)]
+    all_sims_spec_strs_list = [spec_str for spec_str in iterate_specs_over_sims(n_sim)]
 
     # in addition to returning rev script strings (one per simulation),
     # we also write to file
@@ -381,9 +545,23 @@ def get_write_inference_rev_scripts(all_sims_model_spec_list: ty.List[str], all_
 
         for i in range(n_sim):
             _ith_file_name = prefix + "sim_" + str(i) + ".rev"
-            _ith_file_path = _scripts_dir + _ith_file_name            
+            _ith_file_path = scripts_dir + _ith_file_name            
             
             with open(_ith_file_path, "w") as rev_out:
-                rev_out.write(_all_sims_spec_strs_list[i])
+                rev_out.write(all_sims_spec_strs_list[i])
         
-    return _all_sims_spec_strs_list
+    return all_sims_spec_strs_list
+
+
+if __name__ == "__main__":
+    # testing below
+
+    # initializing model
+    model_fp = "examples/multiple_scalar_tree_plated.pj"
+    pgm_obj = cmd.script2pgm(model_fp, in_pj_file=True)
+
+    # either: to see what's inside dataframes (uncomment debugging)
+    prep_data_df(pgm_obj)
+    
+    # or: to see file names and dataframes after organized (uncomment debugging)
+    # dump_pgm_data("./", pgm_obj, prefix="")

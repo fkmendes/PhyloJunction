@@ -48,8 +48,8 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
     # Debugging space #
     ###################
     # seeing trees in script strings in main()
-    # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():    
-        # if node_pgm_name == "trs":
+    # for node_name, node_pgm in pgm_obj.node_name_val_dict.items():    
+        # if node_name == "trs":
         #     fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
         #                              # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
         #     ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
@@ -310,7 +310,7 @@ def parse_deterministic_function_assignment(pgm_obj: pgm.ProbabilisticGraphicalM
         # this check is just to make sure we are adding a class
         # deriving from NodePGM
         # if isinstance(det_obj, NodePGM):
-        #     det_obj.node_pgm_name = det_nd_name
+        #     det_obj.node_name = det_nd_name
         #     det_obj.parent_nodes = parent_pgm_nodes
         #     det_nd_pgm = det_obj
         #     pgm_obj.add_node(det_nd_pgm)

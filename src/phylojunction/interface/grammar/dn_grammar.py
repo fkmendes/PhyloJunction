@@ -83,7 +83,7 @@ class PJDnGrammar():
                     
                     # needed for building inference specifications
                     if isinstance(val[0], pgm.StochasticNodePGM):
-                        parent_node_tracker[arg] = val[0].node_pgm_name 
+                        parent_node_tracker[arg] = val[0].node_name 
                     
                     _extracted_val = pgm.extract_value_from_nodepgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
 
@@ -138,7 +138,7 @@ class PJDnGrammar():
                     
                     # needed for building inference specifications
                     if isinstance(val[0], pgm.StochasticNodePGM):
-                        parent_node_tracker[arg] = val[0].node_pgm_name
+                        parent_node_tracker[arg] = val[0].node_name
                     
                     _extracted_val = pgm.extract_value_from_nodepgm(val)
 
@@ -186,7 +186,7 @@ class PJDnGrammar():
 
                     # needed for building inference specifications
                     if isinstance(val[0], pgm.StochasticNodePGM):
-                        parent_node_tracker[arg] = val[0].node_pgm_name # needed for building inference specifications
+                        parent_node_tracker[arg] = val[0].node_name # needed for building inference specifications
                     
                     _extracted_val = pgm.extract_value_from_nodepgm(val)
 
@@ -238,7 +238,7 @@ class PJDnGrammar():
 
                     # needed for building inference specifications
                     if isinstance(val[0], pgm.StochasticNodePGM):
-                        parent_node_tracker[arg] = val[0].node_pgm_name
+                        parent_node_tracker[arg] = val[0].node_name
                     
                     _extracted_val = pgm.extract_value_from_nodepgm(val)
 
@@ -293,7 +293,7 @@ class PJDnGrammar():
                     
                     # needed for building inference specifications
                     if isinstance(val[0], pgm.StochasticNodePGM):
-                        parent_node_tracker[arg] = val[0].node_pgm_name # needed for building inference specifications
+                        parent_node_tracker[arg] = val[0].node_name # needed for building inference specifications
                     
                     _extracted_val = pgm.extract_value_from_nodepgm(val)
 

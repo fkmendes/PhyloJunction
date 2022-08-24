@@ -183,6 +183,13 @@ class FIGRatesManager:
         self.epsilon = epsilon
 
 
+    def __len__(self) -> int:
+        if isinstance(self.atomic_rate_params_matrix, list):
+            return sum([ len(list_atomic_rates_in_time_slice) for list_atomic_rates_in_time_slice in self.atomic_rate_params_matrix])
+        else:
+            return 0
+
+
     def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]]):
         # original implementation (2nd dimension were states, rather than all rates from all states together)
         # for k, s_state_list in enumerate(matrix_atomic_rate_params):
@@ -276,6 +283,7 @@ class MacroevolEventHandler():
                 if self.seed_age and isinstance(self.slice_t_ends, list):
                     time_slice_t_end = ty.cast(float, self.slice_t_ends[k])
                     self.str_representation += "    Time slice " + str(k + 1) + " (time = " + str(round(time_slice_t_end,4)) + ", age = " + str(round(self.slice_age_ends[k],4)) + ")\n"
+                
                 else:
                     self.str_representation += "    Time slice " + str(k + 1) + " (age = " + str(round(self.slice_age_ends[k],4)) + ")\n"
 
@@ -393,6 +401,14 @@ class MacroevolEventHandler():
             print("   " + "   ".join(str(ap) for ap in all_states_atomic_rate_params))
 
         return random.choices( [ atomic_param for atomic_param in all_states_atomic_rate_params ], weights=ws)
+
+
+    def __len__(self) -> int:
+        if self.fig_rates_manager:
+            return len(self.fig_rates_manager)
+
+        else:
+            return 0
 
     def __str__(self) -> str:
         return self.str_representation

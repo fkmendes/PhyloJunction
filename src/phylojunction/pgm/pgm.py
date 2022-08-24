@@ -67,7 +67,7 @@ class ProbabilisticGraphicalModel():
 
         replacing_node = False
         if node_pgm in self.node_dict:
-            # removes existing node with that node_pgm_name
+            # removes existing node with that node_name
             call_order_idx = node_pgm.call_order_idx
             del self.node_dict[node_pgm]
             replacing_node = True
@@ -81,13 +81,13 @@ class ProbabilisticGraphicalModel():
             self.n_nodes += 1
             node_pgm.call_order_idx = self.n_nodes
         
-        # if node is not deterministic and has a value and node_pgm_name
+        # if node is not deterministic and has a value and node_name
         try:
             self.node_dict[node_pgm] = node_pgm.value
         except:
             self.node_dict[node_pgm] = None
             
-        self.node_name_val_dict[node_pgm.node_pgm_name] = node_pgm
+        self.node_name_val_dict[node_pgm.node_name] = node_pgm
         
 
     def get_node_pgm_by_name(self, node_name):
@@ -162,7 +162,7 @@ class NodePGM(ABC):
                     clamped: bool=False,
                     parent_nodes: ty.Optional[ty.List[NodePGM]]=None):
         
-        self.node_pgm_name = node_name
+        self.node_name = node_name
         self.value = value
         self.sample_size = sample_size
         self.repl_size = replicate_size
@@ -201,7 +201,7 @@ class NodePGM(ABC):
 
                         for val in values_inside_nodes:
                             if not isinstance(val, (int, float, str, np.float64)):
-                                raise ec.VariableAssignmentError(self.node_pgm_name)
+                                raise ec.VariableAssignmentError(self.node_name)
 
                             values.append(val)
 
@@ -209,6 +209,7 @@ class NodePGM(ABC):
 
         self.value = values
 
+    # called in pj_gui
     def get_start2end_str(self, start: int, end: int) -> str:
         if isinstance(self.value, np.ndarray):
             self.value = ", ".join(str(v) for v in self.value.tolist()[start:end])
@@ -225,10 +226,10 @@ class NodePGM(ABC):
         return str(self.value)
 
     def __hash__(self):
-        return hash(self.node_pgm_name)
+        return hash(self.node_name)
 
     def __eq__(self, other) -> bool:
-        return other.node_pgm_name == self.node_pgm_name
+        return other.node_name == self.node_name
 
     # stringify _all_ values
     def __str__(self) -> str:
@@ -254,7 +255,7 @@ class NodePGM(ABC):
                 if n_values % n_repls == 0:
                     return int(n_values / n_repls)
                 else:
-                    raise ec.ReplicateNumberError(node_pgm_name=self.node_pgm_name)
+                    raise ec.ReplicateNumberError(node_name=self.node_name)
         except:
             return 1
 
@@ -368,8 +369,8 @@ class NodePGM(ABC):
 
 class StochasticNodePGM(NodePGM):
 
-    def __init__(self, node_pgm_name: str, sample_size: int, sampled_from: ty.Optional[DistributionPGM]=None, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[ty.Any]]=None):
-        super().__init__(node_pgm_name, sample_size=sample_size, value=value, replicate_size=replicate_size, call_order_idx=call_order_idx, deterministic=deterministic, clamped=clamped, parent_nodes=parent_nodes)
+    def __init__(self, node_name: str, sample_size: int, sampled_from: ty.Optional[DistributionPGM]=None, value: ty.Optional[ty.List[ty.Any]]=None, replicate_size: int=1, call_order_idx: ty.Optional[int]=None, deterministic: bool=False, clamped: bool=False, parent_nodes: ty.Optional[ty.List[ty.Any]]=None):
+        super().__init__(node_name, sample_size=sample_size, value=value, replicate_size=replicate_size, call_order_idx=call_order_idx, deterministic=deterministic, clamped=clamped, parent_nodes=parent_nodes)
         
         self.is_sampled = False
         self.sampling_dn = sampled_from # dn object
@@ -431,16 +432,16 @@ class StochasticNodePGM(NodePGM):
                 
                 # one sample
                 if not sample_idx == None and self.sampling_dn:
-                    _plot_node_histogram(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
+                    plot_node_histogram(axes, hist_vals, sample_idx=sample_idx, repl_size=repl_size)
                 
                 # all samples
                 else:
-                    _plot_node_histogram(axes, hist_vals, repl_size=repl_size)
+                    plot_node_histogram(axes, hist_vals, repl_size=repl_size)
         
         # if scalar
         elif isinstance(self.value, (int, float, str)):
             # return
-            _plot_node_histogram(axes, [float(self.value)])
+            plot_node_histogram(axes, [float(self.value)])
 
 
     def populate_operator_weight(self):
@@ -464,11 +465,12 @@ class StochasticNodePGM(NodePGM):
         return super().get_node_stats_str(start, end, repl_idx)
 
     # rv ~ lognormal(n=10, nr=10, mean=0.0, sd=0.1)
+
 ##############################################################################
 
 class DeterministicNodePGM(NodePGM):
-    def __init__(self, node_pgm_name, value=None, call_order_idx=None, deterministic=True, parent_nodes=None):
-        super().__init__(node_pgm_name, sample_size=None, value=value, call_order_idx=call_order_idx, deterministic=deterministic, parent_nodes=parent_nodes)
+    def __init__(self, node_name, value=None, call_order_idx=None, deterministic=True, parent_nodes=None):
+        super().__init__(node_name, sample_size=None, value=value, call_order_idx=call_order_idx, deterministic=deterministic, parent_nodes=parent_nodes)
         self.is_sampled = False
 
     def __str__(self) -> str:
@@ -476,6 +478,10 @@ class DeterministicNodePGM(NodePGM):
 
     def __lt__(self, other) -> bool:
         return super().__lt__(other)
+
+    # deterministic nodes have all sorts of members, len() here should have no meaning
+    def __len__(self) -> int:
+        return 0
 
     def plot_node(self,
                 axes: plt.Axes,
@@ -495,7 +501,7 @@ class DeterministicNodePGM(NodePGM):
 ############
 # Plotting #
 ############
-def _plot_node_histogram(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
+def plot_node_histogram(axes: plt.Axes, values_list: ty.List[float], sample_idx: ty.Optional[int]=None, repl_size: int=1) -> None:
 
     values_list_to_plot = list()
     # if not sample_idx == None:

@@ -2,23 +2,29 @@
 
 # NOTE: running the GUI from a conda environment messes up the fonts
 
+from genericpath import isfile
 import os
 import typing as ty
 import re
 import PySimpleGUI as sg # type: ignore
 import pyperclip # type: ignore
 import matplotlib.pyplot as plt # type: ignore
+import numpy as np
+import pandas as pd
 import pickle # type: ignore
 # from screeninfo import get_monitors
 # import pyautogui
+from tabulate import tabulate
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
 from matplotlib.figure import Figure # type: ignore
+from matplotlib.widgets import Slider, Button, RadioButtons
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
 import phylojunction.inference.revbayes.rb_inference as rbinf
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.readwrite.pj_read as pjread
+import phylojunction.plotting.pj_plot as pjplot
 import phylojunction.interface.cmd.cmd_parse as cmd
 import phylojunction.utility.exception_classes as ec
 import phylojunction.data.tree as pjdt
@@ -85,10 +91,11 @@ def call_gui():
                 cmd_line_hist.append(valid_cmd_line)
                 wdw["-HIST-"].update("\n".join(cmd_line_hist))
                 wdw["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
+                wdw["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
 
 
-    def initialize_axes():
-        ax = node_display_fig.add_axes([0.25, 0.2, 0.5, 0.6])
+    def initialize_axes(fig: Figure):
+        ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
         ax.patch.set_alpha(0.0)
         ax.xaxis.set_ticks([])
         ax.yaxis.set_ticks([])
@@ -116,24 +123,30 @@ def call_gui():
         window["-PGM-NODES-"].update([])
         window["-PGM-NODE-DISPLAY-"].update("")
         window["-PGM-NODE-STAT-"].update("")
+        window["-COMPARISON-PGM-NODES-"].update([])
+        window["-COMPARISON-PGM-NODE-STATS-"].update([])
         
         cmd_line_hist.append("\n" + msg + "\n")
         window["-HIST-"].update("\n".join(cmd_line_hist))
 
         node_display_fig.clf() # clear everything
-        ax = initialize_axes()
+        ax = initialize_axes(node_display_fig)
         node_display_fig.canvas.draw() # updates canvas
 
-        return pgm_obj, ax
+        comparison_fig.clf() # clear everything
+        comparison_ax = initialize_axes(comparison_fig)
+        comparison_fig.canvas.draw() # updates canvas
+
+        return pgm_obj, ax, comparison_ax
 
 
     def draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
         return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
     
-    def selected_node_read(pgm_obj, node_pgm_name):
-        node_pgm = pgm_obj.get_node_pgm_by_name(node_pgm_name)
-        # display_node_pgm_value_str = pg.get_display_str_by_name(node_pgm_name)
+    def selected_node_read(pgm_obj, node_name):
+        node_pgm = pgm_obj.get_node_pgm_by_name(node_name)
+        # display_node_pgm_value_str = pg.get_display_str_by_name(node_name)
         sample_size = len(node_pgm) # this is n_sim inside sampling distribution classes
         repl_size = node_pgm.repl_size
         
@@ -155,7 +168,7 @@ def call_gui():
         # we get all samples
         else:
             # just calling __str__
-            display_node_pgm_value_str = pgm_obj.get_display_str_by_name(node_pgm.node_pgm_name)
+            display_node_pgm_value_str = pgm_obj.get_display_str_by_name(node_pgm.node_name)
             # getting all values
             display_node_pgm_stat_str = node_pgm.get_node_stats_str(0, len(node_pgm.value), repl_idx) # summary stats
         
@@ -185,12 +198,12 @@ def call_gui():
         fig_obj.canvas.draw()
 
     
-    def do_selected_node(pgm_obj, wdw, fig_obj, node_pgm_name, do_all_samples=True):
+    def do_selected_node(pgm_obj, wdw, fig_obj, node_name, do_all_samples=True):
         """
         Given selected node name, display its string representation and
         plot it on canvas if possible
         """
-        node_pgm, sample_size, repl_size = selected_node_read(pgm_obj, node_pgm_name)
+        node_pgm, sample_size, repl_size = selected_node_read(pgm_obj, node_name)
 
         # updates spin window with number of elements in this node_pgm
         # window["-ITH-VAL-"].update(values=[x for x in range(1, sample_size + 1)]) # can only select the number of values this node contains
@@ -274,7 +287,7 @@ def call_gui():
     ]
 
 
-    layout = [
+    layout_main = [
 
         [ sg.Menu(menu_def, key="-TOP-MENU-", font=("helvetica", 14)) ],
 
@@ -366,27 +379,20 @@ def call_gui():
 
         [ sg.Frame(
             layout = [
-                [ sg.Multiline(key="-ERROR_MSG-", font="helvetica 16", text_color="red", background_color="gray96", disabled=True, size=(110,5)) ]
+                [ sg.Multiline(key="-ERROR_MSG-", font="helvetica 16", text_color="red", background_color="gray96", disabled=True, size=(110,3)) ]
             ],
             title="Log",
             relief=sg.RELIEF_FLAT,
             font="helvetica 14"
             )
-        ],
-
-        # sg.Input(key="-SCRIPT-READ-", enable_events=True, visible=False), # dummy element to trigger file browse
-        # sg.FileBrowse(button_text="Open script file", target="-SCRIPT-READ-", font=("Helvetica", 14), button_color="skyblue1"),        
-        [ sg.Text("Save with prefix", font=("Helvetica", 14)), sg.Input(size=(10, 1), font=("Helvetica", 14), key="-PREFIX-") ]
-
-        # sg.InputText(key="-VALUES-SAVE-DUMMY-", enable_events=True, visible=False) # dummy element to trigger folder browse
-        # sg.FolderBrowse(button_text="Save values in", initial_folder="./", key="-VALUES-SAVE-IN-", font=("Helvetica", 14), button_color=("gold"))
-        # sg.Quit(font=("Helvetica", 14), button_color=("white", "firebrick")
+        ]
     ]
     
-    layout2 = [
+
+    layout_history = [
         [ sg.Frame(
             layout = [
-                [ sg.Multiline(key="-HIST-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,37)) ]
+                [ sg.Multiline(key="-HIST-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,40)) ]
             ],
             title="Command history",
             relief=sg.RELIEF_FLAT,
@@ -395,18 +401,20 @@ def call_gui():
         ]
     ]
 
-    layout3 = [
+    ################
+    # Layout infer #
+    ################
+    layout_infer = [
         [
             sg.Frame(
             layout = [
-                [ sg.Multiline(key="-INFERENCE-SPEC-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,34)) ]
+                [ sg.Multiline(key="-INFERENCE-SPEC-", font=("helvetica", 16), disabled=True, background_color="gray96", size=(110,38)) ]
             ],
             title="Inference specification",
             relief=sg.RELIEF_FLAT,
             font="helvetica 14"
             )
         ],
-        [ sg.VPush() ],
         [
             sg.Text("Inference platform", font=("Helvetica", 14)),
             sg.Combo(["RevBayes", "BEAST 2"], key="-PROGRAM-", font=("Helvetica", 14)),
@@ -421,13 +429,99 @@ def call_gui():
         ]
     ]
 
+    ##################
+    # Layout compare #
+    ##################
+    layout_compare = [
+        [
+            
+            sg.Column(
+                # gray96 for Listbox
+                layout = [
+                    [ sg.VPush() ],
+                    [ 
+                        sg.Frame(
+                            layout = [
+                                [
+                                    sg.Listbox([], key="-COMPARISON-PGM-NODES-", font=("helvetica", 16), enable_events=True, size=(15,16), background_color="linen")
+                                ],
+                            ],
+                            title="SAMPLED NODES",
+                            title_location="n",
+                            relief=sg.RELIEF_FLAT,
+                            border_width=1,
+                            font="helvetica 12 bold",
+                            background_color="antiquewhite"
+                        )
+                    ],
+                    [ sg.Checkbox("Replicate avgs.", key="-REPL-AVG-", default=False, font=("helvetica 14")) ],
+                    [ sg.VPush() ],
+                    [ 
+                        sg.Frame(
+                            layout = [
+                                [
+                                    sg.Listbox([], key="-COMPARISON-PGM-NODE-STATS-", font=("helvetica", 16), enable_events=True, size=(15,16))
+                                ],
+                            ],
+                            title="SUMMARY STAT.",
+                            title_location="n",
+                            relief=sg.RELIEF_FLAT,
+                            border_width=1,
+                            font="helvetica 12 bold"
+                        )
+                    ],
+                    [ sg.VPush() ]
+                ],
+                element_justification="left",
+                expand_y="true" # necessary for VPush() to have an effect
+            ),
+
+            sg.Column(
+                layout = [
+                    [ sg.Button("Compare to .csv (...)", key="-LOAD-COMPARISON-CSV-", font=("Helvetica", 14)) ],
+                    [ sg.Multiline(key="-COMPARE-TO-", font=("Courier", 12), disabled=True, background_color="gray96", size=(108,18)) ],
+                    [ sg.Canvas(key="-COMPARISON-CANVAS-", background_color="white", size=(1200,800)) ],
+                    [
+                        sg.Button("Draw", key="-DRAW-VIOLIN1-", font=("Helvetica", 14)),
+                        sg.Button("Save plot to", key="-SAVE-VIOLIN-TO-", font=("Helvetica", 14))
+                    ]
+                ],
+                element_justification="center"
+            )
+        ]
+    ]
+
+
+    ##################
+    # Layout compare #
+    ##################
+    layout_validate = [
+        []
+    ]
+
+
+    #####################
+    # Layout save specs #
+    #####################
+    layout_save = [
+        [
+            sg.Text("Save with prefix", font=("Helvetica", 14)), sg.Input(size=(10, 1), font=("Helvetica", 14), key="-PREFIX-")
+        ]
+    ]
+
+    ################
+    # Top tab menu #
+    ################
     tabgrp = [
         [
             sg.TabGroup(
                 [
-                    [ sg.Tab("PGM", layout, font=("Helvetica", 14)) ],
-                    [ sg.Tab("History", layout2, font=("Helvetica", 14)) ],
-                    [ sg.Tab("Inference", layout3, font=("Helvetica", 14)) ]
+                    [ sg.Tab("PGM", layout_main, font=("Helvetica", 14)) ],
+                    [ sg.Tab("History", layout_history, font=("Helvetica", 14)) ],
+                    [ sg.Tab("Infer", layout_infer, font=("Helvetica", 14)) ],
+                    [ sg.Tab("Compare", layout_compare, font=("Helvetica", 14)) ],
+                    [ sg.Tab("Validate", layout_validate, font=("Helvetica", 14)) ],
+                    [ sg.Tab("Save specs.", layout_save, font=("Helvetica", 14)) ]
                 ],
                 font=("Helvetica", 14)
             )
@@ -449,17 +543,28 @@ def call_gui():
     # margins=(0,0)
     window = sg.Window("PhyloJunction", tabgrp, finalize=True, resizable=True, keep_on_top=False, element_justification="c", location=(0,0)) 
     window['-CMD-'].Widget.config(insertbackground="white")
+    window["-REPL-AVG-"].set_tooltip("test")
     # window.Size = (1050, 760) # resolution-dependent
 
+    # Main screen figure
     fig_agg = None
     node_display_fig = Figure(figsize=(11,4.5))
-    node_display_fig_axes = initialize_axes()
+    node_display_fig_axes = initialize_axes(node_display_fig)
 
     # Link matplotlib to PySimpleGUI Graph
     fig_agg = FigureCanvasTkAgg(node_display_fig, window["-CANVAS-"].TKCanvas)
     plot_widget = fig_agg.get_tk_widget()
     plot_widget.grid(row=0, column=0)
 
+    # Compare figure
+    fig_agg2 = None
+    comparison_fig = Figure(figsize=(11,4.5))
+    comparison_fig_axes = initialize_axes(comparison_fig)
+
+    # Link matplotlib to PySimpleGUI Graph
+    fig_agg2 = FigureCanvasTkAgg(comparison_fig, window["-COMPARISON-CANVAS-"].TKCanvas)
+    plot_widget2 = fig_agg2.get_tk_widget()
+    plot_widget2.grid(row=0, column=0)
 
     ##############
     # Event loop #
@@ -470,6 +575,14 @@ def call_gui():
     script_out_fp: str = ""
     data_out_dir: str = ""
     inf_out_dir: str = ""
+
+    # for comparison tab
+    comparison_csv_fp: str = ""
+    scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]] = []
+    tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]] = []
+    pj_comparison_df: pd.DataFrame = pd.DataFrame()
+    other_comparison_df: pd.DataFrame = pd.DataFrame()
+    
     while True:
         # general parameters for window
         event, values = window.read()
@@ -501,7 +614,7 @@ def call_gui():
             value_str = str()
             
             if values["-COPY-ALL-"]:
-                value_str = pgm_obj.get_display_str_by_name(node_pgm.node_pgm_name)
+                value_str = pgm_obj.get_display_str_by_name(node_pgm.node_name)
             else:
                 value_str = values['-PGM-NODE-DISPLAY-']
             
@@ -517,7 +630,7 @@ def call_gui():
         elif event == "-DESTROY-PGM-":
             # pgm_obj and node_display_fig_axes are overwritten with new clean objects
             # cmd_history is updated inside
-            pgm_obj, node_display_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+            pgm_obj, node_display_fig_axes, comparison_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
 
 
         ####################################
@@ -618,7 +731,7 @@ def call_gui():
             _script_in_fp = sg.popup_get_file("Script to load", no_window=True, keep_on_top=True)
             
             if _script_in_fp:
-                _, node_display_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+                _, node_display_fig_axes, comparison_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
                 cmd_lines = pjread.read_text_file(_script_in_fp)
                 parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
 
@@ -639,6 +752,7 @@ def call_gui():
                 _, node_display_fig_axes = clean_disable_everything(cmd_history, "## Loading serialized model at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
                 pgm_obj = pjread.read_serialized_pgm(_model_in_fp)
                 window["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
+                window["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm.get_sorted_node_pgm_list() if nd.is_sampled])
             
             else: pass # user canceled event
 
@@ -699,6 +813,10 @@ def call_gui():
             if fig_out_fp:
                 pjwrite.write_fig_to_file(fig_out_fp, node_display_fig)
 
+
+
+
+        # =-=-= INFERENCE =-=-= #
 
         #############################
         # Generating inference spec #
@@ -781,6 +899,132 @@ def call_gui():
             _ = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
             
 
+
+
+        # =-=-= COMPARISON =-=-= #
+        
+        ###########################
+        # Reading comparison .csv #
+        ###########################
+        elif event == "-LOAD-COMPARISON-CSV-":
+            comparison_csv_fp = sg.popup_get_file("CSV file to load", no_window=True, keep_on_top=True)
+            
+            if comparison_csv_fp:
+                if not os.path.isfile(comparison_csv_fp):
+                    print("Could not find " + comparison_csv_fp) # TODO: add exception here later
+
+                try:
+                    other_comparison_df = pjread.read_csv_into_dataframe(comparison_csv_fp)
+                    other_comparison_df_str = tabulate(other_comparison_df, other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip()
+                    window["-COMPARE-TO-"].update(other_comparison_df_str)
+                except:
+                    print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
+            
+            else: pass # event canceled by user
+
+
+        elif event == "-COMPARISON-PGM-NODES-":
+            selected_node_name: str = ""
+            avg_over_repls = values["-REPL-AVG-"]
+            
+            if values["-COMPARISON-PGM-NODES-"]:
+                selected_node_name = values["-COMPARISON-PGM-NODES-"][0]
+                selected_node = pgm_obj.get_node_pgm_by_name(selected_node_name)
+                selected_node_repl_size = selected_node.repl_size
+
+                if not scalar_output_stash or not tree_output_stash:
+                    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+                    _, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
+                    _, tree_summary_df_dict, tree_repl_summary_df_dict = tree_output_stash
+                    
+                    # adding "program" column to PJ's pandas DataFrame's stored inside dicts
+                    for repl_size in scalar_value_df_dict:
+                        scalar_value_df_dict[repl_size].loc[:, "program"] = "PJ"
+
+                    for tr_nd_name in tree_summary_df_dict:
+                        tree_summary_df_dict[tr_nd_name].loc[:, "program"] = "PJ"
+                    
+                    for tr_w_repl_nd_name in tree_repl_summary_df_dict:
+                        tree_repl_summary_df_dict[tr_w_repl_nd_name].loc[:, "program"] = "PJ"
+
+                if isinstance(selected_node.value[0], (int, float, np.float64)):
+                    if not avg_over_repls:
+                        window["-COMPARISON-PGM-NODE-STATS-"].update([])
+                        pj_comparison_df = scalar_value_df_dict[selected_node_repl_size]
+
+                    else:
+                        window["-COMPARISON-PGM-NODE-STATS-"].update(values=["average", "std. dev."])
+                        pj_comparison_df = scalar_repl_summary_df
+
+                elif isinstance(selected_node.value[0], pjdt.AnnotatedTree):
+                    pj_comparison_df = tree_summary_df_dict[selected_node_name]
+                    window["-COMPARISON-PGM-NODE-STATS-"].update(values=[tree_stat for tree_stat in pj_comparison_df.keys() if tree_stat not in ("program", "sample", "replicate")])
+            
+            else:
+                print("If there are no sampled nodes in PJ model, we cannot compare against PJ. Later write an Exception for this")
+                pass
+
+        
+        elif event == "-DRAW-VIOLIN1-":
+            avg_over_repls = values["-REPL-AVG-"]
+            comparison_fig.clf()
+            comparison_fig_axes = initialize_axes(comparison_fig)
+            comparison_fig.canvas.draw() # updates canvas
+
+            if not pj_comparison_df.empty and not other_comparison_df.empty and values["-COMPARISON-PGM-NODES-"]:
+                value_to_compare: str = ""
+                
+                # scalar
+                if isinstance(selected_node.value[0], (int, float, np.float64)):
+                    if not avg_over_repls:
+                        value_to_compare = values["-COMPARISON-PGM-NODES-"][0]
+                    
+                    # averaging over replicates
+                    else:
+                        if values["-COMPARISON-PGM-NODE-STATS-"]:
+                            value_to_compare = values["-COMPARISON-PGM-NODE-STATS-"][0] 
+
+                        # summary stats were not picked, doing nothing
+                        else:
+                            pass
+                
+                # custom class object (e.g., AnnotatedTree)
+                else:
+                    if values["-COMPARISON-PGM-NODE-STATS-"]:
+                        value_to_compare = values["-COMPARISON-PGM-NODE-STATS-"][0]
+                    
+                    # summary stats were not picked, doing nothing
+                    else:
+                        pass
+
+                # debugging
+                # print(tabulate(pj_comparison_df, pj_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
+                # print(tabulate(other_comparison_df, other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
+                
+                joint_dataframe = pjplot.join_dataframes(pj_comparison_df, other_comparison_df, value_to_compare=value_to_compare, summaries_avg_over_repl=False)
+
+                # something went wrong, we clear comparison figure
+                if joint_dataframe.empty: pass
+                
+                else:
+                    pjplot.pjdraw.plot_violins(comparison_fig, comparison_fig_axes, joint_dataframe, "program", value_to_compare, xlab="Program", ylab=value_to_compare)
+                
+                # debugging
+                # print(tabulate(joint_dataframe, joint_dataframe.head(), tablefmt="pretty", showindex=False).lstrip())
+
+            else:
+                print("I need both PJ's and the other simulator dataframes to plot violins.")
+
+        
+        elif event == "-SAVE-VIOLIN-TO-":
+            try:
+                compare_fig_out_fp = sg.popup_get_file("Save plot as", save_as=True, no_window=True, keep_on_top=True) # directory for saving figure
+            
+            except: pass # canceled
+
+            if compare_fig_out_fp:
+                pjwrite.write_fig_to_file(compare_fig_out_fp, comparison_fig)
+        
         #######################################
         # If no other event, we parse command #
         #######################################

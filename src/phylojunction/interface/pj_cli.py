@@ -28,8 +28,8 @@ def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data
     pgm_obj = cmd.script2pgm(model, in_pj_file=True)
 
     # debugging (looking at model)
-    # for node_pgm_name, node_pgm in pgm_obj.node_name_val_dict.items():
-    #     print("\nnode name = " + node_pgm_name)
+    # for node_name, node_pgm in pgm_obj.node_name_val_dict.items():
+    #     print("\nnode name = " + node_name)
     #     print(node_pgm.value)
 
     ################
@@ -42,6 +42,12 @@ def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data
             os.mkdir(data_dir)
     
         pjw.dump_pgm_data(data_dir, pgm_obj, prefix)
+
+    ###################
+    # Writing figures #
+    ###################
+
+    # TODO
 
     ###########################
     # Writing inference files #
@@ -59,6 +65,7 @@ def call_cli() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("script", action="store", type=str, help="Path to phylojunction script specifying a model")
     parser.add_argument("-d", "--data-output", dest="write_data", action="store_true", default=False, help="Toggle data output")
+    parser.add_argument("-f", "--figure-output", dest="write_figures", type=str, action="store", help="String specifying which stochastic nodes to draw figures for, and in what range of the sample (e.g., \'birth_rate,tr;0-1,0-10\')")
     parser.add_argument("-i", "--inference-output", dest="write_inference", action="store_true", default=False, help="Toggle inference script output")
     parser.add_argument("-o", "--output-dir", dest="out_dir", type=str, default="./", help="Path to project root directory, where automatic subdirectories will be created")
     parser.add_argument("-p", "--prefix", dest="prefix", type=str, default="", help="Prefix to be used when naming output files")

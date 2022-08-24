@@ -1,7 +1,9 @@
 import typing as ty
 import numpy as np
 import pandas as pd # type: ignore
-import pickle # type: itnore
+import pickle # type: ignore
+import string
+import csv
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -41,3 +43,46 @@ def read_serialized_pgm(fp_string: str) -> pgm.ProbabilisticGraphicalModel:
         pgm_obj = pickle.load(picklefile)
 
     return pgm_obj
+
+
+def read_csv_into_dataframe(fp_string: str) -> pd.DataFrame:
+    """Read .csv file into a pandas DataFrame
+
+    Args:
+        fp_string (str): String containing file path to text file being read
+
+    Returns:
+        pd.DataFrame: pandas DataFrame object (empty DataFrame if not CSV)
+    """
+    if is_csv(fp_string):
+        return pd.read_csv(fp_string)
+
+    else:
+        return pd.DataFrame()
+
+
+def is_csv(fp_string: str) -> bool:
+    """Check if file in provided path is in CSV format
+
+    Args:
+        fp_string (str): String containing file path to text file being read
+
+    Returns:
+        bool: If file is in CSV format
+    """
+    try:
+        with open(fp_string, newline="") as csvfile:
+            start = csvfile.read(4096) # reading file in 4 KiB chunks
+
+            # isprintable does not allow newlines, printable does not allow umlauts...
+            if not all([c in string.printable or c.isprintable() for c in start]):
+                print("Inside readwrite.pj_read.is_csv():\n    ERROR: Attempted to read CSV file, but it does not seem to be in CSV format.")
+                return False
+            dialect = csv.Sniffer().sniff(start)
+            
+            return True
+    
+    except csv.Error:
+        # could not get a csv dialect -> probably not a csv.
+        print("Inside readwrite.pj_read.is_csv():\n    ERROR: Attempted to read CSV file, but it does not seem to be in CSV format.")
+        return False 

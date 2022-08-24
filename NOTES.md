@@ -147,6 +147,26 @@ You can test things worked by trying, from any directory:
 pjgui
 ```
 
+## Icon for launching PJ 
+
+On Linux, you will need to have (or create) `/home/foo/.local/share/applications/.desktop`, and put the following inside:
+
+```
+[Desktop Entry]
+Version=1.0
+Name=PhyloJunction
+Comment=Open PhyloJunction
+Exec=nohup pjgui &
+Icon=/path/to/PhyloJunction/some_icon.svg
+Terminal=false
+Type=Application
+Categories=Application;
+```
+
+The `nohup pjgui &` makes it so a terminal is not invoked upon execution.
+On Linux, the icon will show when searching "PhyloJunction" with the dock (command key).
+You can make it a favorite and pin it to the taskbar.
+
 ## Documentation
 
 PhyloJunction is documented automatically with `sphinx`, so make sure you have this program installed:

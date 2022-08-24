@@ -55,7 +55,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
     all_nodes_all_sims_spec_list: ty.List[ty.List[str]] = []
     all_nodes_moves_str: str = str()
     sorted_node_pgm_list: ty.List[pgm.NodePGM] = pgm_obj.get_sorted_node_pgm_list()
-    node_pgm_name: str = str()
+    node_name: str = str()
     n_sim = 0
 
     ########################
@@ -63,7 +63,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
     ########################
     node_count = 1
     for node_pgm in sorted_node_pgm_list:
-        node_pgm_name = node_pgm.node_pgm_name
+        node_name = node_pgm.node_name
         is_clamped = node_pgm.is_clamped
         node_inference_spec_str: str
         node_inference_spec_list: ty.List[str] = [] # will contain all sims for this node 
@@ -87,7 +87,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                     # Observed data prep #
                     ######################
                     if is_clamped:
-                        node_inference_spec_str = "truth_" + node_pgm_name + " <- "
+                        node_inference_spec_str = "truth_" + node_name + " <- "
                         start = ith_sim * n_repl
                         end = start + n_repl
                         
@@ -96,34 +96,34 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                                 if n_repl > 1:
                                     node_inference_spec_str += "[" + ", ".join(str(v) for v in node_pgm.value[start:end]) + "]\n\n"
                                     # with replicates, we need a for loop
-                                    node_inference_spec_str += "for (i in 1:" + str(n_repl) + ") {\n    " +  node_pgm_name + "[i] ~ " + rev_str_list[ith_sim] + "\n"
-                                    node_inference_spec_str += "    " + node_pgm_name + "[i].clamp(" + "truth_" + node_pgm_name + "[i])"
+                                    node_inference_spec_str += "for (i in 1:" + str(n_repl) + ") {\n    " +  node_name + "[i] ~ " + rev_str_list[ith_sim] + "\n"
+                                    node_inference_spec_str += "    " + node_name + "[i].clamp(" + "truth_" + node_name + "[i])"
                                     node_inference_spec_str += "\n}"
                                 
                                 # no replicates, single value
                                 else:
                                     node_inference_spec_str += str(node_pgm.value[0]) + "\n\n"
-                                    node_inference_spec_str += node_pgm_name + ".clamp(" + "truth_" + node_pgm_name + ")"
+                                    node_inference_spec_str += node_name + ".clamp(" + "truth_" + node_name + ")"
 
                             else:
                                 print("parsing rb script, found list of objects in clamped node... ignoring for now")
-                            # print(node_pgm.node_pgm_name + ": adding rev spec for sim = " + str(ith_sim))
+                            # print(node_pgm.node_name + ": adding rev spec for sim = " + str(ith_sim))
                     
                         # with replicates, we need a for loop
                         # if n_repl > 1:
-                        #     node_inference_spec_str += "for (i in 1:" + str(n_repl) + ") {\n    " +  node_pgm_name + "[i] ~ " + rev_str_list[ith_sim] + "\n"
-                        #     node_inference_spec_str += "    " + node_pgm_name + "[i].clamp(" + "truth_" + node_pgm_name + "[i])"
+                        #     node_inference_spec_str += "for (i in 1:" + str(n_repl) + ") {\n    " +  node_name + "[i] ~ " + rev_str_list[ith_sim] + "\n"
+                        #     node_inference_spec_str += "    " + node_name + "[i].clamp(" + "truth_" + node_name + "[i])"
                         #     node_inference_spec_str += "\n}"
 
                         # no replicates, single value
                         # else:
-                        #     node_inference_spec_str += node_pgm_name + ".clamp(" + "truth_" + node_pgm_name + ")"
+                        #     node_inference_spec_str += node_name + ".clamp(" + "truth_" + node_name + ")"
 
                         node_inference_spec_list.append(node_inference_spec_str)
                     
                     # not clamped, single distributed-as statement
                     else:
-                        node_inference_spec_list.append(node_pgm_name + " ~ " + rev_str_list[ith_sim])
+                        node_inference_spec_list.append(node_name + " ~ " + rev_str_list[ith_sim])
 
                 # print("after all sims processed, I have")
                 # print(node_inference_spec_str)                    
@@ -164,20 +164,20 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                     # clamped_node <- 1 # first .Rev script
                     # clamped_node <- 2 # second .Rev script
                     if n_vals == n_sim:
-                        node_inference_spec_str = node_pgm_name + " <- " + node_pgm.value[ith_sim]
+                        node_inference_spec_str = node_name + " <- " + node_pgm.value[ith_sim]
 
                     # if clamped nodes have a single value, this value goes into each and every
                     # rev scripts
                     elif n_vals == 1:
-                        node_inference_spec_str = node_pgm_name + " <- " + node_pgm.value[0]
+                        node_inference_spec_str = node_name + " <- " + node_pgm.value[0]
                     
                     # if clamped nodes have more values than sampled stochastic nodes,
                     # all these values go into each and every rev script
                     else:
-                        raise ec.NodeInferenceDimensionalityError(node_pgm_name)
+                        raise ec.NodeInferenceDimensionalityError(node_name)
                     
                     # TODO: fix this
-                    # node_inference_spec_str = node_pgm_name + " <- "
+                    # node_inference_spec_str = node_name + " <- "
 
                     # # node_pgm.value is always a list
                     # if type(node_pgm.value[0]) in (float, int, str):
@@ -196,7 +196,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
             # MCMC move/operator weights #
             ############################## 
             if not is_clamped:
-                all_nodes_moves_str += "\nmoves[" + str(node_count) + "] = mvSlide(" + node_pgm_name + ", delta=1, weight=" + str(node_operator_weight * 5) + ")\n"
+                all_nodes_moves_str += "\nmoves[" + str(node_count) + "] = mvSlide(" + node_name + ", delta=1, weight=" + str(node_operator_weight * 5) + ")\n"
                 node_count += 1
 
     # print("before reorganizing, all_nodes_all_sims_spec_list is")
@@ -246,7 +246,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
     results_dir = inference_root_dir + res_subdir_name 
 
     # the idea is for RB to be called from inference_root_dir
-    all_sims_mcmc_logging_spec_list = get_mcmc_logging_spec_list(node_pgm_name, all_nodes_moves_str, n_sim, mcmc_chain_length, prefix, res_subdir_name)
+    all_sims_mcmc_logging_spec_list = get_mcmc_logging_spec_list(node_name, all_nodes_moves_str, n_sim, mcmc_chain_length, prefix, res_subdir_name)
 
     dir_list = [inference_root_dir, scripts_dir, results_dir]
     # print("\n".join(all_sims_model_spec_list[0]))
