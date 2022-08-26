@@ -3,8 +3,8 @@ import re
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
-import phylojunction.interface.cmd.cmd_parse as cmd
-import phylojunction.interface.cmd.cmd_parse_utils as cmdu
+import phylojunction.interface.cmdbox.cmd_parse as cmd
+import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

@@ -9,7 +9,7 @@ import pickle
 # pj imports
 from phylojunction.data.tree import AnnotatedTree
 import phylojunction.pgm.pgm as pgm
-import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.interface.cmdbox.cmd_parse as cmdp
 
 # for debugging
 from tabulate import tabulate # type: ignore
@@ -160,6 +160,8 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
             # scalar constants (no support for replication via 2D-lists yet)
             if isinstance(node_val[0], (str, int, float, np.float64)) and not node_pgm.is_sampled:                
                 if scalar_constant_df.empty:
+                    if sample_size == 0:
+                        sample_size = len(node_val)
                     scalar_constant_df = initialize_scalar_dataframe(sample_size, n_repl=1, summaries_avg_over_repl=False)
                 
                 if len(node_val) > 1:
@@ -558,7 +560,7 @@ if __name__ == "__main__":
 
     # initializing model
     model_fp = "examples/multiple_scalar_tree_plated.pj"
-    pgm_obj = cmd.script2pgm(model_fp, in_pj_file=True)
+    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
 
     # either: to see what's inside dataframes (uncomment debugging)
     prep_data_df(pgm_obj)

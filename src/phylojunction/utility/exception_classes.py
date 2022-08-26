@@ -178,16 +178,16 @@ class RequireScalarError(Exception):
         return "ERROR: When specifying distribution " + self.dn_name + "'s parameter " + self.arg + ", more than one value was provided. A scalar is required. Exiting..."
 
 class ReplicateNumberError(Exception):
-    node_pgm_name: str
+    node_name: str
     message: str
 
-    def __init__(self, node_pgm_name, message="") -> None:
-        self.node_pgm_name = node_pgm_name
+    def __init__(self, node_name, message="") -> None:
+        self.node_name = node_name
         self.message = message
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "ERROR: When going through values in " + self.node_pgm_name + ", the number of replicates differed among simulations. One or more of the simulations failed to generate the specified number of replicates. Exiting..."
+        return "ERROR: When going through values in " + self.node_name + ", the number of replicates differed among simulations. One or more of the simulations failed to generate the specified number of replicates. Exiting..."
 
 class DimensionalityWarning(Exception):
     rv_name: str

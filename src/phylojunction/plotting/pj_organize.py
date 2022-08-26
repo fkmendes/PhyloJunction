@@ -6,10 +6,9 @@ from tabulate import tabulate # type: ignore
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
-import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.readwrite.pj_read as pjread
-import phylojunction.plotting.pj_draw as pjdraw
 
 def join_dataframes(pj_df: pd.DataFrame, compare_to_df: pd.DataFrame, value_to_compare: str, summaries_avg_over_repl: bool=False) -> pd.DataFrame:
     """_summary_
@@ -65,24 +64,39 @@ def join_dataframes(pj_df: pd.DataFrame, compare_to_df: pd.DataFrame, value_to_c
 
     return joint_df
 
-def draw_compare_fig(scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]], tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]], pgm_obj: pgm.ProbabilisticGraphicalModel, ax: plt.Axes, csv_fp: str, summarize_replicates: bool=False) -> None:
 
-    # first load the dataframe containing the data we want to compare against
-    compare_to_df = pjread.read_csv_into_dataframe(csv_fp)
-        
-    # now we prepare PJ's dataframes, if they have not already been prepared
-    output_df_list: ty.List[pd.DataFrame]
-    if not scalar_output_stash or not tree_output_stash:
-        scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj) # still prefixless
-        _, output_df_list = pjwrite.prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)
+def add_within_hpd_col(df: pd.DataFrame, val_col_name: str) -> pd.DataFrame:
+    """Add column with 1.0 or 0.0 for when a value is within or outside an HPD interval, respectively
 
+    Args:
+        df (pd.DataFrame): DataFrame
+        val_col_name (str): Name of column containing value 
+
+    Returns:
+        pd.DataFrame: Input dataframe with new column
+    """
+    if df.empty:
+        print("Could not add a coverage column because dataframe is empty. For now, ignoring. Later implement Exception")
     
+    else:
+        for i in range(len(df.index)):
+            truth = float(df.at[i, val_col_name])
+            lower = float(df.at[i, "lower_95hpd"])
+            upper = float(df.at[i, "higher_95hpd"])
+
+            if (lower < truth) and (truth <= upper):
+                df.at[i, "within_hpd"] = 1.0
+            
+            else: 
+                df.at[i, "within_hpd"] = 00.0
+
+    return df
 
 
 if __name__ == "__main__":
     # initializing figure
     comparison_fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
-                              # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
+                                  # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
     comparison_fig_axes = comparison_fig.add_axes([0.25, 0.2, 0.5, 0.6])
     comparison_fig_axes.patch.set_alpha(0.0)
     comparison_fig_axes.xaxis.set_ticks([])
@@ -92,9 +106,14 @@ if __name__ == "__main__":
     comparison_fig_axes.spines['right'].set_visible(False)
     comparison_fig_axes.spines['top'].set_visible(False)
 
+    #################################
+    # Testing parsing functions for #
+    # comparison tab                #
+    #################################
+
     # initializing model
     model_fp = "examples/multiple_scalar_tree_plated.pj"
-    pgm_obj = cmd.script2pgm(model_fp, in_pj_file=True)
+    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
 
     # getting pj dataframes
     scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]]
@@ -116,9 +135,27 @@ if __name__ == "__main__":
     # joint_df = join_dataframes(output_df_list[2], compare_to_df, value_to_compare="rv5", summaries_avg_over_repl=False)
     joint_df = join_dataframes(compare_to_df, output_df_list[8], value_to_compare="root_age", summaries_avg_over_repl=False)
 
-    # trying some plotting
-    # sns.violinplot(x="program", y="rv5", data=joint_df, ax=comparison_fig_axes)
-    # sns.violinplot(x="program", y="root_age", data=joint_df, ax=comparison_fig_axes)
-    # pjdraw.plot_violins(comparison_fig, comparison_fig_axes, joint_df, "program", "rv5", xlab="Program", ylab="rv5", color1="blue", color2="red")
-    pjdraw.plot_violins(comparison_fig, comparison_fig_axes, joint_df, "program", "root_age", xlab="Program", ylab="Root age")
-    plt.show()
+    #################################
+    # Testing parsing functions for #
+    # validation tab                #
+    #################################
+
+    # initializing model
+    model_fp = "examples/validate_files/r_b.pj"
+    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
+
+    # reading true values
+    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+    scalar_constant_df = scalar_output_stash[0]
+    # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(), tablefmt="pretty", showindex=False))
+    
+    # reading hpd table
+    hpd_df = pjread.read_csv_into_dataframe("./examples/validate_files/r_b.csv")
+    # print(tabulate(hpd_df, headers=hpd_df.head(), tablefmt="pretty"))
+
+    full_cov_df = pd.concat([scalar_constant_df, hpd_df], axis=1)
+
+    full_cov_df = add_within_hpd_col(full_cov_df, "r_b")
+    print(tabulate(full_cov_df, headers=full_cov_df.head(), tablefmt="pretty", showindex=False).lstrip())
+
+    # print(full_cov_df)

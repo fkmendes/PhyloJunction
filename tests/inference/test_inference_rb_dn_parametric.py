@@ -5,8 +5,8 @@ from statistics import mean, stdev
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
-import phylojunction.interface.cmd.cmd_parse as cmd
-import phylojunction.interface.cmd.cmd_parse_utils as cmdu
+import phylojunction.interface.cmdbox.cmd_parse as cmdp
+import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
 import phylojunction.utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
@@ -26,7 +26,7 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         cmd_line = "u ~ unif(n=1, nr=" + str(n_repl) + ", min=-1.0, max=1.0)"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
-        cmd.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)
+        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)
         a_node_pgm = pgm_obj.get_node_pgm_by_name("u")
 
         # rev_str_list = a_node_pgm.sampling_dn.get_rev_inference_spec_info()
@@ -60,7 +60,7 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         cmd_line1 = "e1 ~ exponential(n=1, nr=" + str(n_repl) + ", rate=0.5, rate_parameterization=\"true\")" # default is true
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmd.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
         a_node_pgm1 = pgm_obj.get_node_pgm_by_name("e1")
 
         # rev_str_list = a_node_pgm1.sampling_dn.get_rev_inference_spec_info()
@@ -77,7 +77,7 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         cmd_line2 = "e2 ~ exponential(n=1, nr=" + str(n_repl) + ", rate=0.5, rate_parameterization=\"false\")"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
-        cmd.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
         a_node_pgm2 = pgm_obj.get_node_pgm_by_name("e2")
 
         # rev_str_list = a_node_pgm2.sampling_dn.get_rev_inference_spec_info()
@@ -119,7 +119,7 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         cmd_line = "n ~ normal(n=1, nr=" + str(n_repl) + ", mean=0.5, sd=0.1)"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
-        cmd.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)
+        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)
         a_node_pgm = pgm_obj.get_node_pgm_by_name("n")
 
         # rev_str_list = a_node_pgm.sampling_dn.get_rev_inference_spec_info()

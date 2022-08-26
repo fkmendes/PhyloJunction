@@ -3,7 +3,6 @@
 # NOTE: running the GUI from a conda environment messes up the fonts
 
 import os
-from tkinter.ttk import Sizegrip
 import typing as ty
 import re
 import PySimpleGUI as sg # type: ignore
@@ -18,15 +17,15 @@ from tabulate import tabulate # type: ignore
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
 from matplotlib.figure import Figure # type: ignore
 from matplotlib.widgets import Slider, Button, RadioButtons
-from PIL import Image
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
 import phylojunction.inference.revbayes.rb_inference as rbinf
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.readwrite.pj_read as pjread
-import phylojunction.plotting.pj_plot as pjplot
-import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.plotting.pj_organize as pjorg
+import phylojunction.plotting.pj_draw as pjdraw
+import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.utility.exception_classes as ec
 import phylojunction.data.tree as pjdt
 
@@ -79,7 +78,7 @@ def call_gui():
             line = line.strip() # removing whitespaces from left and right
             
             try:
-                valid_cmd_line = cmd.cmdline2pgm(a_pgm, line)
+                valid_cmd_line = cmdp.cmdline2pgm(a_pgm, line)
         
             except Exception as e:
                 if not event == "Simulate":
@@ -93,13 +92,15 @@ def call_gui():
                 wdw["-HIST-"].update("\n".join(cmd_line_hist))
                 wdw["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
                 wdw["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
+                wdw["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
 
 
-    def initialize_axes(fig: Figure):
+    def initialize_axes(fig: Figure, disabled_yticks: bool=True) -> plt.Axes:
         ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
         ax.patch.set_alpha(0.0)
         ax.xaxis.set_ticks([])
-        ax.yaxis.set_ticks([])
+        if disabled_yticks:
+            ax.yaxis.set_ticks([])
         ax.spines['left'].set_visible(False)
         ax.spines['bottom'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -108,7 +109,7 @@ def call_gui():
         return ax
 
 
-    def clean_disable_everything(cmd_line_hist, msg):
+    def clean_disable_everything(cmd_line_hist: str, msg: str) -> ty.Tuple[pgm.ProbabilisticGraphicalModel, plt.Axes, plt.Axes,  plt.Axes]:
         """
         Destroy PGM object, reset all panels (except history panel).
         History panel is updated with 'reset PGM' line.
@@ -126,6 +127,8 @@ def call_gui():
         window["-PGM-NODE-STAT-"].update("")
         window["-COMPARISON-PGM-NODES-"].update([])
         window["-COMPARISON-PGM-NODE-STATS-"].update([])
+        window["-VALIDATION-PGM-NODES-"].update([])
+        window["-VALIDATION-PGM-NODE-STATS-"].update([])
         
         cmd_line_hist.append("\n" + msg + "\n")
         window["-HIST-"].update("\n".join(cmd_line_hist))
@@ -138,7 +141,11 @@ def call_gui():
         comparison_ax = initialize_axes(comparison_fig)
         comparison_fig.canvas.draw() # updates canvas
 
-        return pgm_obj, ax, comparison_ax
+        validation_fig.clf() # clear everything
+        validation_ax = initialize_axes(validation_fig)
+        validation_fig.canvas.draw() # updates canvas
+
+        return pgm_obj, ax, comparison_ax, validation_ax
 
 
     def draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
@@ -490,7 +497,7 @@ def call_gui():
                 layout = [
                     [ sg.Button("Compare to .csv (...)", key="-LOAD-COMPARISON-CSV-", font=("Helvetica", 14)) ],
                     [ sg.Multiline(key="-COMPARE-TO-", font=("Courier", 12), disabled=True, background_color="gray96", size=(108,18)) ],
-                    [ sg.Canvas(key="-COMPARISON-CANVAS-", background_color="white", size=(1200,800)) ],
+                    [ sg.Canvas(key="-COMPARISON-CANVAS-", background_color="white", size=(1200,450)) ],
                     [
                         sg.Button("Draw", key="-DRAW-VIOLIN1-", font=("Helvetica", 14)),
                         sg.Button("Save plot to", key="-SAVE-VIOLIN-TO-", font=("Helvetica", 14))
@@ -506,7 +513,83 @@ def call_gui():
     # Layout validate #
     ###################
     layout_validate = [
-        []
+        [
+            sg.Column(
+                # gray96 for Listbox
+                layout = [
+                    [ sg.VPush() ],
+
+                    [
+                        sg.Frame(
+                            layout = [
+                                [
+                                    sg.Listbox([], key="-VALIDATION-PGM-NODES-", font=("helvetica", 16), enable_events=True, size=(14,13), background_color="linen")
+                                ],
+                            ],
+                            title="NON-DET. NODES",
+                            title_location="n",
+                            relief=sg.RELIEF_FLAT,
+                            border_width=1,
+                            font="helvetica 12 bold",
+                            background_color="antiquewhite"
+                        )
+                    ],
+
+                    [ sg.VPush() ],
+
+                    [
+                        sg.Frame(
+                            layout = [
+                                [
+                                    sg.Listbox([], key="-VALIDATION-PGM-NODE-STATS-", font=("helvetica", 16), enable_events=True, size=(14,11))
+                                ],
+                            ],
+                            title="SUMMARY STAT.",
+                            title_location="n",
+                            relief=sg.RELIEF_FLAT,
+                            border_width=1,
+                            font="helvetica 12 bold"
+                        )
+                    ],
+
+                    [ sg.VPush() ]
+                ],
+                element_justification="left",
+                expand_y="true" # necessary for VPush() to have an effect
+            ),
+
+            sg.Column(
+                # gray96 for Listbox
+                layout = [
+                    [ sg.VPush() ],
+
+                    [
+                        sg.Push(),
+                        sg.Button("Load HPDs .csv (...)", key="-LOAD-HPD-CSV-", font=("Helvetica", 14)),
+                        sg.Button("Path to .log files", key="-OPEN-LOG-DIR-", font=("Helvetica", 14)),
+                        sg.Push()
+                    ],
+
+                    [
+                        sg.Multiline(key="-VALIDATE-TABLE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(85,18)),
+                        sg.Multiline(key="-VALIDATE-COVERAGE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(20 ,18))
+                    ],
+
+                    [ sg.Canvas(key="-VALIDATION-CANVAS-", background_color="white", size=(1100,450)) ],
+
+                    [ 
+                        sg.Push(),
+                        sg.Button("Draw", key="-DRAW-COVG-", font=("Helvetica", 14)),
+                        sg.Button("Save plot to", key="-SAVE-COVG-PLOT-TO-", font=("Helvetica", 14)),
+                        sg.Push()
+                    ],
+
+                    [ sg.VPush() ]
+                ],
+                element_justification="left",
+                expand_y="true" # necessary for VPush() to have an effect
+            )
+        ]
     ]
 
 
@@ -574,6 +657,16 @@ def call_gui():
     plot_widget2 = fig_agg2.get_tk_widget()
     plot_widget2.grid(row=0, column=0)
 
+    # Validate figure
+    fig_agg3 = None
+    validation_fig = Figure(figsize=(11,4.5))
+    validation_fig_axes = initialize_axes(validation_fig)
+
+    # Link matplotlib to PySimpleGUI Graph
+    fig_agg3 = FigureCanvasTkAgg(validation_fig, window["-VALIDATION-CANVAS-"].TKCanvas)
+    plot_widget3 = fig_agg3.get_tk_widget()
+    plot_widget3.grid(row=0, column=0)
+
     ##############
     # Event loop #
     ##############
@@ -584,12 +677,19 @@ def call_gui():
     data_out_dir: str = ""
     inf_out_dir: str = ""
 
-    # for comparison tab
-    comparison_csv_fp: str = ""
+    # stashing output data
     scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]] = []
     tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]] = []
+
+    # for comparison tab
+    comparison_csv_fp: str = ""
     pj_comparison_df: pd.DataFrame = pd.DataFrame()
     other_comparison_df: pd.DataFrame = pd.DataFrame()
+    
+    # for validation tab
+    hpd_csv_fp: str = ""
+    pj_validation_df: pd.DataFrame = pd.DataFrame()
+    hpd_df: pd.DataFrame = pd.DataFrame()
     
     while True:
         # general parameters for window
@@ -638,7 +738,7 @@ def call_gui():
         elif event == "-DESTROY-PGM-":
             # pgm_obj and node_display_fig_axes are overwritten with new clean objects
             # cmd_history is updated inside
-            pgm_obj, node_display_fig_axes, comparison_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+            pgm_obj, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
 
 
         ####################################
@@ -739,7 +839,7 @@ def call_gui():
             _script_in_fp = sg.popup_get_file("Script to load", no_window=True, keep_on_top=True)
             
             if _script_in_fp:
-                _, node_display_fig_axes, comparison_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+                _, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
                 cmd_lines = pjread.read_text_file(_script_in_fp)
                 parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
 
@@ -757,10 +857,11 @@ def call_gui():
             _model_in_fp = sg.popup_get_file("Model to load", no_window=True, keep_on_top=True)
             
             if _model_in_fp:
-                _, node_display_fig_axes = clean_disable_everything(cmd_history, "## Loading serialized model at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+                _, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Loading serialized model at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
                 pgm_obj = pjread.read_serialized_pgm(_model_in_fp)
                 window["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
-                window["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm.get_sorted_node_pgm_list() if nd.is_sampled])
+                window["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
+                window["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
             
             else: pass # user canceled event
 
@@ -803,6 +904,7 @@ def call_gui():
             try:
                 script_out_fp = sg.popup_get_file("Save to file", save_as=True, no_window=True, keep_on_top=True) # directory for saving data files
                 # script_out_fp = values['-SCRIPT-SAVE-DUMMY-'] # file path
+            
             except: pass # canceled
 
             if script_out_fp:
@@ -923,12 +1025,14 @@ def call_gui():
 
                 try:
                     other_comparison_df = pjread.read_csv_into_dataframe(comparison_csv_fp)
-                    other_comparison_df_str = tabulate(other_comparison_df, other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip()
+                    other_comparison_df_str = tabulate(other_comparison_df, other_comparison_df.head(), tablefmt="plain", showindex=False).lstrip()
                     window["-COMPARE-TO-"].update(other_comparison_df_str)
+                
                 except:
                     print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
             
-            else: pass # event canceled by user
+            else:
+                pass # event canceled by user
 
 
         elif event == "-COMPARISON-PGM-NODES-":
@@ -940,20 +1044,20 @@ def call_gui():
                 selected_node = pgm_obj.get_node_pgm_by_name(selected_node_name)
                 selected_node_repl_size = selected_node.repl_size
 
-                if not scalar_output_stash or not tree_output_stash:
-                    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
-                    _, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
-                    _, tree_summary_df_dict, tree_repl_summary_df_dict = tree_output_stash
-                    
-                    # adding "program" column to PJ's pandas DataFrame's stored inside dicts
-                    for repl_size in scalar_value_df_dict:
-                        scalar_value_df_dict[repl_size].loc[:, "program"] = "PJ"
+                # could be more efficient, but this makes sure that stashes are always up-to-date
+                scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+                _, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
+                _, tree_summary_df_dict, tree_repl_summary_df_dict = tree_output_stash
+                
+                # adding "program" column to PJ's pandas DataFrame's stored inside dicts
+                for repl_size in scalar_value_df_dict:
+                    scalar_value_df_dict[repl_size].loc[:, "program"] = "PJ"
 
-                    for tr_nd_name in tree_summary_df_dict:
-                        tree_summary_df_dict[tr_nd_name].loc[:, "program"] = "PJ"
-                    
-                    for tr_w_repl_nd_name in tree_repl_summary_df_dict:
-                        tree_repl_summary_df_dict[tr_w_repl_nd_name].loc[:, "program"] = "PJ"
+                for tr_nd_name in tree_summary_df_dict:
+                    tree_summary_df_dict[tr_nd_name].loc[:, "program"] = "PJ"
+                
+                for tr_w_repl_nd_name in tree_repl_summary_df_dict:
+                    tree_repl_summary_df_dict[tr_w_repl_nd_name].loc[:, "program"] = "PJ"
 
                 if isinstance(selected_node.value[0], (int, float, np.float64)):
                     if not avg_over_repls:
@@ -976,7 +1080,13 @@ def call_gui():
         elif event == "-DRAW-VIOLIN1-":
             avg_over_repls = values["-REPL-AVG-"]
             comparison_fig.clf()
-            comparison_fig_axes = initialize_axes(comparison_fig)
+            
+            if values["-COMPARISON-PGM-NODES-"]:
+                comparison_fig_axes = initialize_axes(comparison_fig, disabled_yticks=False)
+            
+            else:
+                comparison_fig_axes = initialize_axes(comparison_fig)
+            
             comparison_fig.canvas.draw() # updates canvas
 
             if not pj_comparison_df.empty and not other_comparison_df.empty and values["-COMPARISON-PGM-NODES-"]:
@@ -1009,13 +1119,13 @@ def call_gui():
                 # print(tabulate(pj_comparison_df, pj_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
                 # print(tabulate(other_comparison_df, other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
                 
-                joint_dataframe = pjplot.join_dataframes(pj_comparison_df, other_comparison_df, value_to_compare=value_to_compare, summaries_avg_over_repl=False)
+                joint_dataframe = pjorg.join_dataframes(pj_comparison_df, other_comparison_df, value_to_compare=value_to_compare, summaries_avg_over_repl=False)
 
                 # something went wrong, we clear comparison figure
                 if joint_dataframe.empty: pass
                 
                 else:
-                    pjplot.pjdraw.plot_violins(comparison_fig, comparison_fig_axes, joint_dataframe, "program", value_to_compare, xlab="Program", ylab=value_to_compare)
+                    pjdraw.plot_violins(comparison_fig, comparison_fig_axes, joint_dataframe, "program", value_to_compare, xlab="Program", ylab=value_to_compare)
                 
                 # debugging
                 # print(tabulate(joint_dataframe, joint_dataframe.head(), tablefmt="pretty", showindex=False).lstrip())
@@ -1033,6 +1143,114 @@ def call_gui():
             if compare_fig_out_fp:
                 pjwrite.write_fig_to_file(compare_fig_out_fp, comparison_fig)
         
+
+
+        # =-=-= VALIDATION =-=-= #
+
+        ####################
+        # Reading HPD .csv #
+        ####################
+        elif event == "-LOAD-HPD-CSV-":
+            hpd_csv_fp = sg.popup_get_file("CSV file to load", no_window=True, keep_on_top=True)
+
+            if hpd_csv_fp:
+                if not os.path.isfile(hpd_csv_fp):
+                    print("Could not find " + hpd_csv_fp) # TODO: add exception here later
+
+                try:
+                    hpd_df = pjread.read_csv_into_dataframe(hpd_csv_fp)
+                    hpd_df_str = tabulate(hpd_df, hpd_df.head(), tablefmt="plain", showindex=False).lstrip()
+                    window["-VALIDATE-TABLE-"].update(hpd_df_str)
+
+                except:
+                    print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
+            
+            else: pass # event canceled by user
+
+
+        elif event == "-VALIDATION-PGM-NODES-":
+            selected_node_name: str = ""
+            # avg_over_repls = values["-REPL-AVG-"]
+            
+            if values["-VALIDATION-PGM-NODES-"]:
+                selected_node_name = values["-VALIDATION-PGM-NODES-"][0]
+                selected_node = pgm_obj.get_node_pgm_by_name(selected_node_name)
+                selected_node_repl_size = selected_node.repl_size
+
+                # could be more efficient, but this makes sure that stashes are always up-to-date
+                scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+                scalar_constant_value_df, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
+                _, tree_summary_df_dict, tree_repl_summary_df_dict = tree_output_stash
+
+                # str because could be constant set by hand
+                if isinstance(selected_node.value[0], (str, int, float, np.float64)):
+                    if selected_node_repl_size == 1:
+                        window["-VALIDATION-PGM-NODE-STATS-"].update([])
+
+                        # sampled, non-deterministic
+                        if selected_node.is_sampled:
+                            pj_validation_df = scalar_value_df_dict[selected_node_repl_size]
+                        
+                        # constant, non-deterministic
+                        else:
+                            pj_validation_df = scalar_constant_value_df
+
+                    else:
+                        window["-VALIDATION-PGM-NODE-STATS-"].update(values=["average", "std. dev."])
+                        pj_validation_df = scalar_repl_summary_df
+
+                # elif isinstance(selected_node.value[0], pjdt.AnnotatedTree):
+                #     pj_validation_df = tree_summary_df_dict[selected_node_name]
+                #     window["-VALIDATION-PGM-NODE-STATS-"].update(values=[tree_stat for tree_stat in pj_validation_df.keys() if tree_stat not in ("program", "sample", "replicate")])
+            
+            else:
+                print("If there are no sampled nodes in PJ model, we cannot compare against PJ. Later write an Exception for this")
+                pass
+
+            # debugging
+            # print(tabulate(pj_validation_df, pj_validation_df.head(), tablefmt="plain", showindex=False))
+ 
+
+        elif event == "-DRAW-COVG-":
+            # avg_over_repls = values["-REPL-AVG-"]
+            validation_fig.clf()
+
+            if values["-VALIDATION-PGM-NODES-"]:
+                validation_fig_axes = initialize_axes(validation_fig, disabled_yticks=False)
+
+            else:
+                validation_fig_axes = initialize_axes(validation_fig)
+            
+            validation_fig.canvas.draw() # updates canvas
+
+            if not pj_validation_df.empty and not hpd_df.empty and values["-VALIDATION-PGM-NODES-"]:
+                stat_to_validate: str = ""
+                
+                # scalar
+                if isinstance(selected_node.value[0], (str, int, float, np.float64)):
+                    stat_to_validate = selected_node_name
+                    
+                # TODO: tree
+
+                # debugging
+                # print(tabulate(pj_validation_df, pj_validation_df.head(), tablefmt="plain", showindex=False).lstrip())
+                # print(tabulate(hpd_df, hpd_df.head(), tablefmt="plain", showindex=False).lstrip())
+                
+                full_cov_df = pd.concat([pj_validation_df, hpd_df], axis=1)
+                full_cov_df = pjorg.add_within_hpd_col(full_cov_df, stat_to_validate)
+
+                # something went wrong, we clear validation figure
+                if full_cov_df.empty:
+                    pass
+
+                # debugging
+                # print(tabulate(full_cov_df, full_cov_df.head(), tablefmt="plain", showindex=False).lstrip())
+
+                pjdraw.plot_intervals(validation_fig, validation_fig_axes, full_cov_df, stat_to_validate, "posterior_mean", ylab="Posterior mean")
+
+            else:
+                print("I need both PJ's and the other simulator dataframes to plot violins.")
+
         #######################################
         # If no other event, we parse command #
         #######################################

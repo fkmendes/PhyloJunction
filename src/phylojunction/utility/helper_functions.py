@@ -124,6 +124,21 @@ def get_ellapsed_time_in_minutes(start: float, end: float) -> int:
     return int(ellapsed_minutes)
 
 
+def is_val_in_interval(val: ty.Union[int, float, np.float64], lower: ty.Union[int, float, np.float64], upper: ty.Union[int, float, np.float64]) -> bool:
+    """Return True/False if numerical value is in (lower, upper]
+
+    Args:
+        val (ty.Union[int, float, np.float64]t): Numerical value
+        lower (ty.Union[int, float, np.float64]): Lower end of interval
+        upper (ty.Union[int, float, np.float64]): Upper end of interval
+
+    Returns:
+        bool: Whether val is in (lower, upper]
+    """
+    if lower < val and val <= upper: 
+        return True
+    else:
+        return False
 
 ##############################################################################
 

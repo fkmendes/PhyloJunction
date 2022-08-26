@@ -2,7 +2,7 @@ import argparse
 import os
 
 # pj imports
-import phylojunction.interface.cmd.cmd_parse as cmd
+import phylojunction.interface.cmdbox.cmd_parse as cmd
 import phylojunction.readwrite.pj_write as pjw
 
 def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data: bool=False, write_inference: bool=False) -> None:

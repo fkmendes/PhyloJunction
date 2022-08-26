@@ -1,7 +1,7 @@
 import unittest
 
 # pj imports
-import phylojunction.interface.cmd.cmd_parse_utils as cmdu
+import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"

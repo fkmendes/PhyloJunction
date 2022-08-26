@@ -5,22 +5,27 @@ import pandas as pd # type: ignore
 from matplotlib.figure import Figure # type: ignore
 from tabulate import tabulate # type: ignore
 
+# pj imports
+import phylojunction.readwrite.pj_read as pjread
+import phylojunction.readwrite.pj_write as pjwrite
+import phylojunction.pgm.pgm as pgm
+import phylojunction.interface.cmdbox.cmd_parse as cmdp
+import plotting.pj_organize as pjorg
+
 
 def plot_violins(fig: Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xlab: ty.Optional[str]=None, ylab: ty.Optional[str]=None) -> None:
     """Draw violin plots on provided Axes object, for one variable (column 1) and two or more factors (column 2)
 
     Args:
+        fig (matplotlib.Figure): _description_
         ax (plt.Axes): pyplot Axes object to draw on
         df (pd.DataFrame): pandas DataFrame with values for a variable (column 1) in two or more scenarios (i.e., two or more factors, such as different simulators; column 2)
         xlab (str): x-axis label. Defaults to None.
         ylab (str): y-axis label. Defaults to None.
-        color1 (str): Color for first violin plot. Defaults to None.
-        color2 (str): Color for second violing plot. Defaults to None.
 
     Returns:
         None
     """
-    
     ax.spines['left'].set_visible(True)
     ax.spines['bottom'].set_visible(True)
 
@@ -37,9 +42,64 @@ def plot_violins(fig: Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xl
     fig.canvas.draw()
     
 
+def plot_intervals(fig: plt.Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xlab: ty.Optional[str]=None, ylab: ty.Optional[str]="Posterior mean"):
+    """_summary_
+
+    Args:
+        fig (matplotlib.Figure): _description_
+        ax (plt.Axes): _description_
+        df (pd.DataFrame): _description_
+        x (str): _description_
+        y (str, optional): _description_. Defaults to "posterior_mean".
+        xlab (ty.Optional[str], optional): _description_. Defaults to None.
+        ylab (ty.Optional[str], optional): _description_. Defaults to None.
+
+    Returns:
+        None
+    """
+    ax.spines['left'].set_visible(True)
+    ax.spines['bottom'].set_visible(True)
+    
+    ax.set_ylabel(ylab)
+    
+    if xlab != None:
+        ax.set_xlabel(xlab)
+    
+    else:
+        ax.set_xlabel(x)
+
+    # blue
+    for i in range(len(df.index)):
+        if df.at[i, "within_hpd"] == 1.0:
+            line_color = "darkturquoise"
+            ax.vlines(float(df.at[i, x]), float(df.at[i, "lower_95hpd"]), float(df.at[i, "higher_95hpd"]), line_color, linewidth=3.0, alpha=0.25)
+            ax.plot(float(df.at[i, x]), float(df.at[i, y]), marker="o", markersize=3, color=line_color)
+        
+    # place red on top of blue
+    for i in range(len(df.index)):
+        if df.at[i, "within_hpd"] == 0.0:
+            line_color = "orangered"
+            ax.vlines(float(df.at[i, x]), float(df.at[i, "lower_95hpd"]), float(df.at[i, "higher_95hpd"]), line_color, alpha=0.8)
+            ax.plot(float(df.at[i, x]), float(df.at[i, y]), marker="o", markersize=3, color=line_color)
+
+    fig.canvas.draw()
+
+
 if __name__ == "__main__":
     # testing below
+
+    fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
+                       # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
+    axes = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+    axes.patch.set_alpha(0.0)
+    axes.spines['left'].set_visible(True)
+    axes.spines['bottom'].set_visible(True)
+    axes.spines['right'].set_visible(False)
+    axes.spines['top'].set_visible(False)
     
+    ###########
+    # Violins #
+    ###########
     df1 = pd.DataFrame({
         "Total taxon count": [1, 3, 4, 5, 5, 5, 5, 6, 7, 10],
         "Program": ["PJ" for i in range(10)]
@@ -51,16 +111,34 @@ if __name__ == "__main__":
         })
     
     df = pd.concat([df1, df2], axis=0)
+    print(tabulate(df, headers=df.head(), tablefmt="pretty"))
 
-    print(tabulate(df, headers=["", "Total taxon count", "Program"], tablefmt="pretty"))
+    # uncomment if testing violins
+    # plot_violins(fig, axes, df, "Program", "Total taxon count", xlab="Program", ylab="Total taxon count")
+    # plt.show()
 
-    fig, axes = plt.subplots()
-    # plot violin. 'Scenario' is according to x axis, 
-    # 'LMP' is y axis, data is your dataframe. ax - is axes instance
-    sns.violinplot("Program", "Total taxon count", data=df, ax=axes)
-    # axes.set_title("")
-    # axes.yaxis.grid(True)
-    # axes.set_xlabel("Simulator")
-    # axes.set_ylabel("Total taxon count")
+    #################
+    # Coverage bars #
+    #################
 
+    # initializing model
+    model_fp = "examples/validate_files/r_b.pj"
+    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
+
+    # reading true values
+    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+    scalar_constant_df = scalar_output_stash[0]
+    # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(), tablefmt="pretty", showindex=False))
+    
+    # reading hpd table
+    hpd_df = pjread.read_csv_into_dataframe("./examples/validate_files/r_b.csv")
+    # print(tabulate(hpd_df, headers=hpd_df.head(), tablefmt="pretty"))
+
+    full_cov_df = pd.concat([scalar_constant_df, hpd_df], axis=1)
+    full_cov_df = pjorg.add_within_hpd_col(full_cov_df, "r_b")
+    print(tabulate(full_cov_df, headers=full_cov_df.head(), tablefmt="pretty", showindex=False).lstrip())
+
+    # uncomment if testing coverage lines
+    plot_intervals(fig, axes, full_cov_df, "r_b", "posterior_mean", ylab="Posterior mean")
+    
     plt.show()
