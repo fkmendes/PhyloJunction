@@ -147,7 +147,10 @@ You can test things worked by trying, from any directory:
 pjgui
 ```
 
-Important note: Sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computar architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+Important notes:
+    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computar architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+
+    (2) On Linux machines, depending on the python version (e.g., 3.9.7), the GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
 
 ### Known issues
 
@@ -155,13 +158,17 @@ Important note: Sometimes when Homebrew updates itself and starts updating pytho
 
 ## Icon for launching PJ 
 
-On Linux, I created `/home/foo/.local/share/applications/.desktop`, and put the following inside:
+On Linux, there are two ways to have icons for PJ:
+
+(1) You add the icon to the dash (command key) and/or the taskbar (by making the icon a favorite)
+
+You do so by creating a file `/home/foo/.local/share/applications/.desktop`, and putting the following inside:
 
 ```
 [Desktop Entry]
 Version=1.0
 Name=PhyloJunction
-Comment=Open PhyloJunction
+Comment=An environment for prototyping, teaching and learning with evolutionary models
 Exec=nohup pjgui &
 Icon=/path/to/PhyloJunction/some_icon.svg
 Terminal=false
@@ -169,9 +176,32 @@ Type=Application
 Categories=Application;
 ```
 
-The `nohup pjgui &` makes it so a terminal is not invoked upon execution.
-On Linux, the icon will show when searching "PhyloJunction" with the dock (command key).
-You can make it a favorite and pin it to the taskbar.
+When you click on the dash or taskbar icon, even with `Terminal=false`, a Terminal window will still be spawned.
+The `nohup pjgui &` prevents that.
+
+(2) You add an icon file to the desktop
+
+You do so by creating a file `/home/foo/Desktop/PhyloJunction.desktop', and again, put the following inside:
+
+```
+[Desktop Entry]
+Type=Application
+Name=PhyloJunction
+Comment=An environment for prototyping, teaching and learning with evolutionary models
+Exec=pjgui
+Icon=/path/to/PhyloJunction/some_icon.svg
+Terminal=false
+Categories=Application;
+```
+
+Then, you have to right-click the icon that will appear on your Desktop, and make sure you click "Allow launching".
+
+Important notes:
+    (1) It can happen that you mess up something like a module import, but the GUI still functions on the Terminal (`pjgui`) or inside VS Code (`python3 PhyloJunction/src/phylojunction/interface/pj_gui.py`).
+    But then when you double-click its icon, nothing happens. 
+    In order to see what the error is, you need to set `Terminal=true` inside the `.desktop` file, and then make sure that, in your Terminal app, when you go to "Preferences" > "Profiles", that option "Hold the terminal open" is chosen for "When command exits".
+    After the GUI bombs, the Terminal will stay open with the error messages and you can then debug it.
+
 
 On Mac OS X, PySimpleGUI provides the `use_custom_titlebar=True` (which automatically means `no_titlebar=True`). 
 These allow `titlebar_icon="some_icon.png"`, which places a .png file on the titlebar, but simultaneously makes the window non-mini/maximizable on Mac OS X.

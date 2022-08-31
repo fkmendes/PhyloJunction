@@ -10,7 +10,7 @@ import phylojunction.readwrite.pj_read as pjread
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.pgm.pgm as pgm
 import phylojunction.interface.cmdbox.cmd_parse as cmdp
-import plotting.pj_organize as pjorg
+import phylojunction.plotting.pj_organize as pjorg
 
 
 def plot_violins(fig: Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xlab: ty.Optional[str]=None, ylab: ty.Optional[str]=None) -> None:
