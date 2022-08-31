@@ -496,7 +496,7 @@ def call_gui():
             sg.Column(
                 layout = [
                     [ sg.Button("Compare to .csv (...)", key="-LOAD-COMPARISON-CSV-", font=("Helvetica", 14)) ],
-                    [ sg.Multiline(key="-COMPARE-TO-", font=("Courier", 12), disabled=True, background_color="gray96", size=(108,18)) ],
+                    [ sg.Multiline(key="-COMPARE-TO-", font=("Courier", 12), disabled=True, background_color="gray96", size=(114,18)) ],
                     [ sg.Canvas(key="-COMPARISON-CANVAS-", background_color="white", size=(1200,450)) ],
                     [
                         sg.Button("Draw", key="-DRAW-VIOLIN1-", font=("Helvetica", 14)),
@@ -571,11 +571,12 @@ def call_gui():
                     ],
 
                     [
-                        sg.Multiline(key="-VALIDATE-TABLE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(85,18)),
-                        sg.Multiline(key="-VALIDATE-COVERAGE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(20 ,18))
+                        sg.Multiline(key="-VALIDATE-TABLE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(88,18)),
+                        sg.Push(),
+                        sg.Multiline(key="-VALIDATE-COVERAGE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(22,18))
                     ],
 
-                    [ sg.Canvas(key="-VALIDATION-CANVAS-", background_color="white", size=(1100,450)) ],
+                    [ sg.Canvas(key="-VALIDATION-CANVAS-", background_color="white", size=(1200,450)) ],
 
                     [ 
                         sg.Push(),
@@ -632,7 +633,7 @@ def call_gui():
     ###############
     # Main window #
     ###############
-    window = sg.Window("PhyloJunction", tabgrp, finalize=True, keep_on_top=True, element_justification="c", location=(0,0), resizable=True) 
+    window = sg.Window("PhyloJunction", tabgrp, finalize=True, keep_on_top=False, element_justification="c", location=(0,0), resizable=True) 
     window['-CMD-'].Widget.config(insertbackground="white")
     window["-REPL-AVG-"].set_tooltip("test")
     # window.Size = (1050, 760) # resolution-dependent
