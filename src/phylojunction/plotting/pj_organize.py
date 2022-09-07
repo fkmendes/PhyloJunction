@@ -1,8 +1,8 @@
-import matplotlib.pyplot as plt # type: ignore
-import seaborn as sns # type: ignore
-import pandas as pd # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
+import seaborn as sns  # type: ignore
+import pandas as pd  # type: ignore
 import typing as ty
-from tabulate import tabulate # type: ignore
+from tabulate import tabulate  # type: ignore
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -10,7 +10,11 @@ import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.readwrite.pj_read as pjread
 
-def join_dataframes(pj_df: pd.DataFrame, compare_to_df: pd.DataFrame, value_to_compare: str, summaries_avg_over_repl: bool=False) -> pd.DataFrame:
+def join_dataframes(
+    pj_df: pd.DataFrame,
+    compare_to_df: pd.DataFrame,
+    value_to_compare: str,
+    summaries_avg_over_repl: bool=False) -> pd.DataFrame:
     """_summary_
 
     Args:

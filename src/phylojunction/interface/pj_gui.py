@@ -16,9 +16,8 @@ import pickle # type: ignore
 from tabulate import tabulate # type: ignore
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # type: ignore
 from matplotlib.figure import Figure # type: ignore
-from matplotlib.widgets import Slider, Button, RadioButtons
 
-# pj imports
+# pj imports #
 import phylojunction.pgm.pgm as pgm
 import phylojunction.inference.revbayes.rb_inference as rbinf
 import phylojunction.readwrite.pj_write as pjwrite
@@ -456,6 +455,7 @@ def call_gui():
                 # gray96 for Listbox
                 layout = [
                     [ sg.VPush() ],
+                    
                     [ 
                         sg.Frame(
                             layout = [
@@ -471,8 +471,11 @@ def call_gui():
                             background_color="antiquewhite"
                         )
                     ],
+
                     [ sg.Checkbox("Replicate avgs.", key="-REPL-AVG-", default=False, font=("helvetica 14")) ],
+
                     [ sg.VPush() ],
+                    
                     [ 
                         sg.Frame(
                             layout = [
@@ -487,6 +490,7 @@ def call_gui():
                             font="helvetica 12 bold"
                         )
                     ],
+                    
                     [ sg.VPush() ]
                 ],
                 element_justification="left",
@@ -496,8 +500,15 @@ def call_gui():
             sg.Column(
                 layout = [
                     [ sg.Button("Compare to .csv (...)", key="-LOAD-COMPARISON-CSV-", font=("Helvetica", 14)) ],
+
                     [ sg.Multiline(key="-COMPARE-TO-", font=("Courier", 12), disabled=True, background_color="gray96", size=(114,18)) ],
-                    [ sg.Canvas(key="-COMPARISON-CANVAS-", background_color="white", size=(1200,450)) ],
+
+                    [ 
+                        sg.Push(),
+                        sg.Canvas(key="-COMPARISON-CANVAS-", background_color="white", size=(1200,450)),
+                        sg.Push(),
+                    ],
+
                     [
                         sg.Button("Draw", key="-DRAW-VIOLIN1-", font=("Helvetica", 14)),
                         sg.Button("Save plot to", key="-SAVE-VIOLIN-TO-", font=("Helvetica", 14))
@@ -576,7 +587,11 @@ def call_gui():
                         sg.Multiline(key="-VALIDATE-COVERAGE-", font=("Courier", 12), disabled=True, background_color="gray96", size=(22,18))
                     ],
 
-                    [ sg.Canvas(key="-VALIDATION-CANVAS-", background_color="white", size=(1200,450)) ],
+                    [ 
+                        sg.Push(),
+                        sg.Canvas(key="-VALIDATION-CANVAS-", background_color="white", size=(1200,450)),
+                        sg.Push()    
+                    ],
 
                     [ 
                         sg.Push(),

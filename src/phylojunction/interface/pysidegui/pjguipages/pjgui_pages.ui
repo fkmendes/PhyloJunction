@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PJGUIPages</class>
+ <widget class="QStackedWidget" name="PJGUIPages">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>975</width>
+    <height>721</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>StackedWidget</string>
+  </property>
+  <property name="currentIndex">
+   <number>0</number>
+  </property>
+  <widget class="QWidget" name="pgm_page">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QFrame" name="pgm_page_frame">
+      <property name="minimumSize">
+       <size>
+        <width>950</width>
+        <height>700</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: white;
+border: 0;</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QWidget" name="gridLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>190</y>
+         <width>951</width>
+         <height>433</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="pgm_fig_node_list_grid_layout">
+        <item row="1" column="1">
+         <widget class="QListWidget" name="node_list">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>400</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QListWidget {
+	background-color: #f1f3f5;
+	color: #495057;
+	border-radius: 5px;
+	border: 0;
+}
+QListWidget::item:selected{
+	background-color: #495057;
+	foreground-color: #495057 ;
+	color: white;
+	border: 0;
+}
+</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" alignment="Qt::AlignLeft">
+         <widget class="MatplotlibWidget" name="pgm_page_matplotlib_widget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>740</width>
+            <height>400</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <zorder>gridLayoutWidget</zorder>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="model_label">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 14pt &quot;Ubuntu&quot;;
+color: black;
+</string>
+          </property>
+          <property name="text">
+           <string>Model nodes</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>630</y>
+         <width>951</width>
+         <height>63</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="cmd_prompt_vert_layout">
+        <item>
+         <widget class="QLabel" name="cmd_prompt_label">
+          <property name="minimumSize">
+           <size>
+            <width>940</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 14pt &quot;Ubuntu&quot;;
+color: black;</string>
+          </property>
+          <property name="text">
+           <string>Command prompt</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="cmd_prompt">
+          <property name="minimumSize">
+           <size>
+            <width>940</width>
+            <height>35</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string extracomment="Enter command here"/>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: black;
+font: 14pt &quot;Courier&quot;;
+font-weight: bold;
+color: white;
+border-radius: 5px;</string>
+          </property>
+          <property name="cursorPosition">
+           <number>0</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="dragEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+           <string extracomment="Enter command here"/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QTabWidget" name="node_content_tabs">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>750</width>
+         <height>181</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: black;
+font: 14pt ;
+</string>
+       </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <widget class="QWidget" name="values_tab">
+        <attribute name="title">
+         <string>Value(s)</string>
+        </attribute>
+        <widget class="QLineEdit" name="values_content">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>750</width>
+           <height>141</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: white;
+border-radius: 4px;
+border: 4px solid lightgray;
+</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="summary_tab">
+        <attribute name="title">
+         <string>Summary stats.</string>
+        </attribute>
+        <widget class="QLineEdit" name="summary_content">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>750</width>
+           <height>141</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: 4px solid lightgray;
+border-radius: 4px;</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <zorder>verticalLayoutWidget</zorder>
+      <zorder>gridLayoutWidget</zorder>
+      <zorder>verticalLayoutWidget</zorder>
+      <zorder>horizontalLayoutWidget</zorder>
+      <zorder>pgm_page_matplotlib_widget</zorder>
+      <zorder>verticalLayoutWidget</zorder>
+      <zorder>gridLayoutWidget</zorder>
+      <zorder>gridLayoutWidget</zorder>
+      <zorder>verticalLayoutWidget</zorder>
+      <zorder>node_content_tabs</zorder>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="cmd_log_page">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Page 2</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MatplotlibWidget</class>
+   <extends>QWidget</extends>
+   <header>matplotlibwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
