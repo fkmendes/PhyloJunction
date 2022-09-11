@@ -23,9 +23,13 @@ class MatplotlibWidget(QWidget):
         
 
     def initialize_axes(self, fig: Figure, disabled_yticks: bool=True) -> plt.Axes:
-        # ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-        ax = fig.add_axes([0.075, 0.2, 0.6, 0.7])
-        # ax = fig.add_axes()
+        # horiz coord of lower-left corner
+        # vertical coord of lower-left corner
+        # subplott width
+        # subplot height
+        # ax = fig.add_axes([0.25, 0.2, 0.5, 0.6]) 
+        ax = fig.add_axes([0.075, 0.25, 0.6, 0.7])
+    
         ax.patch.set_alpha(0.0)
         ax.xaxis.set_ticks([])
         if disabled_yticks:

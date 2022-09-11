@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>975</width>
-    <height>721</height>
+    <width>972</width>
+    <height>724</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,7 +48,7 @@ border: 0;</string>
          <x>0</x>
          <y>190</y>
          <width>951</width>
-         <height>433</height>
+         <height>451</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="pgm_fig_node_list_grid_layout">
@@ -83,22 +83,102 @@ QListWidget::item:selected{
           </property>
          </widget>
         </item>
-        <item row="1" column="0" alignment="Qt::AlignLeft">
-         <widget class="MatplotlibWidget" name="pgm_page_matplotlib_widget" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>740</width>
-            <height>400</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <zorder>gridLayoutWidget</zorder>
-         </widget>
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QRadioButton" name="one_sample_radio">
+            <property name="styleSheet">
+             <string notr="true">color: black;
+</string>
+            </property>
+            <property name="text">
+             <string>One sample</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="all_samples_radio">
+            <property name="styleSheet">
+             <string notr="true">color: black;</string>
+            </property>
+            <property name="text">
+             <string>All samples</string>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="spacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Maximum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sample_idx_spin">
+            <property name="styleSheet">
+             <string notr="true">color: black;</string>
+            </property>
+            <property name="prefix">
+             <string>Sample #</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="spacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Maximum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="repl_idx_spin">
+            <property name="styleSheet">
+             <string notr="true">color: black;
+</string>
+            </property>
+            <property name="prefix">
+             <string>Replicate #</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="spacer_1">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="model_label">
@@ -127,13 +207,29 @@ color: black;
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="MatplotlibWidget" name="pgm_page_matplotlib_widget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>740</width>
+            <height>400</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>400</height>
+           </size>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>630</y>
+         <y>640</y>
          <width>951</width>
          <height>63</height>
         </rect>
@@ -210,9 +306,15 @@ border-radius: 5px;</string>
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>750</width>
+         <width>951</width>
          <height>181</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>940</width>
+         <height>0</height>
+        </size>
        </property>
        <property name="styleSheet">
         <string notr="true">color: black;
@@ -223,7 +325,7 @@ font: 14pt ;
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <property name="iconSize">
         <size>
@@ -235,20 +337,28 @@ font: 14pt ;
         <attribute name="title">
          <string>Value(s)</string>
         </attribute>
-        <widget class="QLineEdit" name="values_content">
+        <widget class="QTextEdit" name="values_content">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>750</width>
+           <width>951</width>
            <height>141</height>
           </rect>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>940</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="styleSheet">
-          <string notr="true">background-color: white;
+          <string notr="true">border: 4px solid lightgray;
 border-radius: 4px;
-border: 4px solid lightgray;
-</string>
+font: 11pt &quot;Courier&quot;;</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </widget>
@@ -256,35 +366,29 @@ border: 4px solid lightgray;
         <attribute name="title">
          <string>Summary stats.</string>
         </attribute>
-        <widget class="QLineEdit" name="summary_content">
+        <widget class="QTextEdit" name="summary_content">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>750</width>
+           <width>951</width>
            <height>141</height>
           </rect>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>940</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="styleSheet">
           <string notr="true">border: 4px solid lightgray;
-border-radius: 4px;</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+border-radius: 4px;
+font: 11pt &quot;Courier&quot;;</string>
          </property>
         </widget>
        </widget>
       </widget>
-      <zorder>verticalLayoutWidget</zorder>
-      <zorder>gridLayoutWidget</zorder>
-      <zorder>verticalLayoutWidget</zorder>
-      <zorder>horizontalLayoutWidget</zorder>
-      <zorder>pgm_page_matplotlib_widget</zorder>
-      <zorder>verticalLayoutWidget</zorder>
-      <zorder>gridLayoutWidget</zorder>
-      <zorder>gridLayoutWidget</zorder>
-      <zorder>verticalLayoutWidget</zorder>
-      <zorder>node_content_tabs</zorder>
      </widget>
     </item>
    </layout>

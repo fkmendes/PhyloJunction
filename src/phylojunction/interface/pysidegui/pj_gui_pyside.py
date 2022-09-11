@@ -44,6 +44,14 @@ class GUIMainWindow(QMainWindow):
         # node list #
         self.ui.ui_pages.node_list.itemClicked.connect(self.do_selected_node)
 
+        # radio button update #
+        self.ui.ui_pages.one_sample_radio.toggled.connect(lambda: self.refresh_selected_node_display_plot(True))
+        self.ui.ui_pages.all_samples_radio.toggled.connect(lambda: self.refresh_selected_node_display_plot(False))
+
+        # spin boxes update #
+        self.ui.ui_pages.sample_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot)
+        self.ui.ui_pages.repl_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot)
+
         # show #
         self.show()
 
@@ -125,6 +133,31 @@ class GUIMainWindow(QMainWindow):
         return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
         
+    def selected_node_display(self, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+        display_node_pgm_value_str = str()
+        display_node_pgm_stat_str = str()
+
+        # first we do values
+        # we care about a specific sample and maybe a specific replicate
+        if not sample_idx == None and not do_all_samples:
+            start = sample_idx * repl_size
+            end = start + repl_size
+            display_node_pgm_value_str = node_pgm.get_start2end_str(start, end) # values
+            display_node_pgm_stat_str = node_pgm.get_node_stats_str(start, end, repl_idx) # summary stats
+        
+        # we get all samples
+        else:
+            # just calling __str__
+            display_node_pgm_value_str = self.gui_modeling.pgm_obj.get_display_str_by_name(node_pgm.node_name)
+            # getting all values
+            display_node_pgm_stat_str = node_pgm.get_node_stats_str(0, len(node_pgm.value), repl_idx) # summary stats
+        
+        # print("Set values_content QLineEdit widget with text: " + display_node_pgm_value_str)
+        # print("Set summary_content QLineEdit widget with text: " + display_node_pgm_stat_str)
+        self.ui.ui_pages.values_content.setText(display_node_pgm_value_str)
+        self.ui.ui_pages.summary_content.setText(display_node_pgm_stat_str)
+
+
     def selected_node_plot(self, fig_obj, fig_axes, node_pgm, do_all_samples,
                            sample_idx=None, repl_idx=0, repl_size=1):
         """
@@ -148,7 +181,7 @@ class GUIMainWindow(QMainWindow):
         fig_obj.canvas.draw()
 
 
-    def do_selected_node(self, fig_obj, do_all_samples=True):
+    def do_selected_node(self):
         """
         Display selected node's string representation and
         plot it on canvas if possible
@@ -156,18 +189,40 @@ class GUIMainWindow(QMainWindow):
         
         # first get selected node's name
         node_name = self.ui.ui_pages.node_list.currentItem().text()
-
-        print("node_name = " + node_name)
         
         # grab pgm_page's figure and axes #
         fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
         fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
 
-        node_pgm, sample_size, repl_size = self.selected_node_read(node_name)
+        node_pgm, sample_size, repl_size = \
+            self.selected_node_read(node_name)
+
+        # updating spin boxes #
+        self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size - 1)
+        self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size - 1)
+
+        # doing all samples?
+        do_all_samples = \
+            self.ui.ui_pages.all_samples_radio.isChecked()
+        
+        # if node is a tree, we always look one tree at
+        # a time
+        if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+            do_all_samples = False
+        
+        # print("do_all_samples = " + str(do_all_samples))
 
         # TODO:
-        sample_idx = 0  # = int(wdw["-ITH-SAMPLE-"].get()) - 1 # (offset)
-        repl_idx = 0  # = int(wdw["-ITH-REPL-"].get()) - 1 # (offset)
+        # sample_idx = 0  # = int(wdw["-ITH-SAMPLE-"].get()) - 1 # (offset)
+        # repl_idx = 0  # = int(wdw["-ITH-REPL-"].get()) - 1 # (offset)
+        sample_idx = self.ui.ui_pages.sample_idx_spin.value()
+        repl_idx = self.ui.ui_pages.repl_idx_spin.value()
+
+        self.selected_node_display(node_pgm,
+                                   do_all_samples,
+                                   sample_idx=sample_idx,
+                                   repl_idx=0,
+                                   repl_size=1)
 
         self.selected_node_plot(fig_obj,
                                 fig_axes,
@@ -176,6 +231,44 @@ class GUIMainWindow(QMainWindow):
                                 sample_idx=sample_idx,
                                 repl_idx=repl_idx,
                                 repl_size=repl_size)      
+
+
+    def refresh_selected_node_display_plot(self, one_sample: bool):
+        if self.ui.ui_pages.node_list.currentItem() != None:
+            node_pgm, sample_size, repl_size = \
+                self.selected_node_read(
+                    self.ui.ui_pages.node_list.currentItem().text())
+
+            # if one sample at a time, spin element
+            # works (only for sampled random variables)
+            if one_sample:
+                self.ui.ui_pages.repl_idx_spin.setMaximum(sample_size)
+                self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+
+                # if we are looking at trees, we can cycle through replicates
+                if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+                    self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
+                    self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+
+                # otherwise, all replicates will be visualized
+                # as histogram (no cycling allowed)
+                else:
+                    self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+
+            # if we're looking at all samples, all samples
+            # and replicates shown in histogram
+            #
+            # and if tree, only one sample at a time is allowed
+            else:
+                self.ui.ui_pages.repl_idx_spin.setValue(0)
+                self.ui.ui_pages.repl_idx_spin.setMaximum(0)
+                self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+                self.ui.ui_pages.sample_idx_spin.setValue(0)
+                self.ui.ui_pages.sample_idx_spin.setMaximum(0)
+                self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+
+            # now refresh selected node display and plot #
+            self.do_selected_node()
 
 
 class GUIModeling():
