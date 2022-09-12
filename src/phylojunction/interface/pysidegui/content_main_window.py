@@ -8,9 +8,10 @@ from PySide6.QtWidgets import QSpacerItem  # type: ignore
 from PySide6.QtWidgets import QSizePolicy  # type: ignore
 from PySide6.QtWidgets import QPushButton  # type: ignore
 
-from interface.pysidegui.pjguipages.gui_pages \
+# pj imports #
+from phylojunction.interface.pysidegui.pjguipages.gui_pages \
     import Ui_PJGUIPages  # type: ignore
-from interface.pysidegui.pjguiwidgets.pj_buttons \
+from phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons \
     import PJPushButton  # type: ignore
 
 

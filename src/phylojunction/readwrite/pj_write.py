@@ -238,7 +238,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                                                                             summaries=False,
                                                                             summaries_avg_over_repl=False)
                 tree_value_df_dict[rv_name][rv_name] = [
-                    ith_val.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True).strip("\"").strip() \
+                    ith_val.tree.as_string(schema="newick", suppress_annotations=False, suppress_internal_taxon_labels=True).strip("\"").strip() \
                         for ith_val in node_val
                 ]
 
@@ -273,7 +273,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                     # NOTE: at the moment, all leaves are counted (in the future, maybe just the sampled ones)
                     if total_n_states > 1:
                         for ith_state in range(replicate_tree.state_count):
-                            tree_summary_df_dict[rv_name].at[i, "n_" + str(ith_state)] = replicate_tree.state_count_dict[ith_state]
+                            tree_summary_df_dict[rv_name].at[idx, "n_" + str(ith_state)] = replicate_tree.state_count_dict[ith_state]
 
                     idx += 1
 
