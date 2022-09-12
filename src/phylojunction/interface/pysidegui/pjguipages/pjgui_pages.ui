@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>972</width>
-    <height>724</height>
+    <height>726</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@ border: 0;</string>
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>190</y>
+         <y>180</y>
          <width>951</width>
          <height>451</height>
         </rect>
@@ -75,7 +75,6 @@ border: 0;</string>
 }
 QListWidget::item:selected{
 	background-color: #495057;
-	foreground-color: #495057 ;
 	color: white;
 	border: 0;
 }
@@ -94,8 +93,11 @@ QListWidget::item:selected{
             <property name="text">
              <string>One sample</string>
             </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -106,6 +108,9 @@ QListWidget::item:selected{
             </property>
             <property name="text">
              <string>All samples</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
             </property>
             <property name="autoExclusive">
              <bool>true</bool>
@@ -133,6 +138,9 @@ QListWidget::item:selected{
             <property name="styleSheet">
              <string notr="true">color: black;</string>
             </property>
+            <property name="accelerated">
+             <bool>true</bool>
+            </property>
             <property name="prefix">
              <string>Sample #</string>
             </property>
@@ -159,6 +167,12 @@ QListWidget::item:selected{
             <property name="styleSheet">
              <string notr="true">color: black;
 </string>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+            <property name="accelerated">
+             <bool>true</bool>
             </property>
             <property name="prefix">
              <string>Replicate #</string>
@@ -229,7 +243,7 @@ color: black;
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>640</y>
+         <y>630</y>
          <width>951</width>
          <height>63</height>
         </rect>
@@ -361,6 +375,8 @@ font: 11pt &quot;Courier&quot;;</string>
           <bool>true</bool>
          </property>
         </widget>
+        <zorder>values_content</zorder>
+        <zorder>gridLayoutWidget</zorder>
        </widget>
        <widget class="QWidget" name="summary_tab">
         <attribute name="title">

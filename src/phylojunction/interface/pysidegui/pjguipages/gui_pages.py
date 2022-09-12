@@ -13,7 +13,7 @@ from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import Matp
 class Ui_PJGUIPages(object):
     def setupUi(self, PJGUIPages):
         PJGUIPages.setObjectName("PJGUIPages")
-        PJGUIPages.resize(972, 724)
+        PJGUIPages.resize(972, 726)
         self.pgm_page = QtWidgets.QWidget()
         self.pgm_page.setObjectName("pgm_page")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.pgm_page)
@@ -27,7 +27,7 @@ class Ui_PJGUIPages(object):
         self.pgm_page_frame.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.pgm_page_frame.setObjectName("pgm_page_frame")
         self.gridLayoutWidget = QtWidgets.QWidget(self.pgm_page_frame)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 190, 951, 451))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 180, 951, 451))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.pgm_fig_node_list_grid_layout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.pgm_fig_node_list_grid_layout.setContentsMargins(0, 0, 0, 0)
@@ -43,7 +43,6 @@ class Ui_PJGUIPages(object):
 "}\n"
 "QListWidget::item:selected{\n"
 "    background-color: #495057;\n"
-"    foreground-color: #495057 ;\n"
 "    color: white;\n"
 "    border: 0;\n"
 "}\n"
@@ -55,17 +54,21 @@ class Ui_PJGUIPages(object):
         self.one_sample_radio = QtWidgets.QRadioButton(self.gridLayoutWidget)
         self.one_sample_radio.setStyleSheet("color: black;\n"
 "")
-        self.one_sample_radio.setChecked(True)
+        self.one_sample_radio.setCheckable(False)
+        self.one_sample_radio.setChecked(False)
         self.one_sample_radio.setObjectName("one_sample_radio")
         self.horizontalLayout.addWidget(self.one_sample_radio)
         self.all_samples_radio = QtWidgets.QRadioButton(self.gridLayoutWidget)
         self.all_samples_radio.setStyleSheet("color: black;")
+        self.all_samples_radio.setCheckable(False)
+        self.all_samples_radio.setAutoExclusive(True)
         self.all_samples_radio.setObjectName("all_samples_radio")
         self.horizontalLayout.addWidget(self.all_samples_radio)
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Maximum, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.sample_idx_spin = QtWidgets.QSpinBox(self.gridLayoutWidget)
         self.sample_idx_spin.setStyleSheet("color: black;")
+        self.sample_idx_spin.setAccelerated(True)
         self.sample_idx_spin.setObjectName("sample_idx_spin")
         self.horizontalLayout.addWidget(self.sample_idx_spin)
         spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Policy.Maximum, QtWidgets.QSizePolicy.Policy.Minimum)
@@ -73,6 +76,8 @@ class Ui_PJGUIPages(object):
         self.repl_idx_spin = QtWidgets.QSpinBox(self.gridLayoutWidget)
         self.repl_idx_spin.setStyleSheet("color: black;\n"
 "")
+        self.repl_idx_spin.setReadOnly(False)
+        self.repl_idx_spin.setAccelerated(True)
         self.repl_idx_spin.setObjectName("repl_idx_spin")
         self.horizontalLayout.addWidget(self.repl_idx_spin)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
@@ -93,7 +98,7 @@ class Ui_PJGUIPages(object):
         self.pgm_page_matplotlib_widget.setObjectName("pgm_page_matplotlib_widget")
         self.pgm_fig_node_list_grid_layout.addWidget(self.pgm_page_matplotlib_widget, 1, 0, 1, 1)
         self.verticalLayoutWidget = QtWidgets.QWidget(self.pgm_page_frame)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 640, 951, 63))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 630, 951, 63))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.cmd_prompt_vert_layout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.cmd_prompt_vert_layout.setContentsMargins(0, 0, 0, 0)
@@ -140,6 +145,8 @@ class Ui_PJGUIPages(object):
 "font: 11pt \"Courier\";")
         self.values_content.setReadOnly(True)
         self.values_content.setObjectName("values_content")
+        self.values_content.raise_()
+        self.gridLayoutWidget.raise_()
         self.node_content_tabs.addTab(self.values_tab, "")
         self.summary_tab = QtWidgets.QWidget()
         self.summary_tab.setObjectName("summary_tab")

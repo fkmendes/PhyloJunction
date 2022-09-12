@@ -45,8 +45,10 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.node_list.itemClicked.connect(self.do_selected_node)
 
         # radio button update #
-        self.ui.ui_pages.one_sample_radio.toggled.connect(lambda: self.refresh_selected_node_display_plot(True))
-        self.ui.ui_pages.all_samples_radio.toggled.connect(lambda: self.refresh_selected_node_display_plot(False))
+        # self.ui.ui_pages.one_sample_radio.toggled.connect(lambda: self.refresh_selected_node_display_plot)
+        # self.ui.ui_pages.all_samples_radio.toggled.connect(lambda: self.refresh_selected_node_display_plot)
+        self.ui.ui_pages.one_sample_radio.clicked.connect(self.refresh_selected_node_display_plot)
+        self.ui.ui_pages.all_samples_radio.clicked.connect(self.refresh_selected_node_display_plot)
 
         # spin boxes update #
         self.ui.ui_pages.sample_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot)
@@ -142,15 +144,26 @@ class GUIMainWindow(QMainWindow):
         if not sample_idx == None and not do_all_samples:
             start = sample_idx * repl_size
             end = start + repl_size
-            display_node_pgm_value_str = node_pgm.get_start2end_str(start, end) # values
-            display_node_pgm_stat_str = node_pgm.get_node_stats_str(start, end, repl_idx) # summary stats
+
+            # values
+            display_node_pgm_value_str = \
+                node_pgm.get_start2end_str(start, end)
+            
+            # summary stats
+            display_node_pgm_stat_str = \
+                node_pgm.get_node_stats_str(start, end, repl_idx)
         
         # we get all samples
         else:
             # just calling __str__
-            display_node_pgm_value_str = self.gui_modeling.pgm_obj.get_display_str_by_name(node_pgm.node_name)
+            display_node_pgm_value_str = \
+                self.gui_modeling.pgm_obj.\
+                get_display_str_by_name(node_pgm.node_name)
+            
             # getting all values
-            display_node_pgm_stat_str = node_pgm.get_node_stats_str(0, len(node_pgm.value), repl_idx) # summary stats
+            display_node_pgm_stat_str = \
+                node_pgm.get_node_stats_str(
+                    0, len(node_pgm.value), repl_idx) # summary stats
         
         # print("Set values_content QLineEdit widget with text: " + display_node_pgm_value_str)
         # print("Set summary_content QLineEdit widget with text: " + display_node_pgm_stat_str)
@@ -181,48 +194,134 @@ class GUIMainWindow(QMainWindow):
         fig_obj.canvas.draw()
 
 
+    def init_and_refresh_radio_spin(self, node_pgm):
+
+        ###################
+        # Stochastic node #
+        ###################
+
+        if node_pgm.is_sampled:
+            # we always look one tree at a time
+            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+                # radio #
+                self.ui.ui_pages.all_samples_radio.setCheckable(False)
+                self.ui.ui_pages.all_samples_radio.setDisabled(True)
+                self.ui.ui_pages.one_sample_radio.setCheckable(True)
+                
+                # default radio value
+                self.ui.ui_pages.one_sample_radio.setChecked(True)
+
+                # spin #
+                self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+                self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+
+            else:
+                # if it's the first click selecting node
+                if not self.ui.ui_pages.all_samples_radio.isCheckable() and \
+                    not self.ui.ui_pages.one_sample_radio.isCheckable():
+
+                    # radio #
+                    self.ui.ui_pages.all_samples_radio.setCheckable(True)
+                    self.ui.ui_pages.one_sample_radio.setCheckable(True)
+
+                    # default radio value
+                    self.ui.ui_pages.one_sample_radio.setChecked(True)
+
+                    # spin #
+                    self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+                    self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+
+                else:
+                    if self.ui.ui_pages.all_samples_radio.isChecked():
+                        self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+                        self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+
+                    else:
+                        self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+                        self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+
+        #################
+        # Constant node #
+        #################
+
+        else:
+            self.ui.ui_pages.all_samples_radio.setCheckable(False)
+            self.ui.ui_pages.one_sample_radio.setCheckable(False)
+            self.ui.ui_pages.repl_idx_spin.setValue(0)
+            self.ui.ui_pages.sample_idx_spin.setValue(0)
+
     def do_selected_node(self):
         """
         Display selected node's string representation and
         plot it on canvas if possible
         """
         
-        # first get selected node's name
-        node_name = self.ui.ui_pages.node_list.currentItem().text()
-        
-        # grab pgm_page's figure and axes #
-        fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
-        fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
+        # first get selected node's name #
+        node_name = \
+            self.ui.ui_pages.node_list.currentItem().text()
 
+        # reading node information #
         node_pgm, sample_size, repl_size = \
             self.selected_node_read(node_name)
-
-        # updating spin boxes #
+        
+        # spin boxes must be up-to-date #
         self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size - 1)
         self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size - 1)
 
-        # doing all samples?
+        # grab pgm_page's figure and axes #
+        fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
+        fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
+        
+        # activate radio buttons and spin elements #
+        self.init_and_refresh_radio_spin(node_pgm)
+        
         do_all_samples = \
             self.ui.ui_pages.all_samples_radio.isChecked()
         
-        # if node is a tree, we always look one tree at
-        # a time
-        if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-            do_all_samples = False
-        
-        # print("do_all_samples = " + str(do_all_samples))
+        # do_all_samples: bool = False
+        # if node_pgm.is_sampled:
+        #     # we always look one tree at a time
+        #     if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+        #         self.ui.ui_pages.all_samples_radio.setCheckable(False)
+        #         self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+        #         self.ui.ui_pages.one_sample_radio.setCheckable(True)
+        #         self.ui.ui_pages.one_sample_radio.setChecked(True)
+        #         self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+        #         do_all_samples = False
 
-        # TODO:
-        # sample_idx = 0  # = int(wdw["-ITH-SAMPLE-"].get()) - 1 # (offset)
-        # repl_idx = 0  # = int(wdw["-ITH-REPL-"].get()) - 1 # (offset)
+        #     else:
+        #         # if it's the first click selecting node
+        #         if not self.ui.ui_pages.all_samples_radio.isCheckable() and \
+        #             not self.ui.ui_pages.one_sample_radio.isCheckable():
+        #             self.ui.ui_pages.all_samples_radio.setCheckable(True)
+        #             self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+        #             self.ui.ui_pages.one_sample_radio.setCheckable(True)
+        #             self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+        #             self.ui.ui_pages.one_sample_radio.setChecked(True)
+
+        #         else:                    
+        #             do_all_samples = \
+        #                 self.ui.ui_pages.all_samples_radio.isChecked()
+
+        #             if do_all_samples:
+        #                 self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+        #                 self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+        
+        #################################
+        # Collect information from spin #
+        #################################
+        
         sample_idx = self.ui.ui_pages.sample_idx_spin.value()
         repl_idx = self.ui.ui_pages.repl_idx_spin.value()
 
+        ###############
+        # Now do node #
+        ###############
         self.selected_node_display(node_pgm,
                                    do_all_samples,
                                    sample_idx=sample_idx,
-                                   repl_idx=0,
-                                   repl_size=1)
+                                   repl_idx=repl_idx,
+                                   repl_size=repl_size)
 
         self.selected_node_plot(fig_obj,
                                 fig_axes,
@@ -233,39 +332,88 @@ class GUIMainWindow(QMainWindow):
                                 repl_size=repl_size)      
 
 
-    def refresh_selected_node_display_plot(self, one_sample: bool):
+    def refresh_selected_node_display_plot(self):
+        
+        # if nodes have been created and selected #
         if self.ui.ui_pages.node_list.currentItem() != None:
-            node_pgm, sample_size, repl_size = \
-                self.selected_node_read(
-                    self.ui.ui_pages.node_list.currentItem().text())
+            # node_pgm, sample_size, repl_size = \
+            #     self.selected_node_read(
+            #         self.ui.ui_pages.node_list.currentItem().text())
 
-            # if one sample at a time, spin element
-            # works (only for sampled random variables)
-            if one_sample:
-                self.ui.ui_pages.repl_idx_spin.setMaximum(sample_size)
-                self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+        #     ###################
+        #     # Stochastic node #
+        #     ###################
+            
+        #     if node_pgm.is_sampled:
+        #         # if both radio buttons are inactive, we
+        #         # must activate them
+        #         if not self.ui.ui_pages.one_sample_radio.isCheckable() and \
+        #             not self.ui.ui_pages.all_samples_radio.isCheckable():
+                    
+        #             # activate radio buttons #
+        #             self.ui.ui_pages.all_samples_radio.setCheckable(True)
+        #             self.ui.ui_pages.one_sample_radio.setCheckable(True)
 
-                # if we are looking at trees, we can cycle through replicates
-                if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                    self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
-                    self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+        #             # one sample is the default #
+        #             self.ui.ui_pages.one_sample_radio.setChecked(True)          
 
-                # otherwise, all replicates will be visualized
-                # as histogram (no cycling allowed)
-                else:
-                    self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+        #         # cycling through trees can only be done
+        #         # with "one-sample" radio button
+        #         if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+        #             self.ui.ui_pages.all_samples_radio.setDisabled(True)
+        #             self.ui.ui_pages.all_samples_radio.setCheckable(False)
+                
+        #         # for all other stochastic nodes,
+        #         # cycling can be done through "all-samples"
+        #         else:
+        #             self.ui.ui_pages.all_samples_radio.setCheckable(True)
+        #             self.ui.ui_pages.all_samples_radio.setEnabled(True)
 
-            # if we're looking at all samples, all samples
-            # and replicates shown in histogram
-            #
-            # and if tree, only one sample at a time is allowed
-            else:
-                self.ui.ui_pages.repl_idx_spin.setValue(0)
-                self.ui.ui_pages.repl_idx_spin.setMaximum(0)
-                self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-                self.ui.ui_pages.sample_idx_spin.setValue(0)
-                self.ui.ui_pages.sample_idx_spin.setMaximum(0)
-                self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+        #     #################
+        #     # Constant node #
+        #     #################
+            
+        #     else:
+        #         self.ui.ui_pages.all_samples_radio.setCheckable(False)
+        #         self.ui.ui_pages.one_sample_radio.setCheckable(False)
+
+
+        # # now collect if one sample if
+        # # radio buttons are activated
+        # one_sample: bool = False
+        # try:
+        #     one_sample = self.ui.ui_pages.\
+        #         one_sample_radio.isChecked()
+
+        # except:
+        #     pass
+
+
+        # # if one sample at a time, spin element
+        # # works (only for sampled random variables)
+        # if self.ui.ui_pages.one_sample_radio.isCheckable() and \
+        #     one_sample:
+        #     self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+
+        #     # if we are looking at trees, we can cycle through replicates
+        #     if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+        #         self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+
+        #     # otherwise, all replicates will be visualized
+        #     # as histogram (no cycling allowed)
+        #     else:
+        #         self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+
+        # # if we're looking at all samples, all samples
+        # # and replicates shown in histogram
+        # #
+        # # and if tree, only one sample at a time is allowed
+        # elif self.ui.ui_pages.all_samples_radio.isCheckable() and \
+        #     not one_sample:
+        #     self.ui.ui_pages.repl_idx_spin.setValue(0)
+        #     self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+        #     self.ui.ui_pages.sample_idx_spin.setValue(0)
+        #     self.ui.ui_pages.sample_idx_spin.setDisabled(True)
 
             # now refresh selected node display and plot #
             self.do_selected_node()

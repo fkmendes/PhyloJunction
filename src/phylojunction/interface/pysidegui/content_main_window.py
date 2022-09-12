@@ -181,6 +181,8 @@ class ContentGUIMainWindow(object):
 
         self.ui_pages = Ui_PJGUIPages()
         self.ui_pages.setupUi(self.pages)  # self.pages is the parent
+        self.ui_pages.sample_idx_spin.setDisabled(True)
+        self.ui_pages.repl_idx_spin.setDisabled(True)
 
 
         ##################
