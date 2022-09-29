@@ -14,7 +14,8 @@ import phylojunction.interface.cmdbox.cmd_parse as cmdp
 # for debugging
 from tabulate import tabulate # type: ignore
 
-def write_text_output(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> None:
+
+def write_str_list(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> None:
     content_string = "\n".join(content_string_list)
     outfile_handle.write(content_string)
 
@@ -134,8 +135,10 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
 
     # tree nodes (one dataframe per different tree node)
     tree_value_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1].tsv": pd.DataFrame with newick strings, for all replicates and samples, "[tr_node_name2].tsv": ... }
+    tree_rec_value_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1].tsv": pd.DataFrame with newick strings (reconstructed trees), for all replicates and samples, "[tr_node_name2].tsv": ... }
     tree_summary_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1]_summaries.tsv": pd.DataFrame with summary stats, for all replicates and samples }
     tree_repl_summary_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1]_replicate_summary.tsv": pd.DataFrame summary stats averaged over replicates, for all samples }
+    tree_nexus_str_states_dict: ty.Dict[str, str] = dict() # { "[tr_node_name1]_sampleidx_repl_idx": nexus_str, ... }
 
     # creating object to hold r.v. values and summaries
     scalar_constant_df: pd.DataFrame = pd.DataFrame()
@@ -234,13 +237,41 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                 try:
                     tree_value_df_dict[rv_name].empty
                 except:
-                    tree_value_df_dict[rv_name] = initialize_tree_dataframe(sample_size, n_repl=n_repl,
-                                                                            summaries=False,
-                                                                            summaries_avg_over_repl=False)
+                    tree_value_df_dict[rv_name] = \
+                        initialize_tree_dataframe(
+                            sample_size,
+                            n_repl=n_repl,
+                            summaries=False,
+                            summaries_avg_over_repl=False)
+
+                    tree_rec_value_df_dict[rv_name] = \
+                        initialize_tree_dataframe(
+                            sample_size,
+                            n_repl=n_repl,
+                            summaries=False,
+                            summaries_avg_over_repl=False)
+                
+                # complete trees #
                 tree_value_df_dict[rv_name][rv_name] = [
-                    ith_val.tree.as_string(schema="newick", suppress_annotations=False, suppress_internal_taxon_labels=True).strip("\"").strip() \
+                    ith_val.tree.as_string(
+                        schema="newick",
+                        suppress_annotations=False,
+                        suppress_internal_taxon_labels=True).strip("\"").strip() \
                         for ith_val in node_val
                 ]
+
+                # reconstructed trees #
+                rec_tree_list = []
+                for ith_val in node_val:
+                    ith_rec_tree = ith_val.extract_reconstructed_tree()
+                    rec_tree_list.append(
+                        ith_rec_tree.as_string(
+                            schema="newick",
+                            suppress_annotations=False,
+                            suppress_internal_taxon_labels=True).strip("\"").strip()
+                    )
+
+                tree_rec_value_df_dict[rv_name][rv_name] = rec_tree_list
 
                 
                 ####################################
@@ -343,6 +374,33 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                         tree_repl_summary_df_dict[rv_name].at[j+1, "n_sa"] = "{:,.5f}".format(stat.stdev(repls_all_stats_dict["Direct ancestor count"]))
                         j += 2
 
+
+                ######################################
+                # Doing dictionary with nexus string #
+                # for states                         #
+                ###################################### 
+                sample_idx = 0
+                repl_idx = 0
+                idx = 0
+                for replicate_tree in node_val:
+                    while (sample_idx < sample_size):
+                        while (repl_idx < n_repl):
+                            nex_fp = rv_name + "_sample" + str(sample_idx+1) + "_repl" + str(repl_idx+1) + ".nex"
+                            nexus_str = node_val[idx].get_taxon_states_nexus_str()
+                            tree_nexus_str_states_dict[nex_fp] = nexus_str
+                            repl_idx += 1
+                            idx += 1
+                        repl_idx = 0
+                        sample_idx += 1
+                    # TODO
+                    # while (sample_idx < n_samples):
+                    #     while (repl_idx < n_repl):
+                    #         nex_fp = node_name + "_sample" + str(sample_idx) + "_repl" + str(repl_idx) + ".nex"
+                    #         nexus_str = node_val[idx].get_taxon_states_nexus_str()
+                    #         tree_nexus_str_states_dict[nex_fp] = nexus_str
+                    #         repl_idx += 1
+                    #     sample_idx += 1
+
     # debugging
     # print("\n\nPrinting dataframe for scalars with fixed value:\n")
     # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(), tablefmt="pretty", showindex=False).lstrip())
@@ -354,8 +412,12 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
     # print("\n\nPrinting dataframe with scalar replicate summaries:\n")
     # print(tabulate(scalar_repl_summary_df, scalar_repl_summary_df.head(), tablefmt="pretty", showindex=False).lstrip())
     
-    # print("\n\nPrinting dataframe with tree values, with replicates if those exist:\n")
+    # print("\n\nPrinting dataframe with complete tree values, with replicates if those exist:\n")
     # for tr_node_name, tr_df in tree_value_df_dict.items():
+    #     print(tabulate(tr_df, tr_df.head(), tablefmt="plain", showindex=False).lstrip() + "\n")
+
+    # print("\n\nPrinting dataframe with reconstructed tree values, with replicates if those exist:\n")
+    # for tr_node_name, tr_df in tree_rec_value_df_dict.items():
     #     print(tabulate(tr_df, tr_df.head(), tablefmt="plain", showindex=False).lstrip() + "\n")
 
     # print("\n\nPrinting dataframe with tree summaries, with replicates if those exist:\n")
@@ -367,26 +429,36 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
     #     print(tr_node_name)
     #     print(tabulate(tr_df, tr_df.head(), tablefmt="pretty", showindex=False).lstrip())
 
+    # print("\n\nPrinting nexus files with states from all trees:\n")
+    # for nex_fp, nexus_str in tree_nexus_str_states_dict.items():
+    #     print(nex_fp)
+    #     print(nexus_str)
+
     ############################
     # Finally adding to return #
     ############################
     scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]] = []
-    tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]] = []
+    tree_output_stash: ty.List[ty.Union[ty.Dict[str, pd.DataFrame], ty.Dict[str, str]]] = []
 
     scalar_output_stash.extend([scalar_constant_df,
-                               scalar_value_df_dict,
-                               scalar_repl_summary_df]
+                                scalar_value_df_dict,
+                                scalar_repl_summary_df]
     )
 
     tree_output_stash.extend([tree_value_df_dict,
-                             tree_summary_df_dict,
-                             tree_repl_summary_df_dict]
+                              tree_rec_value_df_dict,
+                              tree_summary_df_dict,
+                              tree_repl_summary_df_dict,
+                              tree_nexus_str_states_dict]
     )
 
     return scalar_output_stash, tree_output_stash
 
 
-def prep_data_filepaths_dfs(scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]], tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]]) -> ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]:
+def prep_data_filepaths_dfs(
+    scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
+    tree_output_stash: ty.List[ty.Union[ty.Dict[str, pd.DataFrame], ty.Dict[str, str]]]) \
+        -> ty.Tuple[ty.List[str], ty.List[ty.Union[pd.DataFrame, str]]]:
     """Prepare list of file paths and list of pandas dataframes from tuples returned by prep_data_df()
 
     Args:
@@ -398,38 +470,46 @@ def prep_data_filepaths_dfs(scalar_output_stash: ty.List[ty.Union[pd.DataFrame, 
     """
     
     output_fp_list: ty.List[str] = []
-    output_df_list: ty.List[pd.DataFrame] = []
+    output_df_str_list: ty.List[pd.DataFrame] = []
     
     # scalar variables
     if not scalar_output_stash[0].empty:
         output_fp_list.append("scalar_constants.csv")
-        output_df_list.append(scalar_output_stash[0])
+        output_df_str_list.append(scalar_output_stash[0])
     if scalar_output_stash[1]:
         for n_repl, df in scalar_output_stash[1].items():
             output_fp_list.append("scalar_rvs_" + str(n_repl) + "repl.csv")
-            output_df_list.append(df)
+            output_df_str_list.append(df)
     if not scalar_output_stash[2].empty:
         output_fp_list.append("scalar_rvs_stats_summary.csv")
-        output_df_list.append(scalar_output_stash[2])
+        output_df_str_list.append(scalar_output_stash[2])
 
     # tree variables
     if tree_output_stash[0]:
-        for n_repl, df in tree_output_stash[0].items():
-            output_fp_list.append(n_repl + ".tsv")
-            output_df_list.append(df)
+        for rv_name, df in tree_output_stash[0].items():
+            output_fp_list.append(rv_name + "_complete.tsv")
+            output_df_str_list.append(df)
     if tree_output_stash[1]:
-        for n_repl, df in tree_output_stash[1].items():
-            output_fp_list.append(n_repl + "_stats.csv")
-            output_df_list.append(df)
-    if tree_output_stash[1]:
-        for n_repl, df in tree_output_stash[2].items():
-            output_fp_list.append(n_repl + "_stats_summary.csv")
-            output_df_list.append(df)
+        for rv_name, df in tree_output_stash[1].items():
+            output_fp_list.append(rv_name + "_reconstructed.tsv")
+            output_df_str_list.append(df)
+    if tree_output_stash[2]:
+        for rv_name, df in tree_output_stash[2].items():
+            output_fp_list.append(rv_name + "_stats.csv")
+            output_df_str_list.append(df)
+    if tree_output_stash[3]:
+        for rv_name, df in tree_output_stash[3].items():
+            output_fp_list.append(rv_name + "_stats_summary.csv")
+            output_df_str_list.append(df)
+    if tree_output_stash[4]:
+        for state_nex_fp, state_nex_string in tree_output_stash[4].items():
+            output_fp_list.append(state_nex_fp)
+            output_df_str_list.append(state_nex_string)
 
-    return output_fp_list, output_df_list
+    return output_fp_list, output_df_str_list
 
 
-def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="") -> None:
+def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="", write_nex_states: bool=False) -> None:
     """Write stochastic-node sampled values in specified directory 
     
     Args:
@@ -447,12 +527,16 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
     scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]]
     tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]]
     output_fp_list: ty.List[str]
-    output_df_list: ty.List[pd.DataFrame]
+    output_df_str_list: ty.List[pd.DataFrame]
 
-    scalar_output_stash, tree_output_stash = prep_data_df(pgm_obj) # still prefixless
-    output_fp_list, output_df_list = prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)
+    # still prefixless #
+    scalar_output_stash, tree_output_stash = \
+        prep_data_df(pgm_obj) 
+
+    output_fp_list, output_df_str_list = \
+        prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)
     
-    # sort out file path
+    # sort out file path #
     if not dir_string.endswith("/"):
         dir_string += "/"
     
@@ -461,25 +545,40 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
     if prefix:
         output_file_path += prefix + "_"
 
-    # full file paths
-    data_df_full_fp_list = [output_file_path + fn for fn in output_fp_list]
+    # full file paths #
+    data_df_full_fp_list = \
+        [output_file_path + fn for fn in output_fp_list]
 
     # debugging
     # print("\n\n" + "\n".join(data_df_full_fp_list))
-    # for df in output_df_list:
-    #     print(tabulate(df, df.head(), tablefmt="plain", showindex=False).lstrip())
+    # for df_or_str in output_df_str_list:
+    #     if isinstance(df_or_str, pd.DataFrame):
+    #         print(tabulate(df, df.head(), tablefmt="plain", showindex=False).lstrip())
     
-    # write!
+    # write! #
     for idx, full_fp in enumerate(data_df_full_fp_list):
         with open(full_fp, "w") as data_out:
             f: str = ""
+            to_print = output_df_str_list[idx]
             
             if full_fp.endswith("csv"):
                 f = "csv"
+            
             elif full_fp.endswith("tsv"):
                 f = "tsv"
             
-            write_data_df(data_out, output_df_list[idx], format=f)
+            elif full_fp.endswith("nex"):
+                f = "nex"
+
+            if isinstance(to_print, pd.DataFrame):
+                write_data_df(data_out, to_print, format=f)
+            
+            elif isinstance(to_print, str):
+                # ignore nexus file #
+                if f == "nex" and not write_nex_states:
+                    continue
+                
+                write_str_list(data_out, [to_print])
 
 
 def dump_serialized_pgm(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="") -> None:
@@ -566,4 +665,4 @@ if __name__ == "__main__":
     prep_data_df(pgm_obj)
     
     # or: to see file names and dataframes after organized (uncomment debugging)
-    # dump_pgm_data("./", pgm_obj, prefix="")
+    # dump_pgm_data("./", pgm_obj, prefix="test")

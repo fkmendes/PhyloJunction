@@ -1,6 +1,7 @@
 import typing as ty
 import dendropy as dp # type: ignore
 import matplotlib # type: ignore
+import copy # type: ignore
 import numpy as np
 import collections
 # from dendropy import Node, Tree, Taxon 
@@ -28,6 +29,7 @@ class AnnotatedTree(dp.Tree):
     root_age: ty.Optional[float] # can be None
     tree_read_as_newick_by_dendropy: bool
     tree: dp.Tree
+    tree_reconstructed: dp.Tree
     state_count: int
     seed_age: float
     max_age: ty.Optional[float]
@@ -37,7 +39,7 @@ class AnnotatedTree(dp.Tree):
     state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
-    node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]
+    node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]] # { node_name: { attr: value }}
     slice_t_ends: ty.List[ty.Optional[float]]
     slice_age_ends: ty.Optional[ty.List[float]] # can be None
     sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]] # can be None
@@ -423,11 +425,30 @@ class AnnotatedTree(dp.Tree):
         
         Remove internal nodes from taxon namespace, does not affect a tree's newick representation
         """
+        
         if not self.tree_read_as_newick_by_dendropy:
             for nd in self.tree.nodes():
                 if not nd.is_leaf():
                     self.tree.taxon_namespace.remove_taxon(nd.taxon)
 
+
+    # side-effect:
+    # populates self.tree_reconstructed
+    def extract_reconstructed_tree(self) -> dp.Tree:
+        """Make deep copy of self.tree, then prune extinct taxa from copy"""
+        
+        filter_fn = lambda nd: nd.is_sa or (nd.is_leaf() and nd.alive)
+        self.tree_reconstructed = copy.deepcopy(self.tree)
+
+        # if tree went extinct, return empty new tree
+        if (self.n_extant_terminal_nodes + self.n_sa) == 0:
+            return dp.Tree()
+        
+        self.tree_reconstructed.filter_leaf_nodes(
+            filter_fn, suppress_unifurcations=False)
+        
+        return self.tree_reconstructed
+            
 
     def name_internal_nodes(self):
         pass
@@ -503,6 +524,34 @@ class AnnotatedTree(dp.Tree):
         
         return dict((ks[i], str(vs[i])) for i in range(len(ks)))
 
+    # TODO: add to .pyi
+    def _get_taxon_states_dict(self, exclude_internal: bool=True) -> ty.Dict[str, int]:
+        self.populate_nd_attr_dict(["state"])
+        
+        taxon_states_dict: ty.Dict[str, int] = dict()
+        for taxon_name, attr_val_dict in self.node_attr_dict.items():
+            if exclude_internal and \
+               self.tree.find_node_with_label(taxon_name).is_internal():
+               continue
+            
+            taxon_states_dict[taxon_name] = attr_val_dict["state"]
+
+        return taxon_states_dict
+
+    # TODO: add to .pyi
+    def get_taxon_states_nexus_str(self) -> str:
+        taxon_states_dict = self._get_taxon_states_dict()
+        nexus_str = \
+            "#Nexus\n\nBegin data;\nDimension ntax=" + \
+            str(self.n_extant_terminal_nodes + self.n_sa) + \
+            " nchar=1;\nFormat datatype=Standard symbols=\"" + \
+            "".join(str(i) for i in range(self.state_count)) + \
+            "\"\nmissing=? gap=-;\nMatrix\n"
+
+        for taxon_name, taxon_state in taxon_states_dict.items():
+            nexus_str += taxon_name + "\t" + str(taxon_state) + "\n"
+
+        return nexus_str
 
 ###########################
 # Plotting tree functions #
@@ -875,12 +924,14 @@ if __name__ == "__main__":
     # Below we have an environment for debugging #
     ##############################################
     origin_node = dp.Node(taxon=dp.Taxon(label="origin"), label="origin", edge_length=0.0)
+    origin_node.state = 0
     origin_node.alive = False
     origin_node.is_sa = False
     origin_node.is_sa_dummy_parent = False
     origin_node.is_sa_lineage = False
 
     dummy_node = dp.Node(taxon=dp.Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
+    dummy_node.state = 0
     dummy_node.alive = False
     dummy_node.is_sa = False
     dummy_node.is_sa_dummy_parent = True
@@ -890,6 +941,7 @@ if __name__ == "__main__":
     
     # right child of dummy_node
     sa_node = dp.Node(taxon=dp.Taxon(label="sa1"), label="sa1", edge_length=0.0)
+    sa_node.state = 0
     sa_node.alive = False
     sa_node.is_sa = True
     sa_node.is_sa_dummy_parent = False
@@ -897,6 +949,7 @@ if __name__ == "__main__":
 
     # left child of dummy node
     root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=0.5)
+    root_node.state = 0
     root_node.alive = False
     root_node.is_sa = False
     root_node.is_sa_dummy_parent = False
@@ -907,6 +960,7 @@ if __name__ == "__main__":
 
     # left child of root node
     extant_sp1 = dp.Node(taxon=dp.Taxon(label="sp1"), label="sp1", edge_length=0.25)
+    extant_sp1.state = 0
     extant_sp1.alive = False
     extant_sp1.is_sa = False
     extant_sp1.is_sa_dummy_parent = False
@@ -914,6 +968,7 @@ if __name__ == "__main__":
 
     # right child of root node
     extant_sp2 = dp.Node(taxon=dp.Taxon(label="sp2"), label="sp2", edge_length=0.5)
+    extant_sp2.state = 1
     extant_sp2.alive = True
     extant_sp2.is_sa = False
     extant_sp2.is_sa_dummy_parent = False
@@ -934,7 +989,7 @@ if __name__ == "__main__":
     # print("tr_sa_with_root_survives.seed_age = " + str(tr_sa_with_root_survives.max_distance_from_root()))
     # print(tr_sa_with_root_survives.as_string(schema="newick"))
 
-    total_state_count = 1
+    total_state_count = 2
 
     sa_global_time = 1.0
     time_to_sa_lineage_node = 0.5
@@ -952,6 +1007,7 @@ if __name__ == "__main__":
         epsilon=1e-12)
 
     print(ann_tr_sa_with_root_survives_max_age.tree.as_string(schema="newick"))
+    print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_nexus_str())
 
     ######################
     # Preparing plotting #

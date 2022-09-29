@@ -23,8 +23,8 @@ det_death_rate1 := sse_rate(name="mu1", value=death_rate0, states=[1], event="ex
 det_trans_rate_12 := sse_rate(name="q12", value=trans_rate_12, states=[1,2], event="transition")
 
 det_b_birth_rate201 := sse_rate(name="lambda201", value=b_birth_rate_201, states=[2,0,1], event="bw_speciation")
-det_b_birth_rate202 := sse_rate(name="lambda202", value=b_birth_rate_202, states=[2,0,2], event="bw_speciation")
-det_b_birth_rate212 := sse_rate(name="lambda212", value=b_birth_rate_212, states=[2,1,2], event="bw_speciation")
+det_b_birth_rate202 := sse_rate(name="lambda202", value=b_birth_rate_202, states=[2,0,2], event="asym_speciation")
+det_b_birth_rate212 := sse_rate(name="lambda212", value=b_birth_rate_212, states=[2,1,2], event="asym_speciation")
 det_trans_rate_20 := sse_rate(name="q20", value=trans_rate_20, states=[2,0], event="transition")
 det_trans_rate_21 := sse_rate(name="q21", value=trans_rate_21, states=[2,1], event="transition")
 

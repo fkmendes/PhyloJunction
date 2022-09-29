@@ -5,7 +5,7 @@ import os
 import phylojunction.interface.cmdbox.cmd_parse as cmd
 import phylojunction.readwrite.pj_write as pjw
 
-def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data: bool=False, write_inference: bool=False) -> None:
+def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data: bool=False, write_inference: bool=False, write_nex_states: bool=False) -> None:
     """
     Execute .pj script
 
@@ -41,7 +41,8 @@ def execute_pj_script(model: str, prefix: str="", root_dir: str="./", write_data
         if not os.path.isdir(data_dir):
             os.mkdir(data_dir)
     
-        pjw.dump_pgm_data(data_dir, pgm_obj, prefix)
+        pjw.dump_pgm_data(data_dir, pgm_obj, prefix, write_nex_states)
+        
 
     ###################
     # Writing figures #
@@ -69,6 +70,7 @@ def call_cli() -> None:
     parser.add_argument("-i", "--inference-output", dest="write_inference", action="store_true", default=False, help="Toggle inference script output")
     parser.add_argument("-o", "--output-dir", dest="out_dir", type=str, default="./", help="Path to project root directory, where automatic subdirectories will be created")
     parser.add_argument("-p", "--prefix", dest="prefix", type=str, default="", help="Prefix to be used when naming output files")
+    parser.add_argument("-nex", "--nexus-state-output", dest="write_nex_states", action="store_true", default=False, help="Toggle states nexus file output")
     
     args = parser.parse_args()
 
@@ -77,7 +79,8 @@ def call_cli() -> None:
         prefix=args.prefix,
         root_dir=args.out_dir,
         write_data=args.write_data,
-        write_inference=args.write_inference
+        write_inference=args.write_inference,
+        write_nex_states=args.write_nex_states
     )
     
 # if one wants to run pj_cli.py for some reason
