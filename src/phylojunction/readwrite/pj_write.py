@@ -255,7 +255,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                 tree_value_df_dict[rv_name][rv_name] = [
                     ith_val.tree.as_string(
                         schema="newick",
-                        suppress_annotations=False,
+                        suppress_annotations=True,
                         suppress_internal_taxon_labels=True).strip("\"").strip() \
                         for ith_val in node_val
                 ]
@@ -267,7 +267,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                     rec_tree_list.append(
                         ith_rec_tree.as_string(
                             schema="newick",
-                            suppress_annotations=False,
+                            suppress_annotations=True,
                             suppress_internal_taxon_labels=True).strip("\"").strip()
                     )
 

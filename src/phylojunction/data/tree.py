@@ -530,26 +530,39 @@ class AnnotatedTree(dp.Tree):
         
         taxon_states_dict: ty.Dict[str, int] = dict()
         for taxon_name, attr_val_dict in self.node_attr_dict.items():
-            if exclude_internal and \
-               self.tree.find_node_with_label(taxon_name).is_internal():
+            # removing internal taxa
+            if (exclude_internal and \
+               self.tree.find_node_with_label(taxon_name).is_internal()):
                continue
+
+            # removing extinct taxa if tree was simulated with
+            # PJ (i.e., has .alive member)
+            try:
+                if not self.tree.find_node_with_label(taxon_name).alive:
+                    continue
             
+            except:
+                pass
+
             taxon_states_dict[taxon_name] = attr_val_dict["state"]
 
         return taxon_states_dict
+
 
     # TODO: add to .pyi
     def get_taxon_states_nexus_str(self) -> str:
         taxon_states_dict = self._get_taxon_states_dict()
         nexus_str = \
-            "#Nexus\n\nBegin data;\nDimension ntax=" + \
+            "#Nexus\n\nBegin data;\nDimensions ntax=" + \
             str(self.n_extant_terminal_nodes + self.n_sa) + \
             " nchar=1;\nFormat datatype=Standard symbols=\"" + \
             "".join(str(i) for i in range(self.state_count)) + \
-            "\"\nmissing=? gap=-;\nMatrix\n"
+            "\" missing=? gap=-;\nMatrix\n"
 
         for taxon_name, taxon_state in taxon_states_dict.items():
             nexus_str += taxon_name + "\t" + str(taxon_state) + "\n"
+
+        nexus_str += ";\nEnd;\n"
 
         return nexus_str
 
