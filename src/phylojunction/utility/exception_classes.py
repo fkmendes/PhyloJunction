@@ -223,16 +223,6 @@ class SSEStashMisspec(Exception):
     def __str__(self) -> str:
         return "\nERROR: Misspecified SSE stash parameter input. " + self.message
 
-class AnnotatedTreeMisspec(Exception):
-    message: str
-
-    def __init__(self, message) -> None:
-        self.message = message
-        super().__init__(self.message)
-    
-    def __str__(self) -> str:
-        return "\nERROR: Misspecified AnnotatedTree input. " + self.message
-
 class DnInitMisspec(Exception):
     dn_name: str
     message: str
@@ -254,3 +244,24 @@ class InvalidMCMCChainLength(Exception):
 
     def __str__(self) -> str:
         return "\nERROR: " + self.message
+
+# Tree exceptions #
+class AnnotatedTreeMisspec(Exception):
+    message: str
+
+    def __init__(self, message) -> None:
+        self.message = message
+        super().__init__(self.message)
+    
+    def __str__(self) -> str:
+        return "\nERROR: Misspecified AnnotatedTree input. " + self.message
+
+class AnnotatedTreeLineageMissannotation(Exception):
+    message: str
+    
+    def __init__(self, message) -> None:
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return "\nERROR: AnnotatedTree cannot be annotated this way. " + self.message

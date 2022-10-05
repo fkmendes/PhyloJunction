@@ -1,3 +1,4 @@
+from cgitb import small
 import typing as ty
 import dendropy as dp # type: ignore
 import matplotlib # type: ignore
@@ -328,7 +329,7 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates: self.extant_obs_nodes_labels
-    #            self.self.extinct_obs_nodes_labels
+    #            self.extinct_obs_nodes_labels
     def _count_terminal_nodes(self) -> None:
         """Count extant and extinct nodes, store counts and node labels into class members (side-effect)"""
 
@@ -363,7 +364,7 @@ class AnnotatedTree(dp.Tree):
             for nd in self.tree.leaf_node_iter():
                 # an extant terminal node is a leaf whose path to the origin/root
                 # has maximal length (equal to the age of the origin/root)
-                
+
                 # if not sampled ancestor
                 if not (nd.edge_length < self.epsilon):
 
@@ -386,6 +387,8 @@ class AnnotatedTree(dp.Tree):
                         elif not nd.alive:
                             self.n_extinct_terminal_nodes += 1
                             extinct_obs_nodes_labels_list.append(nd.label)
+                        else:
+                            raise ec.AnnotatedTreeLineageMissannotation("Taxon had non-maximal age, but had \'.alive == True\'. This is not allowed. Exiting...")
 
         # just in case
         if self.n_extant_terminal_nodes == 0:
@@ -407,6 +410,55 @@ class AnnotatedTree(dp.Tree):
             # or the tree might have been created by hand and no states were
             # defined (e.g., Yule or birth-death processes)
             except: pass
+
+
+    # TODO: add to .pyi
+    def find_if_extant_or_sa_on_both_sides(self, a_node: dp.Node) -> bool:
+        def _recur_find_extant_or_sa(a_node: dp.Node, has_seen_root: bool, found_extant_or_sa_count: int) -> int:
+            has_seen_root = has_seen_root
+            
+            if a_node.label == "root" or a_node.taxon == "root":
+                has_seen_root = True
+            
+            # a_node will have two sides; will do one and then
+            # another
+            for ch_node in a_node.child_node_iter():
+                if ch_node.label == "root" or ch_node.taxon == "root":
+                    has_seen_root = True
+
+                try:
+                    if has_seen_root:
+                        if ch_node.alive or ch_node.is_sa:
+                            # found extant, stop recursion
+                            # on current side of a_node
+                            found_extant_or_sa_count += 1
+                            break
+
+                        else:
+                            # stay on this side, keep digging
+                            found_extant_or_sa_count = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count)
+
+                    else:
+                        # no root yet, keep digging until
+                        # we find root
+                        found_extant_or_sa_count = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count)
+
+                # tree must have been read as newick string
+                # instead of being simulated by PJ (it doesn't
+                # have .alive and .is_sa members)
+                except:
+                    pass
+
+
+            return found_extant_or_sa_count
+        
+        n_extant_or_sa = _recur_find_extant_or_sa(a_node, False, 0)
+
+        if n_extant_or_sa == 2:
+            return True
+
+        else:
+            return False
 
 
     def recursively_find_node_age(self, a_node: dp.Node, running_age_sum: float) -> float:
@@ -434,19 +486,132 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates self.tree_reconstructed
-    def extract_reconstructed_tree(self) -> dp.Tree:
+    def extract_reconstructed_tree(self, require_obs_both_sides: bool=True) -> dp.Tree:
         """Make deep copy of self.tree, then prune extinct taxa from copy"""
         
         filter_fn = lambda nd: nd.is_sa or (nd.is_leaf() and nd.alive)
         self.tree_reconstructed = copy.deepcopy(self.tree)
 
         # if tree went extinct, return empty new tree
-        if (self.n_extant_terminal_nodes + self.n_sa) == 0:
+        if (self.n_extant_terminal_nodes + self.n_sa) <= 1:
             return dp.Tree()
         
         self.tree_reconstructed.filter_leaf_nodes(
             filter_fn, suppress_unifurcations=False)
+
+        # getting all root information #
+        # root_node will be None if it does not exist
+        smallest_distance = 0.0
+        root_node: dp.Node = dp.Node()
+        root_node = self.tree_reconstructed.find_node_with_label("root")
+        if not root_node:
+            root_node = self.tree_reconstructed.find_node_with_taxon_label("root")
+        root_node_distance_from_seed = 0.0
+        if root_node:
+            root_node_distance_from_seed = root_node.distance_from_root()
+            smallest_distance = root_node_distance_from_seed
         
+        int_node_deeper_than_root: dp.Node = dp.Node()
+        
+        for internal_nd in self.tree_reconstructed.internal_nodes():
+            internal_nd_distance = internal_nd.distance_from_root()
+
+            if not internal_nd.label in ("root", "origin"):
+                # we set int_node_deeper_than_root if we haven't
+                # looked at any internal nodes yet, or if they are
+                # deeper than the last one we checked
+                #
+                # we also only have an int_node_deeper_than_root
+                # if there is (i) a root in the first place, or
+                # (ii) if the root is not the seed_node
+                if (smallest_distance == 0.0 or \
+                   internal_nd_distance < smallest_distance) and \
+                   (root_node_distance_from_seed != 0.0 or \
+                    not root_node):
+                    int_node_deeper_than_root = internal_nd
+                    smallest_distance = internal_nd_distance
+
+
+        #################
+        # Special cases #
+        #################
+        
+        if not require_obs_both_sides:
+            # no speciation happened, so
+            # complete tree has no root
+            if not root_node:
+                origin_node = self.tree_reconstructed.seed_node
+                self.tree_reconstructed.reroot_at_node(int_node_deeper_than_root)
+                int_node_deeper_than_root.remove_child(origin_node)
+                int_node_deeper_than_root.edge_length = 0.0
+
+            # there is a root in the complete tree
+            else:
+                # mrca seems to have side-effect (this shouldn't be the case...)
+                # so we do things on deep copy of tree, and use labels
+
+                # there must be an SA before the root
+                # so we need to reroot above complete
+                # tree's root
+                if int_node_deeper_than_root.label == "None":
+                    self.tree_reconstructed.reroot_at_node(int_node_deeper_than_root)
+
+                    # getting origin and removing it
+                    # if possible
+                    origin_node_rec: dp.Tree = dp.Tree()
+                    if self.origin_node:
+                        origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
+                        
+                        if not origin_node_rec:
+                            origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
+                        
+                        int_node_deeper_than_root.remove_child(origin_node_rec)
+
+                    int_node_deeper_than_root.edge_length = 0.0
+
+                # root is the deepest internal node
+                else:
+                    rec_tree_mrca_label = pj_get_mrca_obs_terminals(
+                        self.tree_reconstructed.seed_node, [l.label for l in self.tree_reconstructed.leaf_node_iter()]
+                    )
+
+                    # re-seed if necessary
+                    if rec_tree_mrca_label != "root":
+                        rec_mrca_node = self.tree_reconstructed.find_node_with_label(rec_tree_mrca_label)
+                        self.tree_reconstructed.reroot_at_node(rec_mrca_node)
+
+                        # if there is a root AND an origin
+                        # it is the origin that will dangle, so we
+                        # remove it
+                        origin_node_rec: dp.Tree = dp.Tree()
+                        if self.origin_node:
+                            origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
+                        
+                            if not origin_node_rec:
+                                origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
+
+                            rec_mrca_node.remove_child(origin_node_rec)
+                    
+                        # no origin! will delete dangling root
+                        else:
+                            rec_mrca_node.remove_child(root_node)
+                        
+                        rec_mrca_node.edge_length = 0.0
+
+                    # complete tree root is rec tree root
+                    else:
+                        root_node.edge_length = 0.0
+
+        # require observed taxa on both sides of root
+        else: 
+            # can't plot if need root
+            if not root_node:
+                return dp.Tree()
+
+            # can't plot if taxa not on both sides of root
+            elif not self.find_if_extant_or_sa_on_both_sides(root_node):
+                return dp.Tree()
+
         return self.tree_reconstructed
             
 
@@ -910,6 +1075,39 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     # axes.set_facecolor("gray") later maybe change colors
     # plt.show()
     # return plt.gcf()%
+
+def pj_get_mrca_obs_terminals(a_node: dp.Node, nd_label_list: ty.List[str]) -> dp.Node:
+    # side-effect recursion
+    def recur_node(a_node, nd_label_list: ty.List[str], mrca_node_label: str):
+        """Populate visited_obs_terminals (side-effect)"""        
+
+        # not done: if tip, get label
+        if a_node.is_leaf() and (a_node.is_sa or a_node.alive):
+            return [a_node.label], ""
+
+        # not done: if internal node, we recur
+        else:
+            visited_obs_terminals: ty.List[str] = []
+
+            for ch_node in a_node.child_node_iter():
+                # recur
+                vot, mrca_node_label = recur_node(ch_node, nd_label_list, mrca_node_label)
+                visited_obs_terminals += vot
+
+            # we are actually done
+            if set(visited_obs_terminals) == set(nd_label_list) and not mrca_node_label:
+                mrca_node_label  = a_node.label
+
+        return visited_obs_terminals, mrca_node_label
+
+    mrca_node_label: str = ""
+    
+    # mrca node
+    _, mrca_node_label = recur_node(a_node, nd_label_list, mrca_node_label)
+    
+    return mrca_node_label
+ 
+    
 
 ##############################################################################
 

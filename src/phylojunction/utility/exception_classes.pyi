@@ -97,6 +97,11 @@ class AnnotatedTreeMisspec(Exception):
     message: str
     def __init__(self, message) -> None: ...
 
+class AnnotatedTreeLineageMissannotation(Exception):
+    message: str
+    def __init__(self, message) -> None: ...
+    def __str__(self) -> str: ...
+
 class DnInitMisspec(Exception):
     dn_name: str
     message: str

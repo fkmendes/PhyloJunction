@@ -256,11 +256,15 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                     ith_val.tree.as_string(
                         schema="newick",
                         suppress_annotations=True,
-                        suppress_internal_taxon_labels=True).strip("\"").strip() \
+                        suppress_internal_taxon_labels=True,
+                        suppress_internal_node_labels=True).strip("\"").strip() \
                         for ith_val in node_val
                 ]
 
                 # reconstructed trees #
+                # suppress_rooting=False guarantees that
+                # [&R] is not added to tree Newick string as
+                # a result of re-rooting the reconstructed tree
                 rec_tree_list = []
                 for ith_val in node_val:
                     ith_rec_tree = ith_val.extract_reconstructed_tree()
@@ -268,7 +272,9 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                         ith_rec_tree.as_string(
                             schema="newick",
                             suppress_annotations=True,
-                            suppress_internal_taxon_labels=True).strip("\"").strip()
+                            suppress_internal_taxon_labels=True,
+                            suppress_rooting=True,
+                            suppress_internal_node_labels=True).strip("\"").strip()
                     )
 
                 tree_rec_value_df_dict[rv_name][rv_name] = rec_tree_list

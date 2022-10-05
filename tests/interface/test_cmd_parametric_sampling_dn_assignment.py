@@ -3,7 +3,7 @@ import re
 import math
 from statistics import mean
 
-# pj imports
+# pj imports #
 import phylojunction.pgm.pgm as pgm
 import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
