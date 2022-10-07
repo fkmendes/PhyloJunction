@@ -1,4 +1,5 @@
 import unittest
+import copy
 from dendropy import Tree, Node, Taxon
 
 # pj imports
@@ -6,6 +7,166 @@ import phylojunction.data.tree as pjtr
 import phylojunction.data.sampled_ancestor as pjsa
 
 class TestExtractReconstructedTree(unittest.TestCase):
+
+    def test_obs_both_sides_root_with_origin_true(self):
+        """
+        Test method inside AnnotatedTree to check if complete tree has one observed taxon
+        on both sides of its root
+
+        To see it on icytree: ((sp2:1.0,(sp3:0.5,sp4:0.5)nd1:0.5)root:1.0)origin:0.0;
+        """
+
+        origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.alive = False
+        origin_node.is_sa = False
+        origin_node.is_sa_dummy_parent = False
+        origin_node.is_sa_lineage = False
+
+        root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
+        root_node.alive = False
+        root_node.is_sa = False
+        root_node.is_sa_dummy_parent = False
+        root_node.is_sa_lineage = False
+
+        origin_node.add_child(root_node)
+
+        # left child of root node
+        extant_sp1 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
+        extant_sp1.alive = True
+        extant_sp1.is_sa = False
+        extant_sp1.is_sa_dummy_parent = False
+        extant_sp1.is_sa_lineage = False
+
+        # right child of root_node
+        internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.5)
+        internal_node1.alive = False
+        internal_node1.is_sa = False
+        internal_node1.is_sa_dummy_parent = False
+        internal_node1.is_sa_lineage = False
+
+        root_node.add_child(extant_sp1)
+        root_node.add_child(internal_node1)
+
+        # left child of nd2
+        extant_sp2 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.5)
+        extant_sp2.alive = True
+        extant_sp2.is_sa = False
+        extant_sp2.is_sa_dummy_parent = False
+        extant_sp2.is_sa_lineage = False
+
+        # right child of nd2
+        extant_sp3 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.5)
+        extant_sp3.alive = True
+        extant_sp3.is_sa = False
+        extant_sp3.is_sa_dummy_parent = False
+        extant_sp3.is_sa_lineage = False
+
+        internal_node1.add_child(extant_sp2)
+        internal_node1.add_child(extant_sp3)
+
+        tr_complete = Tree(seed_node=origin_node)
+        tr_complete.taxon_namespace.add_taxon(origin_node.taxon)
+        tr_complete.taxon_namespace.add_taxon(root_node.taxon)
+        tr_complete.taxon_namespace.add_taxon(internal_node1)
+        tr_complete.taxon_namespace.add_taxon(extant_sp1.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp2.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp3.taxon)
+
+        total_state_count = 1
+        
+        max_age = 2.0
+
+        ann_tr = pjtr.AnnotatedTree(
+            tr_complete,
+            total_state_count,
+            start_at_origin=True,
+            max_age=max_age,
+            epsilon=1e-12)
+
+        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True))
+
+        self.assertTrue(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+
+
+    def test_obs_both_sides_root_with_origin_false(self):
+        """
+        Test method inside AnnotatedTree to check if complete tree has one observed taxon
+        on both sides of its root
+
+        To see it on icytree: ((sp2:1.0,(sp3:0.5,sp4:0.5)nd1:0.5)root:1.0)origin:0.0;
+        """
+
+        origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.alive = False
+        origin_node.is_sa = False
+        origin_node.is_sa_dummy_parent = False
+        origin_node.is_sa_lineage = False
+
+        root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
+        root_node.alive = False
+        root_node.is_sa = False
+        root_node.is_sa_dummy_parent = False
+        root_node.is_sa_lineage = False
+
+        origin_node.add_child(root_node)
+
+        # left child of root node
+        extant_sp1 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
+        extant_sp1.alive = False
+        extant_sp1.is_sa = False
+        extant_sp1.is_sa_dummy_parent = False
+        extant_sp1.is_sa_lineage = False
+
+        # right child of root_node
+        internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.5)
+        internal_node1.alive = False
+        internal_node1.is_sa = False
+        internal_node1.is_sa_dummy_parent = False
+        internal_node1.is_sa_lineage = False
+
+        root_node.add_child(extant_sp1)
+        root_node.add_child(internal_node1)
+
+        # left child of nd2
+        extant_sp2 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.5)
+        extant_sp2.alive = True
+        extant_sp2.is_sa = False
+        extant_sp2.is_sa_dummy_parent = False
+        extant_sp2.is_sa_lineage = False
+
+        # right child of nd2
+        extant_sp3 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.5)
+        extant_sp3.alive = True
+        extant_sp3.is_sa = False
+        extant_sp3.is_sa_dummy_parent = False
+        extant_sp3.is_sa_lineage = False
+
+        internal_node1.add_child(extant_sp2)
+        internal_node1.add_child(extant_sp3)
+
+        tr_complete = Tree(seed_node=origin_node)
+        tr_complete.taxon_namespace.add_taxon(origin_node.taxon)
+        tr_complete.taxon_namespace.add_taxon(root_node.taxon)
+        tr_complete.taxon_namespace.add_taxon(internal_node1)
+        tr_complete.taxon_namespace.add_taxon(extant_sp1.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp2.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp3.taxon)
+
+        total_state_count = 1
+        
+        max_age = 2.0
+
+        ann_tr = pjtr.AnnotatedTree(
+            tr_complete,
+            total_state_count,
+            start_at_origin=True,
+            max_age=max_age,
+            epsilon=1e-12)
+
+        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True))
+
+        self.assertFalse(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+
 
     def test_extract_reconstructed_tree_two_extant_one_extinct_one_sa(self):
         """
@@ -199,7 +360,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=False,
@@ -207,10 +368,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True, suppress_internal_node_labels=True))
+        ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True, suppress_internal_node_labels=True))
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         # print(ann_tr.find_if_extant_or_sa_on_both_sides(tr_rec1.seed_node))
 
@@ -220,7 +383,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True, suppress_rooting=True)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True), "((sa1:0.0,sp1:0.75)dummy1_dummy1:1.0,(sp2:0.8,sp3:0.8)nd1_nd1:0.75)root_root:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True), "((sa1:0.0,sp1:0.75)dummy1_dummy1:1.0,(sp2:0.8,sp3:0.8)nd1_nd1:0.75)root_root:0.0;\n")
         self.assertEqual(tr_rec_str1, "(sa1:0.0,sp1:0.75):0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
     
@@ -294,7 +457,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=False,
@@ -302,10 +465,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
+        ann_tr2 = copy.deepcopy(ann_tr1)
+
         # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True))
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True)
         # print(tr_rec_str1)
@@ -313,7 +478,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True), "((sa1:0.0,sp1:0.5)dummy1_dummy1:1.0,sp2:1.25)root_root:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True), "((sa1:0.0,sp1:0.5)dummy1_dummy1:1.0,sp2:1.25)root_root:0.0;\n")
         self.assertEqual(tr_rec_str1, ";\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
@@ -357,20 +522,22 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=False,
             max_age=max_age,
             epsilon=1e-12)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        ann_tr2 = copy.deepcopy(ann_tr1)
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True)
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True)
         
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True), "(sp1:1.0,sp2:1.0)root_root:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True), "(sp1:1.0,sp2:1.0)root_root:0.0;\n")
         self.assertEqual(tr_rec_str1, ";\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
@@ -455,17 +622,19 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=False,
             max_age=max_age,
             epsilon=1e-12)
 
-        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+        ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False, suppress_rooting=True)
         # print(tr_rec_str1)
@@ -473,7 +642,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "(sp1:0.8,(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:1.0)root:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "(sp1:0.8,(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:1.0)root:0.0;\n")
         self.assertEqual(tr_rec_str1, "(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
@@ -533,7 +702,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=True,
@@ -541,15 +710,17 @@ class TestExtractReconstructedTree(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=True, suppress_internal_taxon_labels=True))
+        ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=True, suppress_internal_taxon_labels=True))
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True)
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sa1:0.0,brosc:0.75)dummy1:1.0)origin:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sa1:0.0,brosc:0.75)dummy1:1.0)origin:0.0;\n")
         self.assertEqual(tr_rec_str1, ";\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
@@ -611,7 +782,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=True,
@@ -619,10 +790,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=False))
+        ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=False))
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False, suppress_rooting=True)
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False, suppress_rooting=True)
@@ -630,7 +803,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # print(tr_rec_str1)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sa1:0.0,brosc:1.0)dummy1:1.0)origin:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sa1:0.0,brosc:1.0)dummy1:1.0)origin:0.0;\n")
         self.assertEqual(tr_rec_str1, "(sa1:0.0,brosc:1.0)dummy1:0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
@@ -712,7 +885,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=True,
@@ -720,20 +893,22 @@ class TestExtractReconstructedTree(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+        ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False, suppress_rooting=True)
         # print(tr_rec_str1)
         
-        tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False)
+        tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False, suppress_rooting=True)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:1.0)origin:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:1.0)origin:0.0;\n")
         self.assertEqual(tr_rec_str1, "(sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:0.0;\n")
-        self.assertEqual(tr_rec_str2, ";\n")
+        self.assertEqual(tr_rec_str2, "(sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:0.0;\n")
 
 
     def test_extract_reconstructed_tree_origin_sa_before_root_tree_three_survive(self):
@@ -825,17 +1000,19 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         max_age = 2.0
 
-        ann_tr = pjtr.AnnotatedTree(
+        ann_tr1 = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             start_at_origin=True,
             max_age=max_age,
             epsilon=1e-12)
 
-        # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+        ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False, suppress_rooting=True)
         # print(tr_rec_str1)
@@ -843,7 +1020,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sp1:0.8,(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:1.0)root:1.0)origin:0.0;\n")
+        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sp1:0.8,(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:1.0)root:1.0)origin:0.0;\n")
         self.assertEqual(tr_rec_str1, "(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 

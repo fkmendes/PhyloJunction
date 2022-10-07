@@ -22,65 +22,81 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     #############################
     # default values for args that are not mandatory
     # all remaining args must be specified
-    _n: int = 1
-    _n_repl: int = 1
-    _event_handler: sseobj.MacroevolEventHandler = sseobj.MacroevolEventHandler(sseobj.FIGRatesManager([[]], 1))
-    _stop: str
-    _stop_values_list: ty.List[float] = []
+    n_samples: int = 1
+    n_repl: int = 1
+    event_handler: sseobj.MacroevolEventHandler = sseobj.MacroevolEventHandler(sseobj.FIGRatesManager([[]], 1))
+    stop_str: str
+    stop_values_list: ty.List[float] = []
     origin: bool = True
     cond_spn: bool = False
     cond_surv: bool = True
-    _start_states_list: ty.List[int] = []
+    
+    # if set to True by user, rejection sampling happens;
+    # if False, reconstructed trees are printed whatever
+    # they may be, upon writing (i.e., no rejection sampling)
+    cond_obs_both_sides: bool = False
+    
+    start_states_list: ty.List[int] = []
     eps: float = 1e-12
     runtime_limit: int = 5 # 5 minutes
 
     # input validation (only things that are not already done by DnSSE)
-    # NOTE: val is a list!
     for arg, val in dn_param_dict.items():
+        
+        # val is a list!
         if val:
-            _extracted_val = pgm.extract_value_from_nodepgm(val) # if element in val is string, it remains unchanged, if NodePGM, we get its string-fied value
+
+            # if element in val is string: remains unchanged
+            #
+            # if StochasticNodePGM: we get its string-fied value
+            extracted_val = pgm.extract_value_from_nodepgm(val) 
 
             ############################
             # Non-vectorized arguments #
             ############################
-            # ... thus using only the first value!
-            _first_val: ty.Union[str, pgm.NodePGM]
-            if len(_extracted_val) >= 1:
-                _first_val = _extracted_val[0] 
-            # DeterministicNodePGM is in val, e.g., val = [pgm.DeterministicNodePGM]
-            else:
-                _first_val = val[0]
             
-            if arg == "meh" and isinstance(_first_val, pgm.NodePGM):
-                nodepgm_val = _first_val.value
+            # ... thus using only the first value!
+            first_val: ty.Union[str, pgm.NodePGM]
+            
+            if len(extracted_val) >= 1:
+                first_val = extracted_val[0] 
+            
+            # if DeterministicNodePGM is in val
+            # e.g., val = [pgm.DeterministicNodePGM]
+            else:
+                first_val = val[0]
+            
+            if arg == "meh" and isinstance(first_val, pgm.NodePGM):
+                nodepgm_val = first_val.value
                 
                 if isinstance(nodepgm_val, sseobj.MacroevolEventHandler):
                 # there should be only one event handler always, but it will be in list
-                    _event_handler = nodepgm_val
+                    event_handler = nodepgm_val
 
             elif arg in ("n", "nr", "runtime_limit"):
                 try:
-                    if isinstance(_first_val, str):
-                        int_val = int(_first_val) # no vectorization allowed here
+                    if isinstance(first_val, str):
+                        int_val = int(first_val) # no vectorization allowed here
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting an integer. Distribution discrete_sse() could not be initialized.")
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
-                if arg == "n": _n = int_val
+                if arg == "n": n_samples = int_val
                 if arg == "runtime_limit": runtime_limit = int_val
-                if arg == "nr": _n_repl = int_val
+                if arg == "nr": n_repl = int_val
 
             elif arg == "stop":
-                if isinstance(_first_val, str):
-                    _stop = _first_val.replace("\"", "")
+                if isinstance(first_val, str):
+                    stop_str = first_val.replace("\"", "")
 
-            elif arg in ("origin", "cond_spn", "cond_surv"):
-                if _first_val != "\"true\"" and _first_val != "\"false\"":
+            # defaults: True, False, True
+            elif arg in ("origin", "cond_spn", "cond_surv", "cond_obs_both_sides"):
+                if first_val != "\"true\"" and first_val != "\"false\"":
                     raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\". Distribution discrete_sse() could not be initialized.")
 
                 else:
-                    if isinstance(_first_val, str):
-                        parsed_val = _first_val.replace("\"", "")
+                    if isinstance(first_val, str):
+                        parsed_val = first_val.replace("\"", "")
 
                     if arg == "origin" and parsed_val == "true": origin = True
                     elif arg == "origin" and parsed_val == "false": origin = False
@@ -88,12 +104,14 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                     elif arg == "cond_spn" and parsed_val == "false": cond_spn = False
                     elif arg == "cond_surv" and parsed_val == "true": cond_surv = True
                     elif arg == "cond_surv" and parsed_val == "false": cond_surv = False
+                    elif arg == "cond_obs_both_sides" and parsed_val == "true": cond_obs_both_sides = True
+                    elif arg == "cond_obs_both_sides" and parsed_val == "false": cond_obs_both_sides = False
 
             # if user specified epsilon, we use it, otherwise default is used
             elif arg == "eps":
                 try:
-                    if isinstance(_first_val, str):
-                        float_val = float(_first_val) # no vectorization allowed here
+                    if isinstance(first_val, str):
+                        float_val = float(first_val) # no vectorization allowed here
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting a double. Distribution discrete_sse() could not be initialized.")
 
@@ -104,10 +122,11 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
             #####################
             elif arg == "stop_value":
                 _is_negative = False
+                
                 try:
-                    _stop_values_list = [float(v) for v in _extracted_val if isinstance(v, str)]
+                    stop_values_list = [float(v) for v in extracted_val if isinstance(v, str)]
                     
-                    for sv in _stop_values_list:
+                    for sv in stop_values_list:
                         if sv < 0.0:
                             _is_negative = True
 
@@ -120,27 +139,28 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
             elif arg == "start_state":
                 try:
-                    _start_states_list = [int(v) for v in _extracted_val if isinstance(v, str)]
+                    start_states_list = [int(v) for v in extracted_val if isinstance(v, str)]
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting integers for starting states. Distribution discrete_sse() could not be initialized.")
 
     
     # making sure essential parameters of distribution have been specified
-    if not any(_event_handler.fig_rates_manager.atomic_rate_params_matrix):
+    if not any(event_handler.fig_rates_manager.atomic_rate_params_matrix):
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"meh\" is missing.")
-    if not _stop_values_list:
+    if not stop_values_list:
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
         
     return dnsse.DnSSE(
-        _event_handler,
-        _stop_values_list,
-        n=_n,
-        n_replicates=_n_repl,
-        stop=_stop,
+        event_handler,
+        stop_values_list,
+        n=n_samples,
+        n_replicates=n_repl,
+        stop=stop_str,
         origin=origin,
-        start_states_list=_start_states_list,
+        start_states_list=start_states_list,
         condition_on_speciation=cond_spn,
         condition_on_survival=cond_surv,
+        condition_on_obs_both_sides_root=cond_obs_both_sides,
         epsilon=eps,
         runtime_limit=runtime_limit
     )

@@ -18,6 +18,7 @@ class DnSSE(pgm.DistributionPGM):
     stop_val: float
     condition_on_speciation: bool
     condition_on_survival: bool
+    condition_on_obs_both_sides_root: bool
     events: sseobj.MacroevolEventHandler
     start_states: ty.List[int]
     state_count: int
@@ -28,7 +29,7 @@ class DnSSE(pgm.DistributionPGM):
     epsilon: float
     runtime_limit: int
     debug: bool
-    def __init__(self, event_handler: sseobj.MacroevolEventHandler = ..., stop_value: ty.List[float] = ..., n: int = ..., n_replicates: int = ..., stop: ty.Optional[str] = ..., origin: bool = ..., start_states_list: ty.List[int] = ..., condition_on_speciation: bool = ..., condition_on_survival: bool = ..., seeds_list: ty.Optional[ty.List[int]] = ..., epsilon: float = ..., runtime_limit: int = ..., debug: bool = ...) -> None: ...
+    def __init__(self, event_handler: sseobj.MacroevolEventHandler = ..., stop_value: ty.List[float] = ..., n: int = ..., n_replicates: int = ..., stop: ty.Optional[str] = ..., origin: bool = ..., start_states_list: ty.List[int] = ..., condition_on_speciation: bool = ..., condition_on_survival: bool = ..., condition_on_obs_both_sides_root: bool = ..., seeds_list: ty.Optional[ty.List[int]] = ..., epsilon: float = ..., runtime_limit: int = ..., debug: bool = ...) -> None: ...
     def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     def get_next_event_time(self, total_rate: float, a_seed: ty.Optional[int] = ...) -> float: ...
     def execute_birth(self,

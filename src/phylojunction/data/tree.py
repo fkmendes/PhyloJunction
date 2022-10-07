@@ -70,6 +70,7 @@ class AnnotatedTree(dp.Tree):
 
         # some initial tree specs
         self.tree = a_tree
+        self.tree_reconstructed = None
         self.with_origin = start_at_origin
         self.tree_died = tree_died
 
@@ -413,9 +414,28 @@ class AnnotatedTree(dp.Tree):
 
 
     # TODO: add to .pyi
-    def find_if_extant_or_sa_on_both_sides(self, a_node: dp.Node) -> bool:
-        def _recur_find_extant_or_sa(a_node: dp.Node, has_seen_root: bool, found_extant_or_sa_count: int) -> int:
+    def find_if_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
+        """
+        Return True if there is at least one extant taxon or sampled ancestor
+        on both sides of the root of the complete tree
+        
+        Note that if tree has an origin and sampled ancestors before the root,
+        the reconstructed tree will be re-rooted at the dummy node that serves
+        as the internal (parent) node of the sampled ancestor.
+        Still, what this method checks is relative to the complete tree root node
+        since a sampled ancestor does not have two sides as it is not a speciation
+        event
+        """
+        def _recur_find_extant_or_sa(a_node: dp.Node, has_seen_root: bool, found_extant_or_sa_count: int, found_extant_or_sa: bool) -> int:
+            # print("just started recurring at node " + a_node.label)
+
+            # if origin, no parent_node
+            if a_node.parent_node and (a_node.parent_node.label != "root" and found_extant_or_sa):
+                # print("... but my parent has a child that is alive or sa, coming back!")
+                return found_extant_or_sa_count, found_extant_or_sa
+
             has_seen_root = has_seen_root
+            found_extant_or_sa = found_extant_or_sa
             
             if a_node.label == "root" or a_node.taxon == "root":
                 has_seen_root = True
@@ -423,25 +443,30 @@ class AnnotatedTree(dp.Tree):
             # a_node will have two sides; will do one and then
             # another
             for ch_node in a_node.child_node_iter():
+                # print("    will look at child " + ch_node.label)
                 if ch_node.label == "root" or ch_node.taxon == "root":
                     has_seen_root = True
 
                 try:
                     if has_seen_root:
                         if ch_node.alive or ch_node.is_sa:
-                            # found extant, stop recursion
-                            # on current side of a_node
+                            # print("      ... this node was alive! Breaking!")
                             found_extant_or_sa_count += 1
-                            break
+                            found_extant_or_sa = True
+
+                            # found extant, stop recursion
+                            # on current side of a_node if not root
+                            if a_node.label != "root":
+                                break
 
                         else:
                             # stay on this side, keep digging
-                            found_extant_or_sa_count = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count)
+                            found_extant_or_sa_count, found_extant_or_sa = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count, found_extant_or_sa)
 
                     else:
                         # no root yet, keep digging until
                         # we find root
-                        found_extant_or_sa_count = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count)
+                        found_extant_or_sa_count, found_extant_or_sa = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count, found_extant_or_sa)
 
                 # tree must have been read as newick string
                 # instead of being simulated by PJ (it doesn't
@@ -449,10 +474,9 @@ class AnnotatedTree(dp.Tree):
                 except:
                     pass
 
-
-            return found_extant_or_sa_count
+            return found_extant_or_sa_count, found_extant_or_sa
         
-        n_extant_or_sa = _recur_find_extant_or_sa(a_node, False, 0)
+        n_extant_or_sa, _ = _recur_find_extant_or_sa(a_node, False, 0, False)
 
         if n_extant_or_sa == 2:
             return True
@@ -486,9 +510,15 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates self.tree_reconstructed
+    # 
+    # if rejection sampling happened, is_tr_ok will populate it;
+    # otherwise, population happend upon writing
     def extract_reconstructed_tree(self, require_obs_both_sides: bool=True) -> dp.Tree:
         """Make deep copy of self.tree, then prune extinct taxa from copy"""
         
+        if self.tree_reconstructed:
+            return self.tree_reconstructed
+
         filter_fn = lambda nd: nd.is_sa or (nd.is_leaf() and nd.alive)
         self.tree_reconstructed = copy.deepcopy(self.tree)
 
@@ -558,7 +588,7 @@ class AnnotatedTree(dp.Tree):
 
                     # getting origin and removing it
                     # if possible
-                    origin_node_rec: dp.Tree = dp.Tree()
+                    origin_node_rec: dp.Node = dp.Node()
                     if self.origin_node:
                         origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
                         
@@ -603,14 +633,29 @@ class AnnotatedTree(dp.Tree):
                         root_node.edge_length = 0.0
 
         # require observed taxa on both sides of root
-        else: 
+        else:
             # can't plot if need root
             if not root_node:
                 return dp.Tree()
 
-            # can't plot if taxa not on both sides of root
-            elif not self.find_if_extant_or_sa_on_both_sides(root_node):
-                return dp.Tree()
+            else:
+                # can't plot if taxa not on both sides of root
+                if not self.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node):
+                    return dp.Tree()
+
+                if self.origin_node and int_node_deeper_than_root.taxon != None:
+                    # getting origin and removing it
+                    # if possible
+                    origin_node_rec: dp.Node = dp.Node()
+                    if self.origin_node:
+                        origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
+                        
+                        if not origin_node_rec:
+                            origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
+
+                    self.tree_reconstructed.reroot_at_node(int_node_deeper_than_root)
+                    int_node_deeper_than_root.remove_child(origin_node_rec)
+                    int_node_deeper_than_root.edge_length = 0.0
 
         return self.tree_reconstructed
             

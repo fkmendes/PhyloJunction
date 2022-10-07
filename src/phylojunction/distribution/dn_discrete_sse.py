@@ -45,7 +45,8 @@ class DnSSE(pgm.DistributionPGM):
         n_time_slices (int): Number of time slices (obtained from 'events').
         slice_t_ends (int): List of end times from time slices (obtained from 'events').
         condition_on_speciation (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to False.
-        condition_on_survival (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to False.
+        condition_on_survival (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to True.
+        condition_on_obs_both_sides_root (bool): If true, rejects trees that do not have observed taxa on both sides of complete tree's root. Defaults to False.
         epsilon (float, optional): Any values difference below this value is set to 0.0. Defaults to 1e-12.
         runtime_limit (int, optional): Maximum number of minutes one is willing to wait until all 'n_sim' simulations are done. Defaults to 10.
         debug (bool, optional): Whether to print debugging messages
@@ -65,6 +66,7 @@ class DnSSE(pgm.DistributionPGM):
     stop_val: ty.List[float]
     condition_on_speciation: bool
     condition_on_survival: bool
+    condition_on_obs_both_sides_root: bool
     events: sseobj.MacroevolEventHandler
     start_states: ty.List[int]
     state_count: int
@@ -78,7 +80,7 @@ class DnSSE(pgm.DistributionPGM):
 
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
     def __init__(self, event_handler: sseobj.MacroevolEventHandler, stop_value: ty.List[float]=[], n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
-                start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=False,
+                start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=True, condition_on_obs_both_sides_root: bool=False,
                 seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
 
         # simulation parameters
@@ -91,6 +93,7 @@ class DnSSE(pgm.DistributionPGM):
         self.stop_val = stop_value
         self.condition_on_speciation = condition_on_speciation
         self.condition_on_survival = condition_on_survival
+        self.condition_on_obs_both_sides_root = condition_on_obs_both_sides_root
 
         # model parameters
         self.start_states = start_states_list
@@ -1108,6 +1111,27 @@ class DnSSE(pgm.DistributionPGM):
 
         if self.condition_on_speciation and not isinstance(ann_tr.root_node, dp.Node):
             return False
+
+        # need to worry about rejection sampling
+        # when user conditions reconstructed tree
+        if self.condition_on_obs_both_sides_root:
+            if self.condition_on_speciation and not isinstance(ann_tr.root_node, dp.Node):
+                return False
+
+            rec_tree = ann_tr.extract_reconstructed_tree(
+                require_obs_both_sides=self.condition_on_obs_both_sides_root
+            )
+            
+            if rec_tree.__str__() == "":
+                print("\nRejected reconstructed tree")
+                print("    Complete tree:")
+                print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+                for ch in ann_tr.tree.leaf_node_iter():
+                    print(ch.label + " alive = " + str(ch.alive))
+                return False
+            
+            print("\nSuccessful reconstructed tree:")
+            print(rec_tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
 
         if self.stop == "size":
             if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:

@@ -62,9 +62,9 @@ class PJDnGrammar():
 
         _extracted_val: ty.List[str]
 
-        #################################
+        #############################
         #  Parametric distributions #
-        #################################
+        #############################
         if dn_id == "lognormal":
             #############################
             # IMPORTANT: Default values #

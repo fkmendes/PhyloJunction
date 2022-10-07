@@ -548,8 +548,11 @@ def plot_blank(axes: plt.Axes) -> None:
 ####################
 def extract_value_from_nodepgm(val_list: ty.List[ty.Union[str, NodePGM]]) -> ty.List[str]:
     """
-    Return copy of val_list if all elements are strings representing values.
-    When elements are StochasticNodePGMs, replaces those objects by their values cast to string (their values must be within a list).
+    Return copy of val_list if all elements are strings representing values
+    
+    When elements are StochasticNodePGMs, replaces those objects by their
+    values cast to string (their values must be within a list).
+    
     If StochasticNodePGMs objects do not have .value field or if they cannot be string-fied, 
     raise exception.
     """
