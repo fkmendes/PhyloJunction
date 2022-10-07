@@ -149,7 +149,7 @@ for (b in 1:n.batches) {
 
     n0.ci.width.max.t[b] = 1.96 * stderr.df.max.t[b, "n0"] # actually half width, which we use in unit test
     n1.ci.width.max.t[b] = 1.96 * stderr.df.max.t[b, "n1"]
-    root.age.ci.width.max.t[b] = 1.96 * stderr.df.max.taxa[b, "root.age"]
+    root.age.ci.width.max.t[b] = 1.96 * stderr.df.max.t[b, "root.age"]
 }
 
 ## getting means and 95-CI widths used (for unit test)
