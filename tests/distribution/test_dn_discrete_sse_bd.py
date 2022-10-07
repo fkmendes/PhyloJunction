@@ -350,6 +350,7 @@ class TestBDTrees(unittest.TestCase):
         """
         Test if birth-death trees have expected number of extant observable nodes
         """
+        
         # setting up stopping conditions
         stop_condition = "age"
         stop_condition_value = [5.0] ## 5 time units
@@ -366,7 +367,7 @@ class TestBDTrees(unittest.TestCase):
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
             sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
-                    start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3000,
+                    start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3000, condition_on_speciation=False, condition_on_survival=False,
                     debug=False)
 
             trs = sse_sim.generate()

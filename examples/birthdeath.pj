@@ -10,4 +10,4 @@ det_death_rate := sse_rate(name="death_rate", value=death_rate, states=[0], even
 meh := sse_wrap(flat_rate_mat=[det_birth_rate, det_death_rate], n_states=1, n_epochs=1) 
 
 # stochastic-node variable ('trs') assignment
-trs ~ discrete_sse(n=100, meh=meh, start_state=[0], stop="age", stop_value=3.0, origin="true", cond_spn="true", cond_surv="true")
+trs ~ discrete_sse(n=100, meh=meh, start_state=[0], stop="age", stop_value=3.0, origin="false", cond_spn="true", cond_surv="true", cond_obs_both_sides="true")

@@ -88,6 +88,126 @@ class TestExtractReconstructedTree(unittest.TestCase):
         self.assertTrue(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
 
 
+    def test_obs_both_sides_root_with_origin_true_larger(self):
+        """
+        Test method inside AnnotatedTree to check if complete tree has one observed taxon
+        on both sides of its root
+
+        To see it on icytree: (((sp1:0.5,sp2:0.5)nd1:1.0,(sp3:0.4,(sp4:0.25,sp5:0.25)nd3:0.25)nd2:1.0)root:1.0)origin:0.0;
+        """
+
+        origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.alive = False
+        origin_node.is_sa = False
+        origin_node.is_sa_dummy_parent = False
+        origin_node.is_sa_lineage = False
+
+        root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
+        root_node.alive = False
+        root_node.is_sa = False
+        root_node.is_sa_dummy_parent = False
+        root_node.is_sa_lineage = False
+
+        origin_node.add_child(root_node)
+
+        # left child of root
+        internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
+        internal_node1.alive = False
+        internal_node1.is_sa = False
+        internal_node1.is_sa_dummy_parent = False
+        internal_node1.is_sa_lineage = False
+
+        # left child of internal_node1
+        extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.5)
+        extant_sp1.alive = True
+        extant_sp1.is_sa = False
+        extant_sp1.is_sa_dummy_parent = False
+        extant_sp1.is_sa_lineage = False
+
+        # right child of internal_node1
+        extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=0.5)
+        extant_sp2.alive = False
+        extant_sp2.is_sa = False
+        extant_sp2.is_sa_dummy_parent = False
+        extant_sp2.is_sa_lineage = False
+
+        internal_node1.add_child(extant_sp1)
+        internal_node1.add_child(extant_sp2)
+
+        # right child of root
+        internal_node2 = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=1.0)
+        internal_node2.alive = False
+        internal_node2.is_sa = False
+        internal_node2.is_sa_dummy_parent = False
+        internal_node2.is_sa_lineage = False
+
+        # left child of internal_node2
+        extant_sp3 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.4)
+        extant_sp3.alive = False
+        extant_sp3.is_sa = False
+        extant_sp3.is_sa_dummy_parent = False
+        extant_sp3.is_sa_lineage = False
+
+        # right child of internal_node2
+        internal_node3 = Node(taxon=Taxon(label="nd3"), label="nd3", edge_length=0.25)
+        internal_node3.alive = False
+        internal_node3.is_sa = False
+        internal_node3.is_sa_dummy_parent = False
+        internal_node3.is_sa_lineage = False
+
+        # left child of internal_node3
+        extant_sp4 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.25)
+        extant_sp4.alive = True
+        extant_sp4.is_sa = False
+        extant_sp4.is_sa_dummy_parent = False
+        extant_sp4.is_sa_lineage = False
+
+        # right child of internal_node3
+        extant_sp5 = Node(taxon=Taxon(label="sp5"), label="sp5", edge_length=0.25)
+        extant_sp5.alive = True
+        extant_sp5.is_sa = False
+        extant_sp5.is_sa_dummy_parent = False
+        extant_sp5.is_sa_lineage = False
+
+        internal_node3.add_child(extant_sp4)
+        internal_node3.add_child(extant_sp5)
+
+        internal_node2.add_child(extant_sp3)
+        internal_node2.add_child(internal_node3)
+
+        root_node.add_child(internal_node1)
+        root_node.add_child(internal_node2)
+
+        tr_complete = Tree(seed_node=origin_node)
+        tr_complete.taxon_namespace.add_taxon(origin_node.taxon)
+        tr_complete.taxon_namespace.add_taxon(root_node.taxon)
+        tr_complete.taxon_namespace.add_taxon(internal_node1)
+        tr_complete.taxon_namespace.add_taxon(internal_node2)
+        tr_complete.taxon_namespace.add_taxon(internal_node3)
+        tr_complete.taxon_namespace.add_taxon(extant_sp1.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp2.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp3.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp4.taxon)
+        tr_complete.taxon_namespace.add_taxon(extant_sp5.taxon)
+
+        total_state_count = 1
+        
+        max_age = 2.0
+
+        ann_tr = pjtr.AnnotatedTree(
+            tr_complete,
+            total_state_count,
+            start_at_origin=True,
+            max_age=max_age,
+            epsilon=1e-12)
+
+        print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True))
+
+        print(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+
+        # self.assertTrue(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+
+
     def test_obs_both_sides_root_with_origin_false(self):
         """
         Test method inside AnnotatedTree to check if complete tree has one observed taxon
@@ -269,8 +389,8 @@ class TestExtractReconstructedTree(unittest.TestCase):
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True, suppress_rooting=True)
 
         self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True), "((sa1:0.0,sp1:1.0)dummy1_dummy1:1.0,(sp2:1.0,sp3:1.25)nd1_nd1:0.75)root_root:0.0;\n")
-        self.assertEqual(tr_rec_str1, "((sa1:0.0,sp1:1.0):1.0,(sp3:1.25):0.75):0.0;\n")
-        self.assertEqual(tr_rec_str2, "((sa1:0.0,sp1:1.0):1.0,(sp3:1.25):0.75):0.0;\n")
+        self.assertEqual(tr_rec_str1, "((sa1:0.0,sp1:1.0):1.0,sp3:2.0):0.0;\n")
+        self.assertEqual(tr_rec_str2, "((sa1:0.0,sp1:1.0):1.0,sp3:2.0):0.0;\n")
 
 
     def test_extract_reconstructed_tree_one_extant_two_extinct_one_sa(self):

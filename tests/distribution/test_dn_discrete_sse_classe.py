@@ -26,8 +26,8 @@ class TestClaSSETrees(unittest.TestCase):
                         sseobj.MacroevolStateDependentRateParameter(name="q23", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,2]) ]
         
         rates_t0_s3 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda312", val=1.2, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="lambda313", val=0.9, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="lambda323", val=0.7, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,1,2]),
+                        sseobj.MacroevolStateDependentRateParameter(name="lambda313", val=0.9, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[2,0,2]),
+                        sseobj.MacroevolStateDependentRateParameter(name="lambda323", val=0.7, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[2,1,2]),
                         sseobj.MacroevolStateDependentRateParameter(name="q31", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]),
                         sseobj.MacroevolStateDependentRateParameter(name="q32", val=0.6, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,1]) ]
         

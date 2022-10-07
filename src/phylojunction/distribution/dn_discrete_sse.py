@@ -1123,15 +1123,18 @@ class DnSSE(pgm.DistributionPGM):
             )
             
             if rec_tree.__str__() == "":
-                print("\nRejected reconstructed tree")
-                print("    Complete tree:")
-                print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
-                for ch in ann_tr.tree.leaf_node_iter():
-                    print(ch.label + " alive = " + str(ch.alive))
+                # debugging
+                # print("\nRejected reconstructed tree")
+                # print("    Complete tree:")
+                # print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+                # for ch in ann_tr.tree.leaf_node_iter():
+                #     print(ch.label + " alive = " + str(ch.alive))
+                # print("\n")
                 return False
             
-            print("\nSuccessful reconstructed tree:")
-            print(rec_tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+            # debugging
+            # print("\nSuccessful reconstructed tree:")
+            # print(rec_tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
 
         if self.stop == "size":
             if self.condition_on_speciation and isinstance(ann_tr.root_node, dp.Node) and len(ann_tr.root_node.child_nodes()) == 0:

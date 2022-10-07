@@ -427,10 +427,13 @@ class AnnotatedTree(dp.Tree):
         event
         """
         def _recur_find_extant_or_sa(a_node: dp.Node, has_seen_root: bool, found_extant_or_sa_count: int, found_extant_or_sa: bool) -> int:
+            # debugging
             # print("just started recurring at node " + a_node.label)
+            # if a_node.parent_node: print("  my parent is " + a_node.parent_node.label)
 
             # if origin, no parent_node
-            if a_node.parent_node and (a_node.parent_node.label != "root" and found_extant_or_sa):
+            if a_node.parent_node and \
+                (a_node.parent_node.label != "root" and found_extant_or_sa):
                 # print("... but my parent has a child that is alive or sa, coming back!")
                 return found_extant_or_sa_count, found_extant_or_sa
 
@@ -447,6 +450,9 @@ class AnnotatedTree(dp.Tree):
                 if ch_node.label == "root" or ch_node.taxon == "root":
                     has_seen_root = True
 
+                if a_node.label != "root" and found_extant_or_sa:
+                    break
+
                 try:
                     if has_seen_root:
                         if ch_node.alive or ch_node.is_sa:
@@ -459,9 +465,15 @@ class AnnotatedTree(dp.Tree):
                             if a_node.label != "root":
                                 break
 
+                        # stay on this side, keep digging
                         else:
-                            # stay on this side, keep digging
-                            found_extant_or_sa_count, found_extant_or_sa = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count, found_extant_or_sa)
+                            # if root, we don't break if the sister is
+                            # extant or sa, so we use False
+                            if a_node.label == "root":
+                                found_extant_or_sa_count, found_extant_or_sa = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count, False)
+                            
+                            else:
+                                found_extant_or_sa_count, found_extant_or_sa = _recur_find_extant_or_sa(ch_node, has_seen_root, found_extant_or_sa_count, found_extant_or_sa)
 
                     else:
                         # no root yet, keep digging until
@@ -477,6 +489,8 @@ class AnnotatedTree(dp.Tree):
             return found_extant_or_sa_count, found_extant_or_sa
         
         n_extant_or_sa, _ = _recur_find_extant_or_sa(a_node, False, 0, False)
+
+        # print("\nWrapping up tree, n_extant_or_sa = " + str(n_extant_or_sa))
 
         if n_extant_or_sa == 2:
             return True
@@ -527,7 +541,7 @@ class AnnotatedTree(dp.Tree):
             return dp.Tree()
         
         self.tree_reconstructed.filter_leaf_nodes(
-            filter_fn, suppress_unifurcations=False)
+            filter_fn, suppress_unifurcations=True)
 
         # getting all root information #
         # root_node will be None if it does not exist
@@ -570,10 +584,13 @@ class AnnotatedTree(dp.Tree):
             # no speciation happened, so
             # complete tree has no root
             if not root_node:
-                origin_node = self.tree_reconstructed.seed_node
                 self.tree_reconstructed.reroot_at_node(int_node_deeper_than_root)
-                int_node_deeper_than_root.remove_child(origin_node)
                 int_node_deeper_than_root.edge_length = 0.0
+
+                # if suppress_unifurcations set to False
+                # origin_node = self.tree_reconstructed.seed_node
+                # int_node_deeper_than_root.remove_child(origin_node)
+                
 
             # there is a root in the complete tree
             else:
@@ -610,21 +627,23 @@ class AnnotatedTree(dp.Tree):
                         rec_mrca_node = self.tree_reconstructed.find_node_with_label(rec_tree_mrca_label)
                         self.tree_reconstructed.reroot_at_node(rec_mrca_node)
 
+                        # if suppress_unifurcations is set to False
+                        #
                         # if there is a root AND an origin
                         # it is the origin that will dangle, so we
                         # remove it
-                        origin_node_rec: dp.Tree = dp.Tree()
-                        if self.origin_node:
-                            origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
+                        # origin_node_rec: dp.Tree = dp.Tree()
+                        # if self.origin_node:
+                        #     origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
                         
-                            if not origin_node_rec:
-                                origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
+                        #     if not origin_node_rec:
+                        #         origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
 
-                            rec_mrca_node.remove_child(origin_node_rec)
+                        #     rec_mrca_node.remove_child(origin_node_rec)
                     
                         # no origin! will delete dangling root
-                        else:
-                            rec_mrca_node.remove_child(root_node)
+                        # else:
+                        #     rec_mrca_node.remove_child(root_node)
                         
                         rec_mrca_node.edge_length = 0.0
 
@@ -644,17 +663,21 @@ class AnnotatedTree(dp.Tree):
                     return dp.Tree()
 
                 if self.origin_node and int_node_deeper_than_root.taxon != None:
+                    self.tree_reconstructed.reroot_at_node(int_node_deeper_than_root)
+
+                    # if suppress_unifurcations is set to False
+                    #
                     # getting origin and removing it
                     # if possible
-                    origin_node_rec: dp.Node = dp.Node()
-                    if self.origin_node:
-                        origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
+                    # origin_node_rec: dp.Node = dp.Node()
+                    # if self.origin_node:
+                    #     origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
                         
-                        if not origin_node_rec:
-                            origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
+                    #     if not origin_node_rec:
+                    #         origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
 
-                    self.tree_reconstructed.reroot_at_node(int_node_deeper_than_root)
-                    int_node_deeper_than_root.remove_child(origin_node_rec)
+                    # int_node_deeper_than_root.remove_child(origin_node_rec)
+                    
                     int_node_deeper_than_root.edge_length = 0.0
 
         return self.tree_reconstructed
