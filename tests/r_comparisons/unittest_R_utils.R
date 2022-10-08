@@ -4,7 +4,7 @@ get.tr.h <- function(a.tr) {
     max(nodeHeights(a.tr))
 }
 
-get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE, w.root=FALSE) {
+get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE, w.root=FALSE, three.states=FALSE) {
     extant.tip.labels = getExtant(a.tr)
     n.tips = length(extant.tip.labels) # extant!
     n.total = length(a.tr$tip.label)
@@ -32,10 +32,18 @@ get.specs <- function(a.tr, w.states=TRUE, w.sa=FALSE, w.root=FALSE) {
     }
 
     if (w.states) {
-        n.0 = sum(a.tr$tip.state==0) # both extant and extinct
-        n.1 = sum(a.tr$tip.state==1)
-        spec.df = data.frame(t(c(tr.h, n.total, n.tips, n.0, n.1)))
-        names(spec.df) = c("tr.h", "n.total", "n.tips", "n.0", "n.1")
+        if (!three.states) {
+            n.0 = sum(a.tr$tip.state==0) # both extant and extinct
+            n.1 = sum(a.tr$tip.state==1)
+            spec.df = data.frame(t(c(tr.h, n.total, n.tips, n.0, n.1)))
+            names(spec.df) = c("tr.h", "n.total", "n.tips", "n.0", "n.1")
+        } else {
+            n.0 = sum(a.tr$tip.state==1) # both extant and extinct
+            n.1 = sum(a.tr$tip.state==2)
+            n.2 = sum(a.tr$tip.state==3)
+            spec.df = data.frame(t(c(tr.h, n.total, n.tips, n.0, n.1, n.2)))
+            names(spec.df) = c("tr.h", "n.total", "n.tips", "n.0", "n.1", "n.2")
+        }
     }
 
     else {
