@@ -48,7 +48,7 @@ class DnSSE(pgm.DistributionPGM):
         condition_on_survival (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to True.
         condition_on_obs_both_sides_root (bool): If true, rejects trees that do not have observed taxa on both sides of complete tree's root. Defaults to False.
         epsilon (float, optional): Any values difference below this value is set to 0.0. Defaults to 1e-12.
-        runtime_limit (int, optional): Maximum number of minutes one is willing to wait until all 'n_sim' simulations are done. Defaults to 10.
+        runtime_limit (int, optional): Maximum number of minutes one is willing to wait until all 'n_sim' simulations are done. Defaults to 5.
         debug (bool, optional): Whether to print debugging messages
 
     Methods
@@ -81,7 +81,7 @@ class DnSSE(pgm.DistributionPGM):
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
     def __init__(self, event_handler: sseobj.MacroevolEventHandler, stop_value: ty.List[float]=[], n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
                 start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=True, condition_on_obs_both_sides_root: bool=False,
-                seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=5, debug: bool=False) -> None:
+                seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=1, debug: bool=False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
@@ -1037,12 +1037,14 @@ class DnSSE(pgm.DistributionPGM):
                                max_age=a_stop_value,
                                slice_t_ends=self.slice_t_ends,
                                slice_age_ends=self.events.slice_age_ends,
-                               sa_lineage_dict=sa_lineage_dict)
+                               sa_lineage_dict=sa_lineage_dict,
+                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root)
         elif self.stop == "size":
             at = AnnotatedTree(tr,
                                self.events.state_count,
                                start_at_origin=self.with_origin,
-                               sa_lineage_dict=sa_lineage_dict)
+                               sa_lineage_dict=sa_lineage_dict,
+                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root)
 
         if self.debug:
             # print(at.tree)
@@ -1065,6 +1067,7 @@ class DnSSE(pgm.DistributionPGM):
             ellapsed_time = pjh.get_ellapsed_time_in_minutes(start_time, time.time())
 
             if ellapsed_time >= self.runtime_limit:
+                print("Aborted simulations, hit runtime limit")
                 break
 
             # simulate!
@@ -1118,9 +1121,7 @@ class DnSSE(pgm.DistributionPGM):
             if self.condition_on_speciation and not isinstance(ann_tr.root_node, dp.Node):
                 return False
 
-            rec_tree = ann_tr.extract_reconstructed_tree(
-                require_obs_both_sides=self.condition_on_obs_both_sides_root
-            )
+            rec_tree = ann_tr.extract_reconstructed_tree()
             
             if rec_tree.__str__() == "":
                 # debugging
@@ -1147,6 +1148,13 @@ class DnSSE(pgm.DistributionPGM):
             return True
 
         elif self.stop == "age":
+            print("WARNING: don't forget to remove n-extant-tip bracketing in is_tr_ok() after FIG validation!!!")
+            # TODO: remove these two ifs after done with FIG validation
+            if ann_tr.n_extant_terminal_nodes <= 30:
+                return False
+            if ann_tr.n_extant_terminal_nodes > 300:
+                return False
+
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
                 # tree is ok if either it reached the max age by epsilon, or if its age is smaller than max age
                 if abs(a_stop_value - ann_tr.origin_age) <= self.epsilon or ann_tr.origin_age < a_stop_value:

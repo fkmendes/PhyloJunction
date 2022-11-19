@@ -120,8 +120,7 @@ This script should be called and be successful every time new code is written, b
 Building and installing PhyloJunction is done using `setuptools`, which is specified in `pyproject.toml`.
 Instructions for `setuptools` are provided in `setup.cfg`.
 
-Start by cloning the PhyloJunction repository, and going to its root (i.e., the
-`PhyloJunction` folder).
+Start by cloning the PhyloJunction repository, and going to its root (i.e., the `PhyloJunction` folder).
 
 If you are on an Apple machine that obstrusively curtails file system access, run the following command:
 
@@ -140,6 +139,8 @@ python3 -m pip install --prefix ~/.local -e .
 
 Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.
 This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
+
+Then make sure you have `/path/to/PhyloJunction/src/` in your `PYTHONPATH` environmental variable on the command line outside VSCode (i.e., irrespective of "env" variable in your `launch.json` file).
 
 You can test things worked by trying, from any directory:
 

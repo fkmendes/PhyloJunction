@@ -30,7 +30,6 @@ class AnnotatedTree(dp.Tree):
     root_age: ty.Optional[float] # can be None
     tree_read_as_newick_by_dendropy: bool
     tree: dp.Tree
-    tree_reconstructed: dp.Tree
     state_count: int
     seed_age: float
     max_age: ty.Optional[float]
@@ -51,10 +50,15 @@ class AnnotatedTree(dp.Tree):
     extinct_obs_nodes_labels: ty.Tuple[str, ...]
     sa_obs_nodes_labels: ty.Tuple[str, ...]
 
+    # rec tree
+    tree_reconstructed: dp.Tree
+    condition_on_obs_both_sides_root: bool
+
     def __init__(self,
                 a_tree: dp.Tree,
                 total_state_count: int,
                 start_at_origin: bool=False,
+                condition_on_obs_both_sides_root: bool=True,
                 max_age: ty.Optional[float]=None,
                 slice_t_ends: ty.List[ty.Optional[float]]=[],
                 slice_age_ends: ty.Optional[ty.List[float]]=None,
@@ -88,6 +92,9 @@ class AnnotatedTree(dp.Tree):
         self.slice_t_ends = slice_t_ends
         self.slice_age_ends = slice_age_ends
         
+        # reconstructed tree
+        self.condition_on_obs_both_sides_root = condition_on_obs_both_sides_root
+
         # other
         self.epsilon = epsilon
         self.sa_lineage_dict = sa_lineage_dict
@@ -527,9 +534,18 @@ class AnnotatedTree(dp.Tree):
     # 
     # if rejection sampling happened, is_tr_ok will populate it;
     # otherwise, population happend upon writing
-    def extract_reconstructed_tree(self, require_obs_both_sides: bool=True) -> dp.Tree:
+    def extract_reconstructed_tree(self, require_obs_both_sides: ty.Optional[bool]=None) -> dp.Tree:
         """Make deep copy of self.tree, then prune extinct taxa from copy"""
-        
+
+        # if method called by someone other than Tree obj,
+        # then require_obs_both_sides won't be None
+        require_obs_both_sides_root = True
+        if not require_obs_both_sides == None:
+            require_obs_both_sides_root = require_obs_both_sides 
+        # otherwise, we use the member inside Tree
+        else:
+            require_obs_both_sides_root = self.condition_on_obs_both_sides_root
+
         if self.tree_reconstructed:
             return self.tree_reconstructed
 
@@ -579,8 +595,8 @@ class AnnotatedTree(dp.Tree):
         #################
         # Special cases #
         #################
-        
-        if not require_obs_both_sides:
+
+        if not require_obs_both_sides_root:
             # no speciation happened, so
             # complete tree has no root
             if not root_node:
@@ -782,22 +798,27 @@ class AnnotatedTree(dp.Tree):
         return taxon_states_dict
 
 
-    # TODO: add to .pyi
-    def get_taxon_states_nexus_str(self) -> str:
+    def get_taxon_states_str(self, nexus: bool=False) -> str:
         taxon_states_dict = self._get_taxon_states_dict()
-        nexus_str = \
+        states_str = ""
+
+        for taxon_name, taxon_state in taxon_states_dict.items():
+            states_str += taxon_name + "\t" + str(taxon_state) + "\n"
+
+        if nexus:
+            nexus_header = \
             "#Nexus\n\nBegin data;\nDimensions ntax=" + \
             str(self.n_extant_terminal_nodes + self.n_sa) + \
             " nchar=1;\nFormat datatype=Standard symbols=\"" + \
             "".join(str(i) for i in range(self.state_count)) + \
             "\" missing=? gap=-;\nMatrix\n"
+            
+            nexus_str = nexus_header + states_str + ";\nEnd;\n"
+            
+            return nexus_header
 
-        for taxon_name, taxon_state in taxon_states_dict.items():
-            nexus_str += taxon_name + "\t" + str(taxon_state) + "\n"
+        return states_str
 
-        nexus_str += ";\nEnd;\n"
-
-        return nexus_str
 
 ###########################
 # Plotting tree functions #

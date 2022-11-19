@@ -138,7 +138,8 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
     tree_rec_value_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1].tsv": pd.DataFrame with newick strings (reconstructed trees), for all replicates and samples, "[tr_node_name2].tsv": ... }
     tree_summary_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1]_summaries.tsv": pd.DataFrame with summary stats, for all replicates and samples }
     tree_repl_summary_df_dict: ty.Dict[str, pd.DataFrame] = dict() # { "[tr_node_name1]_replicate_summary.tsv": pd.DataFrame summary stats averaged over replicates, for all samples }
-    tree_nexus_str_states_dict: ty.Dict[str, str] = dict() # { "[tr_node_name1]_sampleidx_repl_idx": nexus_str, ... }
+    tree_states_str_dict: ty.Dict[str, str] = dict() # { "[tr_node_name1]_sampleidx_repl_idx": states_str, ... }
+    tree_states_str_nexus_dict: ty.Dict[str, str] = dict() # { "[tr_node_name1]_sampleidx_repl_idx": nexus_str, ... }
 
     # creating object to hold r.v. values and summaries
     scalar_constant_df: pd.DataFrame = pd.DataFrame()
@@ -261,6 +262,12 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                         for ith_val in node_val
                 ]
 
+                # print("complete tree = " + node_val[0].tree.as_string(
+                #         schema="newick",
+                #         suppress_annotations=True,
+                #         suppress_internal_taxon_labels=True,
+                #         suppress_internal_node_labels=True).strip("\""))
+
                 # reconstructed trees #
                 # suppress_rooting=False guarantees that
                 # [&R] is not added to tree Newick string as
@@ -268,6 +275,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                 rec_tree_list = []
                 for ith_val in node_val:
                     ith_rec_tree = ith_val.extract_reconstructed_tree()
+
                     rec_tree_list.append(
                         ith_rec_tree.as_string(
                             schema="newick",
@@ -276,7 +284,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                             suppress_rooting=True,
                             suppress_internal_node_labels=True).strip("\"").strip()
                     )
-
+                
                 tree_rec_value_df_dict[rv_name][rv_name] = rec_tree_list
 
                 
@@ -391,11 +399,15 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                 for replicate_tree in node_val:
                     while (sample_idx < sample_size):
                         while (repl_idx < n_repl):
-                            nex_fp = rv_name + "_sample" + str(sample_idx+1) + "_repl" + str(repl_idx+1) + ".nex"
-                            nexus_str = node_val[idx].get_taxon_states_nexus_str()
-                            tree_nexus_str_states_dict[nex_fp] = nexus_str
+                            states_tsv_fp = rv_name + "_sample" + str(sample_idx+1) + "_repl" + str(repl_idx+1) + ".tsv"
+                            states_nex_fp = rv_name + "_sample" + str(sample_idx+1) + "_repl" + str(repl_idx+1) + ".nex"
+                            states_str = node_val[idx].get_taxon_states_str()
+                            nexus_str = node_val[idx].get_taxon_states_str(nexus=True)
+                            tree_states_str_dict[states_tsv_fp] = states_str
+                            tree_states_str_nexus_dict[states_nex_fp] = nexus_str
                             repl_idx += 1
                             idx += 1
+                        
                         repl_idx = 0
                         sample_idx += 1
                     # TODO
@@ -455,7 +467,8 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel) -> ty.Tuple[ty.List[t
                               tree_rec_value_df_dict,
                               tree_summary_df_dict,
                               tree_repl_summary_df_dict,
-                              tree_nexus_str_states_dict]
+                              tree_states_str_dict,
+                              tree_states_str_nexus_dict]
     )
 
     return scalar_output_stash, tree_output_stash
@@ -499,6 +512,7 @@ def prep_data_filepaths_dfs(
         for rv_name, df in tree_output_stash[1].items():
             output_fp_list.append(rv_name + "_reconstructed.tsv")
             output_df_str_list.append(df)
+
     if tree_output_stash[2]:
         for rv_name, df in tree_output_stash[2].items():
             output_fp_list.append(rv_name + "_stats.csv")
@@ -508,7 +522,11 @@ def prep_data_filepaths_dfs(
             output_fp_list.append(rv_name + "_stats_summary.csv")
             output_df_str_list.append(df)
     if tree_output_stash[4]:
-        for state_nex_fp, state_nex_string in tree_output_stash[4].items():
+        for state_tsv_fp, state_string in tree_output_stash[4].items():
+            output_fp_list.append(state_tsv_fp)
+            output_df_str_list.append(state_string)
+    if tree_output_stash[5]:
+        for state_nex_fp, state_nex_string in tree_output_stash[5].items():
             output_fp_list.append(state_nex_fp)
             output_df_str_list.append(state_nex_string)
 
