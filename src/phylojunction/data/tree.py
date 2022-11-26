@@ -35,6 +35,7 @@ class AnnotatedTree(dp.Tree):
     max_age: ty.Optional[float]
     epsilon: float
     tree_died: ty.Optional[bool]
+    tree_invalid: ty.Optional[bool]
     no_event: bool
     state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
@@ -64,6 +65,7 @@ class AnnotatedTree(dp.Tree):
                 slice_age_ends: ty.Optional[ty.List[float]]=None,
                 sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]=None,
                 tree_died: ty.Optional[bool]=None,
+                tree_invalid: ty.Optional[bool]=None,
                 epsilon: float=1e-12):
 
         self.origin_node = None
@@ -94,6 +96,13 @@ class AnnotatedTree(dp.Tree):
         
         # reconstructed tree
         self.condition_on_obs_both_sides_root = condition_on_obs_both_sides_root
+
+        # rejection sampling when stop condition
+        # is age
+        self.tree_invalid = tree_invalid
+        if not isinstance(self.tree_invalid, bool):
+            # (if flag not passed, we assume tree is valid)
+            self.tree_invalid = False
 
         # other
         self.epsilon = epsilon

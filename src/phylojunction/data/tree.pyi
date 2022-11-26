@@ -18,6 +18,7 @@ class AnnotatedTree(dp.Tree):
     seed_age: float
     epsilon: float
     tree_died: ty.Optional[bool]
+    tree_invalid: ty.Optional[bool]
     no_event: bool
     state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
@@ -41,6 +42,7 @@ class AnnotatedTree(dp.Tree):
                  slice_age_ends: ty.Optional[ty.List[float]]=None,
                  sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]=None,
                  tree_died: ty.Optional[bool]=None,
+                 tree_invalid: ty.Optional[bool]=None,
                  epsilon: float=1e-12) -> None: ...
     def count_sampled_ancestors(self) -> None: ...
     def count_observable_nodes(self) -> None: ...

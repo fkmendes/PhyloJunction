@@ -1,3 +1,4 @@
+from os import abort
 import typing as ty
 
 # pj imports
@@ -30,6 +31,12 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     origin: bool = True
     cond_spn: bool = False
     cond_surv: bool = True
+
+    # rejection sampling based on number
+    # of observed taxa in reconstructed tree
+    min_rec_taxa = 0
+    max_rec_taxa = int(1e12)
+    abort_at_obs = int(1e12) # for trees out of control
     
     # if set to True by user, rejection sampling happens;
     # if False, reconstructed trees are printed whatever
@@ -73,7 +80,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                 # there should be only one event handler always, but it will be in list
                     event_handler = nodepgm_val
 
-            elif arg in ("n", "nr", "runtime_limit"):
+            elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa", "max_rec_taxa", "abort_at_obs"):
                 try:
                     if isinstance(first_val, str):
                         int_val = int(first_val) # no vectorization allowed here
@@ -84,6 +91,9 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                 if arg == "n": n_samples = int_val
                 if arg == "runtime_limit": runtime_limit = int_val
                 if arg == "nr": n_repl = int_val
+                if arg == "min_rec_taxa": min_rec_taxa = int_val
+                if arg == "max_rec_taxa": max_rec_taxa = int_val
+                if arg == "abort_at_obs": abort_at_obs = int_val
 
             elif arg == "stop":
                 if isinstance(first_val, str):
@@ -161,6 +171,9 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
         condition_on_speciation=cond_spn,
         condition_on_survival=cond_surv,
         condition_on_obs_both_sides_root=cond_obs_both_sides,
+        min_rec_taxa=min_rec_taxa,
+        max_rec_taxa=max_rec_taxa,
+        abort_at_obs=abort_at_obs,
         epsilon=eps,
         runtime_limit=runtime_limit
     )

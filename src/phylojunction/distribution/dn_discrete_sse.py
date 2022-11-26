@@ -47,6 +47,9 @@ class DnSSE(pgm.DistributionPGM):
         condition_on_speciation (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to False.
         condition_on_survival (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to True.
         condition_on_obs_both_sides_root (bool): If true, rejects trees that do not have observed taxa on both sides of complete tree's root. Defaults to False.
+        min_rec_taxa (int): Required minimum number of observed taxa in reconstructed tree (at least or equal to). Defaults to zero.
+        max_rec_taxa (int): Required maximum number of observed taxa in reconstructed tree (at most and equal to). Defaults to 1e12.
+        abort_at_obs (int): If growing tree reaches this number of living taxa, we abort the sample (invalidate the tree). Defaults to 1e12.
         epsilon (float, optional): Any values difference below this value is set to 0.0. Defaults to 1e-12.
         runtime_limit (int, optional): Maximum number of minutes one is willing to wait until all 'n_sim' simulations are done. Defaults to 5.
         debug (bool, optional): Whether to print debugging messages
@@ -67,6 +70,9 @@ class DnSSE(pgm.DistributionPGM):
     condition_on_speciation: bool
     condition_on_survival: bool
     condition_on_obs_both_sides_root: bool
+    min_rec_taxa: int
+    max_rec_taxa: int
+    abort_at_obs: int
     events: sseobj.MacroevolEventHandler
     start_states: ty.List[int]
     state_count: int
@@ -79,9 +85,24 @@ class DnSSE(pgm.DistributionPGM):
     debug: bool
 
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
-    def __init__(self, event_handler: sseobj.MacroevolEventHandler, stop_value: ty.List[float]=[], n: int=1, n_replicates: int=1, stop: str="", origin: bool=True,
-                start_states_list: ty.List[int]=[], condition_on_speciation: bool=False, condition_on_survival: bool=True, condition_on_obs_both_sides_root: bool=False,
-                seeds_list: ty.Optional[ty.List[int]]=None, epsilon: float=1e-12, runtime_limit: int=1, debug: bool=False) -> None:
+    def __init__(self,
+                 event_handler: sseobj.MacroevolEventHandler,
+                 stop_value: ty.List[float]=[],
+                 n: int=1,
+                 n_replicates: int=1,
+                 stop: str="",
+                 origin: bool=True,
+                 start_states_list: ty.List[int]=[],
+                 condition_on_speciation: bool=False,
+                 condition_on_survival: bool=True,
+                 condition_on_obs_both_sides_root: bool=False,
+                 min_rec_taxa: int=0,
+                 max_rec_taxa: int=int(1e12),
+                 abort_at_obs: int=int(1e12),
+                 seeds_list: ty.Optional[ty.List[int]]=None,
+                 epsilon: float=1e-12,
+                 runtime_limit: int=5,
+                 debug: bool=False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
@@ -95,9 +116,14 @@ class DnSSE(pgm.DistributionPGM):
         self.condition_on_survival = condition_on_survival
         self.condition_on_obs_both_sides_root = condition_on_obs_both_sides_root
 
+        # rejection sampling
+        self.min_rec_taxa = min_rec_taxa
+        self.max_rec_taxa = max_rec_taxa
+        self.abort_at_obs = abort_at_obs
+
         # model parameters
         self.start_states = start_states_list
-        self.events = event_handler # carries all parameters, number of states and of slices        
+        self.events = event_handler # carries all parameters, number of states and of slices
         self.state_count = self.events.state_count
         self.n_time_slices = self.events.n_time_slices
         # if isinstance(self.events.slice_t_ends, list):
@@ -752,6 +778,7 @@ class DnSSE(pgm.DistributionPGM):
         latest_t = 0.0 # will increase as simulation progresses
 
         max_obs_nodes = 0
+        
         current_node_target_count = 1
         cumulative_node_count = 1
         cumulative_sa_count = 0
@@ -763,6 +790,7 @@ class DnSSE(pgm.DistributionPGM):
         last_chosen_node = None
         sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]] = dict() # tree info for plotting
         tr = dp.Tree()
+        tree_invalid = False
 
         if self.stop == "age" and isinstance(a_stop_value, float):
             t_stop = a_stop_value
@@ -994,6 +1022,18 @@ class DnSSE(pgm.DistributionPGM):
 
                     break
 
+                # [Condition is "age", but rejection sampling
+                # was requested for taxon count range]
+                # 
+                # this helps stop trees growing out of control
+                # within age limit
+                if current_node_target_count == self.abort_at_obs:
+                    tree_invalid = True
+                    reached_stop_condition = True
+
+                    break
+
+
                 # check tree grew beyond its max taxon count, stop!
                 #
                 # it's '>' max_obs_nodes below, instead of '==' or '>='
@@ -1038,13 +1078,15 @@ class DnSSE(pgm.DistributionPGM):
                                slice_t_ends=self.slice_t_ends,
                                slice_age_ends=self.events.slice_age_ends,
                                sa_lineage_dict=sa_lineage_dict,
-                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root)
+                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
+                               tree_invalid=tree_invalid)
         elif self.stop == "size":
             at = AnnotatedTree(tr,
                                self.events.state_count,
                                start_at_origin=self.with_origin,
                                sa_lineage_dict=sa_lineage_dict,
-                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root)
+                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
+                               tree_invalid=tree_invalid)
 
         if self.debug:
             # print(at.tree)
@@ -1087,6 +1129,7 @@ class DnSSE(pgm.DistributionPGM):
                     continue
 
             ith_sim += 1
+            print(ith_sim)
 
         return output
 
@@ -1108,7 +1151,6 @@ class DnSSE(pgm.DistributionPGM):
         Returns:
             bool: If tree meets stop condition value.
         """
-
         if self.condition_on_survival and ann_tr.tree_died:
             return False
 
@@ -1148,11 +1190,26 @@ class DnSSE(pgm.DistributionPGM):
             return True
 
         elif self.stop == "age":
-            print("WARNING: don't forget to remove n-extant-tip bracketing in is_tr_ok() after FIG validation!!!")
+            # grew out of control! #
+            if ann_tr.tree_invalid:
+                # tree was cut short of stop_condition
+                # because it grew too much!
+                #
+                # starting from root
+                if (not ann_tr.with_origin and isinstance(ann_tr.root_age, float)) and \
+                    (a_stop_value - ann_tr.root_age) > self.epsilon:
+                    return False
+                # starting from origin
+
+            # print("WARNING: don't forget to remove n-extant-tip bracketing in is_tr_ok() after FIG validation!!!")
             # TODO: remove these two ifs after done with FIG validation
-            if ann_tr.n_extant_terminal_nodes <= 30:
+            # reconstructed tree is too small
+            if ann_tr.n_extant_terminal_nodes < self.min_rec_taxa:
+                print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
-            if ann_tr.n_extant_terminal_nodes > 300:
+            # reconstructed tree is too large
+            if ann_tr.n_extant_terminal_nodes > self.max_rec_taxa:
+                print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
 
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
