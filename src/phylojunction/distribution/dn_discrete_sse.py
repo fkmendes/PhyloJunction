@@ -1129,7 +1129,7 @@ class DnSSE(pgm.DistributionPGM):
                     continue
 
             ith_sim += 1
-            print(ith_sim)
+            # print(ith_sim)
 
         return output
 
@@ -1205,11 +1205,11 @@ class DnSSE(pgm.DistributionPGM):
             # TODO: remove these two ifs after done with FIG validation
             # reconstructed tree is too small
             if ann_tr.n_extant_terminal_nodes < self.min_rec_taxa:
-                print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
+                # print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
             # reconstructed tree is too large
             if ann_tr.n_extant_terminal_nodes > self.max_rec_taxa:
-                print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
+                # print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
 
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
