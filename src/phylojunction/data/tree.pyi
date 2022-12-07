@@ -21,6 +21,8 @@ class AnnotatedTree(dp.Tree):
     tree_invalid: ty.Optional[bool]
     no_event: bool
     state_count_dict: ty.Dict[int, int]
+    alive_state_count_dict: ty.Dict[int, int]
+    dead_state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]

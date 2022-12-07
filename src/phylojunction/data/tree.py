@@ -38,6 +38,9 @@ class AnnotatedTree(dp.Tree):
     tree_invalid: ty.Optional[bool]
     no_event: bool
     state_count_dict: ty.Dict[int, int]
+    alive_state_count_dict: ty.Dict[int, int]
+    dead_state_count_dict: ty.Dict[int, int]
+    obs_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]] # { node_name: { attr: value }}
@@ -83,6 +86,9 @@ class AnnotatedTree(dp.Tree):
         # state-related
         self.state_count = total_state_count
         self.state_count_dict = dict((int(s), 0) for s in range(self.state_count))
+        self.alive_state_count_dict = dict((int(s), 0) for s in range(self.state_count))
+        self.dead_state_count_dict = dict((int(s), 0) for s in range(self.state_count))
+        self.obs_state_count_dict = dict((int(s), 0) for s in range(self.state_count)) # TODO: later deal with this
 
         # age related
         self.seed_age = self.tree.max_distance_from_root()
@@ -420,14 +426,26 @@ class AnnotatedTree(dp.Tree):
     def _count_terminal_node_states(self) -> None:
         # NOTE: we are counting ALL leaves, extinct and extant!
         for nd in self.tree.leaf_node_iter():
-            # if nd.label in self.extant_obs_nodes_labels:
             try:
                 self.state_count_dict[nd.state] += 1
+
             # if tree was read as newick, it might not have states defined
             # or the tree might have been created by hand and no states were
             # defined (e.g., Yule or birth-death processes)
-            except: pass
+            except:
+                pass
 
+            try:
+                if nd.alive:
+                    self.alive_state_count_dict[nd.state] += 1
+                    
+                else:
+                    self.dead_state_count_dict[nd.state] += 1
+            
+            # maybe tree was read as newick string, and it does have
+            # a "state" metadata, but doens't have an "alive" annotation
+            except:
+                pass
 
     # TODO: add to .pyi
     def find_if_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
