@@ -208,6 +208,22 @@ On Mac OS X, PySimpleGUI provides the `use_custom_titlebar=True` (which automati
 These allow `titlebar_icon="some_icon.png"`, which places a .png file on the titlebar, but simultaneously makes the window non-mini/maximizable on Mac OS X.
 So PJ stays cross-platform with windows resizability, I won't be adding any titlebar icons.
 
+## GUI development
+
+PhyloJunction has two functional GUIs:
+
+(1) with PySimpleGUI (`src/interface/pj_gui.py`), and
+(2) with PySide6 (`src/pysidegui/pj_gui_pyside`).
+
+The GUI built with PySimpleGUI was coded entirely by hand.
+
+The GUI built with PySide6 had its main structure coded by hand (`pysidegui/content_main_window.py`), but then individual pages built with Qt Creator / Qt Designer (an app for automating PySide6 GUI development).
+These individual pages are saved as a single `.ui` file (pjguipages/pjgui_pages.ui) that can be translated to a `.py` file with Qt Creator / Qt Designer (Form > View Python Code) or a command line tool:
+
+```
+pyuic6 -x created_file.ui -o created_file.py
+```
+
 ## Documentation
 
 PhyloJunction is documented automatically with `sphinx`, so make sure you have this program installed:

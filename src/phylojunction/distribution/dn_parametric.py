@@ -41,12 +41,16 @@ class DnLogNormal(pgm.DistributionPGM):
         """
 
         if not log_space:
-            sd_param = math.log(sd_param)
-            mean_param = math.log(mean_param)
+            # debugging
+            # print("log-normal in natural space: mean = " + str(mean_param) + " sd = " + str(sd_param))
+            
+            # have to use scale if in natural space
+            return lognorm.rvs(s=sd_param, scale=math.exp(mean_param), size=n_draws)
 
         # debugging
         # print("log-normal in log-space: mean = " + str(mean_param) + " sd = " + str(sd_param))
 
+        # have to use loc if in log-space
         return lognorm.rvs(s=math.exp(sd_param), loc=math.exp(mean_param), scale=1.0, size=n_draws)
 
     # validation of pars happens in phylojunction_grammar

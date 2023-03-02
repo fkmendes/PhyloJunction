@@ -801,37 +801,55 @@ class AnnotatedTree(dp.Tree):
         return dict((ks[i], str(vs[i])) for i in range(len(ks)))
 
     # TODO: add to .pyi
-    def _get_taxon_states_dict(self, exclude_internal: bool=True) -> ty.Dict[str, int]:
+    def _get_taxon_states_dict(self) -> ty.Dict[str, int]:
+        """
+        Living nodes and their states
+        All internal nodes (complete tree!)
+        """
         self.populate_nd_attr_dict(["state"])
         
-        taxon_states_dict: ty.Dict[str, int] = dict()
+        living_node_states_dict: ty.Dict[str, int] = dict()
+        int_node_states_dict: ty.Dict[str, int] = dict()
         for taxon_name, attr_val_dict in self.node_attr_dict.items():
-            # removing internal taxa
-            if (exclude_internal and \
-               self.tree.find_node_with_label(taxon_name).is_internal()):
-               continue
+            a_node = self.tree.find_node_with_label(taxon_name)
+
+            # internal nodes
+            if a_node.is_internal():
+               int_node_states_dict[taxon_name] = attr_val_dict["state"]
 
             # removing extinct taxa if tree was simulated with
             # PJ (i.e., has .alive member)
             try:
-                if not self.tree.find_node_with_label(taxon_name).alive:
+                if not a_node.alive:
                     continue
             
             except:
                 pass
 
-            taxon_states_dict[taxon_name] = attr_val_dict["state"]
+            living_node_states_dict[taxon_name] = attr_val_dict["state"]
 
-        return taxon_states_dict
+        return living_node_states_dict, int_node_states_dict
 
 
     def get_taxon_states_str(self, nexus: bool=False) -> str:
-        taxon_states_dict = self._get_taxon_states_dict()
-        states_str = ""
+        living_node_state_dict, int_node_states_dict = self._get_taxon_states_dict()
+        living_node_states_str = ""
+        int_node_states_str = ""
 
-        for taxon_name, taxon_state in taxon_states_dict.items():
-            states_str += taxon_name + "\t" + str(taxon_state) + "\n"
+        for taxon_name, taxon_state in living_node_state_dict.items():
+            living_node_states_str += taxon_name + "\t" + str(taxon_state) + "\n"
 
+        # only care about internal nodes
+        # in the reconstructed tree
+        for taxon_name, taxon_state in int_node_states_dict.items():
+            if self.tree_reconstructed.__str__() != "":
+                int_node = self.tree_reconstructed.find_node_with_label(taxon_name)
+
+                if int_node != None:
+                    int_node_states_str += taxon_name + "\t" + str(taxon_state) + "\n"
+
+        # not sure if I should be adding self.n_sa here, because
+        # I ignore dead taxa in _get_taxon_states_dict()
         if nexus:
             nexus_header = \
             "#Nexus\n\nBegin data;\nDimensions ntax=" + \
@@ -840,11 +858,11 @@ class AnnotatedTree(dp.Tree):
             "".join(str(i) for i in range(self.state_count)) + \
             "\" missing=? gap=-;\nMatrix\n"
             
-            nexus_str = nexus_header + states_str + ";\nEnd;\n"
+            nexus_str = nexus_header + living_node_states_str + ";\nEnd;\n"
             
-            return nexus_header
+            return nexus_str
 
-        return states_str
+        return living_node_states_str, int_node_states_str
 
 
 ###########################

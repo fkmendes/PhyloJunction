@@ -254,12 +254,16 @@ class NodePGM(ABC):
             if n_values >= 1:
                 if n_values % n_repls == 0:
                     return int(n_values / n_repls)
+
                 else:
                     raise ec.ReplicateNumberError(node_name=self.node_name)
+
         except:
+            print("right here 2")
             return 1
 
         # cosmetic return required by mypy
+        print("right here 3")
         return 1
 
     @abstractmethod

@@ -35,6 +35,9 @@ class GUIMainWindow(QMainWindow):
         # menu button #
         self.ui.pgm_button.clicked.connect(self.show_pgm_page)
 
+        # compare page button #
+        self.ui.compare_button.clicked.connect(self.show_pgm_page)
+
         # pgm page button #
         self.ui.cmd_log_button.clicked.connect(self.show_cmd_log_page)
 
@@ -181,12 +184,14 @@ class GUIMainWindow(QMainWindow):
             # if a tree
             if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
                 self.draw_node_pgm(fig_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
+            
             # when not a tree
             else:
                 if do_all_samples: 
                     self.draw_node_pgm(fig_axes, node_pgm, repl_size=repl_size)
                 else:
                     self.draw_node_pgm(fig_axes, node_pgm, sample_idx=sample_idx, repl_size=repl_size)
+        
         # when it's deterministic
         except:
             self.draw_node_pgm(fig_axes, node_pgm)
@@ -194,68 +199,126 @@ class GUIMainWindow(QMainWindow):
         fig_obj.canvas.draw()
 
 
-    def init_and_refresh_radio_spin(self, node_pgm):
+    def init_and_refresh_radio_spin(self, node_pgm, sample_size):
 
         ###################
         # Stochastic node #
         ###################
 
         if node_pgm.is_sampled:
-            # we always look one tree at a time
+            # tree #
             if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
                 # radio #
+                # we always look one tree at a time
                 self.ui.ui_pages.all_samples_radio.setCheckable(False)
                 self.ui.ui_pages.all_samples_radio.setDisabled(True)
-                self.ui.ui_pages.one_sample_radio.setCheckable(True)
                 
-                # default radio value
+                self.ui.ui_pages.one_sample_radio.setEnabled(True)
+                self.ui.ui_pages.one_sample_radio.setCheckable(True)
                 self.ui.ui_pages.one_sample_radio.setChecked(True)
 
                 # spin #
-                self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+                self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+                self.ui.ui_pages.sample_idx_spin.setMinimum(1)
                 self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+                self.ui.ui_pages.repl_idx_spin.setMinimum(1)
 
+            # non-tree
             else:
+                # TODO: coalesce the if and the else below
+                
                 # if it's the first click selecting node
-                if not self.ui.ui_pages.all_samples_radio.isCheckable() and \
-                    not self.ui.ui_pages.one_sample_radio.isCheckable():
+                if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
+                    not self.ui.ui_pages.one_sample_radio.isEnabled():
+                    "rv3 should not be here"
 
                     # radio #
-                    self.ui.ui_pages.all_samples_radio.setCheckable(True)
+                    # one sample is the default
                     self.ui.ui_pages.one_sample_radio.setCheckable(True)
-
-                    # default radio value
                     self.ui.ui_pages.one_sample_radio.setChecked(True)
 
                     # spin #
-                    self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+                    self.ui.ui_pages.sample_idx_spin.setMinimum(0)
+                    self.ui.ui_pages.sample_idx_spin.setValue(0)
+                    self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+                    
+                    self.ui.ui_pages.repl_idx_spin.setMinimum(0)
+                    self.ui.ui_pages.repl_idx_spin.setValue(0)
                     self.ui.ui_pages.repl_idx_spin.setDisabled(True)
 
                 else:
+                    self.ui.ui_pages.all_samples_radio.setEnabled(True)
+                    self.ui.ui_pages.one_sample_radio.setEnabled(True)
+                    
+                    # if looking at all samples, we
+                    # don't circle through repls
                     if self.ui.ui_pages.all_samples_radio.isChecked():
+                        print("rv3 should have activated this one at ALL SAMPLES")
+                        self.ui.ui_pages.repl_idx_spin.setMinimum(0)
+                        self.ui.ui_pages.repl_idx_spin.setValue(0)
                         self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+                        
+                        self.ui.ui_pages.sample_idx_spin.setMinimum(0)
+                        self.ui.ui_pages.sample_idx_spin.setValue(0)
                         self.ui.ui_pages.sample_idx_spin.setDisabled(True)
 
+                    # if looking at one sample at a time
                     else:
-                        self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+                        print("rv3 should have activated this one at ONE SAMPLE")
+                        self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+                        self.ui.ui_pages.repl_idx_spin.setMinimum(1)
+                        self.ui.ui_pages.sample_idx_spin.setMaximum(100)
+                        self.ui.ui_pages.repl_idx_spin.setValue(1)
+
                         self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+                        self.ui.ui_pages.sample_idx_spin.setMinimum(1)
+                        self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
+                        self.ui.ui_pages.sample_idx_spin.setValue(1)
+
 
         #################
         # Constant node #
         #################
 
+        # cannot circle through replicates
+        # because no 2D-nesting when 
+        # assigning constants (and no
+        # repls in deterministic nodes)
         else:
-            self.ui.ui_pages.all_samples_radio.setCheckable(False)
+            # NOTE: we need to both disable
+            # and uncheck so that the radio
+            # button is totally reset and
+            # turned off
+
+            # radio #
             self.ui.ui_pages.one_sample_radio.setCheckable(False)
-            self.ui.ui_pages.repl_idx_spin.setValue(0)
+            self.ui.ui_pages.one_sample_radio.setDisabled(True)
+            
+            # if deterministic
+            if sample_size == 0:
+                self.ui.ui_pages.all_samples_radio.setCheckable(False)
+                self.ui.ui_pages.all_samples_radio.setDisabled(True)
+            
+            else: 
+                self.ui.ui_pages.all_samples_radio.setEnabled(True)
+                self.ui.ui_pages.all_samples_radio.setCheckable(True)
+                self.ui.ui_pages.all_samples_radio.setChecked(True)
+
+            # spin #
+            self.ui.ui_pages.sample_idx_spin.setMinimum(0)
             self.ui.ui_pages.sample_idx_spin.setValue(0)
+            self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+            self.ui.ui_pages.repl_idx_spin.setMinimum(0)
+            self.ui.ui_pages.repl_idx_spin.setValue(0)
+            self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+            
 
     def do_selected_node(self):
         """
         Display selected node's string representation and
         plot it on canvas if possible
         """
-        
+
         # first get selected node's name #
         node_name = \
             self.ui.ui_pages.node_list.currentItem().text()
@@ -263,17 +326,21 @@ class GUIMainWindow(QMainWindow):
         # reading node information #
         node_pgm, sample_size, repl_size = \
             self.selected_node_read(node_name)
-        
+
         # spin boxes must be up-to-date #
-        self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size - 1)
-        self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size - 1)
+        self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
+        if sample_size == 0:
+            self.ui.ui_pages.sample_idx_spin.setMaximum(0)    
+        
+        else:
+            self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
 
         # grab pgm_page's figure and axes #
         fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
         fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
         
         # activate radio buttons and spin elements #
-        self.init_and_refresh_radio_spin(node_pgm)
+        self.init_and_refresh_radio_spin(node_pgm, sample_size)
         
         do_all_samples = \
             self.ui.ui_pages.all_samples_radio.isChecked()
@@ -311,8 +378,11 @@ class GUIMainWindow(QMainWindow):
         # Collect information from spin #
         #################################
         
-        sample_idx = self.ui.ui_pages.sample_idx_spin.value()
-        repl_idx = self.ui.ui_pages.repl_idx_spin.value()
+        sample_idx = self.ui.ui_pages.sample_idx_spin.value() - 1
+        repl_idx = self.ui.ui_pages.repl_idx_spin.value() - 1
+
+        print("sample_idx = " + str(sample_idx))
+        print("repl_idx = " + str(repl_idx))
 
         ###############
         # Now do node #

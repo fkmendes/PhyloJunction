@@ -64,7 +64,7 @@ class DnSSE(pgm.DistributionPGM):
     n_repl: int
     with_origin: bool
     root_is_born: bool
-    tree_died: bool
+    # tree_died: bool
     stop: str
     stop_val: ty.List[float]
     condition_on_speciation: bool
@@ -101,7 +101,7 @@ class DnSSE(pgm.DistributionPGM):
                  abort_at_obs: int=int(1e12),
                  seeds_list: ty.Optional[ty.List[int]]=None,
                  epsilon: float=1e-12,
-                 runtime_limit: int=5,
+                 runtime_limit: int=15,
                  debug: bool=False) -> None:
 
         # simulation parameters
@@ -109,7 +109,7 @@ class DnSSE(pgm.DistributionPGM):
         self.n_repl = int(n_replicates) # number of replicate trees (in plate) for a given simulation
         self.with_origin = origin
         self.root_is_born = False
-        self.tree_died = False
+        # self.tree_died = False
         self.stop = stop
         self.stop_val = stop_value
         self.condition_on_speciation = condition_on_speciation
@@ -791,6 +791,7 @@ class DnSSE(pgm.DistributionPGM):
         sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]] = dict() # tree info for plotting
         tr = dp.Tree()
         tree_invalid = False
+        tree_died = False
 
         if self.stop == "age" and isinstance(a_stop_value, float):
             t_stop = a_stop_value
@@ -1013,7 +1014,7 @@ class DnSSE(pgm.DistributionPGM):
                 #
                 # check if all lineages went extinct, stop!
                 if current_node_target_count == 0:
-                    self.tree_died = True
+                    tree_died = True
 
                     sa_lineage_node_labels = [nd.label for nd in living_nodes if nd.is_sa_lineage]
                     self.update_sa_lineage_dict(latest_t, sa_lineage_dict, sa_lineage_node_labels) # updates SA info for plotting
@@ -1079,7 +1080,8 @@ class DnSSE(pgm.DistributionPGM):
                                slice_age_ends=self.events.slice_age_ends,
                                sa_lineage_dict=sa_lineage_dict,
                                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
-                               tree_invalid=tree_invalid)
+                               tree_invalid=tree_invalid,
+                               tree_died=tree_died)
         elif self.stop == "size":
             at = AnnotatedTree(tr,
                                self.events.state_count,
@@ -1151,6 +1153,8 @@ class DnSSE(pgm.DistributionPGM):
         Returns:
             bool: If tree meets stop condition value.
         """
+        # print("self.tree_died inside SSE dn: " + str(ann_tr.tree_died))
+        
         if self.condition_on_survival and ann_tr.tree_died:
             return False
 
@@ -1194,6 +1198,7 @@ class DnSSE(pgm.DistributionPGM):
             if ann_tr.tree_invalid:
                 # tree was cut short of stop_condition
                 # because it grew too much!
+                print("Rejected: tree grew out of control!")
                 #
                 # starting from root
                 if (not ann_tr.with_origin and isinstance(ann_tr.root_age, float)) and \
@@ -1205,11 +1210,11 @@ class DnSSE(pgm.DistributionPGM):
             # TODO: remove these two ifs after done with FIG validation
             # reconstructed tree is too small
             if ann_tr.n_extant_terminal_nodes < self.min_rec_taxa:
-                # print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
+                print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
             # reconstructed tree is too large
             if ann_tr.n_extant_terminal_nodes > self.max_rec_taxa:
-                # print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
+                print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
 
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):

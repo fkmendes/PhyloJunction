@@ -146,6 +146,11 @@ class ContentGUIMainWindow(object):
             is_active=True
         )
 
+        self.compare_button = PJPushButton(
+            text="Compare",
+            icon_path="icon_violins.svg"
+        )
+
         self.cmd_log_button = PJPushButton(
             text="Command log",
             icon_path="icon_cmd_log.svg"
@@ -200,6 +205,7 @@ class ContentGUIMainWindow(object):
 
         self.left_menu_top_frame_layout.addWidget(self.menu_button)
         self.left_menu_top_frame_layout.addWidget(self.pgm_button)
+        self.left_menu_top_frame_layout.addWidget(self.compare_button)
         self.left_menu_top_frame_layout.addWidget(self.cmd_log_button)
 
         self.left_menu_bottom_frame_layout.addWidget(self.warning_button)
