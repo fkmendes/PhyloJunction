@@ -38,6 +38,9 @@ class GUIMainWindow(QMainWindow):
         # compare page button #
         self.ui.compare_button.clicked.connect(self.show_pgm_page)
 
+        # coverage page button #
+        self.ui.covg_button.clicked.connect(self.show_pgm_page)
+
         # pgm page button #
         self.ui.cmd_log_button.clicked.connect(self.show_cmd_log_page)
 

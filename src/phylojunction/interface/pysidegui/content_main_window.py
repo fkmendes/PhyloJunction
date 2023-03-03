@@ -151,6 +151,11 @@ class ContentGUIMainWindow(object):
             icon_path="icon_violins.svg"
         )
 
+        self.covg_button = PJPushButton(
+            text="Coverage",
+            icon_path="icon_covg.svg"
+        )
+
         self.cmd_log_button = PJPushButton(
             text="Command log",
             icon_path="icon_cmd_log.svg"
@@ -206,6 +211,7 @@ class ContentGUIMainWindow(object):
         self.left_menu_top_frame_layout.addWidget(self.menu_button)
         self.left_menu_top_frame_layout.addWidget(self.pgm_button)
         self.left_menu_top_frame_layout.addWidget(self.compare_button)
+        self.left_menu_top_frame_layout.addWidget(self.covg_button)
         self.left_menu_top_frame_layout.addWidget(self.cmd_log_button)
 
         self.left_menu_bottom_frame_layout.addWidget(self.warning_button)

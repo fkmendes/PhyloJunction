@@ -87,11 +87,15 @@ def call_gui():
                         wdw["-ERROR_MSG-"].Update(e)
 
             if valid_cmd_line:
+                print("looking at cmd_line: " + valid_cmd_line)
+                
                 cmd_line_hist.append(valid_cmd_line)
                 wdw["-HIST-"].update("\n".join(cmd_line_hist))
                 wdw["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
                 wdw["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
                 wdw["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
+
+                print("it was valid!")
 
 
     def initialize_axes(fig: Figure, disabled_yticks: bool=True) -> plt.Axes:
