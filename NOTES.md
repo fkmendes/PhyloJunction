@@ -149,9 +149,9 @@ pjgui
 ```
 
 Important notes:
-    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computar architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computer architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
 
-    (2) On Linux machines, depending on the python version (e.g., 3.9.7), the GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
+    (2) On Linux machines, depending on the python version (e.g., 3.9.7), the PySimpleGUI GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
 
 ### Known issues
 
@@ -222,6 +222,20 @@ These individual pages are saved as a single `.ui` file (pjguipages/pjgui_pages.
 
 ```
 pyuic6 -x created_file.ui -o created_file.py
+```
+
+or pyuic5 depending on what's available for your OS
+
+```
+pyuic5 -x src/phylojunction/interface/pysidegui/pjguipages/pjgui_pages.ui -o src/phylojunction/interface/pysidegui/pjguipages/gui_pages.py
+```
+
+Then, after `gui_pages.py` is updated, at the top, replace PyQt with `PySide6`.
+You also need to point `gui_pages.py` to PJ's matplotlib widget
+
+```
+from PySide6 import QtCore, QtGui, QtWidgets
+from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import MatplotlibWidget
 ```
 
 ## Documentation

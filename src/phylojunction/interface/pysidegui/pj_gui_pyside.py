@@ -3,7 +3,8 @@ import os
 import re
 import typing as ty
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
+from PySide6.QtGui import QAction
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QTimer
 
 # pj imports #
@@ -14,20 +15,26 @@ import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.readwrite.pj_read as pjread
 import phylojunction.data.tree as pjdt
 
-
 class GUIMainWindow(QMainWindow):
+
     def __init__(self):
         super().__init__()
+
+        self.read_filepath = str()
 
         # initialize all model-related members #
         self.gui_modeling = GUIModeling()
 
         self.setWindowTitle("PhyloJunction")
 
-        # setup #
+        self.setup_top_menus()
+
+        # setup main window #
         self.ui = ContentGUIMainWindow()
         # passing myself as argument to auxiliary setup class
         self.ui.setup_ui(self)
+
+        self.ui.ui_pages.clear_model.clicked.connect(self.clean_disable_everything)
 
         # toggle button #
         self.ui.menu_button.clicked.connect(self.toggle_button_animation)
@@ -62,6 +69,37 @@ class GUIMainWindow(QMainWindow):
 
         # show #
         self.show()
+
+    # set up all top menus
+    def setup_top_menus(self):
+        # setup menu bar #
+        menubar = self.menuBar()
+        
+        # first item (pj menu)
+        pj_menu = menubar.addMenu("PhyloJunction")
+
+        # pj menu items
+        # certain keywords cannot be used in
+        # menubars on Mac, like "quit", "about"
+        # https://stackoverflow.com/questions/73293306/string-containing-about-cannot-be-added-to-the-menu-in-pyside6
+        about_action = pj_menu.addAction("About", self.print_about)
+        about_action.setMenuRole(QAction.MenuRole.NoRole)
+        pj_menu.addAction(about_action)
+
+        quit_action = pj_menu.addAction("Quit", self.quit_app_button_clicked)
+        quit_action.setMenuRole(QAction.MenuRole.NoRole)
+        pj_menu.addAction(quit_action)
+
+        # second item (file menu)
+        file_menu = menubar.addMenu("File")
+
+        # file menu items
+        file_menu.addAction("Read script", self.read_execute_script)
+
+        file_menu.addAction("Load model", self.print_about)
+        file_menu.addSeparator()
+        file_menu.addAction("Save data as", self.print_about)
+        file_menu.addAction("Save model as", self.print_about)
 
 
     # verify which menu buttons are selected #
@@ -348,34 +386,6 @@ class GUIMainWindow(QMainWindow):
         do_all_samples = \
             self.ui.ui_pages.all_samples_radio.isChecked()
         
-        # do_all_samples: bool = False
-        # if node_pgm.is_sampled:
-        #     # we always look one tree at a time
-        #     if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-        #         self.ui.ui_pages.all_samples_radio.setCheckable(False)
-        #         self.ui.ui_pages.sample_idx_spin.setDisabled(True)
-        #         self.ui.ui_pages.one_sample_radio.setCheckable(True)
-        #         self.ui.ui_pages.one_sample_radio.setChecked(True)
-        #         self.ui.ui_pages.repl_idx_spin.setEnabled(True)
-        #         do_all_samples = False
-
-        #     else:
-        #         # if it's the first click selecting node
-        #         if not self.ui.ui_pages.all_samples_radio.isCheckable() and \
-        #             not self.ui.ui_pages.one_sample_radio.isCheckable():
-        #             self.ui.ui_pages.all_samples_radio.setCheckable(True)
-        #             self.ui.ui_pages.sample_idx_spin.setEnabled(True)
-        #             self.ui.ui_pages.one_sample_radio.setCheckable(True)
-        #             self.ui.ui_pages.repl_idx_spin.setEnabled(True)
-        #             self.ui.ui_pages.one_sample_radio.setChecked(True)
-
-        #         else:                    
-        #             do_all_samples = \
-        #                 self.ui.ui_pages.all_samples_radio.isChecked()
-
-        #             if do_all_samples:
-        #                 self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-        #                 self.ui.ui_pages.sample_idx_spin.setEnabled(True)
         
         #################################
         # Collect information from spin #
@@ -492,16 +502,86 @@ class GUIMainWindow(QMainWindow):
             self.do_selected_node()
 
 
+    def read_execute_script(self):
+        script_in_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Read script", dir=".", filter="*.pj")
+
+        if script_in_fp:
+            cmd_line_list = pjread.read_text_file(script_in_fp)
+            self.gui_modeling.parse_cmd_update_pgm(cmd_line_list)
+
+            # add node names to...
+            # pgm page node list
+            self.ui.ui_pages.node_list.addItems(
+                [node_name for node_name in \
+                    self.gui_modeling.pgm_obj.node_name_val_dict]
+            )
+
+            # compare page node list
+            # TODO
+
+            # coverage page node list
+            # TODO
+
+
+    def clean_disable_everything(self):
+        # pgm-related objects are reset
+        self.gui_modeling.clear()
+
+        # remove all node names from list
+        self.ui.ui_pages.node_list.clear()
+
+        # reset text on display and summary
+        # panels
+        self.ui.ui_pages.values_content.clear()
+        self.ui.ui_pages.summary_content.clear()
+
+        # resetting and disabling buttons
+        # radio #
+        self.ui.ui_pages.one_sample_radio.setDisabled(True)
+        self.ui.ui_pages.one_sample_radio.setCheckable(False)
+        self.ui.ui_pages.one_sample_radio.setChecked(False)
+
+        self.ui.ui_pages.all_samples_radio.setDisabled(True)
+        self.ui.ui_pages.all_samples_radio.setCheckable(False)
+        self.ui.ui_pages.all_samples_radio.setChecked(False)
+
+        # spin #
+        self.ui.ui_pages.sample_idx_spin.setMinimum(0)
+        self.ui.ui_pages.sample_idx_spin.setValue(0)
+        self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+        self.ui.ui_pages.repl_idx_spin.setMinimum(0)
+        self.ui.ui_pages.repl_idx_spin.setValue(0)
+        self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+
+        # reset plot(s)
+        self.ui.ui_pages.pgm_page_matplotlib_widget.fig.clf()
+        self.ui.ui_pages.pgm_page_matplotlib_widget.initialize_axes()
+        self.ui.ui_pages.pgm_page_matplotlib_widget.fig.canvas.draw()
+
+
+    def quit_app_button_clicked(self):
+        sys.exit()
+
+
+    def print_about(self):
+        print("oi")
+
+
 class GUIModeling():
+
+    pgm_obj: ProbabilisticGraphicalModel
+    cmd_log_list: ty.List[str]
+    cmd_log: str
+
     def __init__(self):
-        self.pgm_obj: ProbabilisticGraphicalModel = \
-            ProbabilisticGraphicalModel()
-        self.cmd_log_list: ty.List[str] = []
-        self.cmd_log: str = ""
+        self.pgm_obj = ProbabilisticGraphicalModel()
+        self.cmd_log_list = []
+        self.cmd_log = ""
 
 
     def parse_cmd_update_pgm(self, cmd_line_list):
         valid_cmd_line = None
+        print("Reading following command lines:")
         
         for line in cmd_line_list:
             # removing whitespaces from left and right
@@ -520,8 +600,13 @@ class GUIModeling():
                     print(e)  # update warnings page with e
 
             if valid_cmd_line:
+                print("  " + line)
                 self.cmd_log_list.append(valid_cmd_line)
-                self.cmd_log = "\n".join(self.cmd_log_list) 
+                self.cmd_log = "\n".join(self.cmd_log_list)
+
+        
+    def clear(self):
+        self.__init__()
 
 
 def call_gui():

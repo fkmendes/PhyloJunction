@@ -1,4 +1,8 @@
+import os
+from pathlib import Path
+
 from PySide6.QtCore import Qt
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QFrame  # type: ignore
 from PySide6.QtWidgets import QHBoxLayout  # type: ignore
 from PySide6.QtWidgets import QVBoxLayout  # type: ignore
@@ -7,6 +11,7 @@ from PySide6.QtWidgets import QLabel  # type: ignore
 from PySide6.QtWidgets import QSpacerItem  # type: ignore
 from PySide6.QtWidgets import QSizePolicy  # type: ignore
 from PySide6.QtWidgets import QPushButton  # type: ignore
+from PySide6.QtGui import QIcon
 
 # pj imports #
 from phylojunction.interface.pysidegui.pjguipages.gui_pages \
@@ -14,6 +19,7 @@ from phylojunction.interface.pysidegui.pjguipages.gui_pages \
 from phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons \
     import PJPushButton  # type: ignore
 
+my_dir_path = Path(__file__)
 
 class ContentGUIMainWindow(object):
     def setup_ui(self, parent):
@@ -194,6 +200,10 @@ class ContentGUIMainWindow(object):
         self.ui_pages.setupUi(self.pages)  # self.pages is the parent
         self.ui_pages.sample_idx_spin.setDisabled(True)
         self.ui_pages.repl_idx_spin.setDisabled(True)
+
+        # icon_dir_path = os.path.join(my_dir_path.parent, "images/icons/")
+        # clear_model_icon = QIcon(icon_dir_path + "icon_covg.svg")
+        # self.ui_pages.clear_model.setIconSize(QSize(36, 36))
 
 
         ##################

@@ -73,6 +73,8 @@ def call_gui():
     def parse_cmd_lines(cmd_line_list, cmd_line_hist, a_pgm, wdw):
         valid_cmd_line = None
         
+        print("Reading script command lines")
+
         for line in cmd_line_list:
             line = line.strip() # removing whitespaces from left and right
             
@@ -87,15 +89,13 @@ def call_gui():
                         wdw["-ERROR_MSG-"].Update(e)
 
             if valid_cmd_line:
-                print("looking at cmd_line: " + valid_cmd_line)
+                print("  " + valid_cmd_line)
                 
                 cmd_line_hist.append(valid_cmd_line)
                 wdw["-HIST-"].update("\n".join(cmd_line_hist))
                 wdw["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
                 wdw["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
                 wdw["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
-
-                print("it was valid!")
 
 
     def initialize_axes(fig: Figure, disabled_yticks: bool=True) -> plt.Axes:
@@ -856,11 +856,11 @@ def call_gui():
         # Reading script #
         ##################
         elif event == "Open script":
-            _script_in_fp = sg.popup_get_file("Script to load", no_window=True, keep_on_top=True)
+            script_in_fp = sg.popup_get_file("Script to load", no_window=True, keep_on_top=True)
             
-            if _script_in_fp:
+            if script_in_fp:
                 _, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
-                cmd_lines = pjread.read_text_file(_script_in_fp)
+                cmd_lines = pjread.read_text_file(script_in_fp)
                 parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
 
                 # it model has at least one node, destroying is now a possibility
@@ -1066,8 +1066,13 @@ def call_gui():
 
                 # could be more efficient, but this makes sure that stashes are always up-to-date
                 scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+                
                 _, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
-                _, tree_summary_df_dict, tree_repl_summary_df_dict = tree_output_stash
+                
+                tree_value_df_dict, tree_ann_value_df_dict, tree_rec_value_df_dict, \
+                tree_rec_ann_value_df_dict, tree_summary_df_dict, tree_repl_summary_df_dict, \
+                tree_living_nd_states_str_dict, tree_living_nd_states_str_nexus_dict, \
+                tree_internal_nd_states_str_dict = tree_output_stash
                 
                 # adding "program" column to PJ's pandas DataFrame's stored inside dicts
                 for repl_size in scalar_value_df_dict:

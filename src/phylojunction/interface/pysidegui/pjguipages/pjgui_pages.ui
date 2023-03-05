@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>972</width>
-    <height>726</height>
+    <width>980</width>
+    <height>700</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>980</width>
+    <height>700</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>700</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>StackedWidget</string>
@@ -17,19 +29,31 @@
    <number>0</number>
   </property>
   <widget class="QWidget" name="pgm_page">
+   <property name="minimumSize">
+    <size>
+     <width>980</width>
+     <height>700</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>700</height>
+    </size>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QFrame" name="pgm_page_frame">
       <property name="minimumSize">
        <size>
-        <width>950</width>
+        <width>980</width>
         <height>700</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>16777215</height>
+        <height>700</height>
        </size>
       </property>
       <property name="styleSheet">
@@ -46,28 +70,73 @@ border: 0;</string>
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>180</y>
-         <width>951</width>
+         <y>170</y>
+         <width>954</width>
          <height>451</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="pgm_fig_node_list_grid_layout">
-        <item row="1" column="1">
-         <widget class="QListWidget" name="node_list">
+        <item row="0" column="1">
+         <widget class="QLabel" name="model_label">
           <property name="minimumSize">
            <size>
             <width>200</width>
-            <height>400</height>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
-            <height>16777215</height>
+            <height>20</height>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QListWidget {
+           <string notr="true">font: 14pt &quot;Ubuntu&quot;;
+color: black;
+</string>
+          </property>
+          <property name="text">
+           <string>Model nodes</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="MatplotlibWidget" name="pgm_page_matplotlib_widget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>740</width>
+            <height>400</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>400</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QVBoxLayout" name="node_list_vert_layout">
+          <item>
+           <widget class="QListWidget" name="node_list">
+            <property name="minimumSize">
+             <size>
+              <width>195</width>
+              <height>250</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>195</width>
+              <height>380</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QListWidget {
 	background-color: #f1f3f5;
 	color: #495057;
 	border-radius: 5px;
@@ -79,8 +148,42 @@ QListWidget::item:selected{
 	border: 0;
 }
 </string>
-          </property>
-         </widget>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clear_model">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>195</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>195</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string> Clear model</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../images/icons/icon_clear.svg</normaloff>../images/icons/icon_clear.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -194,58 +297,15 @@ QListWidget::item:selected{
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="model_label">
-          <property name="minimumSize">
-           <size>
-            <width>200</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font: 14pt &quot;Ubuntu&quot;;
-color: black;
-</string>
-          </property>
-          <property name="text">
-           <string>Model nodes</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="MatplotlibWidget" name="pgm_page_matplotlib_widget" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>740</width>
-            <height>400</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>400</height>
-           </size>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>630</y>
+         <y>620</y>
          <width>951</width>
-         <height>63</height>
+         <height>65</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="cmd_prompt_vert_layout">
@@ -321,7 +381,7 @@ border-radius: 5px;</string>
          <x>0</x>
          <y>0</y>
          <width>951</width>
-         <height>181</height>
+         <height>171</height>
         </rect>
        </property>
        <property name="minimumSize">
@@ -375,8 +435,6 @@ font: 11pt &quot;Courier&quot;;</string>
           <bool>true</bool>
          </property>
         </widget>
-        <zorder>values_content</zorder>
-        <zorder>gridLayoutWidget</zorder>
        </widget>
        <widget class="QWidget" name="summary_tab">
         <attribute name="title">
@@ -410,6 +468,18 @@ font: 11pt &quot;Courier&quot;;</string>
    </layout>
   </widget>
   <widget class="QWidget" name="cmd_log_page">
+   <property name="minimumSize">
+    <size>
+     <width>974</width>
+     <height>700</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>700</height>
+    </size>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QLabel" name="label_2">
