@@ -95,9 +95,6 @@ class ContentGUIMainWindow(object):
         self.left_menu_bottom_frame_layout.setContentsMargins(0, 0, 0, 0)
         self.left_menu_bottom_frame_layout.setSpacing(0)
 
-        # top bins #
-        self.warning_button = QPushButton("Warnings")
-
         # version label #
         self.left_menu_version_label = QLabel("v0.0.1")
         self.left_menu_version_label.setAlignment(Qt.AlignCenter)
@@ -117,7 +114,9 @@ class ContentGUIMainWindow(object):
         self.top_bar_layout.setContentsMargins(10, 0, 10, 0)
 
         # top-left label #
-        self.top_label_left = QLabel("Test")
+        self.top_label_left = QLabel("MODEL SPECIFICATION")
+        self.top_label_left.setStyleSheet(
+            "font: 700 10pt 'Segoe UI'")
 
         # top spacer (like sg.Push in PySimpleGUI, this forces things
         # to max. left and right positioning)
@@ -125,7 +124,7 @@ class ContentGUIMainWindow(object):
             QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         # top-right label #
-        self.top_label_right = QLabel("| Home")
+        self.top_label_right = QLabel("")
         self.top_label_right.setStyleSheet(
             "font: 700 10pt 'Segoe UI'")
 
@@ -135,6 +134,15 @@ class ContentGUIMainWindow(object):
         self.bottom_bar.setMinimumHeight(30)
         self.bottom_bar.setStyleSheet(
             "background-color: #f1f3f5; color: black")
+
+        # bottom bar layout #
+        self.bottom_bar_layout = QHBoxLayout(self.bottom_bar)
+        # add a bit of padding to the left and right
+        self.bottom_bar_layout.setContentsMargins(10, 0, 10, 0)
+
+        # bottom-left label #
+        self.bottom_label_left = QLabel("")
+        self.bottom_label_left.setStyleSheet("font: 11pt; color: red")
 
 
         ###########
@@ -165,6 +173,12 @@ class ContentGUIMainWindow(object):
         self.cmd_log_button = PJPushButton(
             text="Command log",
             icon_path="icon_cmd_log.svg"
+        )
+
+        # top bins #
+        self.warning_button = PJPushButton(
+            text="Warnings",
+            icon_path="icon_warning.svg"
         )
 
 
@@ -217,6 +231,8 @@ class ContentGUIMainWindow(object):
         # note that spacer is an item
         self.top_bar_layout.addItem(self.top_spacer)
         self.top_bar_layout.addWidget(self.top_label_right)
+
+        self.bottom_bar_layout.addWidget(self.bottom_label_left)
 
         self.left_menu_top_frame_layout.addWidget(self.menu_button)
         self.left_menu_top_frame_layout.addWidget(self.pgm_button)

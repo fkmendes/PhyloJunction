@@ -238,6 +238,22 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import MatplotlibWidget
 ```
 
+## Qt Creator / Qt Designer
+
+This can be a finnicky program, so here are a few notes.
+
+(1) Adding and deleting new pages
+
+In order to add new pages to a QStackedWidget (the class of the main container), you need to right-click the QStackedWidget on the right menu, and do "Insert page".
+You can then "Change page order" after the new page is created.
+
+If you want to delete a page (e.g., one of the two pages that come automatically with QStackedWidget), you need to navigate to the page you want to delete.
+To do that, you must right-click the QStackedWidget, and click "Next Page" until you reach the page to be deleted.
+Then above the "Insert page" menu (from right-clicking QStackedWidget), there will be a menu saying "Page 2 out of 3", say. 
+There you will find a "Delete" button.
+
+(2)
+
 ## Documentation
 
 PhyloJunction is documented automatically with `sphinx`, so make sure you have this program installed:

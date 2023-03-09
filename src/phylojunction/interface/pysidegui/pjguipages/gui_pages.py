@@ -16,7 +16,7 @@ class Ui_PJGUIPages(object):
     def setupUi(self, PJGUIPages):
         PJGUIPages.setObjectName("PJGUIPages")
         PJGUIPages.resize(980, 700)
-        PJGUIPages.setMinimumSize(QtCore.QSize(980, 700))
+        PJGUIPages.setMinimumSize(QtCore.QSize(960, 650))
         PJGUIPages.setMaximumSize(QtCore.QSize(16777215, 700))
         self.pgm_page = QtWidgets.QWidget()
         self.pgm_page.setMinimumSize(QtCore.QSize(980, 700))
@@ -75,6 +75,7 @@ class Ui_PJGUIPages(object):
         self.clear_model.setEnabled(True)
         self.clear_model.setMinimumSize(QtCore.QSize(195, 25))
         self.clear_model.setMaximumSize(QtCore.QSize(195, 16777215))
+        self.clear_model.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.clear_model.setIcon(icon)
@@ -133,6 +134,12 @@ class Ui_PJGUIPages(object):
         self.cmd_prompt = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.cmd_prompt.setMinimumSize(QtCore.QSize(940, 35))
         self.cmd_prompt.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("Courier")
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setItalic(False)
+        self.cmd_prompt.setFont(font)
         self.cmd_prompt.setToolTip("")
         self.cmd_prompt.setStyleSheet("background-color: black;\n"
 "font: 14pt \"Courier\";\n"
@@ -159,8 +166,9 @@ class Ui_PJGUIPages(object):
         self.values_content = QtWidgets.QTextEdit(self.values_tab)
         self.values_content.setGeometry(QtCore.QRect(0, 0, 951, 141))
         self.values_content.setMinimumSize(QtCore.QSize(940, 0))
-        self.values_content.setStyleSheet("border: 4px solid lightgray;\n"
-"border-radius: 4px;\n"
+        self.values_content.setAcceptDrops(False)
+        self.values_content.setStyleSheet("border: 2px solid lightgray;\n"
+"border-radius: 2px;\n"
 "font: 11pt \"Courier\";")
         self.values_content.setReadOnly(True)
         self.values_content.setObjectName("values_content")
@@ -170,24 +178,193 @@ class Ui_PJGUIPages(object):
         self.summary_content = QtWidgets.QTextEdit(self.summary_tab)
         self.summary_content.setGeometry(QtCore.QRect(0, 0, 951, 141))
         self.summary_content.setMinimumSize(QtCore.QSize(940, 0))
-        self.summary_content.setStyleSheet("border: 4px solid lightgray;\n"
-"border-radius: 4px;\n"
+        self.summary_content.setStyleSheet("border: 2px solid lightgray;\n"
+"border-radius: 2px;\n"
 "font: 11pt \"Courier\";")
         self.summary_content.setObjectName("summary_content")
         self.node_content_tabs.addTab(self.summary_tab, "")
         self.verticalLayout.addWidget(self.pgm_page_frame)
         PJGUIPages.addWidget(self.pgm_page)
+        self.compare_page = QtWidgets.QWidget()
+        self.compare_page.setObjectName("compare_page")
+        self.gridLayoutWidget_2 = QtWidgets.QWidget(self.compare_page)
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(10, 10, 961, 681))
+        self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
+        self.compare_page_grid_layout = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
+        self.compare_page_grid_layout.setContentsMargins(0, 0, 0, 0)
+        self.compare_page_grid_layout.setObjectName("compare_page_grid_layout")
+        self.node_stat_vert_layout = QtWidgets.QVBoxLayout()
+        self.node_stat_vert_layout.setObjectName("node_stat_vert_layout")
+        self.frame = QtWidgets.QFrame(self.gridLayoutWidget_2)
+        self.frame.setMinimumSize(QtCore.QSize(195, 350))
+        self.frame.setMaximumSize(QtCore.QSize(195, 350))
+        self.frame.setStyleSheet("border-radius: 5px;\n"
+"background-color: #e6f4f4;\n"
+"border: 0;")
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.compare_node_list = QtWidgets.QListWidget(self.frame)
+        self.compare_node_list.setGeometry(QtCore.QRect(10, 30, 172, 280))
+        self.compare_node_list.setMinimumSize(QtCore.QSize(172, 280))
+        self.compare_node_list.setMaximumSize(QtCore.QSize(172, 280))
+        self.compare_node_list.setStyleSheet("QListWidget {\n"
+"    background-color: #f2f9f9;\n"
+"    color: #495057;\n"
+"    border: 0;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"QListWidget::item:selected{\n"
+"    background-color: #495057;\n"
+"    color: white;\n"
+"    border: 0;\n"
+"}")
+        self.compare_node_list.setObjectName("compare_node_list")
+        self.compare_nodes_label = QtWidgets.QLabel(self.frame)
+        self.compare_nodes_label.setGeometry(QtCore.QRect(40, 10, 110, 16))
+        self.compare_nodes_label.setMinimumSize(QtCore.QSize(110, 16))
+        self.compare_nodes_label.setMaximumSize(QtCore.QSize(110, 16))
+        self.compare_nodes_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.compare_nodes_label.setObjectName("compare_nodes_label")
+        self.avg_replicate_check_button = QtWidgets.QCheckBox(self.frame)
+        self.avg_replicate_check_button.setGeometry(QtCore.QRect(30, 320, 140, 20))
+        self.avg_replicate_check_button.setMinimumSize(QtCore.QSize(140, 20))
+        self.avg_replicate_check_button.setMaximumSize(QtCore.QSize(140, 20))
+        self.avg_replicate_check_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.avg_replicate_check_button.setObjectName("avg_replicate_check_button")
+        self.node_stat_vert_layout.addWidget(self.frame)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.node_stat_vert_layout.addItem(spacerItem3)
+        self.compare_stats_label = QtWidgets.QLabel(self.gridLayoutWidget_2)
+        self.compare_stats_label.setMinimumSize(QtCore.QSize(0, 16))
+        self.compare_stats_label.setMaximumSize(QtCore.QSize(16777215, 16))
+        self.compare_stats_label.setObjectName("compare_stats_label")
+        self.node_stat_vert_layout.addWidget(self.compare_stats_label, 0, QtCore.Qt.AlignHCenter)
+        self.summary_stats_list = QtWidgets.QListWidget(self.gridLayoutWidget_2)
+        self.summary_stats_list.setMinimumSize(QtCore.QSize(195, 250))
+        self.summary_stats_list.setMaximumSize(QtCore.QSize(195, 250))
+        self.summary_stats_list.setStyleSheet("QListWidget{\n"
+"    background-color: #f7f7f7;\n"
+"    border: 2px solid lightgray;\n"
+"}\n"
+"QListWidget::item:selected{\n"
+"    background-color: #495057;\n"
+"    color: white;\n"
+"    border: 0;\n"
+"}")
+        self.summary_stats_list.setObjectName("summary_stats_list")
+        self.node_stat_vert_layout.addWidget(self.summary_stats_list, 0, QtCore.Qt.AlignHCenter)
+        self.compare_page_grid_layout.addLayout(self.node_stat_vert_layout, 0, 0, 1, 1)
+        self.csv_violinplot_vert_layout = QtWidgets.QVBoxLayout()
+        self.csv_violinplot_vert_layout.setObjectName("csv_violinplot_vert_layout")
+        self.compare_csv_button = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.compare_csv_button.setMinimumSize(QtCore.QSize(140, 24))
+        self.compare_csv_button.setMaximumSize(QtCore.QSize(140, 24))
+        self.compare_csv_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.compare_csv_button.setMouseTracking(True)
+        self.compare_csv_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.compare_csv_button.setObjectName("compare_csv_button")
+        self.csv_violinplot_vert_layout.addWidget(self.compare_csv_button, 0, QtCore.Qt.AlignHCenter)
+        self.compare_csv_textbox = QtWidgets.QTextEdit(self.gridLayoutWidget_2)
+        self.compare_csv_textbox.setMinimumSize(QtCore.QSize(0, 188))
+        self.compare_csv_textbox.setMaximumSize(QtCore.QSize(16777215, 188))
+        self.compare_csv_textbox.setStyleSheet("background-color: #ffffff;\n"
+"border: 2px solid lightgray;\n"
+"border-radius: 2px;\n"
+"font: 11pt \"Courier\";")
+        self.compare_csv_textbox.setReadOnly(True)
+        self.compare_csv_textbox.setObjectName("compare_csv_textbox")
+        self.csv_violinplot_vert_layout.addWidget(self.compare_csv_textbox)
+        self.compare_page_matplotlib_widget = MatplotlibWidget(self.gridLayoutWidget_2)
+        self.compare_page_matplotlib_widget.setMinimumSize(QtCore.QSize(740, 400))
+        self.compare_page_matplotlib_widget.setMaximumSize(QtCore.QSize(740, 400))
+        self.compare_page_matplotlib_widget.setObjectName("compare_page_matplotlib_widget")
+        self.csv_violinplot_vert_layout.addWidget(self.compare_page_matplotlib_widget)
+        self.draw_save_hor_layout = QtWidgets.QHBoxLayout()
+        self.draw_save_hor_layout.setObjectName("draw_save_hor_layout")
+        self.draw_violins_button = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.draw_violins_button.setMinimumSize(QtCore.QSize(80, 24))
+        self.draw_violins_button.setMaximumSize(QtCore.QSize(80, 24))
+        self.draw_violins_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.draw_violins_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.draw_violins_button.setObjectName("draw_violins_button")
+        self.draw_save_hor_layout.addWidget(self.draw_violins_button)
+        self.save_violins_button = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.save_violins_button.setMinimumSize(QtCore.QSize(100, 24))
+        self.save_violins_button.setMaximumSize(QtCore.QSize(100, 24))
+        self.save_violins_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.save_violins_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.save_violins_button.setObjectName("save_violins_button")
+        self.draw_save_hor_layout.addWidget(self.save_violins_button)
+        self.csv_violinplot_vert_layout.addLayout(self.draw_save_hor_layout)
+        self.compare_page_grid_layout.addLayout(self.csv_violinplot_vert_layout, 0, 1, 1, 1)
+        PJGUIPages.addWidget(self.compare_page)
         self.cmd_log_page = QtWidgets.QWidget()
-        self.cmd_log_page.setMinimumSize(QtCore.QSize(974, 700))
-        self.cmd_log_page.setMaximumSize(QtCore.QSize(16777215, 700))
         self.cmd_log_page.setObjectName("cmd_log_page")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.cmd_log_page)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.label_2 = QtWidgets.QLabel(self.cmd_log_page)
-        self.label_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_2.setObjectName("label_2")
-        self.verticalLayout_2.addWidget(self.label_2)
+        self.verticalLayoutWidget_3 = QtWidgets.QWidget(self.cmd_log_page)
+        self.verticalLayoutWidget_3.setGeometry(QtCore.QRect(10, 10, 962, 681))
+        self.verticalLayoutWidget_3.setObjectName("verticalLayoutWidget_3")
+        self.cmd_log_page_frame = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_3)
+        self.cmd_log_page_frame.setContentsMargins(0, 0, 0, 0)
+        self.cmd_log_page_frame.setObjectName("cmd_log_page_frame")
+        self.cmd_log_textbox = QtWidgets.QTextEdit(self.verticalLayoutWidget_3)
+        self.cmd_log_textbox.setEnabled(True)
+        self.cmd_log_textbox.setMinimumSize(QtCore.QSize(960, 650))
+        self.cmd_log_textbox.setMaximumSize(QtCore.QSize(16777215, 650))
+        self.cmd_log_textbox.setAcceptDrops(False)
+        self.cmd_log_textbox.setStyleSheet("background-color: #ffffff;\n"
+"border: 2px solid lightgray;\n"
+"border-radius: 2px;")
+        self.cmd_log_textbox.setReadOnly(True)
+        self.cmd_log_textbox.setObjectName("cmd_log_textbox")
+        self.cmd_log_page_frame.addWidget(self.cmd_log_textbox)
         PJGUIPages.addWidget(self.cmd_log_page)
+        self.warnings_page = QtWidgets.QWidget()
+        self.warnings_page.setObjectName("warnings_page")
+        self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.warnings_page)
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(10, 10, 962, 681))
+        self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
+        self.warnings_page_frame = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
+        self.warnings_page_frame.setContentsMargins(0, 0, 0, 0)
+        self.warnings_page_frame.setObjectName("warnings_page_frame")
+        self.warnings_textbox = QtWidgets.QTextEdit(self.verticalLayoutWidget_2)
+        self.warnings_textbox.setMinimumSize(QtCore.QSize(960, 650))
+        self.warnings_textbox.setMaximumSize(QtCore.QSize(16777215, 650))
+        self.warnings_textbox.setStyleSheet("background-color: #ffffff;\n"
+"border: 2px solid lightgray;\n"
+"border-radius: 2px;\n"
+"color: red;")
+        self.warnings_textbox.setReadOnly(True)
+        self.warnings_textbox.setObjectName("warnings_textbox")
+        self.warnings_page_frame.addWidget(self.warnings_textbox)
+        PJGUIPages.addWidget(self.warnings_page)
 
         self.retranslateUi(PJGUIPages)
         PJGUIPages.setCurrentIndex(0)
@@ -206,7 +383,12 @@ class Ui_PJGUIPages(object):
         self.cmd_prompt_label.setText(_translate("PJGUIPages", "Command prompt"))
         self.node_content_tabs.setTabText(self.node_content_tabs.indexOf(self.values_tab), _translate("PJGUIPages", "Value(s)"))
         self.node_content_tabs.setTabText(self.node_content_tabs.indexOf(self.summary_tab), _translate("PJGUIPages", "Summary stats."))
-        self.label_2.setText(_translate("PJGUIPages", "Page 2"))
+        self.compare_nodes_label.setText(_translate("PJGUIPages", "Node to compare"))
+        self.avg_replicate_check_button.setText(_translate("PJGUIPages", "Average replicates"))
+        self.compare_stats_label.setText(_translate("PJGUIPages", "Summary statistics"))
+        self.compare_csv_button.setText(_translate("PJGUIPages", "Compare to .csv (...)"))
+        self.draw_violins_button.setText(_translate("PJGUIPages", "Draw"))
+        self.save_violins_button.setText(_translate("PJGUIPages", "Save plot as"))
 
 
 if __name__ == "__main__":
