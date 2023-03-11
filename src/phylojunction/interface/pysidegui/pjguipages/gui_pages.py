@@ -186,6 +186,7 @@ class Ui_PJGUIPages(object):
         self.verticalLayout.addWidget(self.pgm_page_frame)
         PJGUIPages.addWidget(self.pgm_page)
         self.compare_page = QtWidgets.QWidget()
+        self.compare_page.setEnabled(True)
         self.compare_page.setObjectName("compare_page")
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.compare_page)
         self.gridLayoutWidget_2.setGeometry(QtCore.QRect(10, 10, 961, 681))
@@ -195,16 +196,16 @@ class Ui_PJGUIPages(object):
         self.compare_page_grid_layout.setObjectName("compare_page_grid_layout")
         self.node_stat_vert_layout = QtWidgets.QVBoxLayout()
         self.node_stat_vert_layout.setObjectName("node_stat_vert_layout")
-        self.frame = QtWidgets.QFrame(self.gridLayoutWidget_2)
-        self.frame.setMinimumSize(QtCore.QSize(195, 350))
-        self.frame.setMaximumSize(QtCore.QSize(195, 350))
-        self.frame.setStyleSheet("border-radius: 5px;\n"
+        self.compare_node_frame = QtWidgets.QFrame(self.gridLayoutWidget_2)
+        self.compare_node_frame.setMinimumSize(QtCore.QSize(195, 350))
+        self.compare_node_frame.setMaximumSize(QtCore.QSize(195, 350))
+        self.compare_node_frame.setStyleSheet("border-radius: 5px;\n"
 "background-color: #e6f4f4;\n"
 "border: 0;")
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
-        self.compare_node_list = QtWidgets.QListWidget(self.frame)
+        self.compare_node_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.compare_node_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.compare_node_frame.setObjectName("compare_node_frame")
+        self.compare_node_list = QtWidgets.QListWidget(self.compare_node_frame)
         self.compare_node_list.setGeometry(QtCore.QRect(10, 30, 172, 280))
         self.compare_node_list.setMinimumSize(QtCore.QSize(172, 280))
         self.compare_node_list.setMaximumSize(QtCore.QSize(172, 280))
@@ -220,19 +221,19 @@ class Ui_PJGUIPages(object):
 "    border: 0;\n"
 "}")
         self.compare_node_list.setObjectName("compare_node_list")
-        self.compare_nodes_label = QtWidgets.QLabel(self.frame)
-        self.compare_nodes_label.setGeometry(QtCore.QRect(40, 10, 110, 16))
-        self.compare_nodes_label.setMinimumSize(QtCore.QSize(110, 16))
-        self.compare_nodes_label.setMaximumSize(QtCore.QSize(110, 16))
-        self.compare_nodes_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.compare_nodes_label.setObjectName("compare_nodes_label")
-        self.avg_replicate_check_button = QtWidgets.QCheckBox(self.frame)
+        self.compare_node_label = QtWidgets.QLabel(self.compare_node_frame)
+        self.compare_node_label.setGeometry(QtCore.QRect(40, 10, 110, 16))
+        self.compare_node_label.setMinimumSize(QtCore.QSize(110, 16))
+        self.compare_node_label.setMaximumSize(QtCore.QSize(110, 16))
+        self.compare_node_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.compare_node_label.setObjectName("compare_node_label")
+        self.avg_replicate_check_button = QtWidgets.QCheckBox(self.compare_node_frame)
         self.avg_replicate_check_button.setGeometry(QtCore.QRect(30, 320, 140, 20))
         self.avg_replicate_check_button.setMinimumSize(QtCore.QSize(140, 20))
         self.avg_replicate_check_button.setMaximumSize(QtCore.QSize(140, 20))
         self.avg_replicate_check_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.avg_replicate_check_button.setObjectName("avg_replicate_check_button")
-        self.node_stat_vert_layout.addWidget(self.frame)
+        self.node_stat_vert_layout.addWidget(self.compare_node_frame)
         spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.node_stat_vert_layout.addItem(spacerItem3)
         self.compare_stats_label = QtWidgets.QLabel(self.gridLayoutWidget_2)
@@ -308,6 +309,7 @@ class Ui_PJGUIPages(object):
         self.draw_violins_button.setObjectName("draw_violins_button")
         self.draw_save_hor_layout.addWidget(self.draw_violins_button)
         self.save_violins_button = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.save_violins_button.setEnabled(True)
         self.save_violins_button.setMinimumSize(QtCore.QSize(100, 24))
         self.save_violins_button.setMaximumSize(QtCore.QSize(100, 24))
         self.save_violins_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -326,6 +328,166 @@ class Ui_PJGUIPages(object):
         self.csv_violinplot_vert_layout.addLayout(self.draw_save_hor_layout)
         self.compare_page_grid_layout.addLayout(self.csv_violinplot_vert_layout, 0, 1, 1, 1)
         PJGUIPages.addWidget(self.compare_page)
+        self.coverage_page = QtWidgets.QWidget()
+        self.coverage_page.setObjectName("coverage_page")
+        self.gridLayoutWidget_3 = QtWidgets.QWidget(self.coverage_page)
+        self.gridLayoutWidget_3.setGeometry(QtCore.QRect(10, 10, 963, 681))
+        self.gridLayoutWidget_3.setObjectName("gridLayoutWidget_3")
+        self.coverage_page_grid_layout = QtWidgets.QGridLayout(self.gridLayoutWidget_3)
+        self.coverage_page_grid_layout.setContentsMargins(0, 0, 0, 0)
+        self.coverage_page_grid_layout.setObjectName("coverage_page_grid_layout")
+        self.csv_covplot_vert_layout = QtWidgets.QVBoxLayout()
+        self.csv_covplot_vert_layout.setObjectName("csv_covplot_vert_layout")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.read_hpd_csv_button = QtWidgets.QPushButton(self.gridLayoutWidget_3)
+        self.read_hpd_csv_button.setMinimumSize(QtCore.QSize(140, 24))
+        self.read_hpd_csv_button.setMaximumSize(QtCore.QSize(140, 24))
+        self.read_hpd_csv_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.read_hpd_csv_button.setObjectName("read_hpd_csv_button")
+        self.horizontalLayout_5.addWidget(self.read_hpd_csv_button, 0, QtCore.Qt.AlignHCenter)
+        self.read_logfile_button = QtWidgets.QPushButton(self.gridLayoutWidget_3)
+        self.read_logfile_button.setMinimumSize(QtCore.QSize(115, 24))
+        self.read_logfile_button.setMaximumSize(QtCore.QSize(115, 24))
+        self.read_logfile_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.read_logfile_button.setObjectName("read_logfile_button")
+        self.horizontalLayout_5.addWidget(self.read_logfile_button, 0, QtCore.Qt.AlignHCenter)
+        self.csv_covplot_vert_layout.addLayout(self.horizontalLayout_5)
+        self.gridLayout_5 = QtWidgets.QGridLayout()
+        self.gridLayout_5.setObjectName("gridLayout_5")
+        self.coverage_csv_textbox = QtWidgets.QTextEdit(self.gridLayoutWidget_3)
+        self.coverage_csv_textbox.setMinimumSize(QtCore.QSize(570, 170))
+        self.coverage_csv_textbox.setMaximumSize(QtCore.QSize(570, 170))
+        self.coverage_csv_textbox.setStyleSheet("background-color: #ffffff;\n"
+"border: 2px solid lightgray;\n"
+"border-radius: 2px;\n"
+"font: 11pt \"Courier\";")
+        self.coverage_csv_textbox.setReadOnly(True)
+        self.coverage_csv_textbox.setObjectName("coverage_csv_textbox")
+        self.gridLayout_5.addWidget(self.coverage_csv_textbox, 0, 0, 1, 1, QtCore.Qt.AlignHCenter)
+        self.coverage_textbox = QtWidgets.QListWidget(self.gridLayoutWidget_3)
+        self.coverage_textbox.setMinimumSize(QtCore.QSize(170, 170))
+        self.coverage_textbox.setMaximumSize(QtCore.QSize(170, 170))
+        self.coverage_textbox.setStyleSheet("background-color: #ffffff;\n"
+"border: 2px solid lightgray;\n"
+"border-radius: 2px;")
+        self.coverage_textbox.setObjectName("coverage_textbox")
+        self.gridLayout_5.addWidget(self.coverage_textbox, 0, 1, 1, 1, QtCore.Qt.AlignHCenter)
+        self.csv_covplot_vert_layout.addLayout(self.gridLayout_5)
+        self.coverage_page_matplotlib_widget = MatplotlibWidget(self.gridLayoutWidget_3)
+        self.coverage_page_matplotlib_widget.setMinimumSize(QtCore.QSize(740, 400))
+        self.coverage_page_matplotlib_widget.setMaximumSize(QtCore.QSize(740, 400))
+        self.coverage_page_matplotlib_widget.setObjectName("coverage_page_matplotlib_widget")
+        self.csv_covplot_vert_layout.addWidget(self.coverage_page_matplotlib_widget, 0, QtCore.Qt.AlignHCenter)
+        self.cov_draw_save_hor_layout = QtWidgets.QHBoxLayout()
+        self.cov_draw_save_hor_layout.setObjectName("cov_draw_save_hor_layout")
+        self.draw_cov_button = QtWidgets.QPushButton(self.gridLayoutWidget_3)
+        self.draw_cov_button.setMinimumSize(QtCore.QSize(80, 24))
+        self.draw_cov_button.setMaximumSize(QtCore.QSize(80, 24))
+        self.draw_cov_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.draw_cov_button.setObjectName("draw_cov_button")
+        self.cov_draw_save_hor_layout.addWidget(self.draw_cov_button, 0, QtCore.Qt.AlignHCenter)
+        self.save_cov_button = QtWidgets.QPushButton(self.gridLayoutWidget_3)
+        self.save_cov_button.setMinimumSize(QtCore.QSize(100, 24))
+        self.save_cov_button.setMaximumSize(QtCore.QSize(100, 24))
+        self.save_cov_button.setStyleSheet("QPushButton{\n"
+"    background-color: lightgray;\n"
+"    border-radius: 2px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: #f7f7f7;\n"
+"}\n"
+"QPushButton:pressed{\n"
+"    background-color: #ffffff;\n"
+"}")
+        self.save_cov_button.setObjectName("save_cov_button")
+        self.cov_draw_save_hor_layout.addWidget(self.save_cov_button, 0, QtCore.Qt.AlignHCenter)
+        self.csv_covplot_vert_layout.addLayout(self.cov_draw_save_hor_layout)
+        self.coverage_page_grid_layout.addLayout(self.csv_covplot_vert_layout, 0, 1, 1, 1)
+        self.cov_node_stat_vert_layout = QtWidgets.QVBoxLayout()
+        self.cov_node_stat_vert_layout.setObjectName("cov_node_stat_vert_layout")
+        self.coverage_frame = QtWidgets.QFrame(self.gridLayoutWidget_3)
+        self.coverage_frame.setMinimumSize(QtCore.QSize(195, 320))
+        self.coverage_frame.setMaximumSize(QtCore.QSize(195, 320))
+        self.coverage_frame.setStyleSheet("border-radius: 5px;\n"
+"background-color: #fcf5e3;\n"
+"border: 0;")
+        self.coverage_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.coverage_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.coverage_frame.setObjectName("coverage_frame")
+        self.coverage_node_list = QtWidgets.QListWidget(self.coverage_frame)
+        self.coverage_node_list.setGeometry(QtCore.QRect(10, 30, 172, 280))
+        self.coverage_node_list.setMinimumSize(QtCore.QSize(172, 280))
+        self.coverage_node_list.setMaximumSize(QtCore.QSize(172, 280))
+        self.coverage_node_list.setStyleSheet("QListWidget {\n"
+"    background-color: #f7f5f0;\n"
+"    color: #495057;\n"
+"    border: 0;\n"
+"    border-radius: 0px;\n"
+"}\n"
+"QListWidget::item:selected{\n"
+"    background-color: #495057;\n"
+"    color: white;\n"
+"    border: 0;\n"
+"}")
+        self.coverage_node_list.setObjectName("coverage_node_list")
+        self.coverage_node_label = QtWidgets.QLabel(self.coverage_frame)
+        self.coverage_node_label.setGeometry(QtCore.QRect(40, 10, 110, 16))
+        self.coverage_node_label.setMinimumSize(QtCore.QSize(110, 16))
+        self.coverage_node_label.setMaximumSize(QtCore.QSize(110, 16))
+        self.coverage_node_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.coverage_node_label.setObjectName("coverage_node_label")
+        self.cov_node_stat_vert_layout.addWidget(self.coverage_frame, 0, QtCore.Qt.AlignHCenter)
+        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.cov_node_stat_vert_layout.addItem(spacerItem4)
+        self.compare_stats_label_2 = QtWidgets.QLabel(self.gridLayoutWidget_3)
+        self.compare_stats_label_2.setMinimumSize(QtCore.QSize(0, 16))
+        self.compare_stats_label_2.setMaximumSize(QtCore.QSize(16777215, 16))
+        self.compare_stats_label_2.setObjectName("compare_stats_label_2")
+        self.cov_node_stat_vert_layout.addWidget(self.compare_stats_label_2, 0, QtCore.Qt.AlignHCenter)
+        self.cov_summary_stats_list = QtWidgets.QListWidget(self.gridLayoutWidget_3)
+        self.cov_summary_stats_list.setMinimumSize(QtCore.QSize(195, 250))
+        self.cov_summary_stats_list.setMaximumSize(QtCore.QSize(195, 250))
+        self.cov_summary_stats_list.setStyleSheet("QListWidget{\n"
+"    background-color: #f7f7f7;\n"
+"    border: 2px solid lightgray;\n"
+"}\n"
+"QListWidget::item:selected{\n"
+"    background-color: #495057;\n"
+"    color: white;\n"
+"    border: 0;\n"
+"}")
+        self.cov_summary_stats_list.setObjectName("cov_summary_stats_list")
+        self.cov_node_stat_vert_layout.addWidget(self.cov_summary_stats_list, 0, QtCore.Qt.AlignHCenter)
+        self.coverage_page_grid_layout.addLayout(self.cov_node_stat_vert_layout, 0, 0, 1, 1)
+        PJGUIPages.addWidget(self.coverage_page)
         self.cmd_log_page = QtWidgets.QWidget()
         self.cmd_log_page.setObjectName("cmd_log_page")
         self.verticalLayoutWidget_3 = QtWidgets.QWidget(self.cmd_log_page)
@@ -383,12 +545,18 @@ class Ui_PJGUIPages(object):
         self.cmd_prompt_label.setText(_translate("PJGUIPages", "Command prompt"))
         self.node_content_tabs.setTabText(self.node_content_tabs.indexOf(self.values_tab), _translate("PJGUIPages", "Value(s)"))
         self.node_content_tabs.setTabText(self.node_content_tabs.indexOf(self.summary_tab), _translate("PJGUIPages", "Summary stats."))
-        self.compare_nodes_label.setText(_translate("PJGUIPages", "Node to compare"))
+        self.compare_node_label.setText(_translate("PJGUIPages", "Node to compare"))
         self.avg_replicate_check_button.setText(_translate("PJGUIPages", "Average replicates"))
         self.compare_stats_label.setText(_translate("PJGUIPages", "Summary statistics"))
         self.compare_csv_button.setText(_translate("PJGUIPages", "Compare to .csv (...)"))
         self.draw_violins_button.setText(_translate("PJGUIPages", "Draw"))
         self.save_violins_button.setText(_translate("PJGUIPages", "Save plot as"))
+        self.read_hpd_csv_button.setText(_translate("PJGUIPages", "Read HPDs .csv (...)"))
+        self.read_logfile_button.setText(_translate("PJGUIPages", "Read .log file (...)"))
+        self.draw_cov_button.setText(_translate("PJGUIPages", "Draw"))
+        self.save_cov_button.setText(_translate("PJGUIPages", "Save plot as"))
+        self.coverage_node_label.setText(_translate("PJGUIPages", "Non-det. nodes"))
+        self.compare_stats_label_2.setText(_translate("PJGUIPages", "Summary statistics"))
 
 
 if __name__ == "__main__":

@@ -482,6 +482,9 @@ font: 11pt &quot;Courier&quot;;</string>
    </layout>
   </widget>
   <widget class="QWidget" name="compare_page">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <widget class="QWidget" name="gridLayoutWidget_2">
     <property name="geometry">
      <rect>
@@ -495,7 +498,7 @@ font: 11pt &quot;Courier&quot;;</string>
      <item row="0" column="0">
       <layout class="QVBoxLayout" name="node_stat_vert_layout">
        <item>
-        <widget class="QFrame" name="frame">
+        <widget class="QFrame" name="compare_node_frame">
          <property name="minimumSize">
           <size>
            <width>195</width>
@@ -554,7 +557,7 @@ QListWidget::item:selected{
 }</string>
           </property>
          </widget>
-         <widget class="QLabel" name="compare_nodes_label">
+         <widget class="QLabel" name="compare_node_label">
           <property name="geometry">
            <rect>
             <x>40</x>
@@ -613,7 +616,7 @@ QListWidget::item:selected{
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
+        <spacer name="compare_vert_spacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -791,6 +794,9 @@ QPushButton:pressed{
          </item>
          <item>
           <widget class="QPushButton" name="save_violins_button">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="minimumSize">
             <size>
              <width>100</width>
@@ -824,6 +830,375 @@ QPushButton:pressed{
           </widget>
          </item>
         </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="coverage_page">
+   <widget class="QWidget" name="gridLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>963</width>
+      <height>681</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="coverage_page_grid_layout">
+     <item row="0" column="1">
+      <layout class="QVBoxLayout" name="csv_covplot_vert_layout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QPushButton" name="read_hpd_csv_button">
+           <property name="minimumSize">
+            <size>
+             <width>140</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>140</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton{
+    background-color: lightgray;
+    border-radius: 2px;
+}
+QPushButton:hover{
+    background-color: #f7f7f7;
+}
+QPushButton:pressed{
+    background-color: #ffffff;
+}</string>
+           </property>
+           <property name="text">
+            <string>Read HPDs .csv (...)</string>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QPushButton" name="read_logfile_button">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>115</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton{
+    background-color: lightgray;
+    border-radius: 2px;
+}
+QPushButton:hover{
+    background-color: #f7f7f7;
+}
+QPushButton:pressed{
+    background-color: #ffffff;
+}</string>
+           </property>
+           <property name="text">
+            <string>Read .log file (...)</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0" alignment="Qt::AlignHCenter">
+          <widget class="QTextEdit" name="coverage_csv_textbox">
+           <property name="minimumSize">
+            <size>
+             <width>570</width>
+             <height>170</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>570</width>
+             <height>170</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: #ffffff;
+border: 2px solid lightgray;
+border-radius: 2px;
+font: 11pt &quot;Courier&quot;;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" alignment="Qt::AlignHCenter">
+          <widget class="QListWidget" name="coverage_textbox">
+           <property name="minimumSize">
+            <size>
+             <width>170</width>
+             <height>170</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>170</width>
+             <height>170</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: #ffffff;
+border: 2px solid lightgray;
+border-radius: 2px;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="MatplotlibWidget" name="coverage_page_matplotlib_widget" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>740</width>
+           <height>400</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>740</width>
+           <height>400</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="cov_draw_save_hor_layout">
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QPushButton" name="draw_cov_button">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton{
+    background-color: lightgray;
+    border-radius: 2px;
+}
+QPushButton:hover{
+    background-color: #f7f7f7;
+}
+QPushButton:pressed{
+    background-color: #ffffff;
+}</string>
+           </property>
+           <property name="text">
+            <string>Draw</string>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QPushButton" name="save_cov_button">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton{
+    background-color: lightgray;
+    border-radius: 2px;
+}
+QPushButton:hover{
+    background-color: #f7f7f7;
+}
+QPushButton:pressed{
+    background-color: #ffffff;
+}</string>
+           </property>
+           <property name="text">
+            <string>Save plot as</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0">
+      <layout class="QVBoxLayout" name="cov_node_stat_vert_layout">
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QFrame" name="coverage_frame">
+         <property name="minimumSize">
+          <size>
+           <width>195</width>
+           <height>320</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>195</width>
+           <height>320</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border-radius: 5px;
+background-color: #fcf5e3;
+border: 0;</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QListWidget" name="coverage_node_list">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>30</y>
+            <width>172</width>
+            <height>280</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>172</width>
+            <height>280</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>172</width>
+            <height>280</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QListWidget {
+	background-color: #f7f5f0;
+	color: #495057;
+	border: 0;
+    border-radius: 0px;
+}
+QListWidget::item:selected{
+	background-color: #495057;
+	color: white;
+	border: 0;
+}</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="coverage_node_label">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>10</y>
+            <width>110</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>110</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>110</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Non-det. nodes</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <spacer name="cov_vert_spacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QLabel" name="compare_stats_label_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Summary statistics</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QListWidget" name="cov_summary_stats_list">
+         <property name="minimumSize">
+          <size>
+           <width>195</width>
+           <height>250</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>195</width>
+           <height>250</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QListWidget{
+    background-color: #f7f7f7;
+    border: 2px solid lightgray;
+}
+QListWidget::item:selected{
+	background-color: #495057;
+	color: white;
+	border: 0;
+}</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

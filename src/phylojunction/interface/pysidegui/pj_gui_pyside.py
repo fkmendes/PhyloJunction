@@ -73,8 +73,11 @@ class GUIMainWindow(QMainWindow):
     input_script_filepath: str
     gui_modeling: GUIModeling
     is_avg_repl_check: bool
+
     pj_comparison_df: pd.DataFrame
     other_comparison_df: pd.DataFrame
+    coverage_df: pd.DataFrame
+    hpd_df: pd.DataFrame
 
     def __init__(self):
         super().__init__()
@@ -100,6 +103,11 @@ class GUIMainWindow(QMainWindow):
         self.gui_modeling = GUIModeling()
 
         self.is_avg_repl_check = False
+
+        self.pj_comparison_df = pd.DataFrame()
+        self.other_comparison_df = pd.DataFrame()
+        self.coverage_df = pd.DataFrame()
+        self.hpd_df = pd.DataFrame()
         
 
         #########################
@@ -121,7 +129,7 @@ class GUIMainWindow(QMainWindow):
         self.ui.compare_button.clicked.connect(self.show_compare_page)
 
         # coverage page button #
-        self.ui.covg_button.clicked.connect(self.show_pgm_page)
+        self.ui.covg_button.clicked.connect(self.show_coverage_page)
 
         # warnings page button #
         self.ui.warning_button.clicked.connect(self.show_warnings_page)
@@ -157,6 +165,15 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.compare_node_list.itemClicked.connect(self.do_selected_node_compare_page)
         self.ui.ui_pages.avg_replicate_check_button.clicked.connect(self.avg_repl_check)
         self.ui.ui_pages.draw_violins_button.clicked.connect(self.draw_violin)
+        self.ui.ui_pages.save_violins_button.clicked.connect(lambda plot2fig: \
+            self.write_plot_to_file(self.ui.ui_pages.compare_page_matplotlib_widget.fig))
+
+        # Coverage page #
+        self.ui.ui_pages.read_hpd_csv_button.clicked.connect(self.read_coverage_hpd_csv)
+        self.ui.ui_pages.coverage_node_list.itemClicked.connect(self.do_selected_node_coverage_page)
+        self.ui.ui_pages.draw_cov_button.clicked.connect(self.draw_cov)
+        self.ui.ui_pages.save_cov_button.clicked.connect(lambda plot2fig: \
+            self.write_plot_to_file(self.ui.ui_pages.coverage_page_matplotlib_widget.fig))
 
         # show #
         self.show()
@@ -241,6 +258,13 @@ class GUIMainWindow(QMainWindow):
         self.ui.top_label_left.setText("IMPLEMENTATION COMPARISON")
 
 
+    def show_coverage_page(self):
+        self.reset_selection()
+        self.ui.pages.setCurrentWidget(self.ui.ui_pages.coverage_page)
+        self.ui.compare_button.set_active(True)
+        self.ui.top_label_left.setText("COVERAGE VALIDATION")
+
+
     def show_cmd_log_page(self):
         self.reset_selection()
         self.ui.pages.setCurrentWidget(self.ui.ui_pages.cmd_log_page)
@@ -281,6 +305,20 @@ class GUIMainWindow(QMainWindow):
                 node_name in self.gui_modeling.pgm_obj.node_name_val_dict]
         self.ui.ui_pages.node_list.clear()  # clear first
         self.ui.ui_pages.node_list.addItems(pgm_node_list)
+
+        # compare page node list
+        compare_nodes_list = [nd.node_name for nd in \
+                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
+                    nd.is_sampled]
+        self.ui.ui_pages.compare_node_list.clear()
+        self.ui.ui_pages.compare_node_list.addItems(compare_nodes_list)
+
+        # coverage page node list
+        coverage_nodes_list = [nd.node_name for nd in \
+                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
+                    not nd.is_deterministic]
+        self.ui.ui_pages.coverage_node_list.clear()
+        self.ui.ui_pages.coverage_node_list.addItems(coverage_nodes_list)
 
 
     def selected_node_display(self, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
@@ -361,58 +399,64 @@ class GUIMainWindow(QMainWindow):
         """
         
         # first get selected node's name #
-        node_name = \
-            self.ui.ui_pages.node_list.currentItem().text()
+        selected_node_name: str = ""
+        active_item = self.ui.ui_pages.node_list.currentItem()
+        if active_item:
+            selected_node_name = active_item.text()
 
-        # reading node information #
-        node_pgm, sample_size, repl_size = \
-            self.selected_node_read(node_name)
+        if not selected_node_name in ("", None):
+            # reading node information #
+            node_pgm, sample_size, repl_size = \
+                self.selected_node_read(selected_node_name)
 
-        # spin boxes must be up-to-date #
-        self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
-        if sample_size == 0:
-            self.ui.ui_pages.sample_idx_spin.setMaximum(0)    
+            # spin boxes must be up-to-date #
+            self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
+            if sample_size == 0:
+                self.ui.ui_pages.sample_idx_spin.setMaximum(0)    
+            
+            else:
+                self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
+
+            # grab pgm_page's figure and axes #
+            fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
+            fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
         
+            # activate radio buttons and spin elements #
+            self.init_and_refresh_radio_spin(node_pgm, sample_size)
+            
+            do_all_samples = \
+                self.ui.ui_pages.all_samples_radio.isChecked()
+        
+        
+            #################################
+            # Collect information from spin #
+            #################################
+            
+            sample_idx = self.ui.ui_pages.sample_idx_spin.value() - 1
+            repl_idx = self.ui.ui_pages.repl_idx_spin.value() - 1
+
+
+            ###############
+            # Now do node #
+            ###############
+            self.selected_node_display(node_pgm,
+                                    do_all_samples,
+                                    sample_idx=sample_idx,
+                                    repl_idx=repl_idx,
+                                    repl_size=repl_size)
+
+            self.selected_node_plot(fig_obj,
+                                    fig_axes,
+                                    node_pgm,
+                                    do_all_samples,
+                                    sample_idx=sample_idx,
+                                    repl_idx=repl_idx,
+                                    repl_size=repl_size)  
+
+        # no nodes to do
         else:
-            self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
-
-        # grab pgm_page's figure and axes #
-        fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
-        fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
-        
-        # activate radio buttons and spin elements #
-        self.init_and_refresh_radio_spin(node_pgm, sample_size)
-        
-        do_all_samples = \
-            self.ui.ui_pages.all_samples_radio.isChecked()
-        
-        
-        #################################
-        # Collect information from spin #
-        #################################
-        
-        sample_idx = self.ui.ui_pages.sample_idx_spin.value() - 1
-        repl_idx = self.ui.ui_pages.repl_idx_spin.value() - 1
-
-        print("sample_idx = " + str(sample_idx))
-        print("repl_idx = " + str(repl_idx))
-
-        ###############
-        # Now do node #
-        ###############
-        self.selected_node_display(node_pgm,
-                                   do_all_samples,
-                                   sample_idx=sample_idx,
-                                   repl_idx=repl_idx,
-                                   repl_size=repl_size)
-
-        self.selected_node_plot(fig_obj,
-                                fig_axes,
-                                node_pgm,
-                                do_all_samples,
-                                sample_idx=sample_idx,
-                                repl_idx=repl_idx,
-                                repl_size=repl_size)      
+            print("If there are no nodes in PJ model, nothing to do")
+            pass    
 
 
     def do_selected_node_compare_page(self):
@@ -423,8 +467,10 @@ class GUIMainWindow(QMainWindow):
         """
 
         # first get selected node's name #
-        selected_node_name = \
-            self.ui.ui_pages.compare_node_list.currentItem().text()
+        selected_node_name: str = ""
+        active_item = self.ui.ui_pages.compare_node_list.currentItem()
+        if active_item:
+            selected_node_name = active_item.text()
 
         # if there is at least one
         # sampled node with a name
@@ -467,7 +513,7 @@ class GUIMainWindow(QMainWindow):
                 if not self.is_avg_repl_check:
                     self.pj_comparison_df = scalar_value_df_dict[selected_node_repl_size]
 
-                else:
+                elif selected_node_repl_size > 1:
                     self.ui.ui_pages.summary_stats_list.addItems(
                         ["average", "std. dev."]
                     )
@@ -489,6 +535,66 @@ class GUIMainWindow(QMainWindow):
             print("If there are no sampled nodes in PJ model, we cannot compare against PJ. Later write an Exception for this")
             pass
 
+
+    def do_selected_node_coverage_page(self):
+        """
+        Chose node to get values or summary
+        statistics for coverage plot
+        (coverage menu)
+        """
+
+        # first get selected node's name #
+        selected_node_name: str = ""
+        active_item = self.ui.ui_pages.coverage_node_list.currentItem()
+        if active_item:
+            selected_node_name = active_item.text()
+
+        # if there is at least one
+        # sampled node with a name
+        if not selected_node_name in ("", None):
+
+            # reading node information #
+            selected_node_pgm, selected_node_sample_size, selected_node_repl_size = \
+                self.selected_node_read(selected_node_name)
+
+            # could be more efficient, but this
+            # makes sure that stashes are always up-to-date
+            scalar_output_stash, tree_output_stash = \
+                pjwrite.prep_data_df(self.gui_modeling.pgm_obj)
+            
+            # collecting scalars #
+            scalar_constant_value_df, scalar_value_df_dict, scalar_repl_summary_df = \
+                scalar_output_stash
+
+            # collecting trees #
+            tree_value_df_dict, tree_ann_value_df_dict, tree_rec_value_df_dict, \
+                tree_rec_ann_value_df_dict, tree_summary_df_dict, tree_repl_summary_df_dict, \
+                tree_living_nd_states_str_dict, tree_living_nd_states_str_nexus_dict, \
+                tree_internal_nd_states_str_dict = tree_output_stash
+
+            # str because could be constant set by hand
+            if isinstance(selected_node_pgm.value[0], (str, int, float, np.float64)):
+                if selected_node_repl_size <= 1:
+                    self.ui.ui_pages.cov_summary_stats_list.clear()
+
+                    # sampled, non-deterministic
+                    if selected_node_pgm.is_sampled:
+                        self.coverage_df = scalar_value_df_dict[selected_node_repl_size]
+                    
+                    # constant, non-deterministic
+                    else:
+                        self.coverage_df = scalar_constant_value_df
+
+                else:
+                    self.ui.ui_pages.cov_summary_stats_list.addItems(
+                        ["average", "std. dev."]
+                    )
+                    self.coverage_df = scalar_repl_summary_df
+
+        else:
+            print("If there are no non-deterministic nodes in PJ model, no sensical coverage can be calculated. Later write an Exception for this")
+            pass
+        
 
     ##################
     # Functions for  #
@@ -527,7 +633,11 @@ class GUIMainWindow(QMainWindow):
             )
 
             # coverage page node list
-            # TODO
+            self.ui.ui_pages.coverage_node_list.addItems(
+                [nd.node_name for nd in \
+                    self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
+                        not nd.is_deterministic]
+            )
 
 
     def read_compare_csv(self):
@@ -550,7 +660,40 @@ class GUIMainWindow(QMainWindow):
         else:
             pass # event canceled by user
 
-    
+
+    def read_coverage_hpd_csv(self):
+
+        # read file path #
+        coverage_hpd_csv_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Read HPDs .csv", dir=".", filter="*.csv")
+
+        if coverage_hpd_csv_fp:
+            if not os.path.isfile(coverage_hpd_csv_fp):
+                print("Could not find " + coverage_hpd_csv_fp) # TODO: add exception here later
+
+            try:
+                self.hpd_df = pjread.read_csv_into_dataframe(coverage_hpd_csv_fp)
+                coverage_df_str = tabulate(self.hpd_df, self.hpd_df.head(), tablefmt="plain", showindex=False).lstrip()
+                self.ui.ui_pages.coverage_csv_textbox.setText(coverage_df_str)
+                
+            except:
+                print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
+            
+        else:
+            pass # event canceled by user
+
+
+    ##################
+    # Functions for  #
+    # writing events #
+    ##################
+
+    def write_plot_to_file(self, fig_obj):
+        # get fp
+        fig_fp, filter = QFileDialog.getSaveFileName(self, "Save file", "", ".png")
+
+        pjwrite.write_fig_to_file(fig_fp, fig_obj)
+
+
     #################
     # Functions for #
     # drawing       #
@@ -572,66 +715,127 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.compare_page_matplotlib_widget.fig.canvas.draw()
         
         # first get selected node's name #
-        node_name = \
-            self.ui.ui_pages.compare_node_list.currentItem().text()
+        selected_node_name: str = ""
+        active_item = self.ui.ui_pages.coverage_node_list.currentItem()
+        if active_item:
+            selected_node_name = active_item.text()
 
-        # reading node information #
-        node_pgm, sample_size, repl_size = \
-            self.selected_node_read(node_name)
+        if not selected_node_name in ("", None):
+            # reading node information #
+            node_pgm, sample_size, repl_size = \
+                self.selected_node_read(selected_node_name)
 
-        if not self.pj_comparison_df.empty and \
-            not self.other_comparison_df.empty:
+            if not self.pj_comparison_df.empty and \
+                not self.other_comparison_df.empty:
 
-            # scalar
-            if isinstance(node_pgm.value[0], (int, float, np.float64)):
-                if not self.is_avg_repl_check:
-                    thing_to_compare = node_name
+                # scalar
+                if isinstance(node_pgm.value[0], (int, float, np.float64)):
+                    if not self.is_avg_repl_check:
+                        thing_to_compare = node_name
+                    
+                    # averaging over replicates
+                    else:
+                        if not summary_stat_list_empty:
+                            if self.ui.ui_pages.summary_stats_list.currentItem():
+                                thing_to_compare = self.ui.ui_pages.summary_stats_list.currentItem().text()
+
+                            # summary stats were not picked, doing nothing
+                            else:
+                                pass
                 
-                # averaging over replicates
+                # custom class object (e.g., AnnotatedTree)
                 else:
                     if not summary_stat_list_empty:
                         if self.ui.ui_pages.summary_stats_list.currentItem():
                             thing_to_compare = self.ui.ui_pages.summary_stats_list.currentItem().text()
-
+                    
                         # summary stats were not picked, doing nothing
                         else:
                             pass
-            
-            # custom class object (e.g., AnnotatedTree)
-            else:
-                if not summary_stat_list_empty:
-                    if self.ui.ui_pages.summary_stats_list.currentItem():
-                        thing_to_compare = self.ui.ui_pages.summary_stats_list.currentItem().text()
+
+                # debugging
+                # print(tabulate(self.pj_comparison_df, self.pj_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
+                # print(tabulate(self.other_comparison_df, self.other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
+
+                joint_dataframe = pjorg.join_dataframes(
+                    self.pj_comparison_df, self.other_comparison_df,
+                    value_to_compare=thing_to_compare,
+                    summaries_avg_over_repl=False)
+
+                # something went wrong,
+                # we clear comparison figure
+                if joint_dataframe.empty or not node_pgm.is_sampled:
+                    # node list should only contain
+                    # sampled nodes already, but
+                    # just being sure...                    
+                    print("joint_dataframe was empty or node was constant")
+                    pass
+
+                else:
+                    # initializing plot
+                    self.ui.ui_pages.compare_page_matplotlib_widget.initialize_axes(disabled_yticks=False)
+                    self.ui.ui_pages.compare_page_matplotlib_widget.fig.canvas.draw()
+                    fig_obj = self.ui.ui_pages.compare_page_matplotlib_widget.fig
+                    fig_axes = self.ui.ui_pages.compare_page_matplotlib_widget.axes
+                    
+                    pjdraw.plot_violins(fig_obj, fig_axes,
+                        joint_dataframe, "program", thing_to_compare,
+                        xlab="Program", ylab=thing_to_compare)
+
+    
+    def draw_cov(self):
+        selected_node_name: str = ""
+        thing_to_validate: str = ""
+        coverage_node_list_empty = self.ui.ui_pages.coverage_node_list.count() == 0
+
+        # before draw, we reset coverage plot
+        self.ui.ui_pages.coverage_page_matplotlib_widget.fig.clf()
+        self.ui.ui_pages.coverage_page_matplotlib_widget.initialize_axes()
+        self.ui.ui_pages.coverage_page_matplotlib_widget.fig.canvas.draw()
+
+        # first get selected node's name #
+        selected_node_name: str = ""
+        active_item = self.ui.ui_pages.coverage_node_list.currentItem()
+        if active_item:
+            selected_node_name = active_item.text()
+
+        if not selected_node_name in ("", None):
+            # reading node information #
+            node_pgm, sample_size, repl_size = \
+                self.selected_node_read(selected_node_name)
+
+            if not self.coverage_df.empty and \
+                not self.hpd_df.empty:
                 
-                    # summary stats were not picked, doing nothing
-                    else:
-                        pass
+                # scalar
+                if isinstance(node_pgm.value[0], (str, int, float, np.float64)):
+                    thing_to_validate = selected_node_name
 
-            # debugging
-            # print(tabulate(self.pj_comparison_df, self.pj_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
-            # print(tabulate(self.other_comparison_df, self.other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
+                # debugging
+                # print(tabulate(self.coverage_df, self.coverage_df.head(), tablefmt="plain", showindex=False).lstrip())
+                # print(tabulate(self.hpd_df, self.hpd_df.head(), tablefmt="plain", showindex=False).lstrip())
 
-            joint_dataframe = pjorg.join_dataframes(
-                self.pj_comparison_df, self.other_comparison_df,
-                value_to_compare=thing_to_compare,
-                summaries_avg_over_repl=False)
+                full_cov_df = pd.concat([self.coverage_df, self.hpd_df], axis=1)
+                full_cov_df = pjorg.add_within_hpd_col(full_cov_df, thing_to_validate)
 
-            # something went wrong,
-            # we clear comparison figure
-            if joint_dataframe.empty:                    
-                print("joint_dataframe was empty")
-                pass
+                # debugging
+                # print(tabulate(full_cov_df, full_cov_df.head(), tablefmt="plain", showindex=False).lstrip())
 
-            else:
-                # initializing plot
-                self.ui.ui_pages.compare_page_matplotlib_widget.initialize_axes(disabled_yticks=False)
-                self.ui.ui_pages.compare_page_matplotlib_widget.fig.canvas.draw()
-                fig_obj = self.ui.ui_pages.compare_page_matplotlib_widget.fig
-                fig_axes = self.ui.ui_pages.compare_page_matplotlib_widget.axes
-                
-                pjdraw.plot_violins(fig_obj, fig_axes,
-                    joint_dataframe, "program", thing_to_compare,
-                    xlab="Program", ylab=thing_to_compare)
+                # something went wrong, we clear validation figure
+                if full_cov_df.empty:
+                    pass
+
+                else:
+                    # initializing plot
+                    self.ui.ui_pages.coverage_page_matplotlib_widget.initialize_axes(
+                        disabled_yticks=False, disabled_xticks=False)
+                    self.ui.ui_pages.coverage_page_matplotlib_widget.fig.canvas.draw()
+                    fig_obj = self.ui.ui_pages.coverage_page_matplotlib_widget.fig
+                    fig_axes = self.ui.ui_pages.coverage_page_matplotlib_widget.axes
+                    
+                    pjdraw.plot_intervals(fig_obj, fig_axes, \
+                        full_cov_df, thing_to_validate, "posterior_mean", \
+                        ylab="Posterior mean")
 
 
     #####################
@@ -778,6 +982,8 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.node_list.clear()
         self.ui.ui_pages.compare_node_list.clear()
         self.ui.ui_pages.summary_stats_list.clear()
+        self.ui.ui_pages.coverage_node_list.clear()
+        self.ui.ui_pages.cov_summary_stats_list.clear()
 
         # reset text on display and summary
         # panels
@@ -809,6 +1015,9 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.compare_page_matplotlib_widget.fig.clf()
         self.ui.ui_pages.compare_page_matplotlib_widget.initialize_axes()
         self.ui.ui_pages.compare_page_matplotlib_widget.fig.canvas.draw()
+        self.ui.ui_pages.coverage_page_matplotlib_widget.fig.clf()
+        self.ui.ui_pages.coverage_page_matplotlib_widget.initialize_axes()
+        self.ui.ui_pages.coverage_page_matplotlib_widget.fig.canvas.draw()
 
 
     # side-effect: sets is_avg_repl_check

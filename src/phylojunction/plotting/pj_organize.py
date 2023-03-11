@@ -92,7 +92,7 @@ def add_within_hpd_col(df: pd.DataFrame, val_col_name: str) -> pd.DataFrame:
                 df.at[i, "within_hpd"] = 1.0
             
             else: 
-                df.at[i, "within_hpd"] = 00.0
+                df.at[i, "within_hpd"] = 0.0
 
     return df
 

@@ -1205,7 +1205,10 @@ def call_gui():
                 # could be more efficient, but this makes sure that stashes are always up-to-date
                 scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
                 scalar_constant_value_df, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
-                _, tree_summary_df_dict, tree_repl_summary_df_dict = tree_output_stash
+                tree_value_df_dict, tree_ann_value_df_dict, tree_rec_value_df_dict, \
+                tree_rec_ann_value_df_dict, tree_summary_df_dict, tree_repl_summary_df_dict, \
+                tree_living_nd_states_str_dict, tree_living_nd_states_str_nexus_dict, \
+                tree_internal_nd_states_str_dict = tree_output_stash
 
                 # str because could be constant set by hand
                 if isinstance(selected_node.value[0], (str, int, float, np.float64)):

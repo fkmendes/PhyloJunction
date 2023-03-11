@@ -21,7 +21,7 @@ def write_str_list(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> 
 
 
 def write_fig_to_file(outfile_path: str, fig: plt.Figure) -> None:
-    fig.savefig(outfile_path)
+    fig.savefig(outfile_path, bbox_inches="tight", dpi=300)
 
 
 def write_data_df(outfile_handle: ty.IO, data_df: pd.DataFrame, format="csv") -> None:
