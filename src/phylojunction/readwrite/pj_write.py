@@ -676,11 +676,11 @@ def dump_pgm_data(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, pre
                 write_str_list(data_out, [to_print])
 
 
-def dump_serialized_pgm(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalModel, prefix: str="") -> None:
+def dump_serialized_pgm(file_name: str, pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_log_list: ty.List[str], prefix: str="", to_folder: bool=False) -> None:
     """Write serialized PGM in specified directory 
     
     Args:
-        dir_string (str): Where to save the serialized model to be written
+        file_name (str): Serialized file name
         pgm_obj (pgm.ProbabilisticGraphicalModel): Probabilistic graphical model instance to be serialized and saved
         prefix (str): String to preceed file name
 
@@ -688,12 +688,18 @@ def dump_serialized_pgm(dir_string: str, pgm_obj: pgm.ProbabilisticGraphicalMode
         None
     """
     
-    if not dir_string.endswith("/"): dir_string += "/"
     if prefix: prefix += "_"
 
-    with open(dir_string + prefix + "pgm.pickle", "wb") as picklefile:
-        pickle.dump(pgm_obj, picklefile)
+    if to_folder:
+        if not file_name.endswith("/"): file_name += "/"
         
+        with open(file_name + prefix + ".pickle", "wb") as picklefile:
+            pickle.dump((pgm_obj, cmd_log_list), picklefile)
+
+    else:
+        with open(prefix + file_name + ".pickle", "wb") as picklefile:
+            pickle.dump((pgm_obj, cmd_log_list), picklefile)
+
 
 def get_write_inference_rev_scripts(all_sims_model_spec_list: ty.List[str], all_sims_mcmc_logging_spec_list: ty.List[str], dir_list: ty.List[str], prefix: str="", write2file: bool=False) -> ty.List[str]:
     """Get and/or write full inference .Rev scripts

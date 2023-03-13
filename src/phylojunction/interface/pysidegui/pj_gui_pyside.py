@@ -31,7 +31,13 @@ class GUIModeling():
         self.cmd_log_list = []
 
 
-    def parse_cmd_update_pgm(self, cmd_line_list, gui_main_window_obj):
+    def parse_cmd_update_pgm(self, cmd_line_list, gui_main_window_obj, clear_cmd_log_list: bool=False):
+        # in case we read two scripts
+        # consecutively, we want to clear
+        # the comand line history list
+        if clear_cmd_log_list:
+            self.cmd_log_list = []
+
         valid_cmd_line = None
         print("\nReading following command lines:")
         
@@ -58,11 +64,18 @@ class GUIModeling():
                     gui_main_window_obj.ui.ui_pages.warnings_textbox.setText(str(e))
 
             if valid_cmd_line:
+                try:
+                    if self.cmd_log_list[-1].startswith("\n#"):
+                        self.cmd_log_list.append("")  # adding new line
+                
+                except:
+                    pass
+
                 self.cmd_log_list.append(valid_cmd_line)
             
 
     def cmd_log(self):
-        return "\n".join(self.cmd_log_list)
+        return "\n".join(self.cmd_log_list) + "\n\n"
     
     def clear(self):
         self.pgm_obj = ProbabilisticGraphicalModel()
@@ -158,7 +171,8 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.repl_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot)
 
         # clear model button #
-        self.ui.ui_pages.clear_model.clicked.connect(self.clean_disable_everything)
+        self.ui.ui_pages.clear_model.clicked.connect(lambda clear_model: \
+            self.clean_disable_everything(user_reset=True))
 
         # Compare page #
         self.ui.ui_pages.compare_csv_button.clicked.connect(self.read_compare_csv)
@@ -204,10 +218,10 @@ class GUIMainWindow(QMainWindow):
         # file menu items
         file_menu.addAction("Read script", self.read_execute_script)
 
-        file_menu.addAction("Load model", self.print_about)
+        file_menu.addAction("Load model", self.load_model)
         file_menu.addSeparator()
         file_menu.addAction("Save data as", self.print_about)
-        file_menu.addAction("Save model as", self.print_about)
+        file_menu.addAction("Save model as", self.write_model_to_file)
 
 
     # verify which menu buttons are selected #
@@ -300,25 +314,8 @@ class GUIMainWindow(QMainWindow):
 
         self.ui.ui_pages.cmd_prompt.clear()  # clear
 
-        # now update ListWidget #
-        pgm_node_list = [node_name for \
-                node_name in self.gui_modeling.pgm_obj.node_name_val_dict]
-        self.ui.ui_pages.node_list.clear()  # clear first
-        self.ui.ui_pages.node_list.addItems(pgm_node_list)
-
-        # compare page node list
-        compare_nodes_list = [nd.node_name for nd in \
-                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
-                    nd.is_sampled]
-        self.ui.ui_pages.compare_node_list.clear()
-        self.ui.ui_pages.compare_node_list.addItems(compare_nodes_list)
-
-        # coverage page node list
-        coverage_nodes_list = [nd.node_name for nd in \
-                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
-                    not nd.is_deterministic]
-        self.ui.ui_pages.coverage_node_list.clear()
-        self.ui.ui_pages.coverage_node_list.addItems(coverage_nodes_list)
+        # updating node lists 
+        self.refresh_node_lists()
 
 
     def selected_node_display(self, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
@@ -598,25 +595,26 @@ class GUIMainWindow(QMainWindow):
 
     ##################
     # Functions for  #
-    # reading events #
+    # reading and    #
+    # loading events #
     ##################
     
     def read_execute_script(self):
 
-        # reset everything #
-        self.clean_disable_everything()
-
         # read file path #
-        script_in_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Read script", dir=".", filter="*.pj")
+        script_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Read script", dir=".", filter="*.pj")
 
-        if script_in_fp:
-            cmd_line_list = pjread.read_text_file(script_in_fp)
+        if script_fp:
+            # reset everything #
+            self.clean_disable_everything()
+
+            cmd_line_list = pjread.read_text_file(script_fp)
 
             # (side-effect: gui_modeling stores cmd hist) #
-            self.gui_modeling.parse_cmd_update_pgm(cmd_line_list, self)
+            self.gui_modeling.parse_cmd_update_pgm(cmd_line_list, self, clear_cmd_log_list=True)
 
             # update GUI cmd history #
-            self.refresh_cmd_history()
+            self.refresh_cmd_history(user_reset=True)
 
             # add node names to...
             # pgm page node list
@@ -682,6 +680,18 @@ class GUIMainWindow(QMainWindow):
             pass # event canceled by user
 
 
+    def load_model(self):
+        # read file path #
+        model_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Load model", dir=".", filter="*.pickle")
+
+        if model_fp:
+            self.clean_disable_everything()
+            self.ui.ui_pages.cmd_log_textbox.clear()
+            self.gui_modeling.pgm_obj, self.gui_modeling.cmd_log_list = pjread.read_serialized_pgm(model_fp)
+            self.refresh_node_lists()
+            self.ui.ui_pages.cmd_log_textbox.setText(self.gui_modeling.cmd_log())
+
+
     ##################
     # Functions for  #
     # writing events #
@@ -692,6 +702,14 @@ class GUIMainWindow(QMainWindow):
         fig_fp, filter = QFileDialog.getSaveFileName(self, "Save file", "", ".png")
 
         pjwrite.write_fig_to_file(fig_fp, fig_obj)
+
+
+    def write_model_to_file(self, prefix: str=""):
+        # get fp
+        pickle_fp, filter = QFileDialog.getSaveFileName(self, "Save file", "", "")
+
+        # pickling and saving PGM
+        pjwrite.dump_serialized_pgm(pickle_fp, self.gui_modeling.pgm_obj,self.gui_modeling.cmd_log_list, prefix=prefix)
 
 
     #################
@@ -957,6 +975,28 @@ class GUIMainWindow(QMainWindow):
             self.ui.ui_pages.repl_idx_spin.setDisabled(True)
 
 
+    def refresh_node_lists(self):
+        # pgm page node list #
+        pgm_node_list = [node_name for \
+                node_name in self.gui_modeling.pgm_obj.node_name_val_dict]
+        self.ui.ui_pages.node_list.clear()  # clear first
+        self.ui.ui_pages.node_list.addItems(pgm_node_list)
+
+        # compare page node list
+        compare_nodes_list = [nd.node_name for nd in \
+                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
+                    nd.is_sampled]
+        self.ui.ui_pages.compare_node_list.clear()
+        self.ui.ui_pages.compare_node_list.addItems(compare_nodes_list)
+
+        # coverage page node list
+        coverage_nodes_list = [nd.node_name for nd in \
+                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
+                    not nd.is_deterministic]
+        self.ui.ui_pages.coverage_node_list.clear()
+        self.ui.ui_pages.coverage_node_list.addItems(coverage_nodes_list)
+
+
     def refresh_selected_node_display_plot(self):
         # if nodes have been created and selected #
         if self.ui.ui_pages.node_list.currentItem() != None:
@@ -965,18 +1005,31 @@ class GUIMainWindow(QMainWindow):
 
     def refresh_cmd_history(self, user_reset=False):
         if user_reset:
-            self.gui_modeling.cmd_log_list.append("\n## RESET: Model is being cleared at this point\n")
+            self.gui_modeling.cmd_log_list.insert(0, "## Model is being cleared at this point, as a result of (i) reading script, (ii) loading model, or (iii) user reset\n")
 
-        cmd_hist_str = self.gui_modeling.cmd_log()
+        cmd_hist_str = self.gui_modeling.cmd_log().lstrip()
         self.ui.ui_pages.cmd_log_textbox.setText(cmd_hist_str)
 
 
-    def clean_disable_everything(self):
+    def clean_disable_everything(self, user_reset=False):
+        if user_reset:
+            cmd_hist_str: str = ""
+
+            try:
+                # update GUI cmd history
+                self.gui_modeling.cmd_log_list.append("\n## Model is being cleared at this point, as a result of (i) reading script, (ii) loading model, or (iii) user reset")
+                cmd_hist_str = self.gui_modeling.cmd_log()
+            
+            except:
+                cmd_hist_str = "## Model is being cleared at this point, as a result of (i) reading script, (ii) loading model, or (iii) user reset"
+
+            self.ui.ui_pages.cmd_log_textbox.setText(cmd_hist_str.lstrip())
+
+        else:
+            self.ui.ui_pages.cmd_log_textbox.clear()
+
         # pgm-related objects are reset
         self.gui_modeling.clear()
-
-        # update GUI cmd history
-        self.refresh_cmd_history(user_reset=True)
 
         # remove all node names from list
         self.ui.ui_pages.node_list.clear()

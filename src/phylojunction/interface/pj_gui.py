@@ -874,11 +874,11 @@ def call_gui():
         # Loading PGM #
         ###############
         elif event == "Load model":
-            _model_in_fp = sg.popup_get_file("Model to load", no_window=True, keep_on_top=True)
+            model_in_fp = sg.popup_get_file("Model to load", no_window=True, keep_on_top=True)
             
-            if _model_in_fp:
+            if model_in_fp:
                 _, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Loading serialized model at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
-                pgm_obj = pjread.read_serialized_pgm(_model_in_fp)
+                pgm_obj = pjread.read_serialized_pgm(model_in_fp)
                 window["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
                 window["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
                 window["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
@@ -914,7 +914,7 @@ def call_gui():
             prefix = values["-PREFIX-"]
             
             # pickling and saving PGM
-            pjwrite.dump_serialized_pgm(model_out_dir, pgm_obj, prefix=prefix)
+            pjwrite.dump_serialized_pgm(model_out_dir, pgm_obj, [""], prefix=prefix)
 
 
         ##################
