@@ -117,13 +117,14 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
     deterministic_call_count = len(re.findall(cmdu.deterministic_regex, cmd_line))
 
     if (assignment_call_count + sampled_as_call_count + deterministic_call_count) > 1:
+        print("\n\nCommand line with problem:\n  " + cmd_line)
         raise ec.ScriptSyntaxError(cmd_line, "Only _one_ of the following can be done:\n    (1) [variable] <- [value]\n    (2) [variable] ~ [sampling distribution]" + \
-            "\n    (3) [variable] := [deterministic function]\nExiting...")
+            "\n    (3) [variable] := [deterministic function]")
 
     elif (assignment_call_count + sampled_as_call_count + deterministic_call_count) == 0:
-        print("command line that caused the bombing = " + cmd_line)
+        print("\n\nCommand line with problem:\n  " + cmd_line)
         raise ec.ScriptSyntaxError(cmd_line, "One of the following must be done:\n    (1) [variable] <- [value]\n    (2) [variable] ~ [sampling distribution]" + \
-            "\n    (3) [variable] := [deterministic function]\nExiting...")
+            "\n    (3) [variable] := [deterministic function]")
 
     ##########################
     # Executing command line #
@@ -136,7 +137,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
             parse_variable_assignment(pgm_obj, rv_name, rv_spec, cmd_line)
 
         except:
-            raise ec.ScriptSyntaxError(cmd_line, "Something went wrong during variable assignment. Variable name and value could not be tokenized. Exiting...")
+            raise ec.ScriptSyntaxError(cmd_line, "Something went wrong during variable assignment. Variable name and value could not be tokenized.")
 
 
     # (2) sampling distribution assignment

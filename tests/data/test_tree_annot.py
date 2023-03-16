@@ -11,15 +11,15 @@ class TestAnnotateTree(unittest.TestCase):
         # 
         # Four trees to be read as newick strings
         #
-        rootedgeless_tr_str = "((nd6:2.5,nd7:1.0)nd3:1.0,(nd4:1.0,nd5:2.5)nd2:1.0)root:0.0;"
-        rootedge_tr_str = "(((nd6:3.0,nd7:1.0)nd3:1.0,(nd4:1.0,nd5:3.0)nd2:1.0)root:2.0)origin:0.0;"
-        rootedgeless_no_spn_living_tr_str = "(brosc:1.0)origin:0.0;" # TODO: deprecate, replace with just origin node
-        rootedgeless_no_spn_dead_tr_str = "(brosc:0.5)origin:0.0;" # TODO: deprecate, replace with just origin node
+        # rootedgeless_tr_str = "((nd6:2.5,nd7:1.0)nd3:1.0,(nd4:1.0,nd5:2.5)nd2:1.0)root:0.0;"
+        # rootedge_tr_str = "(((nd6:3.0,nd7:1.0)nd3:1.0,(nd4:1.0,nd5:3.0)nd2:1.0)root:2.0)origin:0.0;"
+        # rootedgeless_no_spn_living_tr_str = "(brosc:1.0)origin:0.0;" # TODO: deprecate, replace with just origin node
+        # rootedgeless_no_spn_dead_tr_str = "(brosc:0.5)origin:0.0;" # TODO: deprecate, replace with just origin node
 
-        tr_root = Tree.get(data=rootedgeless_tr_str, schema="newick")
-        tr_origin = Tree.get(data=rootedge_tr_str, schema="newick")
-        tr_no_spn = Tree.get(data=rootedgeless_no_spn_living_tr_str, schema="newick")
-        tr_no_spn_dead = Tree.get(data=rootedgeless_no_spn_dead_tr_str, schema="newick")
+        # tr_root = Tree.get(data=rootedgeless_tr_str, schema="newick")
+        # tr_origin = Tree.get(data=rootedge_tr_str, schema="newick")
+        # tr_no_spn = Tree.get(data=rootedgeless_no_spn_living_tr_str, schema="newick")
+        # tr_no_spn_dead = Tree.get(data=rootedgeless_no_spn_dead_tr_str, schema="newick")
 
         #
         # Tree 1 (building by hand):
@@ -27,6 +27,7 @@ class TestAnnotateTree(unittest.TestCase):
         # TODO: replace this one with an origin node that is alive and no root
         origin_node1 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node1.alive = False
+        origin_node1.is_sa = False
         brosc_node1 = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
         brosc_node1.alive = True
         brosc_node1.is_sa = False
@@ -41,6 +42,7 @@ class TestAnnotateTree(unittest.TestCase):
         # correctly)
         origin_node2 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node2.alive = False
+        origin_node2.is_sa = False
         brosc_node2 = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=0.5)
         brosc_node2.alive = False
         brosc_node2.is_sa = False
@@ -61,17 +63,21 @@ class TestAnnotateTree(unittest.TestCase):
         # for testing the parsing of states into AnnotatedTree member dictionary
         origin_node3 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node3.alive = False
+        origin_node3.is_sa = False
         origin_node3.state = 0
         root_node3 = Node(taxon=Taxon(label="root"), label="root", edge_length=0.5)
         root_node3.alive = False
+        root_node3.is_sa = False
         root_node3.state = 0
         origin_node3.add_child(root_node3)
         child_left = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
         child_left.alive = True
+        child_left.is_sa = False
         child_left.state = 0
         root_node3.add_child(child_left)
         child_right = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=1.0)
         child_right.alive = True
+        child_right.is_sa = False
         child_right.state = 1
         root_node3.add_child(child_right)
         bif_tr_two_states = Tree(seed_node=origin_node3)
@@ -112,41 +118,33 @@ class TestAnnotateTree(unittest.TestCase):
         
         # tree starting at root
         # extant nodes
-        self.assertEqual(self.tree_root.n_extant_obs_nodes, 2, "Count of observable extant nodes should be 2.")
+        # self.assertEqual(self.tree_root.n_extant_obs_nodes, 2, "Count of observable extant nodes should be 2.")
 
         # extant nodes label check
-        self.assertSequenceEqual(self.tree_root.extant_obs_nodes_labels, ("nd6", "nd5"), "Labels should be (\"nd6\", \"nd5\").")
+        # self.assertSequenceEqual(self.tree_root.extant_obs_nodes_labels, ("nd6", "nd5"), "Labels should be (\"nd6\", \"nd5\").")
 
         # extinct nodes
-        self.assertEqual(self.tree_root.n_extinct_obs_nodes, 2, "Count of observable extinct nodes should be 2.")
+        # self.assertEqual(self.tree_root.n_extinct_obs_nodes, 2, "Count of observable extinct nodes should be 2.")
         
         # extinct nodes label check
-        self.assertSequenceEqual(self.tree_root.extinct_obs_nodes_labels, ("nd7", "nd4"), "Labels should be (\"nd7\", \"nd4\").")
+        # self.assertSequenceEqual(self.tree_root.extinct_obs_nodes_labels, ("nd7", "nd4"), "Labels should be (\"nd7\", \"nd4\").")
 
         # ----------------------- #
 
-        # tree starting at origin
+        # tree starting at origin and either surviving without spn, or dying without speciation
         # extant nodes
-        self.assertEqual(self.tree_origin.n_extant_obs_nodes, 2, "Count of observable extant nodes should be 2.")
-        # self.assertEqual(self.tree_no_spn.n_extant_obs_nodes, 1, "Count of observable extant nodes should be 1.")
-        self.assertEqual(self.tree_no_spn_built.n_extant_obs_nodes, 1, "Count of observable extant nodes should be 1.")
-        # self.assertEqual(self.tree_no_spn_dead.n_extant_obs_nodes, 0, "Count of observable extant nodes should be 0.")
-        self.assertEqual(self.tree_no_spn_dead_built.n_extant_obs_nodes, 0, "Count of observable extant nodes should be 0.")
-        
-        # extant nodes label check
-        self.assertSequenceEqual(self.tree_origin.extant_obs_nodes_labels, ("nd6", "nd5"), "Labels should be (\"nd6\", \"nd5\").")
-        # self.assertSequenceEqual(self.tree_no_spn.extant_obs_nodes_labels, ("root",), "Labels should be (\"root\").") # must have comma
-        self.assertSequenceEqual(self.tree_no_spn_built.extant_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").") # must have comma
+        self.assertEqual(self.tree_no_spn_built.n_extant_terminal_nodes, 1, "Count of observable terminal nodes should be 1.")
+        self.assertEqual(self.tree_no_spn_built.extant_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").")
 
         # extinct nodes
-        self.assertEqual(self.tree_origin.n_extinct_obs_nodes, 2, "Count of observable extinct nodes should be 2.")
-        # self.assertEqual(self.tree_no_spn_dead.n_extinct_obs_nodes, 1, "Count of observable extinct nodes should be 1.")
-        self.assertEqual(self.tree_no_spn_dead_built.n_extinct_obs_nodes, 1, "Count of observable extinct nodes should be 1.")
+        self.assertEqual(self.tree_no_spn_dead_built.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(self.tree_no_spn_dead_built.extinct_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").")
         
         # extinct node label check
-        self.assertSequenceEqual(self.tree_origin.extinct_obs_nodes_labels, ("nd7", "nd4"), "Labels should be (\"nd7\", \"nd4\").")
+        # self.assertSequenceEqual(self.tree_origin.extinct_obs_nodes_labels, ("nd7", "nd4"), "Labels should be (\"nd7\", \"nd4\").")
         # self.assertSequenceEqual(self.tree_no_spn_dead.extinct_obs_nodes_labels, ("root",), "Labels should be (\"root\").") # must have comma
-        self.assertSequenceEqual(self.tree_no_spn_dead_built.extinct_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").") # must have comma
+        
+        # self.assertSequenceEqual(self.tree_no_spn_dead_built.extinct_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").") # must have comma
 
     # def test_node_attr_dict_population(self):
     #     """

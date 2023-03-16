@@ -18,8 +18,11 @@ class AnnotatedTree(dp.Tree):
     seed_age: float
     epsilon: float
     tree_died: ty.Optional[bool]
+    tree_invalid: ty.Optional[bool]
     no_event: bool
     state_count_dict: ty.Dict[int, int]
+    alive_state_count_dict: ty.Dict[int, int]
+    dead_state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]
@@ -41,6 +44,7 @@ class AnnotatedTree(dp.Tree):
                  slice_age_ends: ty.Optional[ty.List[float]]=None,
                  sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]=None,
                  tree_died: ty.Optional[bool]=None,
+                 tree_invalid: ty.Optional[bool]=None,
                  epsilon: float=1e-12) -> None: ...
     def count_sampled_ancestors(self) -> None: ...
     def count_observable_nodes(self) -> None: ...
@@ -52,6 +56,7 @@ class AnnotatedTree(dp.Tree):
     def extract_reconstructed_tree(self) -> dp.Tree: ...
     def populate_nd_attr_dict(self, attrs_of_interest_list) -> None: ...
     def plot_node(self, axes: plt.Axes, node_attr: ty.Optional[str]=None, **kwargs) -> None: ...
+    def get_taxon_states_str(self, nexus: bool=False) -> str: ...
 
 color_map: Incomplete
 

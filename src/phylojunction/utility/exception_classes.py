@@ -8,8 +8,8 @@ class ScriptSyntaxError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: " + self.cmd_line + \
-            "\nThe line above had a syntax problem. " + self.message
+        return "ERROR: " + self.cmd_line + \
+            "\n\nThe line above had a syntax problem. " + self.message
 
 class InexistentVariableError(Exception):
     rv_name: str
@@ -21,7 +21,7 @@ class InexistentVariableError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: There was a problem when assigning \'" + self.rv_name + \
+        return "ERROR: There was a problem when assigning \'" + self.rv_name + \
             "\' as an argument. It seems this variable has not been not initialized."
 
 class VariableAssignmentError(Exception):
@@ -34,10 +34,11 @@ class VariableAssignmentError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Cannot assign values of different types to a variable (\'" + self.rv_name + "\'). Exiting..."
+        return "ERROR: Cannot assign values of different types to a variable (\'" + self.rv_name + "\'). Exiting..."
 
 class VariableMisspec(Exception):
     rv_name: str
+    message: str
 
     def __init__(self, rv_name: str) -> None:
         self.message = ""
@@ -45,7 +46,7 @@ class VariableMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Could not parse value out of variable \'" + self.rv_name + "\'."
+        return "ERROR: Could not parse value out of variable \'" + self.rv_name + "\'."
 
 class NoSpecificationError(Exception):
     message: str
@@ -55,7 +56,7 @@ class NoSpecificationError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Function call had not arguments. "+ self.message
+        return "ERROR: Function call had not arguments. "+ self.message
 
 class FunctionArgError(Exception):
     par_name: str
@@ -67,7 +68,7 @@ class FunctionArgError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Could not set value for function parameter " + self.par_name + ". " + self.message
+        return "ERROR: Could not set value for function parameter " + self.par_name + ". " + self.message
 
 class InvalidFunctionArgError(Exception):
     function_name: str
@@ -79,7 +80,7 @@ class InvalidFunctionArgError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Could not specify function " + self.function_name + ". " + self.message
+        return "ERROR: Could not specify function " + self.function_name + ". " + self.message
 
 class FunctionArgsMismatchError(Exception):
     fn_name: str
@@ -91,7 +92,7 @@ class FunctionArgsMismatchError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Could not call function " + self.fn_name + " because argument values are incongruent in some way. " + self.message + ". Exiting... "
+        return "ERROR: Could not call function " + self.fn_name + " because argument values are incongruent in some way. " + self.message + ". Exiting... "
 
 class NotAParameterError(Exception):
     par_name: str
@@ -103,7 +104,7 @@ class NotAParameterError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: \'" + self.par_name + "\' does not seem to be a valid parameter." + self.message + " Exiting... "
+        return "ERROR: \'" + self.par_name + "\' does not seem to be a valid parameter." + self.message + " Exiting... "
 
 class WrongDimensionError(Exception):
     container_name: str
@@ -119,7 +120,7 @@ class WrongDimensionError(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "\nERROR: Container " + self.obj_name + " had a different dimension than expected. " + self.message + ". Exiting... "
+        return "ERROR: Container " + self.obj_name + " had a different dimension than expected. " + self.message + ". Exiting... "
 
 class DimensionalityError(Exception):
     dn_name: str
@@ -211,7 +212,7 @@ class SSEAtomicRateMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Misspecified SSE atomic rate parameter input. " + self.message
+        return "ERROR: Misspecified SSE atomic rate parameter input. " + self.message
 
 class SSEStashMisspec(Exception):
     message: str
@@ -221,7 +222,7 @@ class SSEStashMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Misspecified SSE stash parameter input. " + self.message
+        return "ERROR: Misspecified SSE stash parameter input. " + self.message
 
 class DnInitMisspec(Exception):
     dn_name: str
@@ -233,7 +234,7 @@ class DnInitMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Distribution " + self.dn_name + " was not properly initialized. " + self.message
+        return "ERROR: Distribution " + self.dn_name + " was not properly initialized. " + self.message
 
 class InvalidMCMCChainLength(Exception):
     message: str
@@ -243,7 +244,7 @@ class InvalidMCMCChainLength(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "\nERROR: " + self.message
+        return "ERROR: " + self.message
 
 # Tree exceptions #
 class AnnotatedTreeMisspec(Exception):
@@ -254,7 +255,7 @@ class AnnotatedTreeMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "\nERROR: Misspecified AnnotatedTree input. " + self.message
+        return "ERROR: Misspecified AnnotatedTree input. " + self.message
 
 class AnnotatedTreeLineageMissannotation(Exception):
     message: str
@@ -264,4 +265,4 @@ class AnnotatedTreeLineageMissannotation(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "\nERROR: AnnotatedTree cannot be annotated this way. " + self.message
+        return "ERROR: AnnotatedTree cannot be annotated this way. " + self.message

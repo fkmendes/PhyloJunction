@@ -120,8 +120,7 @@ This script should be called and be successful every time new code is written, b
 Building and installing PhyloJunction is done using `setuptools`, which is specified in `pyproject.toml`.
 Instructions for `setuptools` are provided in `setup.cfg`.
 
-Start by cloning the PhyloJunction repository, and going to its root (i.e., the
-`PhyloJunction` folder).
+Start by cloning the PhyloJunction repository, and going to its root (i.e., the `PhyloJunction` folder).
 
 If you are on an Apple machine that obstrusively curtails file system access, run the following command:
 
@@ -141,12 +140,11 @@ python3 -m pip install --prefix ~/.local -e .
 Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.
 This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
 
-
 Add a shell variable for PYTHONPATH to your bash profile, for example
 ```
 PYTHONPATH="/Users/mlandis/projects/PhyloJunction/src"
 ```
-(Note: the file path associated with this `PYTHONPATH` variable ends with the `src` directory, not `src/phylojunction`)
+(Note: the file path associated with this `PYTHONPATH` variable ends with the `src` directory, not `src/phylojunction` -- i.e., irrespective of "env" variable in your `launch.json` file in VS Code).
 
 You can test things worked by trying, from any directory:
 
@@ -155,9 +153,9 @@ pjgui
 ```
 
 Important notes:
-    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computar architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computer architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
 
-    (2) On Linux machines, depending on the python version (e.g., 3.9.7), the GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
+    (2) On Linux machines, depending on the python version (e.g., 3.9.7), the PySimpleGUI GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
 
 ### Known issues
 
@@ -213,6 +211,52 @@ Important notes:
 On Mac OS X, PySimpleGUI provides the `use_custom_titlebar=True` (which automatically means `no_titlebar=True`). 
 These allow `titlebar_icon="some_icon.png"`, which places a .png file on the titlebar, but simultaneously makes the window non-mini/maximizable on Mac OS X.
 So PJ stays cross-platform with windows resizability, I won't be adding any titlebar icons.
+
+## GUI development
+
+PhyloJunction has two functional GUIs:
+
+(1) with PySimpleGUI (`src/interface/pj_gui.py`), and
+(2) with PySide6 (`src/pysidegui/pj_gui_pyside`).
+
+The GUI built with PySimpleGUI was coded entirely by hand.
+
+The GUI built with PySide6 had its main structure coded by hand (`pysidegui/content_main_window.py`), but then individual pages built with Qt Creator / Qt Designer (an app for automating PySide6 GUI development).
+These individual pages are saved as a single `.ui` file (pjguipages/pjgui_pages.ui) that can be translated to a `.py` file with Qt Creator / Qt Designer (Form > View Python Code) or a command line tool:
+
+```
+pyuic6 -x created_file.ui -o created_file.py
+```
+
+or pyuic5 depending on what's available for your OS
+
+```
+pyuic5 -x src/phylojunction/interface/pysidegui/pjguipages/pjgui_pages.ui -o src/phylojunction/interface/pysidegui/pjguipages/gui_pages.py
+```
+
+Then, after `gui_pages.py` is updated, at the top, replace PyQt with `PySide6`.
+You also need to point `gui_pages.py` to PJ's matplotlib widget
+
+```
+from PySide6 import QtCore, QtGui, QtWidgets
+from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import MatplotlibWidget
+```
+
+## Qt Creator / Qt Designer
+
+This can be a finnicky program, so here are a few notes.
+
+(1) Adding and deleting new pages
+
+In order to add new pages to a QStackedWidget (the class of the main container), you need to right-click the QStackedWidget on the right menu, and do "Insert page".
+You can then "Change page order" after the new page is created.
+
+If you want to delete a page (e.g., one of the two pages that come automatically with QStackedWidget), you need to navigate to the page you want to delete.
+To do that, you must right-click the QStackedWidget, and click "Next Page" until you reach the page to be deleted.
+Then above the "Insert page" menu (from right-clicking QStackedWidget), there will be a menu saying "Page 2 out of 3", say. 
+There you will find a "Delete" button.
+
+(2)
 
 ## Documentation
 
