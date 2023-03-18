@@ -209,17 +209,23 @@ class NodePGM(ABC):
 
         self.value = values
 
-    # called in pj_gui
-    def get_start2end_str(self, start: int, end: int) -> str:
+    # called by GUI
+    def get_start2end_str(self, start: int, end: int, repl_idx: int=0, is_tree: bool=False) -> str:
         if isinstance(self.value, np.ndarray):
             self.value = ", ".join(str(v) for v in self.value.tolist()[start:end])
 
         if isinstance(self.value, list):
             if len(self.value) >= 2:
-                if isinstance(self.value[0], (int, float, str, np.float64)):
-                    return ", ".join(str(v) for v in self.value[start:end])
+                if not is_tree:
+                    if isinstance(self.value[0], (int, float, str, np.float64)):
+                        return ", ".join(str(v) for v in self.value[start:end])
+                    
+                    else:
+                        return "\n".join(str(v) for v in self.value[start:end])
+                
                 else:
-                    return "\n".join(str(v) for v in self.value[start:end])
+                    return str(self.value[start + repl_idx])
+            
             else:
                 return str(self.value[0])
 
@@ -416,11 +422,11 @@ class StochasticNodePGM(NodePGM):
             repl_size (int, optional): How many scalar random variables to plot at a time. Defaults to 1.
             branch_attr (str, optional): Which discrete attribute associated to a branch length to color by. Defaults to "state".
         """
-        # if list 
+
+        # if list
         if super().__len__() >= 1 and isinstance(self.value, list):
             # if tree, we only plot one
             if isinstance(self.value[0], pjtr.AnnotatedTree):
-                
                 # so mypy won't complain
                 if isinstance(sample_idx, int) and isinstance(self.value[sample_idx*repl_size + repl_idx], pjtr.AnnotatedTree):    
                     if self.value[0].state_count > 1:
@@ -493,6 +499,7 @@ class DeterministicNodePGM(NodePGM):
                 repl_idx: ty.Optional[int]=0,
                 repl_size: ty.Optional[int]=1,
                 branch_attr: ty.Optional[str]="state") -> None:
+
         plot_blank(axes)
 
     def populate_operator_weight(self):

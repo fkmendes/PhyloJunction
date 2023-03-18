@@ -365,7 +365,6 @@ if __name__ == "__main__":
     script_str15 = "a ~ normal(n=3, mean=[0.0, 0.01, 0.011], sd=[1.0])"
     script_str16 = "a ~ exponential(n=3, rate=1.0)"
     script_str17 = "a ~ exponential(rate=1.0, rate_parameterization=\"true\")"
-    # TODO: must make str18 be allowed together with str20, by multiplying the single value drawn from uniform
     script_str18 = "l0 ~ unif(n=1, min=0.8, max=0.8)\nl0rate := sse_rate(name=\"lambda0\", value=l0, states=[0,0,0], event=\"w_speciation\")"
     script_str19 = "l0 ~ unif(n=3, min=0.8, max=0.8)\nl0rate := sse_rate(name=\"lambda0\", value=l0, states=[0,0,0], event=\"w_speciation\")"
     script_str20 = script_str18 + "\nmeh := sse_wrap(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)" + \
@@ -461,6 +460,14 @@ if __name__ == "__main__":
         "trs ~ discrete_sse(n=100, meh=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
 
     script_str36 = "a ~ lognormal(n=2, nr=10, mean=10.0, sd=1.0)"
+    
+    # yule with n_sim as a model node
+    script_str37 = \
+        "n_sim <- 2\n" + \
+        "birth_rate ~ exponential(n=n_sim, rate=1.0)\n" + \
+        "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" + \
+        "meh := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" + \
+        "trs ~ discrete_sse(n=n_sim, meh=meh, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
 
     # for copying and pasting in GUI:
     #
@@ -514,4 +521,4 @@ if __name__ == "__main__":
     
     # file_handle_exception = io.StringIO(script_str36)
 
-    script2pgm(script_str36, in_pj_file=False)
+    script2pgm(script_str37, in_pj_file=False)

@@ -86,6 +86,7 @@ class Ui_PJGUIPages(object):
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.one_sample_radio = QtWidgets.QRadioButton(self.gridLayoutWidget)
+        self.one_sample_radio.setEnabled(False)
         self.one_sample_radio.setStyleSheet("color: black;\n"
 "")
         self.one_sample_radio.setCheckable(False)
@@ -93,6 +94,7 @@ class Ui_PJGUIPages(object):
         self.one_sample_radio.setObjectName("one_sample_radio")
         self.horizontalLayout.addWidget(self.one_sample_radio)
         self.all_samples_radio = QtWidgets.QRadioButton(self.gridLayoutWidget)
+        self.all_samples_radio.setEnabled(False)
         self.all_samples_radio.setStyleSheet("color: black;")
         self.all_samples_radio.setCheckable(False)
         self.all_samples_radio.setAutoExclusive(True)
@@ -101,6 +103,7 @@ class Ui_PJGUIPages(object):
         spacerItem = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.sample_idx_spin = QtWidgets.QSpinBox(self.gridLayoutWidget)
+        self.sample_idx_spin.setEnabled(False)
         self.sample_idx_spin.setStyleSheet("color: black;")
         self.sample_idx_spin.setAccelerated(True)
         self.sample_idx_spin.setObjectName("sample_idx_spin")
@@ -108,6 +111,7 @@ class Ui_PJGUIPages(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
         self.repl_idx_spin = QtWidgets.QSpinBox(self.gridLayoutWidget)
+        self.repl_idx_spin.setEnabled(False)
         self.repl_idx_spin.setStyleSheet("color: black;\n"
 "")
         self.repl_idx_spin.setReadOnly(False)

@@ -192,6 +192,9 @@ QListWidget::item:selected{
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QRadioButton" name="one_sample_radio">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">color: black;
 </string>
@@ -209,6 +212,9 @@ QListWidget::item:selected{
           </item>
           <item>
            <widget class="QRadioButton" name="all_samples_radio">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">color: black;</string>
             </property>
@@ -241,6 +247,9 @@ QListWidget::item:selected{
           </item>
           <item>
            <widget class="QSpinBox" name="sample_idx_spin">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">color: black;</string>
             </property>
@@ -270,6 +279,9 @@ QListWidget::item:selected{
           </item>
           <item>
            <widget class="QSpinBox" name="repl_idx_spin">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">color: black;
 </string>

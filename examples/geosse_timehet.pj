@@ -76,4 +76,4 @@ det_trans_rate2_1_t1 := sse_rate(name="q2_1_t1", value=trans_rate2_1_t1, states=
 meh := sse_wrap(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate0_2_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate1_2_t0, det_b_birth_rate2_0_1_t0, det_b_birth_rate2_0_2_t0, det_b_birth_rate2_1_2_t0, det_trans_rate2_0_t0, det_trans_rate2_1_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate0_2_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate1_2_t1, det_b_birth_rate2_0_1_t1, det_b_birth_rate2_0_2_t1, det_b_birth_rate2_1_2_t1, det_trans_rate2_0_t1, det_trans_rate2_1_t1], n_states=3, n_epochs=2, seed_age=3.0, epoch_age_ends=[1.5])
 
 # stochastic-node variable ('trs') assignment
-trs ~ discrete_sse(n=100, meh=meh, start_state=[0], stop="age", stop_value=3.0, origin="true")
+trs ~ discrete_sse(n=2, nr=2, meh=meh, start_state=[0], stop="age", stop_value=3.0, origin="true")
