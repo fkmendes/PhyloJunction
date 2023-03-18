@@ -140,7 +140,11 @@ python3 -m pip install --prefix ~/.local -e .
 Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.
 This is an attractive option if you normally already have `~/.local/bin` as part of your PATH variable.
 
-Then make sure you have `/path/to/PhyloJunction/src/` in your `PYTHONPATH` environmental variable on the command line outside VSCode (i.e., irrespective of "env" variable in your `launch.json` file).
+Add a shell variable for PYTHONPATH to your bash profile, for example
+```
+PYTHONPATH="/Users/mlandis/projects/PhyloJunction/src"
+```
+(Note: the file path associated with this `PYTHONPATH` variable ends with the `src` directory, not `src/phylojunction` -- i.e., irrespective of "env" variable in your `launch.json` file in VS Code).
 
 You can test things worked by trying, from any directory:
 
