@@ -171,12 +171,20 @@ QListWidget::item:selected{
             <property name="cursor">
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
+            <property name="styleSheet">
+             <string notr="true">QAbstractButton {
+    qproperty-icon: theme_url(&quot;src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg&quot;) off,
+        qproperty-icon: theme_url(&quot;src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_clicked.svg&quot;) on;
+}</string>
+            </property>
             <property name="text">
              <string> Clear model</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../images/icons/icon_clear.svg</normaloff>../images/icons/icon_clear.svg</iconset>
+              <normaloff>../images/icons/icon_clear.svg</normaloff>
+              <activeon>../images/icons/icon_clear_clicked.svg</activeon>
+              <selectedon>../images/icons/icon_clear_clicked.svg</selectedon>../images/icons/icon_clear.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -368,6 +376,7 @@ color: black;</string>
            <font>
             <family>Courier</family>
             <pointsize>14</pointsize>
+            <weight>75</weight>
             <italic>false</italic>
             <bold>true</bold>
            </font>
@@ -572,21 +581,21 @@ QListWidget::item:selected{
          <widget class="QLabel" name="compare_node_label">
           <property name="geometry">
            <rect>
-            <x>40</x>
+            <x>20</x>
             <y>10</y>
-            <width>110</width>
+            <width>155</width>
             <height>16</height>
            </rect>
           </property>
           <property name="minimumSize">
            <size>
-            <width>110</width>
+            <width>155</width>
             <height>16</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>110</width>
+            <width>155</width>
             <height>16</height>
            </size>
           </property>
@@ -600,29 +609,35 @@ QListWidget::item:selected{
          <widget class="QCheckBox" name="avg_replicate_check_button">
           <property name="geometry">
            <rect>
-            <x>30</x>
+            <x>20</x>
             <y>320</y>
-            <width>140</width>
+            <width>155</width>
             <height>20</height>
            </rect>
           </property>
           <property name="minimumSize">
            <size>
-            <width>140</width>
+            <width>155</width>
             <height>20</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>140</width>
+            <width>155</width>
             <height>20</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <italic>false</italic>
+           </font>
           </property>
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="text">
-           <string>Average replicates</string>
+           <string>Replicates</string>
           </property>
          </widget>
         </widget>
