@@ -152,7 +152,7 @@ QListWidget::item:selected{
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="clear_model">
+           <widget class="PJClearPGMQPushButton" name="clear_model">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -172,9 +172,8 @@ QListWidget::item:selected{
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="styleSheet">
-             <string notr="true">QAbstractButton {
-    qproperty-icon: theme_url(&quot;src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg&quot;) off,
-        qproperty-icon: theme_url(&quot;src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_clicked.svg&quot;) on;
+             <string notr="true">QPushButton:hover {
+    color: #ec4a8a;
 }</string>
             </property>
             <property name="text">
@@ -182,9 +181,7 @@ QListWidget::item:selected{
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../images/icons/icon_clear.svg</normaloff>
-              <activeon>../images/icons/icon_clear_clicked.svg</activeon>
-              <selectedon>../images/icons/icon_clear_clicked.svg</selectedon>../images/icons/icon_clear.svg</iconset>
+              <normaloff>../images/icons/icon_clear.svg</normaloff>../images/icons/icon_clear.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -376,7 +373,6 @@ color: black;</string>
            <font>
             <family>Courier</family>
             <pointsize>14</pointsize>
-            <weight>75</weight>
             <italic>false</italic>
             <bold>true</bold>
            </font>
@@ -609,7 +605,7 @@ QListWidget::item:selected{
          <widget class="QCheckBox" name="avg_replicate_check_button">
           <property name="geometry">
            <rect>
-            <x>20</x>
+            <x>40</x>
             <y>320</y>
             <width>155</width>
             <height>20</height>
@@ -709,13 +705,13 @@ QListWidget::item:selected{
         <widget class="QPushButton" name="compare_csv_button">
          <property name="minimumSize">
           <size>
-           <width>140</width>
+           <width>170</width>
            <height>24</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>140</width>
+           <width>170</width>
            <height>24</height>
           </size>
          </property>
@@ -789,13 +785,13 @@ font: 11pt &quot;Courier&quot;;</string>
           <widget class="QPushButton" name="draw_violins_button">
            <property name="minimumSize">
             <size>
-             <width>80</width>
+             <width>95</width>
              <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>80</width>
+             <width>95</width>
              <height>24</height>
             </size>
            </property>
@@ -826,13 +822,13 @@ QPushButton:pressed{
            </property>
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>130</width>
              <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>130</width>
              <height>24</height>
             </size>
            </property>
@@ -882,13 +878,13 @@ QPushButton:pressed{
           <widget class="QPushButton" name="read_hpd_csv_button">
            <property name="minimumSize">
             <size>
-             <width>140</width>
+             <width>170</width>
              <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>140</width>
+             <width>170</width>
              <height>24</height>
             </size>
            </property>
@@ -913,13 +909,13 @@ QPushButton:pressed{
           <widget class="QPushButton" name="read_logfile_button">
            <property name="minimumSize">
             <size>
-             <width>115</width>
+             <width>145</width>
              <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>115</width>
+             <width>145</width>
              <height>24</height>
             </size>
            </property>
@@ -1014,13 +1010,13 @@ border-radius: 2px;</string>
           <widget class="QPushButton" name="draw_cov_button">
            <property name="minimumSize">
             <size>
-             <width>80</width>
+             <width>95</width>
              <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>80</width>
+             <width>95</width>
              <height>24</height>
             </size>
            </property>
@@ -1045,13 +1041,13 @@ QPushButton:pressed{
           <widget class="QPushButton" name="save_cov_button">
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>130</width>
              <height>24</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>130</width>
              <height>24</height>
             </size>
            </property>
@@ -1320,8 +1316,13 @@ color: red;</string>
   <customwidget>
    <class>MatplotlibWidget</class>
    <extends>QWidget</extends>
-   <header>matplotlibwidget.h</header>
+   <header>phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PJClearPGMQPushButton</class>
+   <extends>QPushButton</extends>
+   <header>phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons</header>
   </customwidget>
  </customwidgets>
  <resources/>

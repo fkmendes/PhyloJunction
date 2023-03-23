@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtCore import Qt, QRect
-from PySide6.QtGui import QPainter, QPixmap
+from PySide6.QtGui import QPainter, QPixmap, QIcon, QEnterEvent
 
 
 my_dir_path = Path(__file__)
@@ -144,3 +144,78 @@ class PJPushButton(QPushButton):
             icon  # draw icon
         )
         painter.end()
+
+
+class PJWhiteBackgroundQPushButton(QPushButton):
+
+    icon_dir_path: str
+    icon_normal: QIcon
+    icon_over: QIcon
+    icon_pressed: QIcon
+
+    def __init__(self, *args, **kwargs):
+        # super(ClearPGMPushButton, self).__init__(*a, **kw)
+        super().__init__()
+        self.icon_dir_path = os.path.join(my_dir_path.parent.parent, "images/icons")
+        self.icon_normal = kwargs.get("icon_normal", "")
+        self.icon_over = kwargs.get("icon_over", "")
+        self.icon_pressed = kwargs.get("icon_pressed", "")
+
+    def enterEvent(self, event):
+        self.setIcon(self.icon_over)
+        self.setStyleSheet("color: #ec4a8a;")
+
+    def leaveEvent(self, event):
+        self.setIcon(self.icon_normal)
+        self.setStyleSheet("color: black;")
+
+    def mousePressEvent(self, event):
+        self.setIcon(self.icon_pressed)
+        self.setStyleSheet("color: #6ed7d3;")
+        
+        # need to handle the original event
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if self.underMouse():
+            self.setIcon(self.icon_over)
+            self.setStyleSheet("color: #ec4a8a;")
+        
+        else:
+            self.setIcon(self.icon_normal)
+            self.setStyleSheet("color: black;")
+
+        # need to handle the original event
+        super().mouseReleaseEvent(event)
+
+
+class PJClearPGMQPushButton(PJWhiteBackgroundQPushButton):
+
+    clear_pgm_normal: QIcon
+    clear_pgm_over: QIcon
+    clear_pgm_pressed: QIcon
+
+    def __init__(self, *a, **kw):
+        clear_pgm_normal = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"))
+        clear_pgm_over = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_over.svg"))
+        clear_pgm_pressed = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_pressed.svg"))
+        
+        super().__init__(
+            icon_normal=clear_pgm_normal,
+            icon_over=clear_pgm_over,
+            icon_pressed=clear_pgm_pressed
+        )
+
+    def enterEvent(self, event):
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        super().leaveEvent(event)
+
+    def mousePressEvent(self, event):
+        # need to handle the original event
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        # need to handle the original event
+        super().mouseReleaseEvent(event)

@@ -239,7 +239,6 @@ You also need to point `gui_pages.py` to PJ's matplotlib widget
 
 ```
 from PySide6 import QtCore, QtGui, QtWidgets
-from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import MatplotlibWidget
 ```
 
 ## Qt Creator / Qt Designer
@@ -256,7 +255,15 @@ To do that, you must right-click the QStackedWidget, and click "Next Page" until
 Then above the "Insert page" menu (from right-clicking QStackedWidget), there will be a menu saying "Page 2 out of 3", say. 
 There you will find a "Delete" button.
 
-(2)
+(2) Adding a custom widget (that makes use of some .py code the developer wrote) to Qt Creator's .ui pages
+
+If you have a custom widget (e.g., QPushButton) that you want to place on a page being designed with Qt Creator, you can start by placing a QWidget on the page.
+Then you right-click the QWidget > "Promote to...". 
+Here, you can add the name ("Promoted class name") of the custom Python class implementing the custom widget.
+For "Header file", you want to put the entire Python path to the custom class, as it would appear in the imports of a Python script.
+E.g., `phylojunction.interface.pysidegui.pjguiwidgets.file_defining_class`
+
+pyuic5 or pyuic6 creates a .py from Qt Creator's ui, it will place import statements at the bottom of the file, so that your module can see the classes used by the custom widgets.
 
 ## Documentation
 
