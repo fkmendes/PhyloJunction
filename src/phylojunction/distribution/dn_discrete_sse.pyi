@@ -5,6 +5,7 @@ import typing as ty
 import phylojunction.pgm.pgm as pgm
 import phylojunction.calculation.discrete_sse as sseobj
 import phylojunction.data.sampled_ancestor as pjsa
+import phylojunction.data.attribute_transition as pjat
 from phylojunction.data.tree import AnnotatedTree
 
 class DnSSE(pgm.DistributionPGM):
@@ -73,6 +74,7 @@ class DnSSE(pgm.DistributionPGM):
                          tr_namespace: dp.TaxonNamespace,
                          chosen_node: dp.Node,
                          state_representation_dict: ty.Dict[int, ty.Set[str]],
+                         state_transition_dict: ty.Dict[str, ty.List[pjat.AttributeTransition]],
                          sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
                          untargetable_node_set: ty.Set[str],
                          macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
@@ -93,6 +95,7 @@ class DnSSE(pgm.DistributionPGM):
                       macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
                       chosen_node: dp.Node,
                       state_representation_dict: ty.Dict[int, ty.Set[str]],
+                      state_transition_dict: ty.Dict[str, ty.List[pjat.AttributeTransition]],
                       untargetable_node_set: ty.Set[str],
                       cumulative_node_count: int,
                       cumulative_sa_count: int,

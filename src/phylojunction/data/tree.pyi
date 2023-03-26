@@ -5,6 +5,7 @@ from _typeshed import Incomplete
 from matplotlib.figure import Figure as Figure # type: ignore
 
 import phylojunction.data.sampled_ancestor as pjsa
+import phylojunction.data.attribute_transition as pjat
 
 class AnnotatedTree(dp.Tree):
     with_origin: bool
@@ -29,6 +30,7 @@ class AnnotatedTree(dp.Tree):
     slice_t_ends: ty.List[ty.Optional[float]]
     slice_age_ends: ty.Optional[ty.List[float]]
     sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]
+    at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]]
     n_extant_obs_nodes: int
     n_extinct_obs_nodes: int
     n_sa_obs_nodes: int

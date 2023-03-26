@@ -15,9 +15,10 @@ import phylojunction.pgm.pgm as pgm
 import phylojunction.calculation.discrete_sse as sseobj
 import phylojunction.utility.helper_functions as pjh
 import phylojunction.utility.exception_classes as ec
+import phylojunction.distribution.dn_parametric as dnpar
 from phylojunction.data.tree import AnnotatedTree
 from phylojunction.data.sampled_ancestor import SampledAncestor # type: ignore
-import phylojunction.distribution.dn_parametric as dnpar
+from phylojunction.data.attribute_transition import AttributeTransition # type: ignore
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -278,6 +279,7 @@ class DnSSE(pgm.DistributionPGM):
                     chosen_node: dp.Node,
                     state_representation_dict: ty.Dict[int, ty.Set[str]],
                     sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                    state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
                     untargetable_node_set: ty.Set[str],
                     cumulative_node_count: int,
                     macroevol_atomic_param: sseobj.MacroevolStateDependentRateParameter,
@@ -289,7 +291,8 @@ class DnSSE(pgm.DistributionPGM):
             tr_namespace (dendropy.TaxonNamespace): Dendropy object recording taxa in the tree.
             chosen_node (dendropy.Node): Node that will undergo speciation.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            sa_lineage_dict (dict): .
+            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children..
+            state_transition_dict (dict): Dictionary that keeps track of nodes subtending which state transitions happen (used for plotting)
             untargetable_node_set (set): Set of Node labels that cannot be targeted for events anymore (went extinct).
             cumulative_node_count (int): Total number of nodes in the tree (to be used in labeling).
             macroevol_atomic_param (AtomicRateParameter): Atomic rate parameter containing departing/arriving state.
@@ -300,7 +303,8 @@ class DnSSE(pgm.DistributionPGM):
             (dendropy.Node, int): Tuple with last node to under go event and total (cumulative) node count.
         """
 
-        left_arriving_state, right_arriving_state = macroevol_atomic_param.arriving_states
+        left_arriving_state, right_arriving_state = \
+            macroevol_atomic_param.arriving_states
 
         if debug:
             print("> SPECIATION of node " + chosen_node.label + " in state " + str(chosen_node.state) + \
@@ -353,47 +357,98 @@ class DnSSE(pgm.DistributionPGM):
                 # ancestor sampling event, but it could be > 0.0 if a state transition event happened)
                 # root_node.edge_length += chosen_node.edge_length # I think this is wrong,
                 
-                # print("brosc underwent birth, and it has edge_length = " + str(chosen_node.edge_length))
-                
-                # print("tree height should be = " + str(event_t))
                 root_node.edge_length = chosen_node.edge_length
                 
-                # because the extend_all_lineages() method does extend brosc_node
+                # because the extend_all_lineages() method does
+                # extend brosc_node
                 root_node.is_sa_lineage = chosen_node.is_sa_lineage
 
-                # if true, means brosc's parent is a dummy node, and brosc's sister taxon is a SA
+                # if true, means brosc's parent is a dummy node,
+                # and brosc's sister taxon is a SA
                 if root_node.is_sa_lineage:
                     sa_lineage_dict["root"] = sa_lineage_dict.pop("brosc")
                 
-                brosc_parent_node = chosen_node.parent_node # could be origin, or dummy node (in which case, brosc would have a SA sister taxon)
-                brosc_parent_node.remove_child(chosen_node) # brosc is obliterated
-                brosc_parent_node.add_child(root_node) # we add the root node in its place
+                # could be origin, or dummy node
+                # (in which case, brosc would have a SA sister taxon)
+                brosc_parent_node = chosen_node.parent_node 
+                
+                # brosc is obliterated
+                brosc_parent_node.remove_child(chosen_node)
+                
+                # we add the root node in its place
+                brosc_parent_node.add_child(root_node) 
+
+                if "brosc" in state_transition_dict:
+                    state_transition_dict["root"] = state_transition_dict["brosc"]
+                    del state_transition_dict["brosc"]
        
-            # now make chosen_node become the root, so the rest of the birth event can be executed
+            # now make chosen_node become the root,
+            # so the rest of the birth event can be executed
             chosen_node = root_node
 
         # normal birth event code (assuming only bifurcations)
         cumulative_node_count += 1
         left_label = "nd" + str(cumulative_node_count)
-        left_child = dp.Node(taxon=dp.Taxon(label=left_label), label=left_label, edge_length=0.0)
+        left_child = dp.Node(
+            taxon=dp.Taxon(label=left_label),
+            label=left_label,
+            edge_length=0.0
+        )
         left_child.is_sa = False
         left_child.is_sa_lineage = False
         left_child.is_sa_dummy_parent = False
         left_child.alive = True
         left_child.state = left_arriving_state
         left_child.annotations.add_bound_attribute("state")
-        state_representation_dict[left_child.state].add(left_child.label)
+        state_representation_dict[left_child.state].add(
+            left_child.label
+        )
 
         cumulative_node_count += 1
         right_label = "nd" + str(cumulative_node_count)
-        right_child = dp.Node(taxon=dp.Taxon(label=right_label), label=right_label, edge_length=0.0)
+        right_child = dp.Node(
+            taxon=dp.Taxon(label=right_label),
+            label=right_label,
+            edge_length=0.0
+        )
         right_child.is_sa = False
         right_child.is_sa_lineage = False
         right_child.is_sa_dummy_parent = False
         right_child.alive = True
         right_child.state = right_arriving_state
         right_child.annotations.add_bound_attribute("state")
-        state_representation_dict[right_child.state].add(right_child.label)
+        state_representation_dict[right_child.state].add(
+            right_child.label
+        )
+
+        ####################################
+        # Adding state transition instance #
+        # to class member that bookkeeps   #
+        # (for painting mid-branch)        #
+        ####################################
+        for idx, child_node in enumerate((left_child, right_child)):
+            arriving_state: int=-1
+            
+            if idx == 0:
+                arriving_state = left_arriving_state
+
+            elif idx == 1:
+                arriving_state = right_arriving_state
+
+            if arriving_state != chosen_node.state:
+                state_trans = AttributeTransition(
+                    "state",
+                    child_node.label,
+                    event_t,
+                    chosen_node.state,
+                    arriving_state
+                )
+
+                try:
+                    state_transition_dict[child_node.label].append(state_trans)
+                
+                except:
+                    state_transition_dict[child_node.label] = [state_trans]
 
         # updating parent node
         # (1) adding both children
@@ -401,18 +456,23 @@ class DnSSE(pgm.DistributionPGM):
         tr_namespace.add_taxon(left_child.taxon)
         chosen_node.add_child(right_child)
         tr_namespace.add_taxon(right_child.taxon)
+        
         # (2) parent node does not represent its state and cannot be targeted anymore
         try:
             state_representation_dict[chosen_node.state].remove(chosen_node.label) # state of parent is now irrelevant
+        
         except:
             # if chosen_node is root, it has never been added to state_representation_dict, so we pass
             pass
+        
         chosen_node.alive = False
         untargetable_node_set.add(chosen_node.label) # cannot pick parent anymore!
+        
         # (3) mark parent node as the last node to undergo event
         #     will use this node to undo last event when number of species
         #     go beyond maximum
         last_node2speciate = chosen_node
+        
         # (4) if chosen node was on a lineage with SAs, we update the SAs info
         if chosen_node.is_sa_lineage:
             self.update_sa_lineage_dict(event_t, sa_lineage_dict, [chosen_node.label], debug=debug)
@@ -434,7 +494,7 @@ class DnSSE(pgm.DistributionPGM):
             tr_namespace (dendropy.TaxonNamespace): Dendropy object recording taxa in the tree.
             chosen_node (dendropy.Node): Node that will undergo extinction.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            sa_lineage_dict (dict): .
+            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children..
             untargetable_node_set (set): Set of Node labels that cannot be targeted for events anymore (went extinct).
             cumulative_node_count (int): Total number of nodes in the tree (to be used in labeling).
             event_t (float): Time of death event taking place.
@@ -444,20 +504,24 @@ class DnSSE(pgm.DistributionPGM):
         if debug:
             print("EXTINCTION of node " + chosen_node.label)
 
-        # with this node gone, and this state is not represented by it anymore
+        # with this node gone, this state
+        # is not represented by it anymore
         state_representation_dict[chosen_node.state].remove(chosen_node.label)
 
-        # we also cannot choose this extinct node anymore to undergo an event
+        # we also cannot choose this extinct node
+        # anymore to undergo an event
         chosen_node.alive = False
         untargetable_node_set.add(chosen_node.label)
 
-        # if chosen node was on a lineage with SAs, we update the SAs info
+        # if chosen node was on a lineage with SAs,
+        # we update the SAs info
         if chosen_node.is_sa_lineage:
             self.update_sa_lineage_dict(event_t, sa_lineage_dict, [chosen_node.label])
 
-        ###########################################################
-        # Special case: origin went extinct, we slap a brosc node #
-        ###########################################################
+        ######################################
+        # Special case: origin went extinct, #
+        # we slap a brosc node               #
+        ######################################
         if chosen_node.label == "origin":
             # at this point, the origin was chosen to die, but this node will never be extended
             # (the origin always has an origin_edge_length = 0.0); for us to account for the
@@ -484,19 +548,32 @@ class DnSSE(pgm.DistributionPGM):
                         tr_namespace: dp.TaxonNamespace,
                         chosen_node: dp.Node,
                         state_representation_dict: ty.Dict[int, ty.Set[str]],
+                        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
                         untargetable_node_set: ty.Set[str],
                         macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
                         event_t: float,
                         debug: bool=False) -> None:
-        """Execute anagenetic trait-state transition on path to chosen node (side-effect)
+        """
+        Execute anagenetic trait-state transition on path to chosen
+        node (side-effect)
 
         Args:
-            tr_namespace (dendropy.TaxonNamespace): Dendropy object recording taxa in the tree.
-            chosen_node (dendropy.Node): Node that will undergo anagenetic trait-state transition.
-            state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            macroevol_rate_param (AtomicRateParameter): Atomic rate parameter containing departing/arriving state.
-            event_t (float): 
-            debug (bool): If 'true', prints debugging messages. Defaults to False.
+            tr_namespace (dendropy.TaxonNamespace): Dendropy object
+                recording taxa in the tree.
+            chosen_node (dendropy.Node): Node that will undergo
+                anagenetic trait-state transition.
+            state_representation_dict (dict): Dictionary that keeps
+                track of all states currently represented by living
+                lineages.
+            state_transition_dict (dict): Dictionary that keeps track
+                of nodes subtending which state transitions happen
+                (used for plotting)
+            macroevol_rate_param (AtomicRateParameter): Atomic rate
+                parameter containing departing/arriving state.
+            event_t (float): Time of anagenetic transition event taking
+                place.
+            debug (bool): If 'True', prints debugging messages.
+                Defaults to False.
         """
 
         if debug:
@@ -523,6 +600,7 @@ class DnSSE(pgm.DistributionPGM):
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = False
+            brosc_node.state = chosen_node.state
             tr_namespace.add_taxon(brosc_node.taxon)
 
             # origin cannot be selected anymore
@@ -533,6 +611,25 @@ class DnSSE(pgm.DistributionPGM):
             # now make chosen_node become brosc, so the rest of the anagenetic transition event can be executed
             chosen_node = brosc_node
 
+        ####################################
+        # Adding state transition instance #
+        # to class member that bookkeeps   #
+        # (for painting mid-branch)        #
+        ####################################
+        state_trans = AttributeTransition(
+            "state",
+            chosen_node.label,
+            event_t,
+            chosen_node.state,
+            arriving_state)
+
+        try:
+            state_transition_dict[chosen_node.label].append(state_trans)
+        
+        except:
+            state_transition_dict[chosen_node.label] = [state_trans]
+
+        # last updates and bookkeping #
         # new state gets assigned
         chosen_node.state = arriving_state
 
@@ -555,9 +652,9 @@ class DnSSE(pgm.DistributionPGM):
             tr_namespace (dendropy.TaxonNamespace): 
             chosen_node (dendropy.Node): Node that will undergo event.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            sa_lineage_dict (dict): .
+            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children.
             cumulative_sa_count (int): Total number of sampled ancestors nodes in the tree (to be used in labeling).
-            event_t (float): Time of ancestpr sampling event taking place.
+            event_t (float): Time of ancestor sampling event taking place.
             debug (bool): If 'true', prints debugging messages. Defaults to False.
         """
         
@@ -674,7 +771,7 @@ class DnSSE(pgm.DistributionPGM):
 
         Args:
             a_time (float): Either the time of the last event an SA lineage node undergoes, or the simulation end time.
-            sa_lineage_dict (dict): .
+            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children..
             sa_lineage_node_labels (str): List of node labels, whose subtending branch has SAs.
         """
 
@@ -704,6 +801,7 @@ class DnSSE(pgm.DistributionPGM):
                         macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
                         chosen_node: dp.Node,
                         state_representation_dict: ty.Dict[int, ty.Set[str]],
+                        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
                         sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
                         untargetable_node_set: ty.Set[str],
                         cumulative_node_count: int,
@@ -718,7 +816,8 @@ class DnSSE(pgm.DistributionPGM):
             macroevol_rate_param (MacroevolStateDependentRateParameter): Instance of MacroevolStateDependentRateParameter carrying event information.
             chosen_node (dendropy.Node): Node that will undergo event.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            sa_lineage_dict (dict): .
+            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children..
+            state_transition_dict (dict): Dictionary that keeps track of nodes below which state transitions happen (used for plotting).
             untargetable_node_set (set): Set of Node labels that cannot be targeted for events anymore (went extinct).
             cumulative_node_count (int): Total number of nodes in the tree (to be used in labeling).
             cumulative_sa_count (int): Total number of sampled ancestor nodes in the tree (to be used in labeling).
@@ -731,19 +830,55 @@ class DnSSE(pgm.DistributionPGM):
         """
         macroevol_event = macroevol_rate_param.event
 
-        # TODO: this should be come if macroevol_event == MacroevolEvent.SPECIATION or BW-SPECIATION or ASYM-SPECIATION
-        #       and then execute_birth deals with them (avoiding code redundancy)
-        if macroevol_event == sseobj.MacroevolEvent.W_SPECIATION or macroevol_event == sseobj.MacroevolEvent.BW_SPECIATION or macroevol_event == sseobj.MacroevolEvent.ASYM_SPECIATION:
-            last_chosen_node, cumulative_node_count = self.execute_birth(tr_namespace, chosen_node, state_representation_dict, sa_lineage_dict, untargetable_node_set, cumulative_node_count, macroevol_rate_param, event_t, debug=debug)
+        if macroevol_event == sseobj.MacroevolEvent.W_SPECIATION or \
+            macroevol_event == sseobj.MacroevolEvent.BW_SPECIATION or \
+            macroevol_event == sseobj.MacroevolEvent.ASYM_SPECIATION:
+            
+            last_chosen_node, cumulative_node_count = \
+                self.execute_birth(
+                    tr_namespace,
+                    chosen_node,
+                    state_representation_dict,
+                    sa_lineage_dict,
+                    state_transition_dict,
+                    untargetable_node_set,
+                    cumulative_node_count,
+                    macroevol_rate_param,
+                    event_t,
+                    debug=debug)
 
         elif macroevol_event == sseobj.MacroevolEvent.EXTINCTION:
-            self.execute_death(tr_namespace, chosen_node, state_representation_dict, sa_lineage_dict, untargetable_node_set, event_t, debug=debug)
+            self.execute_death(
+                tr_namespace,
+                chosen_node,
+                state_representation_dict,
+                sa_lineage_dict,
+                untargetable_node_set,
+                event_t,
+                debug=debug)
 
         elif macroevol_event == sseobj.MacroevolEvent.ANAGENETIC_TRANSITION:
-            self.execute_anatrans(tr_namespace, chosen_node, state_representation_dict, untargetable_node_set, macroevol_rate_param, event_t, debug=debug)
+            self.execute_anatrans(
+                tr_namespace,
+                chosen_node,
+                state_representation_dict,
+                state_transition_dict,
+                untargetable_node_set,
+                macroevol_rate_param,
+                event_t,
+                debug=debug)
 
         elif macroevol_event == sseobj.MacroevolEvent.ANCESTOR_SAMPLING:
-            cumulative_sa_count = self.execute_sample_ancestor(tr_namespace, chosen_node, state_representation_dict, sa_lineage_dict, untargetable_node_set, cumulative_sa_count, event_t, debug=debug)
+            cumulative_sa_count = \
+                self.execute_sample_ancestor(
+                    tr_namespace,
+                    chosen_node,
+                    state_representation_dict,
+                    sa_lineage_dict,
+                    untargetable_node_set,
+                    cumulative_sa_count,
+                    event_t,
+                    debug=debug)
 
         return last_chosen_node, cumulative_node_count, cumulative_sa_count
 
@@ -788,10 +923,12 @@ class DnSSE(pgm.DistributionPGM):
         start_state = a_start_state
         state_representation_dict: ty.Dict[int, ty.Set[str]] = dict((i, set()) for i in range(self.events.state_count)) # { 0: ["origin", "root"], 1: ["nd1", "nd2"], 2:["nd3",...], ... }
         last_chosen_node = None
-        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]] = dict() # tree info for plotting
         tr = dp.Tree()
         tree_invalid = False
         tree_died = False
+
+        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]] = dict() # tree info for plotting
+        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]] = dict() # tree info for plotting
 
         if self.stop == "age" and isinstance(a_stop_value, float):
             t_stop = a_stop_value
@@ -992,6 +1129,7 @@ class DnSSE(pgm.DistributionPGM):
                         macroevol_atomic_param,
                         chosen_node,
                         state_representation_dict,
+                        state_transition_dict,
                         sa_lineage_dict,
                         untargetable_node_set,
                         cumulative_node_count,
@@ -1071,6 +1209,13 @@ class DnSSE(pgm.DistributionPGM):
 
         # (11) got out of while loop because met stop condition
         # 'at' is scoped to simulate_a_tree() function
+        
+        # debugging
+        # for nd_name, at_list in state_transition_dict.items():
+        #     print("nd_name = " + nd_name)
+        #     for at in at_list:
+        #         print(str(at))
+
         if self.stop == "age":
             at = AnnotatedTree(tr,
                                self.events.state_count,
@@ -1079,14 +1224,17 @@ class DnSSE(pgm.DistributionPGM):
                                slice_t_ends=self.slice_t_ends,
                                slice_age_ends=self.events.slice_age_ends,
                                sa_lineage_dict=sa_lineage_dict,
+                               at_dict=state_transition_dict,
                                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
                                tree_invalid=tree_invalid,
                                tree_died=tree_died)
+        
         elif self.stop == "size":
             at = AnnotatedTree(tr,
                                self.events.state_count,
                                start_at_origin=self.with_origin,
                                sa_lineage_dict=sa_lineage_dict,
+                               at_dict=state_transition_dict,
                                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
                                tree_invalid=tree_invalid)
 

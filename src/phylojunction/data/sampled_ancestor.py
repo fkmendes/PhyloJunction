@@ -4,7 +4,7 @@ class SampledAncestor():
 
     label: str
     lineage_node_label: str # label of node on whose subtending branch the SA is attached
-    global_time: float # SA's (forward) occurrence time (origin or root = 0.0)
+    global_time: float # SA's (forward) occurrence time (i.e., origin or root = 0.0)
     
     # time to lineage node (node defining the branch on which the SA is placed);
     # this class member is filled out (if unfilled) when the lineage node either undergoes an

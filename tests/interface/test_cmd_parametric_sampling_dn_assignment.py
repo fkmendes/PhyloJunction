@@ -13,6 +13,7 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 class TestParametricSamplingDnAssignment(unittest.TestCase):
+    
     def test_sampling_unif_assignment(self):
         """
         Test if uniform sampling distribution assignments are correctly evaluated
@@ -75,25 +76,42 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         cmd_line1 = "u ~ unif(n=1, nr=1, max=1.0)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Uniform\" was not properly initialized. Parameter \"min\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj,
+                stoch_node_name,
+                stoch_node_spec,
+                cmd_line1)        
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Uniform\" was not properly initialized. " +
+            "Parameter \"min\" is missing.")
         
         cmd_line2 = "u ~ unif(n=1, nr=1, min=0.0)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Uniform\" was not properly initialized. Parameter \"max\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj,
+                stoch_node_name,
+                stoch_node_spec,
+                cmd_line2)        
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Uniform\" was not properly initialized. " + \
+            "Parameter \"max\" is missing.")
 
 
     def test_sampling_exp_assignment(self):
         """
-        Test if exponential sampling distribution assignments are correctly evaluated
-        and result in the right probabilistic graphical model
+        Test if exponential sampling distribution assignments are
+        correctly evaluated and result in the right probabilistic
+        graphical model
         """
 
         ################################################
@@ -103,8 +121,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         cmd_line1 = "e1 ~ exponential(n=100000, nr=1, rate=0.5)"
         
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+        
+        cmdp.parse_samp_dn_assignment(
+            pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        
         a_node_pgm1 = pgm_obj.get_node_pgm_by_name("e1")
 
         self.assertTrue(isinstance(a_node_pgm1.value, list))
@@ -129,25 +151,33 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
     def test_exp_misspec(self):
         """
-        Test exponential sampling distribution assignment throws exception
-        if mandatory parameters are missing
+        Test exponential sampling distribution assignment throws
+        exception if mandatory parameters are missing
         """
         
         pgm_obj = pgm.ProbabilisticGraphicalModel()
 
         cmd_line = "e ~ exponential(n=1, nr=1)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Exponential\" was not properly initialized. Parameter \"rate\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj,
+                stoch_node_name,
+                stoch_node_spec,
+                cmd_line)        
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Exponential\" was not properly " \
+            + "initialized. Parameter \"rate\" is missing.")
 
 
     def test_sampling_gamma_assignment(self):
         """
-        Test if gamma sampling distribution assignments are correctly evaluated
-        and result in the right probabilistic graphical model
+        Test if gamma sampling distribution assignments are correctly
+        evaluated and result in the right probabilistic graphical model
         """
 
         ###########################################
@@ -157,8 +187,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         cmd_line1 = "g1 ~ gamma(n=100000, nr=1, shape=0.5, scale=0.5)"
         
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+        
+        cmdp.parse_samp_dn_assignment(
+            pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        
         a_node_pgm1 = pgm_obj.get_node_pgm_by_name("g1")
         
         self.assertTrue(isinstance(a_node_pgm1.value, list))
@@ -169,10 +203,15 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         ################################
         # Gamma, rate parameterization #
         ################################
-        cmd_line2 = "g2 ~ gamma(n=100000, nr=1, shape=0.5, scale=0.5, rate_parameterization=\"true\")"
+        cmd_line2 = "g2 ~ gamma(n=100000, nr=1, shape=0.5, scale=0.5, " \
+            + "rate_parameterization=\"true\")"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
+
+        cmdp.parse_samp_dn_assignment(
+            pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        
         a_node_pgm2 = pgm_obj.get_node_pgm_by_name("g2")
 
         self.assertTrue(isinstance(a_node_pgm2.value, list))
@@ -191,33 +230,48 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         cmd_line1 = "g ~ gamma(n=1, nr=1, shape=0.5)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Gamma\" was not properly initialized. Parameter \"scale\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)      
+
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Gamma\" was not properly " \
+            + "initialized. Parameter \"scale\" is missing.")
         
         cmd_line2 = "g ~ gamma(n=1, nr=1, scale=0.5)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Gamma\" was not properly initialized. Parameter \"shape\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Gamma\" was not properly " \
+            + "initialized. Parameter \"shape\" is missing.")
 
 
     def test_sampling_normal_assignment(self):
         """
-        Test if normal sampling distribution assignments are correctly evaluated
-        and result in the right probabilistic graphical model
+        Test if normal sampling distribution assignments are correctly
+        evaluated and result in the right probabilistic graphical
+        model
         """
         
         pgm_obj = pgm.ProbabilisticGraphicalModel()
         
         cmd_line1 = "n ~ normal(n=100000, mean=0.5, sd=0.1)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+        
+        cmdp.parse_samp_dn_assignment(
+            pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        
         a_node_pgm = pgm_obj.get_node_pgm_by_name("n")
         
         self.assertTrue(isinstance(a_node_pgm.value, list))
@@ -236,25 +290,36 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         cmd_line1 = "n ~ normal(n=1, nr=1, sd=0.1)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Normal\" was not properly initialized. Parameter \"mean\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Normal\" was not properly initialized. " \
+            + "Parameter \"mean\" is missing.")
         
         cmd_line2 = "n ~ normal(n=1, nr=1, mean=0.5)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Normal\" was not properly initialized. Parameter \"sd\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Normal\" was not properly initialized. " \
+            + "Parameter \"sd\" is missing.")
 
 
     def test_sampling_ln_assignment(self):
         """
-        Test if log-normal sampling distribution assignments are correctly evaluated
-        and result in the right probabilistic graphical model
+        Test if log-normal sampling distribution assignments are
+        correctly evaluated and result in the right probabilistic
+        graphical model
         """
         
         ###################################
@@ -264,8 +329,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         
         cmd_line1 = "ln1 ~ lognormal(n=100000, mean=-3.25, sd=0.25)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+        
+        cmdp.parse_samp_dn_assignment(
+            pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        
         a_node_pgm = pgm_obj.get_node_pgm_by_name("ln1")
         
         self.assertTrue(isinstance(a_node_pgm.value, list))
@@ -279,10 +348,15 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         exp_mean = str(math.exp(-3.25))
         exp_sd = str(math.exp(0.25))
-        cmd_line2 = "ln2 ~ lognormal(n=100000, mean=" + exp_mean + ", sd=" + exp_sd + ", log_space=\"false\")"
+        cmd_line2 = "ln2 ~ lognormal(n=100000, mean=" + exp_mean \
+            + ", sd=" + exp_sd + ", log_space=\"false\")"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
+        
+        cmdp.parse_samp_dn_assignment(
+            pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        
         a_node_pgm = pgm_obj.get_node_pgm_by_name("ln2")
 
         self.assertTrue(isinstance(a_node_pgm.value, list))
@@ -293,27 +367,38 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
     def test_ln_misspec(self):
         """
-        Test log-normal sampling distribution assignment throws exception
-        if mandatory parameters are missing
+        Test log-normal sampling distribution assignment throws
+        exception if mandatory parameters are missing
         """
         
         pgm_obj = pgm.ProbabilisticGraphicalModel()
 
         cmd_line1 = "ln ~ lognormal(n=1, nr=1, sd=0.25)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Log-normal\" was not properly initialized. Parameter \"mean\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
+        
+        self.assertEqual(str(exc.exception), 
+            "ERROR: Distribution \"Log-normal\" was not properly " \
+            "initialized. Parameter \"mean\" is missing.")
         
         cmd_line2 = "ln ~ lognormal(n=1, nr=1, mean=-3.25)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution \"Log-normal\" was not properly initialized. Parameter \"sd\" is missing.")
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution \"Log-normal\" was not properly " \
+            + "initialized. Parameter \"sd\" is missing.")
+
 
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder

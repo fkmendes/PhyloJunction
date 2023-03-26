@@ -119,16 +119,22 @@ def initialize_tree_dataframe(sample_size: int, n_repl: int=1, summaries: bool=F
     return return_df
 
 
-def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel, write_nex_states: bool=False) -> ty.Tuple[ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]], ty.List[ty.Dict[str, pd.DataFrame]]]:
-    """Return two pandas DataFrame's, with scalar and tree random variables
+def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel,
+                 write_nex_states: bool=False) \
+        -> ty.Tuple[
+            ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
+            ty.List[ty.Dict[str, pd.DataFrame]]]:
+    """
+    Return two pandas DataFrame's, with scalar and tree random
+    variables
     
     Arguments
-        sample_size (int): Sample size (each sample is a simulation that can then have replicated nodes)
-        node_pgm_list (pgm.NodePGM):
+        pgm_obj (pgm.ProbabilisticGraphicalModel):
         write_nex_states (bool): Whether to write .nex file with states
 
     Returns
-        (tuple): Tuple with two lists as elements, one with file-suffix strings, another with pandas.DataFrame's   
+        (tuple): Tuple with two lists as elements, one with file-suffix
+                 strings, another with pandas.DataFrame's   
     """
 
     sample_size = pgm_obj.sample_size
@@ -241,6 +247,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel, write_nex_states: boo
                 ######################################
                 try:
                     tree_value_df_dict[rv_name].empty
+                
                 except:
                     tree_value_df_dict[rv_name] = \
                         initialize_tree_dataframe(
@@ -530,8 +537,10 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel, write_nex_states: boo
 
 
 def prep_data_filepaths_dfs(
-    scalar_output_stash: ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
-    tree_output_stash: ty.List[ty.Union[ty.Dict[str, pd.DataFrame], ty.Dict[str, str]]]) \
+    scalar_output_stash:
+        ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
+    tree_output_stash:
+        ty.List[ty.Union[ty.Dict[str, pd.DataFrame], ty.Dict[str, str]]]) \
         -> ty.Tuple[ty.List[str], ty.List[ty.Union[pd.DataFrame, str]]]:
     """Prepare list of file paths and list of pandas dataframes from tuples returned by prep_data_df()
 

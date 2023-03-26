@@ -137,7 +137,8 @@ class TestSSEStopConditionsBD(unittest.TestCase):
         Test if invalid stop condition values are correctly caught and
         the appropriate exceptions are raise:
             (1) Negative number of terminal nodes,
-            (2) Number of terminal nodes being a float that cannot be converted to integer,
+            (2) Number of terminal nodes being a float that cannot be
+                converted to integer,
             (3) Negative tree height
         """
         # simulation initialization
@@ -150,22 +151,58 @@ class TestSSEStopConditionsBD(unittest.TestCase):
 
         # (1) Negative number of terminal nodes
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)       
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution DnSSE was not properly initialized. Stop condition value (number of terminal nodes) cannot be negative. Exiting...")
+            distsse.DnSSE(
+                self.event_handler,
+                stop_condition_value,
+                n=n_sim,
+                stop=stop_condition,
+                origin=start_at_origin,
+                start_states_list=start_states_list,
+                condition_on_survival=True,
+                epsilon=1e-12)       
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution DnSSE was not properly initialized. " + \
+            "Stop condition value (number of terminal nodes) cannot be " + \
+            "negative. Exiting...")
 
         # (2) Number of terminal nodes being a float that cannot be converted to integer
         stop_condition_value = [0.5, 2]
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)       
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution DnSSE was not properly initialized. Stop condition value (number of terminal nodes) could not be converted to integer. Exiting...")
+            distsse.DnSSE(
+                self.event_handler,
+                stop_condition_value,
+                n=n_sim,
+                stop=stop_condition,
+                origin=start_at_origin,
+                start_states_list=start_states_list,
+                condition_on_survival=True,
+                epsilon=1e-12)       
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution DnSSE was not properly initialized. " + \
+            "Stop condition value (number of terminal nodes) could not be " + \
+            "converted to integer. Exiting...")
 
         # (3) Negative tree height
         stop_condition = "age"
         stop_condition_value = [0.0, -0.1]
 
         with self.assertRaises(ec.DnInitMisspec) as exc:
-            distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)       
-        self.assertEqual(str(exc.exception), "\nERROR: Distribution DnSSE was not properly initialized. Stop condition value (tree height) cannot be negative. Exiting...")
+            distsse.DnSSE(
+                self.event_handler,
+                stop_condition_value,
+                n=n_sim,
+                stop=stop_condition,
+                origin=start_at_origin, 
+                start_states_list=start_states_list,
+                condition_on_survival=True,
+                epsilon=1e-12)       
+        
+        self.assertEqual(str(exc.exception),
+            "ERROR: Distribution DnSSE was not properly initialized. " + \
+            "Stop condition value (tree height) cannot be negative. " + \
+            "Exiting...")
 
 
 if __name__ == "__main__":

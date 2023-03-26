@@ -1,9 +1,10 @@
-from cgitb import small
+# from cgitb import small
 import typing as ty
 import dendropy as dp # type: ignore
 import matplotlib # type: ignore
 import copy # type: ignore
 import numpy as np
+import pandas as pd
 import collections
 # from dendropy import Node, Tree, Taxon 
 
@@ -11,11 +12,13 @@ import collections
 import matplotlib.pyplot as plt # type: ignore
 import matplotlib.collections as mpcollections # type: ignore
 from matplotlib.figure import Figure # type: ignore
+from matplotlib import colors
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
 import phylojunction.utility.helper_functions as pjh
 import phylojunction.data.sampled_ancestor as pjsa
+import phylojunction.data.attribute_transition as pjat
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -46,7 +49,6 @@ class AnnotatedTree(dp.Tree):
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]] # { node_name: { attr: value }}
     slice_t_ends: ty.List[ty.Optional[float]]
     slice_age_ends: ty.Optional[ty.List[float]] # can be None
-    sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]] # can be None
     n_extant_obs_nodes: int
     n_extinct_obs_nodes: int
     n_sa_obs_nodes: int
@@ -54,7 +56,11 @@ class AnnotatedTree(dp.Tree):
     extinct_obs_nodes_labels: ty.Tuple[str, ...]
     sa_obs_nodes_labels: ty.Tuple[str, ...]
 
-    # rec tree
+    # for plotting #
+    sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]] # can be None
+    at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]] # can be None
+
+    # rec tree #
     tree_reconstructed: dp.Tree
     condition_on_obs_both_sides_root: bool
 
@@ -67,6 +73,7 @@ class AnnotatedTree(dp.Tree):
                 slice_t_ends: ty.List[ty.Optional[float]]=[],
                 slice_age_ends: ty.Optional[ty.List[float]]=None,
                 sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]=None,
+                at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]]=None,
                 tree_died: ty.Optional[bool]=None,
                 tree_invalid: ty.Optional[bool]=None,
                 epsilon: float=1e-12):
@@ -110,9 +117,12 @@ class AnnotatedTree(dp.Tree):
             # (if flag not passed, we assume tree is valid)
             self.tree_invalid = False
 
+        # for plotting
+        self.sa_lineage_dict = sa_lineage_dict
+        self.at_dict = at_dict
+
         # other
         self.epsilon = epsilon
-        self.sa_lineage_dict = sa_lineage_dict
 
         try:
             self.tree.seed_node.alive
@@ -556,11 +566,14 @@ class AnnotatedTree(dp.Tree):
                     self.tree.taxon_namespace.remove_taxon(nd.taxon)
 
 
+    # returns reconstructed tree, but also
+    #
     # side-effect:
     # populates self.tree_reconstructed
     # 
-    # if rejection sampling happened, is_tr_ok will populate it;
-    # otherwise, population happend upon writing
+    # if rejection sampling happened, is_tr_ok() in
+    # dn_discrete_sse will populate it; otherwise
+    # population happens upon writing
     def extract_reconstructed_tree(self, require_obs_both_sides: ty.Optional[bool]=None) -> dp.Tree:
         """Make deep copy of self.tree, then prune extinct taxa from copy"""
 
@@ -569,6 +582,7 @@ class AnnotatedTree(dp.Tree):
         require_obs_both_sides_root = True
         if not require_obs_both_sides == None:
             require_obs_both_sides_root = require_obs_both_sides 
+        
         # otherwise, we use the member inside Tree
         else:
             require_obs_both_sides_root = self.condition_on_obs_both_sides_root
@@ -591,9 +605,11 @@ class AnnotatedTree(dp.Tree):
         smallest_distance = 0.0
         root_node: dp.Node = dp.Node()
         root_node = self.tree_reconstructed.find_node_with_label("root")
+        
         if not root_node:
             root_node = self.tree_reconstructed.find_node_with_taxon_label("root")
         root_node_distance_from_seed = 0.0
+        
         if root_node:
             root_node_distance_from_seed = root_node.distance_from_root()
             smallest_distance = root_node_distance_from_seed
@@ -842,7 +858,8 @@ class AnnotatedTree(dp.Tree):
         # only care about internal nodes
         # in the reconstructed tree
         for taxon_name, taxon_state in int_node_states_dict.items():
-            if self.tree_reconstructed.__str__() != "":
+            if self.tree_reconstructed.__str__() != "" and \
+                self.tree_reconstructed != None:
                 int_node = self.tree_reconstructed.find_node_with_label(taxon_name)
 
                 if int_node != None:
@@ -869,7 +886,7 @@ class AnnotatedTree(dp.Tree):
 # Plotting tree functions #
 ###########################
 
-color_map = {0: "deepskyblue", 1: "magenta", 2: "darkorange", 3: "gold", 4: "lawngreen"}
+# color_map = {0: "deepskyblue", 1: "magenta", 2: "darkorange", 3: "gold", 4: "lawngreen"}
 
 def get_node_name(nd):
     if nd.label: return nd.label
@@ -878,7 +895,7 @@ def get_node_name(nd):
 
 
 def get_x_coord_from_nd_heights(ann_tr, use_age=False, unit_branch_lengths=False):
-    """Get dictionary of node labels as keys, node y_coords (time) as values
+    """Get dictionary of node labels as keys, node x_coords (time) as values
 
     Args:
         ann_tr (AnnotatedTree): Annotated dendropy tree
@@ -887,6 +904,8 @@ def get_x_coord_from_nd_heights(ann_tr, use_age=False, unit_branch_lengths=False
     if use_age and not unit_branch_lengths:
         return ann_tr.node_ages_dict
 
+    # print("node_heights_dict:  ")
+    # print(ann_tr.node_heights_dict)
     return ann_tr.node_heights_dict
 
 
@@ -949,25 +968,29 @@ def get_y_coord_from_n_obs_nodes(ann_tr, start_at_origin=False, sa_along_branche
 
     return y_coords
 
+
 # side-effect:
 # prints tree on axes (of class matplotlib.pyplot.Axes)
 def plot_ann_tree(ann_tr: AnnotatedTree,
-                    axes: plt.Axes,
-                    use_age: bool=False,
-                    start_at_origin: bool=False,
-                    attr_of_interest: str=None,
-                    sa_along_branches: bool=True) -> None:
+                  axes: plt.Axes,
+                  use_age: bool=False,
+                  start_at_origin: bool=False,
+                  attr_of_interest: str=None,
+                  sa_along_branches: bool=True) -> None:
+
+    color_map: ty.Dict[int, str]
+    color_map = get_color_map(ann_tr.state_count)
 
     ####################################################
     # Setting up flags and checking tree content is OK # 
     ####################################################
     if ann_tr.origin_node:
         start_at_origin = True # scoped to draw_tree()
+
     if sa_along_branches and not ann_tr.sa_lineage_dict:
         # throw plotting exception, cannot plot sa along branches
         # without dict
         pass
-
 
     # grabbing key coordinates for drawing tree
     x_coords = get_x_coord_from_nd_heights(ann_tr, use_age=use_age)
@@ -1016,6 +1039,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         """
         if not use_linecollection and orientation == "horizontal":
             axes.hlines(y_here, x_start, x_here, color=color, lw=lw)
+        
         elif use_linecollection and orientation == "horizontal":
             if not x_end:
                 horizontal_linecollections.append(
@@ -1032,6 +1056,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
         elif not use_linecollection and orientation == "vertical":
             axes.vlines(x_here, y_bot, y_top, color=color)
+
         elif use_linecollection and orientation == "vertical":
             vertical_linecollections.append(
                 mpcollections.LineCollection(
@@ -1042,9 +1067,47 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
     def _draw_clade(nd, x_start, color, lw, use_age, start_at_origin) -> None:
         """Recursively draw a tree, down from the given node"""
+        
         nd_name = get_node_name(nd)
+        
+        attr_idx = 0
+        # segment_colors = ["black"]
+        segment_colors = [color]
+        
+        # in case it is a tree with attrs
+        if ann_tr.node_attr_dict:
+            attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
+            segment_colors = [color_map[attr_idx]] # from parent
+        
+        x_starts = [x_start]
+        x_heres = []
+        x_here_int_nodes = x_coords[nd_name]
 
-        x_here = x_coords[nd_name]
+        if ann_tr.at_dict != None:
+            # if branch descending from nd
+            # underwent an attribute transition
+            if nd_name in ann_tr.at_dict:
+                attr_trs = ann_tr.at_dict[nd_name]
+
+                for idx, at in enumerate(attr_trs):
+                    x_starts.append(at.global_time)
+                    x_heres.append(at.global_time)
+                    segment_colors.insert(0, color_map[at.from_state])
+
+            else:
+                segment_colors.append(color)
+
+            # age of focal node is always
+            # the latest time (x_here)
+            x_heres.append(x_coords[nd_name])
+
+        # if no attribute transition dict,
+        # we have a single line with a single
+        # color to draw (default behavior)
+        else:
+            x_heres = [x_coords[nd_name]]
+            segment_colors = ["black"]
+
         y_here = y_coords[nd_name]
 
         from_x_here_to_this_x: float=0.0 # default (present moment)
@@ -1053,31 +1116,48 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             if isinstance(ann_tr.root_age, float):
                 from_x_here_to_this_x = ann_tr.root_age
 
-        color = "black"
-        if attr_of_interest:
-            attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
-            color = color_map[attr_idx]
+        # DEPRECATED
+        # color = "black"
+        # if attr_of_interest:
+        #     attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
+        #     color = color_map[attr_idx]
 
         #################################
         # Draw horizontal line (branch) #
         #################################
-        _draw_clade_lines(
-            x_end=from_x_here_to_this_x,
-            use_linecollection=True,
-            orientation="horizontal",
-            y_here=y_here,
-            x_start=x_start,
-            x_here=x_here,
-            color=color,
-            lw=lw
-        )
+        
+        # debugging
+        # print("\nabout to draw hor. line for node " + nd_name)
+        # print("where x_starts:")
+        # print(x_starts)
+        # print("where x_heres:")
+        # print(x_heres)
+        
+        # for i in [-1]:
+        for idx in range(len(x_starts)):
+            
+            # debugging
+            # print("in for loop: segment_colors = ")
+            # print(segment_colors)
+            # print("idx of color = " + str(idx))
+            
+            _draw_clade_lines(
+                x_end=from_x_here_to_this_x,
+                use_linecollection=True,
+                orientation="horizontal",
+                y_here=y_here,
+                x_start=x_starts[idx],
+                x_here=x_heres[idx],
+                color=segment_colors[idx],
+                lw=lw
+            )
 
         #########################
         # Add node/taxon labels #
         #########################
         if nd.is_leaf():
             axes.text(
-                x_here,
+                x_heres[-1],
                 y_here,
                 f" {nd_name}",
                 verticalalignment="center",
@@ -1087,6 +1167,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         # Draw sampled ancestors if any #
         #################################
         if sa_along_branches and (not nd.is_sa_dummy_parent and nd.is_sa_lineage):
+                
                 sas: ty.List[pjsa.SampledAncestor]=[]
                 if isinstance(ann_tr.sa_lineage_dict, dict):
                     sas = ann_tr.sa_lineage_dict[nd_name]
@@ -1125,13 +1206,17 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
                     y_bot = y_coords[get_node_name(children[1])]
 
+                    # last color in segment_colors will
+                    # match the state of the node whose
+                    # subtending branch we are drawing
                     _draw_clade_lines(
                         use_linecollection=True,
                         orientation="vertical",
-                        x_here=x_here,
+                        x_here=x_here_int_nodes,
                         y_bot=y_bot,
                         y_top=y_top,
-                        color=color,
+                        # color=segment_colors[0],
+                        color=segment_colors[-1],
                         lw=lw,
                     )
 
@@ -1143,21 +1228,26 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                 # if sa_along_branches and (child_nd.is_sa or child_nd.is_sa_dummy_parent):
                 if sa_along_branches and child_nd.is_sa:
                     continue
-
-                # draws horizontal line (branch) inside 
-                _draw_clade(child_nd, x_here, color, lw, False, start_at_origin)
+                
+                # segment_colors[-1] is the color
+                # of the node whose children we are
+                # visiting
+                _draw_clade(child_nd, x_heres[-1], segment_colors[-1], lw, False, start_at_origin)
 
 
     def _draw_time_slices(ann_tr: AnnotatedTree, axes: plt.Axes, use_age: bool) -> None:
         """Draw vertical lines representing boundaries of time slices"""
+        
         xs: ty.List[float] = []
         if use_age and ann_tr.slice_age_ends:
             xs = ann_tr.slice_age_ends[1:] # ignore present
+        
         elif ann_tr.slice_t_ends:
             xs = [t_end for t_end in ann_tr.slice_t_ends[:-1] if isinstance(t_end, float)] # so mypy won't complain
 
         for x in xs:
-            axes.axvline(x=x, color="deeppink")
+            axes.axvline(x=x, color="gray", dashes=[2.0, 1.5])
+
 
     def _draw_sa_along_branch(sa_name: str, x: float, y: float, axes: plt.Axes) -> None:
         """Draw SA nodes along internal branches"""
@@ -1170,17 +1260,25 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     ########
     # call #
     ########
-    _draw_clade(ann_tr.tree.seed_node, 0, "k", plt.rcParams["lines.linewidth"], use_age, start_at_origin)
+    color = "black"
+    if attr_of_interest:
+        attr_idx = ann_tr.node_attr_dict[ann_tr.tree.seed_node.label][attr_of_interest]
+        color = color_map[attr_idx]
+    
+    _draw_clade(ann_tr.tree.seed_node, 0, color, plt.rcParams["lines.linewidth"], use_age, start_at_origin)
+    
     _draw_time_slices(ann_tr, axes, use_age)
 
     # draw lines
     for i in horizontal_linecollections:
         axes.add_collection(i)
+    
     for i in vertical_linecollections:
         axes.add_collection(i)
 
     if use_age:
         axes.set_xlabel("Age")
+    
     else:
         axes.set_xlabel("Time")
 
@@ -1209,6 +1307,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     # axes.set_facecolor("gray") later maybe change colors
     # plt.show()
     # return plt.gcf()%
+
 
 def pj_get_mrca_obs_terminals(a_node: dp.Node, nd_label_list: ty.List[str]) -> dp.Node:
     # side-effect recursion
@@ -1241,7 +1340,54 @@ def pj_get_mrca_obs_terminals(a_node: dp.Node, nd_label_list: ty.List[str]) -> d
     
     return mrca_node_label
  
+
+def get_color_map(n_states: int) -> ty.Dict[int, str]:
+    """
+    Return dict {int: str} where int is a state integer
+    and string is a HEX color to be used to paint branches
+    segments with that state
+    """
     
+    def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+        """
+        Truncate color map to remove parts of the palette,
+        such as almost white colors
+        """
+        new_cmap = colors.LinearSegmentedColormap.from_list(
+            'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+            cmap(np.linspace(minval, maxval, n))
+        )
+        
+        return new_cmap
+
+    color_map: ty.Dict[int, str] = {}
+    
+    if n_states <= 20:
+        qual_cmap = matplotlib.cm.get_cmap('tab20')
+        color_map = dict(
+            (i, matplotlib.colors.rgb2hex(qual_cmap(i)[:3])) 
+                for i in range(qual_cmap.N)
+        )
+
+    elif n_states <= 120:
+        cmap = matplotlib.pyplot.cm.get_cmap('terrain', n_states)
+        new_cmap = truncate_colormap(cmap, minval=0.0, maxval=2.08, n=n_states)
+        color_map = dict(
+            (i, matplotlib.colors.rgb2hex(new_cmap(i)[:3])) 
+                for i in range(new_cmap.N)
+        )
+
+    # if n_states >120 up to 250
+    else:
+        cmap = matplotlib.pyplot.cm.get_cmap('terrain', n_states)
+        maxv = 120 * 2.08 / n_states
+        new_cmap = truncate_colormap(cmap, minval=0.0, maxval=maxv, n=n_states)
+        color_map = dict(
+            (i, matplotlib.colors.rgb2hex(new_cmap(i)[:3])) 
+                for i in range(new_cmap.N)
+        )
+
+    return color_map
 
 ##############################################################################
 
@@ -1259,8 +1405,8 @@ if __name__ == "__main__":
     # 
     # If you want to run this as a standalone from PhyloJunction/
     # on the terminal, remember to add "src/" to
-    # PYTHONPATH (system variable), or to set it if it does not
-    # exist -- don't forget to export it!
+    # PYTHONPATH (system variable, e.g., [...]/Phylojunction/src/ should be
+    # in PYTHONPATH), or to set it if it does not exist -- don't forget to export it!
     # 
     # Then you can do:
     # $ python3 src/phylojunction/data/tree.py
@@ -1294,7 +1440,7 @@ if __name__ == "__main__":
 
     # left child of dummy node
     root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=0.5)
-    root_node.state = 0
+    root_node.state = 1
     root_node.alive = False
     root_node.is_sa = False
     root_node.is_sa_dummy_parent = False
@@ -1305,7 +1451,7 @@ if __name__ == "__main__":
 
     # left child of root node
     extant_sp1 = dp.Node(taxon=dp.Taxon(label="sp1"), label="sp1", edge_length=0.25)
-    extant_sp1.state = 0
+    extant_sp1.state = 2
     extant_sp1.alive = False
     extant_sp1.is_sa = False
     extant_sp1.is_sa_dummy_parent = False
@@ -1313,7 +1459,7 @@ if __name__ == "__main__":
 
     # right child of root node
     extant_sp2 = dp.Node(taxon=dp.Taxon(label="sp2"), label="sp2", edge_length=0.5)
-    extant_sp2.state = 1
+    extant_sp2.state = 3
     extant_sp2.alive = True
     extant_sp2.is_sa = False
     extant_sp2.is_sa_dummy_parent = False
@@ -1340,6 +1486,15 @@ if __name__ == "__main__":
     time_to_sa_lineage_node = 0.5
     sa = pjsa.SampledAncestor("sa1", "root", sa_global_time, time_to_lineage_node=time_to_sa_lineage_node)
     sa_lineage_dict = { "root": [sa] }
+
+    at1 = pjat.AttributeTransition("state", "root", 1.25, 0, 1)
+    at2 = pjat.AttributeTransition("state", "sp1", 1.6, 1, 2)
+    at3 = pjat.AttributeTransition("state", "sp2", 1.8, 1, 3)
+    at_dict = {
+        "root": [at1],
+        "sp1": [at2],
+        "sp2": [at3]
+    }
     
     max_age = 2.0
 
@@ -1349,10 +1504,11 @@ if __name__ == "__main__":
         start_at_origin=True,
         max_age=max_age,
         sa_lineage_dict=sa_lineage_dict,
+        at_dict=at_dict, # comment this out to see a "Yule" tree
         epsilon=1e-12)
 
     print(ann_tr_sa_with_root_survives_max_age.tree.as_string(schema="newick"))
-    print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_nexus_str())
+    print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_str(nexus=True))
 
     ######################
     # Preparing plotting #
@@ -1373,7 +1529,8 @@ if __name__ == "__main__":
                      ax,
                      use_age=False,
                      start_at_origin=True,
-                     sa_along_branches=True
+                     sa_along_branches=True,
+                     attr_of_interest="state"
                      # sa_along_branches=False
                      )
 

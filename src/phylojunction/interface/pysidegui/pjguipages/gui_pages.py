@@ -366,8 +366,8 @@ class Ui_PJGUIPages(object):
         self.read_hpd_csv_button.setObjectName("read_hpd_csv_button")
         self.horizontalLayout_5.addWidget(self.read_hpd_csv_button, 0, QtCore.Qt.AlignHCenter)
         self.read_logfile_button = QtWidgets.QPushButton(self.gridLayoutWidget_3)
-        self.read_logfile_button.setMinimumSize(QtCore.QSize(145, 24))
-        self.read_logfile_button.setMaximumSize(QtCore.QSize(145, 24))
+        self.read_logfile_button.setMinimumSize(QtCore.QSize(150, 24))
+        self.read_logfile_button.setMaximumSize(QtCore.QSize(150, 24))
         self.read_logfile_button.setStyleSheet("QPushButton{\n"
 "    background-color: lightgray;\n"
 "    border-radius: 2px;\n"
@@ -469,9 +469,9 @@ class Ui_PJGUIPages(object):
 "}")
         self.coverage_node_list.setObjectName("coverage_node_list")
         self.coverage_node_label = QtWidgets.QLabel(self.coverage_frame)
-        self.coverage_node_label.setGeometry(QtCore.QRect(40, 10, 110, 16))
-        self.coverage_node_label.setMinimumSize(QtCore.QSize(110, 16))
-        self.coverage_node_label.setMaximumSize(QtCore.QSize(110, 16))
+        self.coverage_node_label.setGeometry(QtCore.QRect(20, 10, 140, 16))
+        self.coverage_node_label.setMinimumSize(QtCore.QSize(140, 16))
+        self.coverage_node_label.setMaximumSize(QtCore.QSize(140, 16))
         self.coverage_node_label.setAlignment(QtCore.Qt.AlignCenter)
         self.coverage_node_label.setObjectName("coverage_node_label")
         self.cov_node_stat_vert_layout.addWidget(self.coverage_frame, 0, QtCore.Qt.AlignHCenter)

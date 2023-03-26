@@ -5,7 +5,8 @@ import typing as ty
 import numpy as np
 import pandas as pd
 from tabulate import tabulate # type: ignore
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QSpinBox
+from PySide6.QtWidgets import \
+    QApplication, QMainWindow, QPushButton, QFileDialog
 from PySide6.QtGui import QAction
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QTimer
 
