@@ -267,19 +267,57 @@ def parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_dn_spec, cmd_l
             if clamp in ("\"false\"", "\"F\"", "\"False\""):
                 clamped = False
 
-        except: pass
-
-        sample_size = 1
-        try:
-            sample_size = int(spec_dict["n"][0])
         except:
             pass
 
+        sample_size = 1
+        if "n" in spec_dict:
+            # if user passes 'n' as a simple string,
+            # e.g., 'normal(n=2...)'
+            if isinstance(spec_dict["n"][0], str):
+                try:
+                    sample_size = int(spec_dict["n"][0])
+                
+                except:
+                    pass
+
+            # if user passes 'r' as a node,
+            # e.g., 'n_sim <- 2', then 'normal(n=n_sim...)
+            elif isinstance(spec_dict["n"][0], pgm.StochasticNodePGM):
+                if len(spec_dict["n"][0].value) > 1:
+                    raise ec.RequireScalarError(dn_name, "n")
+
+                try:
+                    # [0] because it is vectorized
+                    sample_size = int(spec_dict["n"][0].value[0])
+                
+                except:
+                    raise ec.FunctionArgError("n", "Was expecting either a scalar string, or a node storing a scalar constant. Distribution discrete_sse() could not be initialized.")
+
         # deal with replicates in a single simulation
         repl_size = 1
-        try:
-            repl_size = int(spec_dict["nr"][0])
-        except: pass # user did not provide replicate size
+        if "nr" in spec_dict:
+            # if user passes 'nr' as a simple string,
+            # e.g., 'normal(...nr=2...)'
+            if isinstance(spec_dict["nr"][0], str):
+                try:
+                    repl_size = int(spec_dict["nr"][0])
+                
+                except:
+                    pass # user did not provide replicate size
+
+            # if user passes 'nr' as a node,
+            # e.g., 'n_rep <- 2', then 'normal(...nr=n_rep...)
+            elif isinstance(spec_dict["nr"][0], pgm.StochasticNodePGM):
+                if len(spec_dict["nr"][0].value) > 1:
+                    raise ec.RequireScalarError(dn_name, "nr")
+                
+                try:
+                    # [0] because it is vectorized
+                    repl_size = int(spec_dict["nr"][0].value[0])
+                
+                except:
+                    raise ec.FunctionArgError("nr", "Was expecting either a scalar string, or a node storing a scalar constant. Distribution discrete_sse() could not be initialized.")
 
         create_add_rv_pgm(stoch_node_name, sample_size, repl_size, dn_obj, parent_pgm_nodes, clamped)
 
@@ -464,10 +502,11 @@ if __name__ == "__main__":
     # yule with n_sim as a model node
     script_str37 = \
         "n_sim <- 2\n" + \
-        "birth_rate ~ exponential(n=n_sim, rate=1.0)\n" + \
+        "n_rep <- 2\n" + \
+        "birth_rate <- [0.8, 0.9, 1.0, 1.1]\n" + \
         "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" + \
         "meh := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" + \
-        "trs ~ discrete_sse(n=n_sim, meh=meh, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
+        "trs ~ discrete_sse(n=n_sim, nr=n_rep, meh=meh, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
 
     # for copying and pasting in GUI:
     #

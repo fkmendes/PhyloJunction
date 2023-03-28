@@ -145,6 +145,9 @@ class GUIMainWindow(QMainWindow):
         # coverage page button #
         self.ui.covg_button.clicked.connect(self.show_coverage_page)
 
+        # settings page button #
+        self.ui.settings_button.clicked.connect(self.show_settings_page)
+
         # warnings page button #
         self.ui.warning_button.clicked.connect(self.show_warnings_page)
 
@@ -154,7 +157,10 @@ class GUIMainWindow(QMainWindow):
         # (created by QtCreator/Designer) #
         ###################################
 
+        ############
         # PGM page #
+        ############
+
         # cmd line enter #
         self.ui.ui_pages.cmd_prompt.returnPressed.connect(self.parse_cmd_update_gui)
 
@@ -174,24 +180,41 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.sample_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot_spin)
         self.ui.ui_pages.repl_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot_spin)
 
+        # save plot #
+        self.ui.ui_pages.save_pgm_node_plot.clicked.connect(
+            lambda plot2fig: self.write_plot_to_file(
+                self.ui.ui_pages.pgm_page_matplotlib_widget.fig
+            )
+        )
+
         # clear model button #
         self.ui.ui_pages.clear_model.clicked.connect(lambda clear_model: \
             self.clean_disable_everything(user_reset=True))
 
+        ################
         # Compare page #
+        ################
         self.ui.ui_pages.compare_csv_button.clicked.connect(self.read_compare_csv)
         self.ui.ui_pages.compare_node_list.itemClicked.connect(self.do_selected_node_compare_page)
         self.ui.ui_pages.avg_replicate_check_button.clicked.connect(self.avg_repl_check)
         self.ui.ui_pages.draw_violins_button.clicked.connect(self.draw_violin)
-        self.ui.ui_pages.save_violins_button.clicked.connect(lambda plot2fig: \
-            self.write_plot_to_file(self.ui.ui_pages.compare_page_matplotlib_widget.fig))
+        self.ui.ui_pages.save_violins_button.clicked.connect(
+            lambda plot2fig: self.write_plot_to_file(
+                self.ui.ui_pages.compare_page_matplotlib_widget.fig
+            )
+        )
 
+        #################
         # Coverage page #
+        #################
         self.ui.ui_pages.read_hpd_csv_button.clicked.connect(self.read_coverage_hpd_csv)
         self.ui.ui_pages.coverage_node_list.itemClicked.connect(self.do_selected_node_coverage_page)
         self.ui.ui_pages.draw_cov_button.clicked.connect(self.draw_cov)
-        self.ui.ui_pages.save_cov_button.clicked.connect(lambda plot2fig: \
-            self.write_plot_to_file(self.ui.ui_pages.coverage_page_matplotlib_widget.fig))
+        self.ui.ui_pages.save_cov_button.clicked.connect(
+            lambda plot2fig: self.write_plot_to_file(
+                self.ui.ui_pages.coverage_page_matplotlib_widget.fig
+            )
+        )
 
         # show #
         self.show()
@@ -288,6 +311,13 @@ class GUIMainWindow(QMainWindow):
         self.ui.pages.setCurrentWidget(self.ui.ui_pages.cmd_log_page)
         self.ui.cmd_log_button.set_active(True)
         self.ui.top_label_left.setText("COMMAND LOG")
+
+
+    def show_settings_page(self):
+        self.reset_selection()
+        self.ui.pages.setCurrentWidget(self.ui.ui_pages.settings_page)
+        self.ui.warning_button.set_active(True)
+        self.ui.top_label_left.setText("SETTINGS")
 
 
     def show_warnings_page(self):
@@ -425,6 +455,9 @@ class GUIMainWindow(QMainWindow):
             # reading node information #
             node_pgm, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
+
+            # print("sample_size=" + str(sample_size))
+            # print("repl_size=" + str(repl_size))
 
             # spin boxes must be up-to-date #
             self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
@@ -721,15 +754,31 @@ class GUIMainWindow(QMainWindow):
     ##################
 
     def write_plot_to_file(self, fig_obj):
-        # get fp
-        fig_fp, filter = QFileDialog.getSaveFileName(self, "Save file", "", ".png")
+        is_plot = True
+        if not fig_obj.axes[0].properties()["xticklabels"] \
+            and not fig_obj.axes[0].properties()["yticklabels"]:
+            is_plot = False
 
-        pjwrite.write_fig_to_file(fig_fp, fig_obj)
+        if is_plot:
+            # get fp
+            fig_fp, filter = \
+                QFileDialog.getSaveFileName(self, "Save file", "", ".png")
+
+            head, tail = os.path.split(fig_fp)
+            prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
+
+            pjwrite.write_fig_to_file(
+                head + "/" + prefix + "_" + tail,
+                fig_obj
+            )
 
 
     def write_model_to_file(self, prefix: str=""):
         # get file path
         pickle_fp, filter = QFileDialog.getSaveFileName(self, "Save file", "", "")
+
+        if not prefix:
+            prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
 
         # pickling and saving PGM
         pjwrite.dump_serialized_pgm(
@@ -741,7 +790,11 @@ class GUIMainWindow(QMainWindow):
 
     def write_data_to_dir(self, prefix: str=""):
         # get dir path
-        data_out_dir = QFileDialog.getExistingDirectory(self, "Save in folder", "./", QFileDialog.ShowDirsOnly)
+        data_out_dir = QFileDialog.getExistingDirectory(
+            self, "Save in folder", "./", QFileDialog.ShowDirsOnly
+        )
+
+        prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
         
         # writing all simulated variables to 
         # different files
@@ -1187,7 +1240,7 @@ class GUIMainWindow(QMainWindow):
         sys.exit()
 
     def print_about(self):
-        print("oi")
+        self.ui.about_licensing.exec()
 
 
 def call_gui():

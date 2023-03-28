@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtCore import QSize
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QFrame  # type: ignore
 from PySide6.QtWidgets import QHBoxLayout  # type: ignore
 from PySide6.QtWidgets import QVBoxLayout  # type: ignore
@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QLabel  # type: ignore
 from PySide6.QtWidgets import QSpacerItem  # type: ignore
 from PySide6.QtWidgets import QSizePolicy  # type: ignore
 from PySide6.QtWidgets import QPushButton  # type: ignore
-from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QMessageBox  # type: ignore
 
 # pj imports #
 from phylojunction.interface.pysidegui.pjguipages.gui_pages \
@@ -28,7 +28,8 @@ class ContentGUIMainWindow(object):
 
         # window size #
         parent.resize(1200, 720)
-        parent.setMinimumSize(1020, 800)
+        # parent.setMinimumSize(1020, 800)
+        parent.setMinimumSize(1020, 785)
 
         ####################
         # Creating widgets #
@@ -144,6 +145,25 @@ class ContentGUIMainWindow(object):
         self.bottom_label_left = QLabel("")
         self.bottom_label_left.setStyleSheet("font: 11pt; color: red")
 
+        # about/licensing #
+        self.icon_dir_path = os.path.join(my_dir_path.parent, "images/icons/")
+        self.about_licensing = QMessageBox()
+        self.about_licensing.setWindowTitle("PhyloJunction")
+        self.about_licensing.setText(
+            """
+            <p style='text-align: center;'>
+            <div style='font: 14px;'><b>PhyloJunction</b></div>
+            <div style='font: 12px;'>(v0.0.1)</div>
+            <br>
+            <div style='font: 12px;'><strong>Developed by</strong>
+            <div>Fabio K. Mendes and Michael J. Landis</div><br>
+            <div style='font: 12px;'><strong>License</strong>
+            <div style='font: 12px;'>GNU General Public License v3.0</div>
+            """
+        )
+        self.about_licensing.setIconPixmap(
+            QPixmap(self.icon_dir_path + "pj_logo_icon.png").scaled(
+                120, 120, Qt.KeepAspectRatio))
 
         ###########
         # Buttons #
@@ -175,7 +195,12 @@ class ContentGUIMainWindow(object):
             icon_path="icon_cmd_log.svg"
         )
 
-        # top bins #
+        # bottom bins #
+        self.settings_button = PJPushButton(
+            text="Settings",
+            icon_path="icon_settings.svg"
+        )
+        
         self.warning_button = PJPushButton(
             text="Warnings",
             icon_path="icon_warning.svg"
@@ -240,6 +265,7 @@ class ContentGUIMainWindow(object):
         self.left_menu_top_frame_layout.addWidget(self.covg_button)
         self.left_menu_top_frame_layout.addWidget(self.cmd_log_button)
 
+        self.left_menu_bottom_frame_layout.addWidget(self.settings_button)
         self.left_menu_bottom_frame_layout.addWidget(self.warning_button)
 
         self.left_menu_layout.addWidget(self.left_menu_top_frame)

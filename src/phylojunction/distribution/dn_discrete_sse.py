@@ -211,8 +211,12 @@ class DnSSE(pgm.DistributionPGM):
     # Vectorization methods #
     #########################
     def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
-        # changing atomic_rate_params_matrix here should affect fig_rates_manager
-        atomic_rate_params_matrix = self.events.fig_rates_manager.atomic_rate_params_matrix # 1D: time slices, 2D: list of atomic rate params
+        # changing atomic_rate_params_matrix here
+        # should affect fig_rates_manager
+        #
+        # 1D: time slices, 2D: list of atomic rate params
+        atomic_rate_params_matrix = \
+            self.events.fig_rates_manager.atomic_rate_params_matrix
 
         ############################
         # Checking rate parameters #
@@ -223,10 +227,11 @@ class DnSSE(pgm.DistributionPGM):
                 n_val = len(arp.value)
 
                 # we multiply values if one is provided, but > 1 sims
-                if n_val == 1 and self.n_sim > 1:
+                if n_val == 1 and (self.n_sim > 1):
                     arp.value = [arp.value[0] for i in range(self.n_sim)]
+                
                 # do not know how to multiply, error!
-                elif n_val > 1 and n_val < self.n_sim:
+                elif n_val > 1 and n_val != self.n_sim:
                     raise ec.DimensionalityError(self.DN_NAME)
 
         ############################

@@ -180,7 +180,8 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel,
                 
                 if len(node_val) > 1:
                     scalar_constant_df[rv_name] = node_val
-                # multiply single value up to sample size
+                
+                # vectorize single value up to sample size
                 else:
                     scalar_constant_df[rv_name] = [node_val[0] for i in range(sample_size)]
             
@@ -459,6 +460,7 @@ def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel,
                         
                         repl_idx = 0
                         sample_idx += 1
+
                     # TODO
                     # while (sample_idx < n_samples):
                     #     while (repl_idx < n_repl):
@@ -697,17 +699,26 @@ def dump_serialized_pgm(file_name: str, pgm_obj: pgm.ProbabilisticGraphicalModel
         None
     """
     
-    if prefix: prefix += "_"
+    if file_name:
+        if prefix:
+            prefix += "_"
 
-    if to_folder:
-        if not file_name.endswith("/"): file_name += "/"
-        
-        with open(file_name + prefix + ".pickle", "wb") as picklefile:
-            pickle.dump((pgm_obj, cmd_log_list), picklefile)
+        # PySimpleGUI
+        if to_folder:
+            if not file_name.endswith("/"):
+                file_name += "/"
+            
+            with open(file_name + prefix + ".pickle", "wb") as picklefile:
+                pickle.dump((pgm_obj, cmd_log_list), picklefile)
 
-    else:
-        with open(prefix + file_name + ".pickle", "wb") as picklefile:
-            pickle.dump((pgm_obj, cmd_log_list), picklefile)
+        # PySide6
+        else:
+            head, tail = os.path.split(file_name)
+            if not head.endswith("/"):
+                head += "/"
+
+            with open(head + prefix + tail + ".pickle", "wb") as picklefile:
+                pickle.dump((pgm_obj, cmd_log_list), picklefile)
 
 
 def get_write_inference_rev_scripts(all_sims_model_spec_list: ty.List[str], all_sims_mcmc_logging_spec_list: ty.List[str], dir_list: ty.List[str], prefix: str="", write2file: bool=False) -> ty.List[str]:

@@ -21,8 +21,10 @@ class InexistentVariableError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: There was a problem when assigning \'" + self.rv_name + \
-            "\' as an argument. It seems this variable has not been not initialized."
+        return "ERROR: There was a problem when assigning \'" \
+            + self.rv_name + "\' as an argument. It seems this " \
+            + "variable has not been not initialized."
+
 
 class VariableAssignmentError(Exception):
     rv_name: str
@@ -34,7 +36,9 @@ class VariableAssignmentError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: Cannot assign values of different types to a variable (\'" + self.rv_name + "\'). Exiting..."
+        return "ERROR: Cannot assign values of different types to a " \
+            + "variable (\'" + self.rv_name + "\'). Exiting..."
+
 
 class VariableMisspec(Exception):
     rv_name: str
@@ -48,6 +52,7 @@ class VariableMisspec(Exception):
     def __str__(self) -> str:
         return "ERROR: Could not parse value out of variable \'" + self.rv_name + "\'."
 
+
 class NoSpecificationError(Exception):
     message: str
 
@@ -57,6 +62,7 @@ class NoSpecificationError(Exception):
     
     def __str__(self) -> str:
         return "ERROR: Function call had not arguments. "+ self.message
+
 
 class FunctionArgError(Exception):
     par_name: str
@@ -70,6 +76,8 @@ class FunctionArgError(Exception):
     def __str__(self) -> str:
         return "ERROR: Could not set value for function parameter " + self.par_name + ". " + self.message
 
+
+# TODO: coalesce with exception above, maybe grab arg name?
 class InvalidFunctionArgError(Exception):
     function_name: str
     message: str
@@ -82,6 +90,7 @@ class InvalidFunctionArgError(Exception):
     def __str__(self) -> str:
         return "ERROR: Could not specify function " + self.function_name + ". " + self.message
 
+
 class FunctionArgsMismatchError(Exception):
     fn_name: str
     message: str
@@ -92,7 +101,10 @@ class FunctionArgsMismatchError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: Could not call function " + self.fn_name + " because argument values are incongruent in some way. " + self.message + ". Exiting... "
+        return "ERROR: Could not call function " + self.fn_name \
+            + " because argument values are incongruent in some way. " \
+            + self.message
+
 
 class NotAParameterError(Exception):
     par_name: str
@@ -104,7 +116,9 @@ class NotAParameterError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: \'" + self.par_name + "\' does not seem to be a valid parameter." + self.message + " Exiting... "
+        return "ERROR: \'" + self.par_name + "\' does not seem to be " \
+            + "a valid parameter." + self.message
+
 
 class WrongDimensionError(Exception):
     container_name: str
@@ -112,7 +126,8 @@ class WrongDimensionError(Exception):
     exp_len: int
     message: str
 
-    def __init__(self, container_name: str, obs_len: int, exp_len: int=0, message: str="") -> None:
+    def __init__(self, container_name: str, obs_len: int,
+        exp_len: int=0, message: str="") -> None:
         self.obj_name = container_name
         self.obs_len = obs_len
         self.exp_len = exp_len
@@ -120,7 +135,9 @@ class WrongDimensionError(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "ERROR: Container " + self.obj_name + " had a different dimension than expected. " + self.message + ". Exiting... "
+        return "ERROR: Container " + self.obj_name + " had a different " \
+            + "dimension than expected. " + self.message + ". Exiting... "
+
 
 class DimensionalityError(Exception):
     dn_name: str
@@ -134,8 +151,9 @@ class DimensionalityError(Exception):
     def __str__(self) -> str:
         return "ERROR: When specifying distribution " + self.dn_name + ":\n" + \
             "  (i) the number of values provided for each parameters differed, or\n" + \
-            "  (ii) the number(s) was larger than the specified number of draws, or\n" + \
-            "  (iii) thet number(s) was larger than 1, but smaller than the specified number of draws.\nExiting..."
+            "  (ii) the number(s) was larger than the specified number of samples (i.e., draws), or\n" + \
+            "  (iii) the number(s) was larger than 1, but smaller than the specified number of samples.\nExiting..."
+
 
 class NodeInferenceDimensionalityError(Exception):
     node_name: str
@@ -176,7 +194,9 @@ class RequireScalarError(Exception):
         self.message = ""
         
     def __str__(self) -> str:
-        return "ERROR: When specifying distribution " + self.dn_name + "'s parameter " + self.arg + ", more than one value was provided. A scalar is required. Exiting..."
+        return "ERROR: When specifying distribution " + self.dn_name \
+            + "'s parameter \'" + self.arg + "\', more than one value was " \
+            + "provided. A scalar is required."
 
 class ReplicateNumberError(Exception):
     node_name: str
