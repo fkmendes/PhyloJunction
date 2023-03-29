@@ -6,7 +6,7 @@ import phylojunction.calculation.discrete_sse as sseobj
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-class TestDiscreteSSECheckingFunctions(unittest.TestCase):
+class TestDiscreteSSE(unittest.TestCase):
     
     def test_state2pattern_converter(self):
         """
@@ -48,14 +48,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/calculation/test_discrete_sse_checking_fns.py
+    # $ python3 tests/calculation/test_discrete_sse.py
     # 
     # or
     #
-    # $ python3 -m tests.calculation.test_discrete_sse_checking_fns
+    # $ python3.9 -m tests.calculation.test_discrete_sse
     #
     # or 
     #
-    # $ python3 -m unittest tests.calculation.test_discrete_sse_checking_fns.TestDiscreteSSECheckingFunctions.test_state2pattern_converter
+    # $ python3.9 -m unittest tests.calculation.test_discrete_sse.TestDiscreteSSE.test_state2pattern_converter
 
     unittest.main()

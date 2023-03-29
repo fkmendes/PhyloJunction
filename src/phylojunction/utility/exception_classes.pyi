@@ -44,6 +44,12 @@ class NotAParameterError(Exception):
     message: str
     def __init__(self, par_name: str, message: str = ...) -> None: ...
 
+class NotBetweenZeroAndOneError(Exception):
+    par_name: str
+    message: str
+    def __init__(self, par_name: str, message: str="") -> None: ...
+    def __str__(self) -> str: ...
+
 class WrongDimensionError(Exception):
     container_name: str
     obs_len: int

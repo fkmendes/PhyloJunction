@@ -18,19 +18,19 @@ class TestGeoSSETrees(unittest.TestCase):
         total_n_states = 3
 
         # calling state 0 "1" to match R unit test
-        rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="sA", val=1.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="xA", val=1.0, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="dA", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
+        rates_t0_s1 = [ sseobj.DiscreteStateDependentRate(name="sA", val=1.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
+                        sseobj.DiscreteStateDependentRate(name="xA", val=1.0, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
+                        sseobj.DiscreteStateDependentRate(name="dA", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
         
-        rates_t0_s2 = [ sseobj.MacroevolStateDependentRateParameter(name="sB", val=1.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[2,2,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="xB", val=1.0, event=sseobj.MacroevolEvent.EXTINCTION, states=[2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="dB", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]) ]
+        rates_t0_s2 = [ sseobj.DiscreteStateDependentRate(name="sB", val=1.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[2,2,2]),
+                        sseobj.DiscreteStateDependentRate(name="xB", val=1.0, event=sseobj.MacroevolEvent.EXTINCTION, states=[2]),
+                        sseobj.DiscreteStateDependentRate(name="dB", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]) ]
         
-        rates_t0_s3 = [ sseobj.MacroevolStateDependentRateParameter(name="sAB", val=0.75, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[0,1,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="sAB_AB_A", val=1.25, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[0,0,1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="sAB_AB_B", val=1.25, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[0,0,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="dAB_B", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="dAB_A", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1])
+        rates_t0_s3 = [ sseobj.DiscreteStateDependentRate(name="sAB", val=0.75, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[0,1,2]),
+                        sseobj.DiscreteStateDependentRate(name="sAB_AB_A", val=1.25, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[0,0,1]),
+                        sseobj.DiscreteStateDependentRate(name="sAB_AB_B", val=1.25, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[0,0,2]),
+                        sseobj.DiscreteStateDependentRate(name="dAB_B", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,2]),
+                        sseobj.DiscreteStateDependentRate(name="dAB_A", val=1.0, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1])
                       ]
         
         rates_t0 = rates_t0_s1 + rates_t0_s2 + rates_t0_s3
@@ -39,9 +39,9 @@ class TestGeoSSETrees(unittest.TestCase):
         # matrix_atomic_rate_params = [ [ rates_t0_s1, rates_t0_s2, rates_t0_s3 ] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         matrix_atomic_rate_params = [ rates_t0 ]
 
-        fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
         
-        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
 
     def test_tree_size_state_count_max_t_geosse(self):

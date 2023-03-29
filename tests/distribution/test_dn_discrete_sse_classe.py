@@ -17,19 +17,19 @@ class TestClaSSETrees(unittest.TestCase):
         total_n_states = 3
 
         # calling state 0 "1" to match R unit test
-        rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=0.9, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.6, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                        sseobj.MacroevolStateDependentRateParameter(name="q13", val=0.9, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,2]) ]
+        rates_t0_s1 = [ sseobj.DiscreteStateDependentRate(name="lambda1", val=0.9, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                        sseobj.DiscreteStateDependentRate(name="mu1", val=0.6, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
+                        sseobj.DiscreteStateDependentRate(name="q13", val=0.9, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,2]) ]
         
-        rates_t0_s2 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda2", val=0.7, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="mu2", val=0.4, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="q23", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,2]) ]
+        rates_t0_s2 = [ sseobj.DiscreteStateDependentRate(name="lambda2", val=0.7, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
+                        sseobj.DiscreteStateDependentRate(name="mu2", val=0.4, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
+                        sseobj.DiscreteStateDependentRate(name="q23", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,2]) ]
         
-        rates_t0_s3 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda312", val=1.2, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="lambda313", val=0.9, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[2,0,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="lambda323", val=0.7, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[2,1,2]),
-                        sseobj.MacroevolStateDependentRateParameter(name="q31", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]),
-                        sseobj.MacroevolStateDependentRateParameter(name="q32", val=0.6, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,1]) ]
+        rates_t0_s3 = [ sseobj.DiscreteStateDependentRate(name="lambda312", val=1.2, event=sseobj.MacroevolEvent.BW_SPECIATION, states=[2,0,1]),
+                        sseobj.DiscreteStateDependentRate(name="lambda313", val=0.9, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[2,0,2]),
+                        sseobj.DiscreteStateDependentRate(name="lambda323", val=0.7, event=sseobj.MacroevolEvent.ASYM_SPECIATION, states=[2,1,2]),
+                        sseobj.DiscreteStateDependentRate(name="q31", val=0.4, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,0]),
+                        sseobj.DiscreteStateDependentRate(name="q32", val=0.6, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[2,1]) ]
         
         rates_t0 = rates_t0_s1 + rates_t0_s2 + rates_t0_s3
 
@@ -37,9 +37,9 @@ class TestClaSSETrees(unittest.TestCase):
         # matrix_atomic_rate_params = [ [ rates_t0_s1, rates_t0_s2, rates_t0_s3 ] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         matrix_atomic_rate_params = [ rates_t0 ]
 
-        fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
         
-        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
 
     def test_tree_size_state_count_max_taxa_classe(self):

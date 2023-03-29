@@ -3,7 +3,7 @@ from _typeshed import Incomplete
 
 MacroevolEvent: Incomplete
 
-class MacroevolStateDependentRateParameter:
+class DiscreteStateDependentRate:
     value: ty.List[float]
     name: Incomplete
     state_tuple: Incomplete
@@ -16,28 +16,35 @@ class MacroevolStateDependentRateParameter:
     def get_length(self): ...
     def get_gcf(self) -> None: ...
 
-class FIGRatesManager:
-    atomic_rate_params_matrix: Incomplete
+class DiscreteStateDependentParameter:
+    val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
+    name: str
+    state: int
+    def __init__(self, val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], name: str="", state: int=0) -> None: ...
+    def _initialize_str_representation(self) -> None: ...
+
+class DiscreteStateDependentParameterManager:
+    matrix_state_dep_params: ty.List[ty.List[DiscreteStateDependentParameter]]
     state_count: int
     seed_age_for_time_slicing: ty.Optional[float]
     n_time_slices: int
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
-    atomic_rate_params_dict: Incomplete
+    state_dep_params_dict: Incomplete
     epsilon: Incomplete
-    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
-    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]]): ...
-    def atomic_rate_params_at_time(self, atomic_rate_params_matrix, a_time: float): ...
+    def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[DiscreteStateDependentParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
+    def init_matrix_state_dep_params_dict(self, matrix_atomic_rate_params: ty.List[ty.List[DiscreteStateDependentParameter]]): ...
+    def state_dep_params_at_time(self, atomic_rate_params_matrix, a_time: float): ...
 
 class MacroevolEventHandler:
-    fig_rates_manager: FIGRatesManager
+    state_dep_par_manager: DiscreteStateDependentParameterManager
     state_count: int
     n_time_slices: int
     seed_age: float
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
     str_representation: str
-    def __init__(self, a_fig_rates_manager: FIGRatesManager) -> None: ...
+    def __init__(self, a_fig_rates_manager: DiscreteStateDependentParameterManager) -> None: ...
     def total_rate(self, a_time: float, state_representation_dict: ty.Dict[int, ty.Set[str]], value_idx: int = ..., departing_state: ty.Optional[int] = ..., debug: bool = ...): ...
     def sample_event_atomic_parameter(self, denominator: float, a_time: float, state_indices: ty.List[int], value_idx: int = ..., a_seed: ty.Optional[float] = ..., debug: bool = ...): ...
     def get_gcf(self) -> None: ...

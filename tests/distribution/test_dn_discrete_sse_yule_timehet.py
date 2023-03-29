@@ -37,18 +37,18 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         # not state-dependent (just state 0, and no transition)
         total_n_states = 1
 
-        rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda_t0", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
-        rates_t1_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda_t1", val=0.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
-        rates_t2_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda_t2", val=3.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
-        rates_t3_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda_t3", val=0.4, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
+        rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t0", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
+        rates_t1_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t1", val=0.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
+        rates_t2_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t2", val=3.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
+        rates_t3_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t3", val=0.4, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
 
         # original implementation
         # matrix_atomic_rate_params = [ [ rates_t0_s0 ], [ rates_t1_s0 ], [ rates_t2_s0 ], [ rates_t3_s0 ] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         matrix_atomic_rate_params = [ rates_t0_s0, rates_t1_s0, rates_t2_s0, rates_t3_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-        fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states, seed_age_for_time_slicing=cls.seed_age_for_time_slicing, list_time_slice_age_ends=cls.time_slice_age_ends)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states, seed_age_for_time_slicing=cls.seed_age_for_time_slicing, list_time_slice_age_ends=cls.time_slice_age_ends)
 
-        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
 
     def test_tree_size_state_count_max_taxa_timehet_yule(self):

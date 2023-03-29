@@ -23,18 +23,18 @@ class TestDnSSEObject(unittest.TestCase):
         total_n_states = 2
 
         l = [ 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-        lrate = sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=l, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
+        lrate = sseobj.DiscreteStateDependentRate(name="lambda0", val=l, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
         
         mu = [ 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0, 10.0, 10.0 ]
-        murate = sseobj.MacroevolStateDependentRateParameter(name="mu0", val=mu, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
+        murate = sseobj.DiscreteStateDependentRate(name="mu0", val=mu, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
         
         rates_t0 = [ lrate, murate ]
 
         matrix_atomic_rate_params = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
         
-        fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
-        meh = sseobj.MacroevolEventHandler(fig_rates_manager)
+        meh = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
         ########
         # Tree #

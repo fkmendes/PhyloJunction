@@ -22,7 +22,7 @@ class TestDataDump(unittest.TestCase):
         total_n_states = 2
 
         l0 = [ 1.0, 1.1, 0.9, 0.95, 1.05 ]
-        l0rate = sseobj.MacroevolStateDependentRateParameter(
+        l0rate = sseobj.DiscreteStateDependentRate(
             name="lambda0",
             val=l0,
             event=sseobj.MacroevolEvent.W_SPECIATION,
@@ -30,14 +30,14 @@ class TestDataDump(unittest.TestCase):
         )
 
         mu0 = [ 0.23, 0.24, 0.25, 0.26, 0.27 ]
-        mu0rate = sseobj.MacroevolStateDependentRateParameter(
+        mu0rate = sseobj.DiscreteStateDependentRate(
             name="mu0",
             val=mu0,
             event=sseobj.MacroevolEvent.EXTINCTION,
             states=[0]
         )
         
-        q01rate = sseobj.MacroevolStateDependentRateParameter(
+        q01rate = sseobj.DiscreteStateDependentRate(
             name="q01",
             val=0.75,
             event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
@@ -46,21 +46,21 @@ class TestDataDump(unittest.TestCase):
         
         rates_t0_s0 = [ l0rate, mu0rate, q01rate ]
 
-        l1rate = sseobj.MacroevolStateDependentRateParameter(
+        l1rate = sseobj.DiscreteStateDependentRate(
             name="lambda1",
             val=1.5,
             event=sseobj.MacroevolEvent.W_SPECIATION,
             states=[1,1,1]
         )
         
-        mu1rate = sseobj.MacroevolStateDependentRateParameter(
+        mu1rate = sseobj.DiscreteStateDependentRate(
             name="mu1",
             val=0.25,
             event=sseobj.MacroevolEvent.EXTINCTION,
             states=[1]
         )
         
-        q10rate = sseobj.MacroevolStateDependentRateParameter(
+        q10rate = sseobj.DiscreteStateDependentRate(
             name="q10",
             val=0.75,
             event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
@@ -75,7 +75,7 @@ class TestDataDump(unittest.TestCase):
         # 2D: all rates from all states in i-th time slice
         matrix_atomic_rate_params = [ rates_t0 ]
         
-        fig_rates_manager = sseobj.FIGRatesManager(
+        fig_rates_manager = sseobj.DiscreteStateDependentParameterManager(
             matrix_atomic_rate_params, total_n_states
         )
 

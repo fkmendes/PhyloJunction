@@ -19,16 +19,16 @@ class TestBDTrees(unittest.TestCase):
         total_n_states = 1
 
         # not state-dependent (just state 0, and no transition)
-        rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.MacroevolStateDependentRateParameter(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
+        rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                        sseobj.DiscreteStateDependentRate(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
 
         # original implementation
         # matrix_atomic_rate_params = [ [rates_t0_s0] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-        fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
-        cls.event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
+        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
 
     def test_tree_size_total_count_max_taxa_bd(self):
@@ -434,14 +434,14 @@ if __name__ == '__main__':
     # total_n_states = 1
 
     # # not state-dependent (just state 0, and no transition)
-    # rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-    #                 sseobj.MacroevolStateDependentRateParameter(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
+    # rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+    #                 sseobj.DiscreteStateDependentRate(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
 
     # matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-    # fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
+    # state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
-    # event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
+    # event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
     # # stop_condition = "size"
     # stop_condition = "age"

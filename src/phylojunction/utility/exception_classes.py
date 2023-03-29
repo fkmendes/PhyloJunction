@@ -11,6 +11,7 @@ class ScriptSyntaxError(Exception):
         return "ERROR: " + self.cmd_line + \
             "\n\nThe line above had a syntax problem. " + self.message
 
+
 class InexistentVariableError(Exception):
     rv_name: str
     message: str
@@ -50,7 +51,8 @@ class VariableMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: Could not parse value out of variable \'" + self.rv_name + "\'."
+        return "ERROR: Could not parse value out of variable \'" \
+            + self.rv_name + "\'."
 
 
 class NoSpecificationError(Exception):
@@ -74,7 +76,8 @@ class FunctionArgError(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: Could not set value for function parameter " + self.par_name + ". " + self.message
+        return "ERROR: Could not set value for function parameter " \
+            + self.par_name + ". " + self.message
 
 
 # TODO: coalesce with exception above, maybe grab arg name?
@@ -118,6 +121,20 @@ class NotAParameterError(Exception):
     def __str__(self) -> str:
         return "ERROR: \'" + self.par_name + "\' does not seem to be " \
             + "a valid parameter." + self.message
+
+
+class NotBetweenZeroAndOneError(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str, message: str="") -> None:
+        self.par_name = par_name
+        self.message = message
+        super().__init__(self.message)
+    
+    def __str__(self) -> str:
+        return "ERROR: \'" + self.par_name + "\' must be contained in " \
+            + "[0,1], but it was " + self.message + "."
 
 
 class WrongDimensionError(Exception):
@@ -169,6 +186,7 @@ class NodeInferenceDimensionalityError(Exception):
             "number of values as larger than 1, but smaller than the number of samples specified for " + \
             "other nodes. Unsure how to parse values. Exiting..."
 
+
 class NoPlatingAllowedError(Exception):
     det_name: str
     message: str
@@ -184,6 +202,7 @@ class NoPlatingAllowedError(Exception):
         return "ERROR: When executing " + self.det_name + "(), replicates were detected for argument " + \
             self.node_pgm_name + ". Plating is not supported for this deterministic function.\nExiting... "
 
+
 class RequireScalarError(Exception):
     dn_name: str
     message: str
@@ -198,6 +217,7 @@ class RequireScalarError(Exception):
             + "'s parameter \'" + self.arg + "\', more than one value was " \
             + "provided. A scalar is required."
 
+
 class ReplicateNumberError(Exception):
     node_name: str
     message: str
@@ -209,6 +229,7 @@ class ReplicateNumberError(Exception):
 
     def __str__(self) -> str:
         return "ERROR: When going through values in " + self.node_name + ", the number of replicates differed among simulations. One or more of the simulations failed to generate the specified number of replicates. Exiting..."
+
 
 class DimensionalityWarning(Exception):
     rv_name: str
@@ -224,6 +245,7 @@ class DimensionalityWarning(Exception):
     def __str__(self) -> str:
         return "\Warning: Distribution " + self.dn_name + " will be called to sample " + self.rv_name + " using vectorization."
 
+
 class SSEAtomicRateMisspec(Exception):
     message: str
 
@@ -234,6 +256,7 @@ class SSEAtomicRateMisspec(Exception):
     def __str__(self) -> str:
         return "ERROR: Misspecified SSE atomic rate parameter input. " + self.message
 
+
 class SSEStashMisspec(Exception):
     message: str
 
@@ -243,6 +266,7 @@ class SSEStashMisspec(Exception):
     
     def __str__(self) -> str:
         return "ERROR: Misspecified SSE stash parameter input. " + self.message
+
 
 class DnInitMisspec(Exception):
     dn_name: str
@@ -256,6 +280,7 @@ class DnInitMisspec(Exception):
     def __str__(self) -> str:
         return "ERROR: Distribution " + self.dn_name + " was not properly initialized. " + self.message
 
+
 class InvalidMCMCChainLength(Exception):
     message: str
 
@@ -265,6 +290,7 @@ class InvalidMCMCChainLength(Exception):
 
     def __str__(self) -> str:
         return "ERROR: " + self.message
+
 
 # Tree exceptions #
 class AnnotatedTreeMisspec(Exception):
@@ -276,6 +302,7 @@ class AnnotatedTreeMisspec(Exception):
     
     def __str__(self) -> str:
         return "ERROR: Misspecified AnnotatedTree input. " + self.message
+
 
 class AnnotatedTreeLineageMissannotation(Exception):
     message: str

@@ -25,7 +25,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # all remaining args must be specified
     n_samples: int = 1
     n_repl: int = 1
-    event_handler: sseobj.MacroevolEventHandler = sseobj.MacroevolEventHandler(sseobj.FIGRatesManager([[]], 1))
+    event_handler: sseobj.MacroevolEventHandler = sseobj.MacroevolEventHandler(sseobj.DiscreteStateDependentParameterManager([[]], 1))
     stop_str: str
     stop_values_list: ty.List[float] = []
     origin: bool = True
@@ -155,7 +155,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
     
     # making sure essential parameters of distribution have been specified
-    if not any(event_handler.fig_rates_manager.atomic_rate_params_matrix):
+    if not any(event_handler.state_dep_par_manager.matrix_state_dep_params):
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"meh\" is missing.")
     if not stop_values_list:
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
@@ -191,19 +191,19 @@ if __name__ == "__main__":
 
     total_n_states = 2
 
-    rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.MacroevolStateDependentRateParameter(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                        sseobj.MacroevolStateDependentRateParameter(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
+    rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+                        sseobj.DiscreteStateDependentRate(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
+                        sseobj.DiscreteStateDependentRate(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
 
-    rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                        sseobj.MacroevolStateDependentRateParameter(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
+    rates_t0_s1 = [ sseobj.DiscreteStateDependentRate(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
+                        sseobj.DiscreteStateDependentRate(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
+                        sseobj.DiscreteStateDependentRate(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
 
     rates_t0 = rates_t0_s0 + rates_t0_s1
 
     matrix_atomic_rate_params = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-    fig_rates_manager = sseobj.FIGRatesManager(matrix_atomic_rate_params, total_n_states)
+    fig_rates_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
     event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
 

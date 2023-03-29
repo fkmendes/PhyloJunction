@@ -10,7 +10,6 @@ from PySide6.QtWidgets import QStackedWidget  # type: ignore
 from PySide6.QtWidgets import QLabel  # type: ignore
 from PySide6.QtWidgets import QSpacerItem  # type: ignore
 from PySide6.QtWidgets import QSizePolicy  # type: ignore
-from PySide6.QtWidgets import QPushButton  # type: ignore
 from PySide6.QtWidgets import QMessageBox  # type: ignore
 
 # pj imports #

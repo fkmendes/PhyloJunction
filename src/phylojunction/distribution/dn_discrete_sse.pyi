@@ -60,7 +60,7 @@ class DnSSE(pgm.DistributionPGM):
                       sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
                       untargetable_node_set: ty.Set[str],
                       cumulative_node_count: int,
-                      macroevol_atomic_param: sseobj.MacroevolStateDependentRateParameter,
+                      macroevol_atomic_param: sseobj.DiscreteStateDependentRate,
                       event_t: float,
                       debug: bool = ...) -> ty.Tuple[dp.Node, int]: ...
     def execute_death(self,
@@ -77,7 +77,7 @@ class DnSSE(pgm.DistributionPGM):
                          state_transition_dict: ty.Dict[str, ty.List[pjat.AttributeTransition]],
                          sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
                          untargetable_node_set: ty.Set[str],
-                         macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
+                         macroevol_rate_param: sseobj.DiscreteStateDependentRate,
                          event_t: float,
                          debug: bool = ...) -> None: ...
     def execute_sample_ancestor(self,
@@ -92,7 +92,7 @@ class DnSSE(pgm.DistributionPGM):
     def update_sa_lineage_dict(self, a_time: float, sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]], sa_lineage_node_labels: ty.List[str], debug: bool=False) -> None: ...
     def execute_event(self,
                       tr_namespace,
-                      macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
+                      macroevol_rate_param: sseobj.DiscreteStateDependentRate,
                       chosen_node: dp.Node,
                       state_representation_dict: ty.Dict[int, ty.Set[str]],
                       state_transition_dict: ty.Dict[str, ty.List[pjat.AttributeTransition]],

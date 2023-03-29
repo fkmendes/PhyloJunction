@@ -107,13 +107,13 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
         # TODO: deal with vectorization later
         if isinstance(sse_rate_name, str):
             # see 'invariance vs covariance' in mypy's doc for why list() is called here
-            return sseobj.MacroevolStateDependentRateParameter(name=sse_rate_name, val=list(value), event=event_type, states=the_states)
+            return sseobj.DiscreteStateDependentRate(name=sse_rate_name, val=list(value), event=event_type, states=the_states)
     
     else:
         # TODO: deal with vectorization later
         if isinstance(sse_rate_name, str):
             # see 'invariance vs covariance' in mypy's doc for why list() is called here
-            return sseobj.MacroevolStateDependentRateParameter(name=sse_rate_name, val=list(value), event=event_type)
+            return sseobj.DiscreteStateDependentRate(name=sse_rate_name, val=list(value), event=event_type)
 
 
 def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroevolEventHandler:
@@ -173,28 +173,28 @@ def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[
         raise ec.SSEStashMisspec(message="Cannot initialize SSE stash without a vector of SSE rates. Exiting...")
         
     # _matrix_det_node_atomic_rate_params: ty.List[pgm.DeterministicNodePGM] = []
-    _matrix_atomic_rate_params: ty.List[ty.List[sseobj.MacroevolStateDependentRateParameter]] = []
+    _matrix_atomic_rate_params: ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
     _total_n_rate_params = len(_flat_rate_mat)
     _n_rate_params_per_slice = int(_total_n_rate_params / _n_time_slices)
     
     # iterating over time slices
     for i in range(0, _total_n_rate_params, _n_rate_params_per_slice):
 
-        atomic_rate_params: ty.List[sseobj.MacroevolStateDependentRateParameter] = []
+        atomic_rate_params: ty.List[sseobj.DiscreteStateDependentRate] = []
         for atomic_rate_param_det_nd in _flat_rate_mat[i:(i+_n_rate_params_per_slice)]:
 
             # so mypy won't complain
-            if isinstance(atomic_rate_param_det_nd.value, sseobj.MacroevolStateDependentRateParameter):
+            if isinstance(atomic_rate_param_det_nd.value, sseobj.DiscreteStateDependentRate):
                 atomic_rate_params.append(atomic_rate_param_det_nd.value)
         
-        _matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of MacroevolStateDependentRateParameter
+        _matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of DiscreteStateDependentRate
                                                               # 1D: time slices, 2D: atomic SSE rate list
         
         # _matrix_det_node_atomic_rate_params.append(_flat_rate_mat[i:(i+_n_rate_params_per_slice)]) # list of lists of DeterministicNodePGM's
     
     # matrix_atomic_rate_params = [det_node_atomic_rate.value for det_node_atomic_rate in _matrix_det_node_atomic_rate_params]
         
-    # fig_rates_manager = FIGRatesManager(_matrix_det_node_atomic_rate_params, _n_states)
-    fig_rates_manager = sseobj.FIGRatesManager(_matrix_atomic_rate_params, _n_states, seed_age_for_time_slicing=_seed_age_for_time_slicing, list_time_slice_age_ends=_time_slice_age_ends)
+    # fig_rates_manager = DiscreteStateDependentParameterManager(_matrix_det_node_atomic_rate_params, _n_states)
+    fig_rates_manager = sseobj.DiscreteStateDependentParameterManager(_matrix_atomic_rate_params, _n_states, seed_age_for_time_slicing=_seed_age_for_time_slicing, list_time_slice_age_ends=_time_slice_age_ends)
         
     return sseobj.MacroevolEventHandler(fig_rates_manager)

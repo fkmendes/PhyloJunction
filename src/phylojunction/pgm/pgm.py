@@ -459,7 +459,7 @@ class StochasticNodePGM(NodePGM):
             if isinstance(self.value[0], (int, float, str, np.float64)):
                 self.operator_weight = 1 # this is a scalar random variable
             
-            # has objects like MacroevolStateDependentRateParameter inside list of values
+            # has objects like DiscreteStateDependentRate inside list of values
             else:
                 # TODO: later see how rev moves 2D-arrays and tree nodes
                 # print("value has objects inside")

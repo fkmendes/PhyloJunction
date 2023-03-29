@@ -12,30 +12,80 @@ class TestMacroEvolEvent(unittest.TestCase):
     def setUpClass(cls):
         # birth-death
         total_n_states = 1
-        cls.bd_rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                            sseobj.MacroevolStateDependentRateParameter(name="mu", val=0.5, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
+        cls.bd_rates_t0_s0 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda", val=1.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]
+            ),
+            sseobj.DiscreteStateDependentRate(
+                name="mu", val=0.5,
+                event=sseobj.MacroevolEvent.EXTINCTION, states=[0]
+            )
+        ]
         
-        bd_matrix_atomic_rate_params = [ cls.bd_rates_t0_s0 ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
-        bd_fig_rates_manager = sseobj.FIGRatesManager(bd_matrix_atomic_rate_params, total_n_states)
-        cls.bd_event_handler = sseobj.MacroevolEventHandler(bd_fig_rates_manager)
-        cls.bd_state_representation_dict = { 0: ["nd3", "nd4", "nd5", "nd6"] }
+        # 1D: time slices
+        # 2D: states
+        # 3D: parameters of state, several parameters -> matrix
+        bd_matrix_atomic_rate_params = [ cls.bd_rates_t0_s0 ]
+        bd_discrete_state_dep_param_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                bd_matrix_atomic_rate_params, total_n_states
+            )
+        cls.bd_event_handler = \
+            sseobj.MacroevolEventHandler(bd_discrete_state_dep_param_manager)
+        cls.bd_state_representation_dict = \
+            { 0: ["nd3", "nd4", "nd5", "nd6"] }
 
 
         # BiSSE
         total_n_states = 2
-        cls.bisse_rates_t0_s0 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                                  sseobj.MacroevolStateDependentRateParameter(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                                  sseobj.MacroevolStateDependentRateParameter(name="q01", val=0.5, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
-        cls.bisse_rates_t0_s1 = [ sseobj.MacroevolStateDependentRateParameter(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                                  sseobj.MacroevolStateDependentRateParameter(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                                  sseobj.MacroevolStateDependentRateParameter(name="q10", val=0.5, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
+        cls.bisse_rates_t0_s0 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda0", val=0.5,
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]
+            ),
+            sseobj.DiscreteStateDependentRate(
+                name="mu0", val=0.25,
+                event=sseobj.MacroevolEvent.EXTINCTION, states=[0]
+            ),
+            sseobj.DiscreteStateDependentRate(
+                name="q01", val=0.5,
+                event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
+                states=[0,1]
+            )
+        ]
+        cls.bisse_rates_t0_s1 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda1", val=1.5,
+                event=sseobj.MacroevolEvent.W_SPECIATION,
+                states=[1,1,1]
+            ),
+            sseobj.DiscreteStateDependentRate(
+                name="mu1", val=0.25,
+                event=sseobj.MacroevolEvent.EXTINCTION,
+                states=[1]
+            ),
+            sseobj.DiscreteStateDependentRate(
+                name="q10", val=0.5,
+                event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
+                states=[1,0]
+            )
+        ]
 
         bisse_rates_t0 = cls.bisse_rates_t0_s0 + cls.bisse_rates_t0_s1
         
-        bisse_matrix_atomic_rate_params = [ bisse_rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
-        bisse_fig_rates_manager = sseobj.FIGRatesManager(bisse_matrix_atomic_rate_params, total_n_states)
-        cls.bisse_event_handler = sseobj.MacroevolEventHandler(bisse_fig_rates_manager)
-        cls.bisse_state_representation_dict = { 0: ["nd3"], 1: ["nd4", "nd5", "nd6"] }
+        # 1D: time slices (i)
+        # 2D: all rates from all states in i-th time slice
+        bisse_matrix_atomic_rate_params = [ bisse_rates_t0 ]
+        bisse_fig_rates_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                bisse_matrix_atomic_rate_params, total_n_states
+            )
+        cls.bisse_event_handler = \
+            sseobj.MacroevolEventHandler(bisse_fig_rates_manager)
+        cls.bisse_state_representation_dict = \
+            { 0: ["nd3"], 1: ["nd4", "nd5", "nd6"] }
+
 
     def test_total_rate_single_epoch_bd(self):
         """

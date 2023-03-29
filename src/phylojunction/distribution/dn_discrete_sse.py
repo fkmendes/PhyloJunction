@@ -161,7 +161,7 @@ class DnSSE(pgm.DistributionPGM):
             raise ec.DnInitMisspec(self.DN_NAME, "When providing time-slice age ends, you must specify a seed (origin or root) age to anchor the tree and ensure the tree spans those slices. Exiting...")
         
         if self.stop == "age" and self.seed_age:
-            # TODO: make sure seed age in FIGManager is vectorized and that in script, the same variable is used for both FIGRateManager and stop condition value in the spec of this distribution
+            # TODO: make sure seed age in FIGManager is vectorized and that in script, the same variable is used for both DiscreteStateDependentParameterManager and stop condition value in the spec of this distribution
             for idx, a_stop_val in enumerate(self.stop_val):
                 # TODO: will need to do self.seed_age[idx] later when vectorization is added
                 if a_stop_val != self.seed_age:
@@ -216,7 +216,7 @@ class DnSSE(pgm.DistributionPGM):
         #
         # 1D: time slices, 2D: list of atomic rate params
         atomic_rate_params_matrix = \
-            self.events.fig_rates_manager.atomic_rate_params_matrix
+            self.events.state_dep_par_manager.matrix_state_dep_params
 
         ############################
         # Checking rate parameters #
@@ -287,7 +287,7 @@ class DnSSE(pgm.DistributionPGM):
                     state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
                     untargetable_node_set: ty.Set[str],
                     cumulative_node_count: int,
-                    macroevol_atomic_param: sseobj.MacroevolStateDependentRateParameter,
+                    macroevol_atomic_param: sseobj.DiscreteStateDependentRate,
                     event_t: float,
                     debug=False) -> ty.Tuple[dp.Node, int]:
         """Execute lineage birth (side-effect and return)
@@ -555,7 +555,7 @@ class DnSSE(pgm.DistributionPGM):
                         state_representation_dict: ty.Dict[int, ty.Set[str]],
                         state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
                         untargetable_node_set: ty.Set[str],
-                        macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
+                        macroevol_rate_param: sseobj.DiscreteStateDependentRate,
                         event_t: float,
                         debug: bool=False) -> None:
         """
@@ -803,7 +803,7 @@ class DnSSE(pgm.DistributionPGM):
 
     def execute_event(self,
                         tr_namespace,
-                        macroevol_rate_param: sseobj.MacroevolStateDependentRateParameter,
+                        macroevol_rate_param: sseobj.DiscreteStateDependentRate,
                         chosen_node: dp.Node,
                         state_representation_dict: ty.Dict[int, ty.Set[str]],
                         state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
@@ -818,7 +818,7 @@ class DnSSE(pgm.DistributionPGM):
 
         Args:
             tr_namespace (dendropy.TaxonNamespace): Dendropy object recording taxa in the tree.
-            macroevol_rate_param (MacroevolStateDependentRateParameter): Instance of MacroevolStateDependentRateParameter carrying event information.
+            macroevol_rate_param (DiscreteStateDependentRate): Instance of DiscreteStateDependentRate carrying event information.
             chosen_node (dendropy.Node): Node that will undergo event.
             state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
             sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children..

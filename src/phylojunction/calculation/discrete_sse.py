@@ -3,6 +3,7 @@ import numpy as np
 import enum
 import random
 import math
+from abc import ABC, abstractmethod
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
@@ -22,15 +23,76 @@ class MacroevolEvent(enum.Enum):
 
 ##############################################################################
 
-class MacroevolStateDependentRateParameter():
-    """Main class for discrete-state macroevolutionary parameters
+
+class DiscreteStateDependentParameter():
+    """
+    Main class for discrete state-dependent parameters
+
+    Supports vectorization of values only.
+    """
+
+    val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
+    name: str
+    state: int=0  # associated state
+
+    def __init__(self,
+        val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
+        name: str="", state: int=0):
+
+        self.name = name
+        self.state = state
+        self.value = []
+
+        # scalar
+        if isinstance(val, (float, int, str)):
+            # vectorizing if input wasn't in list or ndarray form
+            self.value = [float(val)]
+
+        # list
+        elif isinstance(val, list):
+            if isinstance(val[0], (int, float, str, np.float64)):
+                self.value = [float(v) for v in val]
+            
+            else:
+                raise ec.SSEAtomicRateMisspec(
+                    message="Could not recognize type of value argument, " \
+                        " for parameter " + self.name + ". Cannot initialize " + name + ".")
+
+        else:
+            raise ec.SSEAtomicRateMisspec(
+                message="Argument to value parameter is not either in scalar or " \
+                    + "vectorized form (it is likely an object). " \
+                    + " Cannot initialize. " + name)
+
+    @abstractmethod
+    def _initialize_str_representation(self) -> None:
+        pass
+
+    def __len__(self):
+        if isinstance(self.value, list):
+            return len(self.value)
+        else:
+            return 1
+
+##############################################################################
+
+
+class DiscreteStateDependentRate_old_and_working():
+    """
+    Main class for discrete state-dependent rate parameters
 
     Supports vectorization of values only.
     """
     
-    value: ty.List[float]
-    
-    def __init__(self, val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], event: MacroevolEvent, name: str="", states: ty.List[int]=[0,0,0]):
+    value: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
+    event: MacroevolEvent
+    name: str
+    states: ty.List[int]
+
+    def __init__(self,
+        val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
+        event: MacroevolEvent, name: str="", states: ty.List[int]=[0,0,0]):
+
         self.name = name
         self.value = []
         
@@ -50,11 +112,17 @@ class MacroevolStateDependentRateParameter():
             #     val = val.tolist()
             if isinstance(val[0], (int, float, str, np.float64)):
                 self.value = [float(v) for v in val]
+            
             else:
-                raise ec.SSEAtomicRateMisspec(message="Could not recognize type of value parameter. Cannot initialize. Exiting...")
+                raise ec.SSEAtomicRateMisspec(
+                    message="Could not recognize type of value argument, " \
+                        " for parameter " + self.name + ". Cannot initialize " + name + ".")
 
         else:
-            raise ec.SSEAtomicRateMisspec(message="Argument to value parameter is not already in vectorized or scalar form (it is likely an object). Cannot initialize. Exiting...")
+            raise ec.SSEAtomicRateMisspec(
+                message="Argument to value parameter is not either in scalar or " \
+                    + "vectorized form (it is likely an object). " \
+                    + " Cannot initialize. " + name)
 
         self.state_tuple = tuple(int(s) for s in states)
         self.departing_state = self.state_tuple[0]
@@ -70,31 +138,42 @@ class MacroevolStateDependentRateParameter():
 
         # making sure inputs are ok
         if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Extinction only takes a departing state (and no arriving states). Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="Extinction only takes a " \
+                + "departing state (and no arriving states).")
 
         if self.event == MacroevolEvent.W_SPECIATION and \
             len(set(self.arriving_states)) != 1 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Within-state speciation requires the departing and arriving states to be all the same. Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="Within-state speciation " \
+                + "requires the departing and arriving states to be all " \
+                + "the same.")
 
         if self.event == MacroevolEvent.BW_SPECIATION and \
             len(set(self.arriving_states)) != 2 and \
                 self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Between-state speciation requires the departing and the two arriving states to be all different. Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="Between-state speciation " \
+                + "requires the departing and the two arriving states to be " \
+                + "all different.")
 
         if self.event == MacroevolEvent.ASYM_SPECIATION and \
             len(set(self.arriving_states)) != 2 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Asymmetric-state speciation requires the departing and one of the arriving states to be the same, and " + \
-                "the other arriving state to be different. Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="Asymmetric-state " \
+                + "speciation requires the departing and one of the " \
+                + "arriving states to be the same, and the other " \
+                + "arriving state to be different. Exiting...")
 
         if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
             len(set(self.arriving_states)) != 1 and \
                 self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="State transition requires the departing and arriving states to be different. Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="State transition " \
+                + "requires the departing and arriving states to be " \
+                + "different.")
 
         if self.event == MacroevolEvent.ANCESTOR_SAMPLING and self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling only takes a departing state (and no arriving states). Exiting...")
+            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling " \
+                + "only takes a departing state (and no arriving " \
+                + "states).")
 
     def __str__(self):
         return self.str_representation
@@ -108,22 +187,301 @@ class MacroevolStateDependentRateParameter():
         else:
             return 1
 
-    def sample(self):
-        super().sample()
+##############################################################################
 
-    def get_length(self):
-        return super().get_length()
 
-    def get_gcf(self):
-        pass
+class DiscreteStateDependentRate(DiscreteStateDependentParameter):
+    """
+    Main class for discrete state-dependent rate parameters
+
+    Supports vectorization of values only.
+    """
+    
+    states: ty.List[int]
+    
+    def __init__(self,
+        val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
+        event: MacroevolEvent, name: str="", states: ty.List[int]=[0,0,0]):
+
+        # side-effect: initializes self.value, self.name, self.state
+        state = int(states[0])
+        super().__init__(val=val, name=name, state=state)
+
+        self.state_tuple = tuple(int(s) for s in states)
+        self.departing_state = self.state_tuple[0]
+        self.arriving_states = self.state_tuple[1:] # does not include time_slice_index 1
+        
+        # making sure inputs are ok
+        self.event = event
+        if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Extinction only takes a " \
+                + "departing state (and no arriving states).")
+
+        if self.event == MacroevolEvent.W_SPECIATION and \
+            len(set(self.arriving_states)) != 1 and \
+                not self.departing_state in self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Within-state speciation " \
+                + "requires the departing and arriving states to be all " \
+                + "the same.")
+
+        if self.event == MacroevolEvent.BW_SPECIATION and \
+            len(set(self.arriving_states)) != 2 and \
+                self.departing_state in self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Between-state speciation " \
+                + "requires the departing and the two arriving states to be " \
+                + "all different.")
+
+        if self.event == MacroevolEvent.ASYM_SPECIATION and \
+            len(set(self.arriving_states)) != 2 and \
+                not self.departing_state in self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Asymmetric-state " \
+                + "speciation requires the departing and one of the " \
+                + "arriving states to be the same, and the other " \
+                + "arriving state to be different. Exiting...")
+
+        if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
+            len(set(self.arriving_states)) != 1 and \
+                self.departing_state in self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="State transition " \
+                + "requires the departing and arriving states to be " \
+                + "different.")
+
+        if self.event == MacroevolEvent.ANCESTOR_SAMPLING and self.arriving_states:
+            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling " \
+                + "only takes a departing state (and no arriving " \
+                + "states).")
+
+        self._initialize_str_representation()
+
+
+    def _initialize_str_representation(self):
+        self.str_representation = "Discrete state-dependent rate\n" \
+            + "   Name:                " + self.name + "\n" \
+            + "   Value:               " \
+            + ", ".join(str(v) for v in self.value) + "\n" \
+            + "   Departing state:     " + str(self.departing_state) + "\n" \
+            + "   Arriving state(s):   " \
+            + ", ".join(str(v) for v in self.arriving_states) + "\n" \
+            + "   Associated event:    " + str(self.event) + "\n\n"
+
+
+    def __str__(self):
+        return self.str_representation
+
+
+    def __repr__(self):
+        return self.str_representation
+
+
+    def __len__(self) -> int:
+        return super().__len__()
 
 ##############################################################################
 
-class FIGRatesManager:
-    """Stash for discrete-state macroevolutionary parameters and time slices
+
+class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
+    """
+    Main class for discrete state-dependent probability parameters
+
+    Supports vectorization of values only.
+    """
+
+    def __init__(self,
+        val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
+        name: str="", state: int=0):
+        
+        # side-effect: populates self.values (list of floats)
+        super().__init__(val=val, name=name, state=state)
+
+        for v in self.values:
+            if v < 0.0:
+                raise ec.NotBetweenZeroAndOneError(name, "negative")
+
+            elif v > 1.0:
+                raise ec.NotBetweenZeroAndOneError(name, "positive")
+
+        self._initialize_str_representation()
+
+
+    def _initialize_str_representation(self):
+        self.str_representation = "Discrete state-dependent probability\n" \
+            + "   Name:                " + self.name + "\n" \
+            + "   Value:               " \
+            + ", ".join(str(v) for v in self.value) + "\n" \
+            + "   State:     " + str(self.state) + "\n\n"
+
+
+    def __str__(self):
+        return self.str_representation
+
+
+    def __repr__(self):
+        return self.str_representation
+
+
+    def __len__(self) -> int:
+        return super().__len__()
+
+##############################################################################
+
+
+class DiscreteStateDependentParameterManager:
+    """Stash for discrete state-dependent parameters and time slices
+
+    At the moment, this class does not care about vectorization.
+    It manipulates whole instances of DiscreteStateDependentParameter,
+    which then in turn contain multiple values if vectors have been passed
+    by user.
+
+    Later, vectorization of seed ages for time slicing and time slices themselves
+    might become vectorized.
+    """
+
+    matrix_state_dep_params: ty.List[ty.List[DiscreteStateDependentParameter]]
+    seed_age: ty.Optional[float]
+    slice_age_ends: ty.List[float]
+    slice_t_ends: ty.List[ty.Optional[float]]
+
+    # NOTE: This class is flexible in that it allows different parameter
+    # numbers per time slice, for whatever that is worth. However, the
+    # user interface has a check inside make_MacroevolEventHandler()
+    # that forces the user to specify the same number of parameters in
+    # all time slices
+
+    def __init__(self,
+                 matrix_state_dep_params: ty.List[ty.List[DiscreteStateDependentParameter]],
+                 total_state_count: int,
+                 seed_age_for_time_slicing: ty.Optional[float]=None,
+                 list_time_slice_age_ends: ty.Optional[ty.List[float]]=None,
+                 epsilon: float=1e-12):
+        
+        # 1D: time slices
+        # 2D: list of atomic rate params
+        self.matrix_state_dep_params = matrix_state_dep_params 
+        
+        self.state_count = total_state_count
+
+        # this is the origin or root age, and it is used to anchor
+        # the user-specified ages to convert it to time
+        self.seed_age = seed_age_for_time_slicing 
+        
+        self.n_time_slices = 1 # default is one slice
+        
+        # default slice ends at present (age = 0.0)
+        self.slice_age_ends = [ 0.0 ]
+
+        # default slice t's at present
+        # (t = seed_age = stop_value with "age" condition)
+        self.slice_t_ends = [ self.seed_age ] 
+
+        # age ends (larger in the past, 0.0 in the present)
+        if list_time_slice_age_ends:
+            self.n_time_slices += len(list_time_slice_age_ends)
+            self.slice_age_ends = list_time_slice_age_ends
+            
+            # appends age end of time slice ending in present
+            self.slice_age_ends.append(0.0)
+
+            # convert into time ends
+            # (0.0 at origin, seed_age = stop_val for "age" stop
+            # condition in the present)
+            if self.seed_age:
+                self.slice_t_ends = \
+                    [self.seed_age - age_end for \
+                        age_end in self.slice_age_ends]
+                        # no need to append seed_age, because
+                        # self.slice_age_ends already has 0.0 in it
+
+        self.state_dep_params_dict: \
+            ty.Dict[int, ty.List[ty.List[DiscreteStateDependentRate]]] = \
+                dict((s, [[] for j in range(self.n_time_slices)]) \
+                for s in range(self.state_count))
+        
+        # side effect: initializes self.atomic_rate_params_dict
+        self.init_matrix_state_dep_params_dict(matrix_state_dep_params)
+        # self.state_dep_params_dict =
+        # { state0:
+        #           [ [ #slice1#; atomic_param1, atomic_param2, ...] [ #slice2#; atomic_param1, atomic_param2 ] ], ... ]
+        #   state1:
+        #           [ [ #slice1#; atomic_param1, atomic_param2, ...] [ #slice2#; atomic_param1, atomic_param2 ] ], ... ]
+        # }
+
+        self.epsilon = epsilon
+
+
+    def __len__(self) -> int:
+        if isinstance(self.matrix_state_dep_params, list):
+            return sum([ len(list_atomic_rates_in_time_slice) for list_atomic_rates_in_time_slice in self.matrix_state_dep_params])
+        else:
+            return 0
+
+
+    def init_matrix_state_dep_params_dict(self,
+        matrix_state_dep_params: \
+            ty.List[ty.List[DiscreteStateDependentParameter]]):
+        # original implementation (2nd dimension were states, rather than all rates from all states together)
+        # for k, s_state_list in enumerate(matrix_atomic_rate_params):
+
+        # k-th time slice
+        for k, list_params in enumerate(matrix_state_dep_params):
+
+            # original implementation had this extra loop
+            # for s, list_atomic_rate_params in enumerate(s_state_list):
+
+            for param in list_params:
+                try:
+                    self.state_dep_params_dict[param.state][k].append(param)
+                
+                except:
+                    exit("Parameter " + param.name + "'s associated " \
+                        + "(possibly departing) state is " + str(param.state) +
+                        ", but this state is not represented between 0 and " +
+                        str(self.state_count) +
+                        ". Likely the total number of states was misspecified.")
+
+
+    def state_dep_params_at_time(self, params_matrix, a_time: float):
+        # see where a_time falls within (get time_slice_index)
+        # grab list of atomic rate params at that time_slice_index
+        # print("self.n_time_slices = " + str(self.n_time_slices))
+
+        time_slice_index = -1
+        # try:
+        while time_slice_index < self.n_time_slices:
+            time_slice_index += 1
+
+            try:
+                if isinstance(self.slice_t_ends, list) and \
+                    isinstance(self.slice_t_ends[time_slice_index], float):
+                        time_slice_t_end = \
+                            ty.cast(float, self.slice_t_ends[time_slice_index])
+                        
+                        if a_time > time_slice_t_end or \
+                            (abs(a_time - time_slice_t_end) <= self.epsilon):
+                            continue
+
+            # self.slice_t_ends will be None if no seed age
+            # or time slice age ends are provided
+            except:
+                # in which case we want the index to just be 0
+                time_slice_index = 0
+
+            break        
+
+        # adjusting
+        # if time_slice_index > (self.n_time_slices - 1):
+        #     time_slice_index = self.n_time_slices - 1
+
+        return params_matrix[time_slice_index]
+
+##############################################################################
+
+
+class DiscreteStateDependentParameterManager_old_working:
+    """Stash for discrete state-dependent parameters and time slices
 
     At the moment, this class does not care about vectorization. It manipulates
-    whole instances of MacroevolStateDependentRateParameter, which then in turn
+    whole instances of DiscreteStateDependentParameter, which then in turn
     contain multiple values if vectors have been passed by user.
 
     Later, vectorization of seed ages for time slicing and time slices themselves
@@ -141,7 +499,7 @@ class FIGRatesManager:
     # all time slices
 
     def __init__(self,
-                 matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]],
+                 matrix_atomic_rate_params: ty.List[ty.List[DiscreteStateDependentRate]],
                  total_state_count: int,
                  seed_age_for_time_slicing: ty.Optional[float]=None,
                  list_time_slice_age_ends: ty.Optional[ty.List[float]]=None,
@@ -170,7 +528,7 @@ class FIGRatesManager:
             if self.seed_age:
                 self.slice_t_ends = [self.seed_age - age_end for age_end in self.slice_age_ends] # no need to append seed_age, because self.slice_age_ends already has 0.0 in it
 
-        self.atomic_rate_params_dict: ty.Dict[int, ty.List[ty.List[MacroevolStateDependentRateParameter]]] = dict((s, [[] for j in range(self.n_time_slices)]) for s in range(self.state_count))
+        self.atomic_rate_params_dict: ty.Dict[int, ty.List[ty.List[DiscreteStateDependentRate]]] = dict((s, [[] for j in range(self.n_time_slices)]) for s in range(self.state_count))
         
         self.init_atomic_rate_param_dict(matrix_atomic_rate_params) # side effect: initializes self.atomic_rate_params_dict
         # self.atomic_rate_params_dict =
@@ -190,7 +548,7 @@ class FIGRatesManager:
             return 0
 
 
-    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[MacroevolStateDependentRateParameter]]):
+    def init_atomic_rate_param_dict(self, matrix_atomic_rate_params: ty.List[ty.List[DiscreteStateDependentRate]]):
         # original implementation (2nd dimension were states, rather than all rates from all states together)
         # for k, s_state_list in enumerate(matrix_atomic_rate_params):
 
@@ -242,6 +600,7 @@ class FIGRatesManager:
 
 ##############################################################################
 
+
 class MacroevolEventHandler():
     """Class for sampling of discrete-state macroevolutionary events
 
@@ -251,13 +610,13 @@ class MacroevolEventHandler():
     stored in a #-simulations-sized list.
     """
 
-    # NOTE: This class depends on FIGRatesManager, which allows different
+    # NOTE: This class depends on DiscreteStateDependentParameterManager, which allows different
     # parameter numbers per time slice, for whatever that is worth. However,
     # the user interface has a check inside make_MacroevolEventHandler()
     # that forces the user to specify the same number of parameters in
     # all time slices
 
-    fig_rates_manager: FIGRatesManager
+    state_dep_par_manager: DiscreteStateDependentParameterManager
     state_count: int
     n_time_slices: int
     seed_age: ty.Optional[float]
@@ -265,17 +624,17 @@ class MacroevolEventHandler():
     slice_t_ends: ty.List[ty.Optional[float]]
     str_representation: str
 
-    def __init__(self, a_fig_rates_manager: FIGRatesManager) -> None:
-        self.fig_rates_manager = a_fig_rates_manager
-        self.state_count = self.fig_rates_manager.state_count
-        self.n_time_slices = self.fig_rates_manager.n_time_slices
-        self.seed_age = self.fig_rates_manager.seed_age
-        self.slice_t_ends = self.fig_rates_manager.slice_t_ends
-        self.slice_age_ends = self.fig_rates_manager.slice_age_ends
+    def __init__(self, a_state_dep_par_manager: DiscreteStateDependentParameterManager) -> None:
+        self.state_dep_par_manager = a_state_dep_par_manager
+        self.state_count = self.state_dep_par_manager.state_count
+        self.n_time_slices = self.state_dep_par_manager.n_time_slices
+        self.seed_age = self.state_dep_par_manager.seed_age
+        self.slice_t_ends = self.state_dep_par_manager.slice_t_ends
+        self.slice_age_ends = self.state_dep_par_manager.slice_age_ends
 
         self.str_representation = "MacroevolEventHandler"
         # state s
-        for s, atomic_rates_state_mat in self.fig_rates_manager.atomic_rate_params_dict.items():
+        for s, atomic_rates_state_mat in self.state_dep_par_manager.state_dep_params_dict.items():
             self.str_representation += "\n  State " + str(s) + ":\n"
 
             # time slice k
@@ -291,6 +650,7 @@ class MacroevolEventHandler():
                 for ar in list_atomic_rates_slice:
                     self.str_representation += "      " + ar.name + " = "
                     self.str_representation += ", ".join(str(v) for v in ar.value) + "\n"
+
 
     # this function deals with vectorization
     def total_rate(self, a_time: float, state_representation_dict: ty.Dict[int, ty.Set[str]], value_idx: int=0, departing_state: ty.Optional[int]=None, debug: bool=False) -> ty.Union[float, ty.Tuple[float, ty.List[float]]]:
@@ -328,8 +688,8 @@ class MacroevolEventHandler():
                     print("  state " + str(state_idx) + " is represented by " + str(n_lineages_in_state) + " lineages (weight).")
 
             # scoped to total_rate
-            atomic_rate_params_matrix = self.fig_rates_manager.atomic_rate_params_dict[state_idx] # conditioning
-            atomic_rate_params_at_time = self.fig_rates_manager.atomic_rate_params_at_time(atomic_rate_params_matrix, a_time)
+            atomic_rate_params_matrix = self.state_dep_par_manager.state_dep_params_dict[state_idx] # conditioning
+            atomic_rate_params_at_time = self.state_dep_par_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
 
             for atomic_rate_param in atomic_rate_params_at_time:
                 w = 1.0 # weight
@@ -388,8 +748,8 @@ class MacroevolEventHandler():
         all_states_atomic_rate_params = list()
         ws = list() # weights for sampling proportional to rate value
         for state_idx in state_indices:
-            atomic_rate_params_matrix = self.fig_rates_manager.atomic_rate_params_dict[state_idx]
-            this_state_atomic_rate_params = self.fig_rates_manager.atomic_rate_params_at_time(atomic_rate_params_matrix, a_time)
+            atomic_rate_params_matrix = self.state_dep_par_manager.state_dep_params_dict[state_idx]
+            this_state_atomic_rate_params = self.state_dep_par_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
             all_states_atomic_rate_params += this_state_atomic_rate_params
 
             # total rate of outcomes must depend on "adjacent" states across events
@@ -404,8 +764,8 @@ class MacroevolEventHandler():
 
 
     def __len__(self) -> int:
-        if self.fig_rates_manager:
-            return len(self.fig_rates_manager)
+        if self.state_dep_par_manager:
+            return len(self.state_dep_par_manager)
 
         else:
             return 0
@@ -423,6 +783,7 @@ class MacroevolEventHandler():
         pass
 
 ##############################################################################
+
 
 class StateIntoPatternConverter:
     """Stash and machinery for checking and converting character compound-states into bit patterns,
@@ -496,8 +857,8 @@ class StateIntoPatternConverter:
         for k, v in self.int2set_dict.items():
             self.set2int_dict[v] = k
 
-
 ##############################################################################
+
 
 if __name__ == "__main__":
     # can be called from calculation/
@@ -511,11 +872,11 @@ if __name__ == "__main__":
     # can also be called from VS Code, if open folder is phylojuction/
     
     # yule, one state, one epoch
-    # arp = MacroevolStateDependentRateParameter(1.0, MacroevolEvent.W_SPECIATION, name="lambda")
+    # arp = DiscreteStateDependentRate(1.0, MacroevolEvent.W_SPECIATION, name="lambda")
     # print(arp)
     # rates_t0_s0 = [ arp ]
     # matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice        
-    # fig_rates_manager = FIGRatesManager(matrix_atomic_rate_params, 1)
+    # state_dep_par_manager = DiscreteStateDependentParameterManager(matrix_atomic_rate_params, 1)
 
     n_characters = 3 # regions A and B
     n_states_per_char = 2 # presence/absence
