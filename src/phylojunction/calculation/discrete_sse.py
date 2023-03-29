@@ -293,7 +293,7 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
         # side-effect: populates self.values (list of floats)
         super().__init__(val=val, name=name, state=state)
 
-        for v in self.values:
+        for v in self.value:
             if v < 0.0:
                 raise ec.NotBetweenZeroAndOneError(name, "negative")
 
@@ -305,10 +305,10 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
 
     def _initialize_str_representation(self):
         self.str_representation = "Discrete state-dependent probability\n" \
-            + "   Name:                " + self.name + "\n" \
-            + "   Value:               " \
+            + "   Name:   " + self.name + "\n" \
+            + "   Value:  " \
             + ", ".join(str(v) for v in self.value) + "\n" \
-            + "   State:     " + str(self.state) + "\n\n"
+            + "   State:  " + str(self.state) + "\n\n"
 
 
     def __str__(self):
@@ -341,6 +341,7 @@ class DiscreteStateDependentParameterManager:
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
+    epsilon: float
 
     # NOTE: This class is flexible in that it allows different parameter
     # numbers per time slice, for whatever that is worth. However, the
@@ -358,6 +359,8 @@ class DiscreteStateDependentParameterManager:
         # 1D: time slices
         # 2D: list of atomic rate params
         self.matrix_state_dep_params = matrix_state_dep_params 
+
+        self._check_single_parameter_type()
         
         self.state_count = total_state_count
 
@@ -365,7 +368,8 @@ class DiscreteStateDependentParameterManager:
         # the user-specified ages to convert it to time
         self.seed_age = seed_age_for_time_slicing 
         
-        self.n_time_slices = 1 # default is one slice
+        # default is one slice, but this gets updated below
+        self.n_time_slices = 1
         
         # default slice ends at present (age = 0.0)
         self.slice_age_ends = [ 0.0 ]
@@ -392,13 +396,30 @@ class DiscreteStateDependentParameterManager:
                         # no need to append seed_age, because
                         # self.slice_age_ends already has 0.0 in it
 
+
+        self._check_same_rates_in_all_time_slices()
+
+        # TODO: at this point, we should check that we have
+        # a # of parameters that is a multiple of the number of
+        # states
+        # 
+        # if manager is holding rates, we need to build a dictionary
+        # of state-triplets [(0,0,0), (2,0,1)] and make sure all triplets
+        # appear in all time slices ()
+        #
+        # some of this testing is already being done at the interface level
+        # within dn_fn_discrete_sse.py.make_MacroevolEventHandler(), but
+        # that testing is weaker, because it just checks that the number
+        # of specified parameters is a multiple of the number of time slices
+        # irrespective of what parameter states are
+
         self.state_dep_params_dict: \
             ty.Dict[int, ty.List[ty.List[DiscreteStateDependentRate]]] = \
                 dict((s, [[] for j in range(self.n_time_slices)]) \
                 for s in range(self.state_count))
         
         # side effect: initializes self.atomic_rate_params_dict
-        self.init_matrix_state_dep_params_dict(matrix_state_dep_params)
+        self._init_matrix_state_dep_params_dict()
         # self.state_dep_params_dict =
         # { state0:
         #           [ [ #slice1#; atomic_param1, atomic_param2, ...] [ #slice2#; atomic_param1, atomic_param2 ] ], ... ]
@@ -409,24 +430,43 @@ class DiscreteStateDependentParameterManager:
         self.epsilon = epsilon
 
 
-    def __len__(self) -> int:
-        if isinstance(self.matrix_state_dep_params, list):
-            return sum([ len(list_atomic_rates_in_time_slice) for list_atomic_rates_in_time_slice in self.matrix_state_dep_params])
-        else:
-            return 0
+    def _check_single_parameter_type(self):
+        different_par_type_set: ty.Set(DiscreteStateDependentParameter) \
+            = set()
+        
+        # k-th time slice
+        for k, list_params in enumerate(self.matrix_state_dep_params):
+            for param in list_params:
+                this_param_type = type(param)
+                
+                if not this_param_type in different_par_type_set:
+                    different_par_type_set.add(this_param_type)
+
+        if len(different_par_type_set) >= 2:
+            raise(ec.RequireSameParameterType(
+                "DiscreteStateDependentParameterManager",
+                len(different_par_type_set))
+            )
+
+    def _check_same_rates_in_all_time_slices(self):
+        pass
 
 
-    def init_matrix_state_dep_params_dict(self,
-        matrix_state_dep_params: \
-            ty.List[ty.List[DiscreteStateDependentParameter]]):
-        # original implementation (2nd dimension were states, rather than all rates from all states together)
-        # for k, s_state_list in enumerate(matrix_atomic_rate_params):
+    def _init_matrix_state_dep_params_dict(self):
 
         # k-th time slice
-        for k, list_params in enumerate(matrix_state_dep_params):
+        for k, list_params in enumerate(self.matrix_state_dep_params):
 
-            # original implementation had this extra loop
-            # for s, list_atomic_rate_params in enumerate(s_state_list):
+            if (k - self.n_time_slices) > -1:
+                raise ec.WrongDimensionError(
+                    "DiscreteStateDependentParameterManager",
+                    self.n_time_slices, len(self.matrix_state_dep_params),
+                    message=str(self.n_time_slices) + " time slices was" \
+                        + " (were) specified, but from the matrix of" \
+                        + " state-dependent parameters, it looks like" \
+                        + " there are " \
+                        + str(len(self.matrix_state_dep_params)) + " slices"
+                )
 
             for param in list_params:
                 try:
@@ -473,6 +513,13 @@ class DiscreteStateDependentParameterManager:
         #     time_slice_index = self.n_time_slices - 1
 
         return params_matrix[time_slice_index]
+
+
+    def __len__(self) -> int:
+        if isinstance(self.matrix_state_dep_params, list):
+            return sum([ len(list_atomic_rates_in_time_slice) for list_atomic_rates_in_time_slice in self.matrix_state_dep_params])
+        else:
+            return 0
 
 ##############################################################################
 

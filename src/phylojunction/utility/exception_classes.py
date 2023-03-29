@@ -134,7 +134,8 @@ class NotBetweenZeroAndOneError(Exception):
     
     def __str__(self) -> str:
         return "ERROR: \'" + self.par_name + "\' must be contained in " \
-            + "[0,1], but it was " + self.message + "."
+            + "[0,1], but one or more of its values was " + self.message \
+            + "."
 
 
 class WrongDimensionError(Exception):
@@ -153,7 +154,7 @@ class WrongDimensionError(Exception):
 
     def __str__(self) -> str:
         return "ERROR: Container " + self.obj_name + " had a different " \
-            + "dimension than expected. " + self.message + ". Exiting... "
+            + "dimension than expected. " + self.message + "."
 
 
 class DimensionalityError(Exception):
@@ -216,6 +217,22 @@ class RequireScalarError(Exception):
         return "ERROR: When specifying distribution " + self.dn_name \
             + "'s parameter \'" + self.arg + "\', more than one value was " \
             + "provided. A scalar is required."
+
+
+class RequireSameParameterType(Exception):
+    message: str
+    obj_name: str
+    n_diff_par: int
+
+    def __init__(self, obj_name: str, n_diff_par: int) -> None:
+        self.obj_name = obj_name
+        self.n_diff_par = n_diff_par
+        self.message = ""
+        
+    def __str__(self) -> str:
+        return "ERROR: When specifying object " + self.obj_name \
+            + " only one type of parameter is allowed. Found " \
+            + str(self.n_diff_par) + "."
 
 
 class ReplicateNumberError(Exception):

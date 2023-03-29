@@ -46,7 +46,12 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         # matrix_atomic_rate_params = [ [ rates_t0_s0 ], [ rates_t1_s0 ], [ rates_t2_s0 ], [ rates_t3_s0 ] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         matrix_atomic_rate_params = [ rates_t0_s0, rates_t1_s0, rates_t2_s0, rates_t3_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states, seed_age_for_time_slicing=cls.seed_age_for_time_slicing, list_time_slice_age_ends=cls.time_slice_age_ends)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(
+            matrix_atomic_rate_params,
+            total_n_states,
+            seed_age_for_time_slicing=cls.seed_age_for_time_slicing,
+            list_time_slice_age_ends=cls.time_slice_age_ends
+        )
 
         cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 

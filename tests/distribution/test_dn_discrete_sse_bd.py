@@ -22,8 +22,6 @@ class TestBDTrees(unittest.TestCase):
         rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
                         sseobj.DiscreteStateDependentRate(name="mu", val=0.8, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]) ]
 
-        # original implementation
-        # matrix_atomic_rate_params = [ [rates_t0_s0] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
         matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
         state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)

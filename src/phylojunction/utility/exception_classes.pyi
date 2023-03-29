@@ -80,6 +80,12 @@ class RequireScalarError(Exception):
     arg: Incomplete
     def __init__(self, dn_name: str, arg: str) -> None: ...
 
+class RequireSameParameterType(Exception):
+    message: str
+    obj_name: str
+    n_diff_par: int
+    def __init__(self, obj_name: str, n_diff_par: int) -> None: ...
+
 class ReplicateNumberError(Exception):
     node_name: str
     message: str
