@@ -1,3 +1,5 @@
+import typing as ty
+
 class ScriptSyntaxError(Exception):
     cmd_line: str
     message: str
@@ -261,6 +263,48 @@ class DimensionalityWarning(Exception):
 
     def __str__(self) -> str:
         return "\Warning: Distribution " + self.dn_name + " will be called to sample " + self.rv_name + " using vectorization."
+
+
+class MissingStateDependentParameterError(Exception):
+    epoch_missing_param: int
+    symmetric_diff_set: ty.Set[ty.Any]
+    symmetric_diff_str: str
+    message: str
+
+    def __init__(self, epoch_missing_param: int,
+        symmetric_diff_set: ty.Set[ty.Any],
+        message: str="") -> None:
+
+        self.epoch_missing_param = epoch_missing_param
+        self.symmetric_diff_str = "( "
+        
+        for i in symmetric_diff_set:
+            ith_str = ""
+            
+            if isinstance(i, int):
+                ith_str = str(i)
+            
+            elif isinstance(i, tuple):
+                ith_str = "(" + ", ".join(str(j) for j in i) + ")"
+            
+            if self.symmetric_diff_str == "( ":
+                self.symmetric_diff_str += ith_str
+            
+            else:
+                self.symmetric_diff_str += ", " + ith_str
+        
+        self.symmetric_diff_str += " )"
+        
+        self.message = message
+        
+        super().__init__(self.message)
+    
+    def __str__(self) -> str:
+        return "ERROR: One or more state-dependent parameters were " \
+            + "missing at least from time slice " \
+            + str(self.epoch_missing_param) + ". The symmetric " \
+            + "difference between time-slice state sets is " \
+            + self.symmetric_diff_str
 
 
 class SSEAtomicRateMisspec(Exception):

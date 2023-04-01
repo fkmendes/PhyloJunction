@@ -157,6 +157,10 @@ class TestDiscreteSSE(unittest.TestCase):
 
     def test_state_dep_param_manager_init_error(self):
         """
+        Test for different types of initialization errors related
+        to forgetting state-dependent parameters of certain kinds
+        in one or more epochs, or mixing state-dependent parameters
+        of different types (e.g., rates vs. probabilities)
         """
         
         total_n_states = 2
@@ -171,16 +175,37 @@ class TestDiscreteSSE(unittest.TestCase):
             # sseobj.DiscreteStateDependentProbability(name="rho1_1", val=0.4, state=1),
         ]
 
+        probs_t1_2 = [
+            sseobj.DiscreteStateDependentProbability(name="rho1_0", val=0.2, state=0),
+            sseobj.DiscreteStateDependentProbability(name="rho1_1", val=0.4, state=0)
+        ]
+
         prob_rate_t1 = [
             sseobj.DiscreteStateDependentProbability(name="rho1_0", val=0.2, state=0),
             sseobj.DiscreteStateDependentRate(name="lambda1_0", val=1.0,
-            event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])   
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
+        ]
+
+        rates_t0 = [
+            sseobj.DiscreteStateDependentRate(name="lambda1_0", val=1.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+            sseobj.DiscreteStateDependentRate(name="lambda2_0", val=1.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1])
+        ]
+
+        rates_t1 = [
+            sseobj.DiscreteStateDependentRate(name="lambda1_1", val=1.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
+            sseobj.DiscreteStateDependentRate(name="lambda2_1", val=1.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
         ]
 
         # 1D: time slices (i)
         # 2D: all rates from all states in i-th time slice
         matrix_state_dep_probs_error1 = [ probs_t0, probs_t1 ]
         matrix_state_dep_probs_error2 = [ probs_t0, prob_rate_t1 ]
+        matrix_state_dep_probs_error3 = [ probs_t0, probs_t1_2 ]
+        matrix_state_dep_rates_error3 = [ rates_t0, rates_t1 ]
 
         # number of time slices deduced from matrix of
         # parameters does not match default number of
@@ -192,9 +217,16 @@ class TestDiscreteSSE(unittest.TestCase):
                 matrix_state_dep_probs_error1, total_n_states
             )
 
+        self.assertEqual(str(exc1.exception),
+            "ERROR: Container DiscreteStateDependentParameterManager " \
+            + "had a different dimension than expected. 1 time slices was " \
+            + "(were) specified, but from the matrix of state-dependent " \
+            + "parameters, it looks like there are 2 slices."
+        )
+
         # rate and prob both passed together
         # but only one type allowed
-        with self.assertRaises(ec.RequireSameParameterType) as exc1:
+        with self.assertRaises(ec.RequireSameParameterType) as exc2:
             state_dep_par_manager = \
             sseobj.DiscreteStateDependentParameterManager(
                 matrix_state_dep_probs_error2, total_n_states,
@@ -202,9 +234,37 @@ class TestDiscreteSSE(unittest.TestCase):
                 list_time_slice_age_ends=[1.0]
             )
 
-        # TODO:
-        # add test for one of the slices missing a parameter
-        # associated with one of the states
+        self.assertEqual(str(exc2.exception),
+            "ERROR: When specifying object " \
+            + "DiscreteStateDependentParameterManager " \
+            + "only one type of parameter is allowed. Found 2."
+        )
+
+        with self.assertRaises(ec.MissingStateDependentParameterError) as exc3:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_probs_error3, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
+
+        self.assertEqual(str(exc3.exception),
+            "ERROR: One or more state-dependent parameters were missing " \
+            + "at least from time slice 1. The symmetric difference " \
+            + "between time-slice state sets is ( 1 )"
+        )
+
+        with self.assertRaises(ec.MissingStateDependentParameterError) as exc4:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_rates_error3, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
+
+        self.assertEqual(str(exc4.exception),
+            "ERROR: One or more state-dependent parameters were missing " \
+            + "at least from time slice 1. The symmetric difference " \
+            + "between time-slice state sets is ( (1, 1, 1) )"
+        )
 
 
     def test_state2pattern_converter(self):

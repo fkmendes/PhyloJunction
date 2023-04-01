@@ -6,7 +6,7 @@ MacroevolEvent: Incomplete
 class DiscreteStateDependentRate:
     value: ty.List[float]
     name: Incomplete
-    state_tuple: Incomplete
+    state_tuple: ty.Tuple[int]
     departing_state: Incomplete
     arriving_states: Incomplete
     event: Incomplete
@@ -37,6 +37,8 @@ class DiscreteStateDependentParameterManager:
     state_dep_params_dict: Incomplete
     epsilon: float
     def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[DiscreteStateDependentParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
+    def _check_single_parameter_type(self) -> None: ...
+    def _check_all_states_in_all_time_slices(self) -> None: ...
     def init_matrix_state_dep_params_dict(self) -> None: ...
     def state_dep_params_at_time(self, params_matrix, a_time: float): ...
 

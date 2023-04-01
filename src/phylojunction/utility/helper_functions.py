@@ -140,6 +140,20 @@ def is_val_in_interval(val: ty.Union[int, float, np.float64], lower: ty.Union[in
     else:
         return False
 
+
+def symmetric_difference(set1: ty.Set[ty.Any], set2: ty.Set[ty.Any]) -> ty.Set[ty.Any]:
+    """Return symmetric difference among two sets"""
+    result = set1
+    
+    for elem in set2:
+        try:
+            result.remove(elem)
+        
+        except KeyError:
+            result.add(elem)
+    
+    return result
+
 ##############################################################################
 
 if __name__ == "__main__":

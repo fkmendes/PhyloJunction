@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
+import phylojunction.utility.helper_functions as pjh
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -197,7 +198,7 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
     Supports vectorization of values only.
     """
     
-    states: ty.List[int]
+    state_tuple: ty.Tuple[int]
     
     def __init__(self,
         val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
@@ -396,8 +397,8 @@ class DiscreteStateDependentParameterManager:
                         # no need to append seed_age, because
                         # self.slice_age_ends already has 0.0 in it
 
-
-        self._check_same_rates_in_all_time_slices()
+        if self.n_time_slices > 1:
+            self._check_all_states_in_all_time_slices()
 
         # TODO: at this point, we should check that we have
         # a # of parameters that is a multiple of the number of
@@ -448,8 +449,40 @@ class DiscreteStateDependentParameterManager:
                 len(different_par_type_set))
             )
 
-    def _check_same_rates_in_all_time_slices(self):
-        pass
+
+    def _check_all_states_in_all_time_slices(self):
+        states_per_epoch_dict = \
+            dict((k, set()) for k in range(self.n_time_slices))
+        
+        # k-th time slice
+        for k, list_params in enumerate(self.matrix_state_dep_params):
+            for param in list_params:
+                sts = tuple()
+
+                # try states (if rate)
+                try:
+                    sts = param.state_tuple
+                    states_per_epoch_dict[k].add(sts)
+
+                # if not, it's a parameter, then state
+                except:
+                    sts = param.state
+                    states_per_epoch_dict[k].add(sts)
+
+        # print(states_per_epoch_dict)
+        oldest_epoch_state_set = states_per_epoch_dict[0]
+        for k, state_tup_set in states_per_epoch_dict.items():
+            if k > 0:
+                if oldest_epoch_state_set != state_tup_set:
+                    raise ec.MissingStateDependentParameterError(
+                        k,
+                        pjh.symmetric_difference(
+                            oldest_epoch_state_set,
+                            state_tup_set
+                        ),
+                        ""
+                    )
+
 
 
     def _init_matrix_state_dep_params_dict(self):

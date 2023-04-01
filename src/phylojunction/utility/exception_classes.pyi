@@ -1,3 +1,4 @@
+import typing as ty
 from _typeshed import Incomplete
 
 class ScriptSyntaxError(Exception):
@@ -96,6 +97,14 @@ class DimensionalityWarning(Exception):
     dn_name: str
     message: str
     def __init__(self, rv_name: str, dn_name: str, message: str = ...) -> None: ...
+
+class MissingStateDependentParameterError(Exception):
+    epoch_missing_param: int
+    symmetric_diff_set: ty.Set[ty.Any]
+    message: str
+    def __init__(self, epoch_missing_param: int,
+        symmetric_diff_set: ty.Set[ty.Any],
+        message: str="") -> None: ...
 
 class SSEAtomicRateMisspec(Exception):
     message: str
