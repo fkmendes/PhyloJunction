@@ -560,4 +560,4 @@ if __name__ == "__main__":
     
     # file_handle_exception = io.StringIO(script_str36)
 
-    script2pgm(script_str37, in_pj_file=False)
+    script2pgm(script_str29, in_pj_file=False)

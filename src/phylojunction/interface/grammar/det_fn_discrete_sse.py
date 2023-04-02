@@ -236,7 +236,7 @@ def make_MacroevolEventHandler(
     time_slice_age_ends: ty.List[float] = []
     seed_age_for_time_slicing: ty.Optional[float] = None
     flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodePGM]
-    flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodePGM]
+    flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodePGM] = []
     
     # val is a list
     for arg, val in det_fn_param_dict.items():
@@ -252,6 +252,7 @@ def make_MacroevolEventHandler(
             if arg == "n_epochs":
                 try:
                     n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
+                
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_wrap().")
 
@@ -280,13 +281,23 @@ def make_MacroevolEventHandler(
                         "sse_wrap",
                         "\"sse_wrap\" expects that the number of epoch ends " \
                         + "is equal to the number of epochs minus 1")
-    
+
+            if arg == "flat_prob_mat":
+                if det_fn_param_dict["flat_prob_mat"]:
+                    flat_state_dep_prob_mat = \
+                        [v for v in det_fn_param_dict["flat_prob_mat"] \
+                            if isinstance(v, pgm.DeterministicNodePGM)]
+
+                # total number of rates has to be divisible by number of slices
+                if len(flat_state_dep_prob_mat) % n_time_slices != 0:
+                    raise ec.WrongDimensionError(arg, len(flat_state_dep_prob_mat))
+
     try:
         flat_state_dep_rate_mat = \
             [v for v in det_fn_param_dict["flat_rate_mat"] \
                 if isinstance(v, pgm.DeterministicNodePGM)] # list of NodePGM's
 
-        # number of rates has to be divisible by number of slices
+        # total number of rates has to be divisible by number of slices
         if len(flat_state_dep_rate_mat) % n_time_slices != 0:
             raise ec.WrongDimensionError(arg, len(flat_state_dep_rate_mat))
     
@@ -295,32 +306,88 @@ def make_MacroevolEventHandler(
             message="Cannot initialize SSE stash without a vector of " \
                 + "state-dependent rates.")
         
-    # _matrix_det_node_atomic_rate_params: ty.List[pgm.DeterministicNodePGM] = []
-    matrix_atomic_rate_params: ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
-    total_n_rate_params = len(flat_state_dep_rate_mat)
-    n_rate_params_per_slice = int(total_n_rate_params / n_time_slices)
-    
-    # iterating over time slices
-    for i in range(0, total_n_rate_params, n_rate_params_per_slice):
+    matrix_state_dep_rates: \
+        ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
+    total_n_rate = len(flat_state_dep_rate_mat)
+    n_rates_per_slice = int(total_n_rate / n_time_slices)
 
-        atomic_rate_params: ty.List[sseobj.DiscreteStateDependentRate] = []
-        for atomic_rate_param_det_nd in flat_state_dep_rate_mat[i:(i+n_rate_params_per_slice)]:
+    matrix_state_dep_probs: \
+        ty.List[ty.List[sseobj.DiscreteStateDependentProbability]] = []
+    expected_n_prob_per_slice = n_states * n_time_slices
+    total_n_prob = n_states * n_time_slices # initialize to expected
+    n_prob_per_slice = int(total_n_prob / n_time_slices)
+
+    # must provide one probability parameter per state
+    # per time slice!
+    probs_were_provided = False
+    if len(flat_state_dep_prob_mat) > 0 and \
+        (n_prob_per_slice != expected_n_prob_per_slice):
+        probs_were_provided = True
+        # TODO: write exception
+        pass
+    
+    # populating state-dependent rate matrix #
+    for i in range(0, total_n_rate, n_rates_per_slice):
+
+        state_dep_rates: ty.List[sseobj.DiscreteStateDependentRate] = []
+        for state_dep_rate_det_nd in flat_state_dep_rate_mat[i:(i+n_rates_per_slice)]:
 
             # so mypy won't complain
-            if isinstance(atomic_rate_param_det_nd.value, sseobj.DiscreteStateDependentRate):
-                atomic_rate_params.append(atomic_rate_param_det_nd.value)
+            if isinstance(state_dep_rate_det_nd.value, sseobj.DiscreteStateDependentRate):
+                state_dep_rates.append(state_dep_rate_det_nd.value)
         
-        matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of DiscreteStateDependentRate
-                                                              # 1D: time slices, 2D: atomic SSE rate list
-        
-        # _matrix_det_node_atomic_rate_params.append(_flat_rate_mat[i:(i+_n_rate_params_per_slice)]) # list of lists of DeterministicNodePGM's
-    
-    # matrix_atomic_rate_params = [det_node_atomic_rate.value for det_node_atomic_rate in _matrix_det_node_atomic_rate_params]
-        
-    # state_dep_rates_manager = DiscreteStateDependentParameterManager(_matrix_det_node_atomic_rate_params, _n_states)
+        # appending a list of DiscreteStateDependentRate
+        # 1D: time slices, 2D: state-dep rate list
+        matrix_state_dep_rates.append(state_dep_rates) 
+
     state_dep_rates_manager = \
         sseobj.DiscreteStateDependentParameterManager(
-            matrix_atomic_rate_params,
+            matrix_state_dep_rates,
+            n_states,
+            seed_age_for_time_slicing=seed_age_for_time_slicing,
+            list_time_slice_age_ends=time_slice_age_ends
+        )
+
+    # populating state-dependent prob matrix #
+    #
+    # this iteration here is effectively over
+    # time-slices if dimensions are indeed all
+    # correct
+    for i in range(0, total_n_prob, n_prob_per_slice):
+
+        state_dep_probs: ty.List[sseobj.DiscreteStateDependentProbability] = []
+        if probs_were_provided:
+            for state_dep_prob_det_nd in flat_state_dep_prob_mat[i:(i+n_prob_per_slice)]:
+
+                # so mypy won't complain
+                if isinstance(state_dep_prob_det_nd.value,
+                    sseobj.DiscreteStateDependentProbability):
+                    state_dep_probs.append(state_dep_prob_det_nd.value)
+
+        # else here means we will have i being
+        # one integer per probability (per state
+        # per slice)
+        #
+        # we will make all probabilities 1.0 by
+        # default
+        else:
+            st = i % n_prob_per_slice
+            state_dep_prob = sseobj.DiscreteStateDependentProbability(
+                name="rho" + str(st) + "_t" + str(i // n_prob_per_slice),
+                val=1.0, state=st)
+                
+            # so mypy won't complain
+            if isinstance(state_dep_prob,
+                sseobj.DiscreteStateDependentProbability):
+                state_dep_probs.append(state_dep_prob)
+
+            # appending a list of DiscreteStateDependentProbability
+            # 1D: time slices, 2D: state-dep prob list
+            matrix_state_dep_probs.append(state_dep_probs) 
+
+    state_dep_probs_manager = \
+        sseobj.DiscreteStateDependentParameterManager(
+            matrix_state_dep_probs,
             n_states,
             seed_age_for_time_slicing=seed_age_for_time_slicing,
             list_time_slice_age_ends=time_slice_age_ends

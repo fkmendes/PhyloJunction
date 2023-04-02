@@ -4,6 +4,7 @@ import enum
 import random
 import math
 from abc import ABC, abstractmethod
+from copy import deepcopy
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
@@ -379,12 +380,17 @@ class DiscreteStateDependentParameterManager:
 
         # default slice t's at present
         # (t = seed_age = stop_value with "age" condition)
-        self.slice_t_ends = [ self.seed_age ] 
+        self.slice_t_ends = [ self.seed_age ]
 
         # age ends (larger in the past, 0.0 in the present)
         if list_time_slice_age_ends:
             self.n_time_slices += len(list_time_slice_age_ends)
-            self.slice_age_ends = list_time_slice_age_ends
+
+            # we do not want to change this object outside
+            # of this class instance, because other state-dep
+            # param managers may be created (and will be taking
+            # 'list_time_slice_age_ends' as arguments)
+            self.slice_age_ends = deepcopy(list_time_slice_age_ends)
             
             # appends age end of time slice ending in present
             self.slice_age_ends.append(0.0)
@@ -471,7 +477,10 @@ class DiscreteStateDependentParameterManager:
                     sts = param.state
                     states_per_epoch_dict[k].add(sts)
 
+        # debugging
+        # print("states_per_epoch_dict after populating")
         # print(states_per_epoch_dict)
+
         oldest_epoch_state_set = states_per_epoch_dict[0]
         for k, state_tup_set in states_per_epoch_dict.items():
             if k > 0:

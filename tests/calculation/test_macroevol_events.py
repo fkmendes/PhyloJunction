@@ -77,12 +77,12 @@ class TestMacroEvolEvent(unittest.TestCase):
         # 1D: time slices (i)
         # 2D: all rates from all states in i-th time slice
         bisse_matrix_atomic_rate_params = [ bisse_rates_t0 ]
-        bisse_fig_rates_manager = \
+        bisse_state_dep_rates_manager = \
             sseobj.DiscreteStateDependentParameterManager(
                 bisse_matrix_atomic_rate_params, total_n_states
             )
         cls.bisse_event_handler = \
-            sseobj.MacroevolEventHandler(bisse_fig_rates_manager)
+            sseobj.MacroevolEventHandler(bisse_state_dep_rates_manager)
         cls.bisse_state_representation_dict = \
             { 0: ["nd3"], 1: ["nd4", "nd5", "nd6"] }
 
