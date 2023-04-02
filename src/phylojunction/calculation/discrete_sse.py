@@ -55,12 +55,12 @@ class DiscreteStateDependentParameter():
                 self.value = [float(v) for v in val]
             
             else:
-                raise ec.SSEAtomicRateMisspec(
+                raise ec.StateDependentParameterMisspec(
                     message="Could not recognize type of value argument, " \
                         " for parameter " + self.name + ". Cannot initialize " + name + ".")
 
         else:
-            raise ec.SSEAtomicRateMisspec(
+            raise ec.StateDependentParameterMisspec(
                 message="Argument to value parameter is not either in scalar or " \
                     + "vectorized form (it is likely an object). " \
                     + " Cannot initialize. " + name)
@@ -115,12 +115,12 @@ class DiscreteStateDependentRate_old_and_working():
                 self.value = [float(v) for v in val]
             
             else:
-                raise ec.SSEAtomicRateMisspec(
+                raise ec.StateDependentParameterMisspec(
                     message="Could not recognize type of value argument, " \
                         " for parameter " + self.name + ". Cannot initialize " + name + ".")
 
         else:
-            raise ec.SSEAtomicRateMisspec(
+            raise ec.StateDependentParameterMisspec(
                 message="Argument to value parameter is not either in scalar or " \
                     + "vectorized form (it is likely an object). " \
                     + " Cannot initialize. " + name)
@@ -139,27 +139,27 @@ class DiscreteStateDependentRate_old_and_working():
 
         # making sure inputs are ok
         if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Extinction only takes a " \
+            raise ec.StateDependentParameterMisspec(message="Extinction only takes a " \
                 + "departing state (and no arriving states).")
 
         if self.event == MacroevolEvent.W_SPECIATION and \
             len(set(self.arriving_states)) != 1 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Within-state speciation " \
+            raise ec.StateDependentParameterMisspec(message="Within-state speciation " \
                 + "requires the departing and arriving states to be all " \
                 + "the same.")
 
         if self.event == MacroevolEvent.BW_SPECIATION and \
             len(set(self.arriving_states)) != 2 and \
                 self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Between-state speciation " \
+            raise ec.StateDependentParameterMisspec(message="Between-state speciation " \
                 + "requires the departing and the two arriving states to be " \
                 + "all different.")
 
         if self.event == MacroevolEvent.ASYM_SPECIATION and \
             len(set(self.arriving_states)) != 2 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Asymmetric-state " \
+            raise ec.StateDependentParameterMisspec(message="Asymmetric-state " \
                 + "speciation requires the departing and one of the " \
                 + "arriving states to be the same, and the other " \
                 + "arriving state to be different. Exiting...")
@@ -167,12 +167,12 @@ class DiscreteStateDependentRate_old_and_working():
         if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
             len(set(self.arriving_states)) != 1 and \
                 self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="State transition " \
+            raise ec.StateDependentParameterMisspec(message="State transition " \
                 + "requires the departing and arriving states to be " \
                 + "different.")
 
         if self.event == MacroevolEvent.ANCESTOR_SAMPLING and self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling " \
+            raise ec.StateDependentParameterMisspec(message="Ancestor sampling " \
                 + "only takes a departing state (and no arriving " \
                 + "states).")
 
@@ -215,27 +215,27 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
         # making sure inputs are ok
         self.event = event
         if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Extinction only takes a " \
+            raise ec.StateDependentParameterMisspec(message="Extinction only takes a " \
                 + "departing state (and no arriving states).")
 
         if self.event == MacroevolEvent.W_SPECIATION and \
             len(set(self.arriving_states)) != 1 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Within-state speciation " \
+            raise ec.StateDependentParameterMisspec(message="Within-state speciation " \
                 + "requires the departing and arriving states to be all " \
                 + "the same.")
 
         if self.event == MacroevolEvent.BW_SPECIATION and \
             len(set(self.arriving_states)) != 2 and \
                 self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Between-state speciation " \
+            raise ec.StateDependentParameterMisspec(message="Between-state speciation " \
                 + "requires the departing and the two arriving states to be " \
                 + "all different.")
 
         if self.event == MacroevolEvent.ASYM_SPECIATION and \
             len(set(self.arriving_states)) != 2 and \
                 not self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Asymmetric-state " \
+            raise ec.StateDependentParameterMisspec(message="Asymmetric-state " \
                 + "speciation requires the departing and one of the " \
                 + "arriving states to be the same, and the other " \
                 + "arriving state to be different. Exiting...")
@@ -243,12 +243,12 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
         if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
             len(set(self.arriving_states)) != 1 and \
                 self.departing_state in self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="State transition " \
+            raise ec.StateDependentParameterMisspec(message="State transition " \
                 + "requires the departing and arriving states to be " \
                 + "different.")
 
         if self.event == MacroevolEvent.ANCESTOR_SAMPLING and self.arriving_states:
-            raise ec.SSEAtomicRateMisspec(message="Ancestor sampling " \
+            raise ec.StateDependentParameterMisspec(message="Ancestor sampling " \
                 + "only takes a departing state (and no arriving " \
                 + "states).")
 
@@ -286,6 +286,8 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
 
     Supports vectorization of values only.
     """
+
+    state_representation: str
 
     def __init__(self,
         val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
@@ -696,7 +698,8 @@ class MacroevolEventHandler():
     # that forces the user to specify the same number of parameters in
     # all time slices
 
-    state_dep_par_manager: DiscreteStateDependentParameterManager
+    state_dep_rate_manager: DiscreteStateDependentParameterManager
+    state_dep_prob_manager: ty.Optional[DiscreteStateDependentParameterManager]
     state_count: int
     n_time_slices: int
     seed_age: ty.Optional[float]
@@ -704,17 +707,25 @@ class MacroevolEventHandler():
     slice_t_ends: ty.List[ty.Optional[float]]
     str_representation: str
 
-    def __init__(self, a_state_dep_par_manager: DiscreteStateDependentParameterManager) -> None:
-        self.state_dep_par_manager = a_state_dep_par_manager
-        self.state_count = self.state_dep_par_manager.state_count
-        self.n_time_slices = self.state_dep_par_manager.n_time_slices
-        self.seed_age = self.state_dep_par_manager.seed_age
-        self.slice_t_ends = self.state_dep_par_manager.slice_t_ends
-        self.slice_age_ends = self.state_dep_par_manager.slice_age_ends
+    def __init__(self,
+        a_state_dep_rate_manager: DiscreteStateDependentParameterManager,
+        a_state_dep_prob_manager: ty.Optional[DiscreteStateDependentParameterManager]=None) \
+            -> None:
+
+        if a_state_dep_prob_manager == None:
+            pass
+
+        self.state_dep_rate_manager = a_state_dep_rate_manager
+        self.state_dep_prob_manager = a_state_dep_prob_manager
+        self.state_count = self.state_dep_rate_manager.state_count
+        self.n_time_slices = self.state_dep_rate_manager.n_time_slices
+        self.seed_age = self.state_dep_rate_manager.seed_age
+        self.slice_t_ends = self.state_dep_rate_manager.slice_t_ends
+        self.slice_age_ends = self.state_dep_rate_manager.slice_age_ends
 
         self.str_representation = "MacroevolEventHandler"
         # state s
-        for s, atomic_rates_state_mat in self.state_dep_par_manager.state_dep_params_dict.items():
+        for s, atomic_rates_state_mat in self.state_dep_rate_manager.state_dep_params_dict.items():
             self.str_representation += "\n  State " + str(s) + ":\n"
 
             # time slice k
@@ -768,8 +779,8 @@ class MacroevolEventHandler():
                     print("  state " + str(state_idx) + " is represented by " + str(n_lineages_in_state) + " lineages (weight).")
 
             # scoped to total_rate
-            atomic_rate_params_matrix = self.state_dep_par_manager.state_dep_params_dict[state_idx] # conditioning
-            atomic_rate_params_at_time = self.state_dep_par_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
+            atomic_rate_params_matrix = self.state_dep_rate_manager.state_dep_params_dict[state_idx] # conditioning
+            atomic_rate_params_at_time = self.state_dep_rate_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
 
             for atomic_rate_param in atomic_rate_params_at_time:
                 w = 1.0 # weight
@@ -828,8 +839,8 @@ class MacroevolEventHandler():
         all_states_atomic_rate_params = list()
         ws = list() # weights for sampling proportional to rate value
         for state_idx in state_indices:
-            atomic_rate_params_matrix = self.state_dep_par_manager.state_dep_params_dict[state_idx]
-            this_state_atomic_rate_params = self.state_dep_par_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
+            atomic_rate_params_matrix = self.state_dep_rate_manager.state_dep_params_dict[state_idx]
+            this_state_atomic_rate_params = self.state_dep_rate_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
             all_states_atomic_rate_params += this_state_atomic_rate_params
 
             # total rate of outcomes must depend on "adjacent" states across events
@@ -844,8 +855,8 @@ class MacroevolEventHandler():
 
 
     def __len__(self) -> int:
-        if self.state_dep_par_manager:
-            return len(self.state_dep_par_manager)
+        if self.state_dep_rate_manager:
+            return len(self.state_dep_rate_manager)
 
         else:
             return 0

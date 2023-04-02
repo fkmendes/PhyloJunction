@@ -207,16 +207,16 @@ class NoPlatingAllowedError(Exception):
 
 
 class RequireScalarError(Exception):
-    dn_name: str
+    obj_name: str
     message: str
 
-    def __init__(self, dn_name: str, arg: str) -> None:
-        self.dn_name = dn_name
+    def __init__(self, obj_name: str, arg: str) -> None:
+        self.obj_name = obj_name
         self.arg = arg
         self.message = ""
         
     def __str__(self) -> str:
-        return "ERROR: When specifying distribution " + self.dn_name \
+        return "ERROR: When specifying object " + self.obj_name \
             + "'s parameter \'" + self.arg + "\', more than one value was " \
             + "provided. A scalar is required."
 
@@ -307,7 +307,7 @@ class MissingStateDependentParameterError(Exception):
             + self.symmetric_diff_str
 
 
-class SSEAtomicRateMisspec(Exception):
+class StateDependentParameterMisspec(Exception):
     message: str
 
     def __init__(self, message: str="") -> None:
@@ -315,7 +315,8 @@ class SSEAtomicRateMisspec(Exception):
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: Misspecified SSE atomic rate parameter input. " + self.message
+        return "ERROR: Misspecified state-dependent parameter input. " \
+            + self.message
 
 
 class SSEStashMisspec(Exception):

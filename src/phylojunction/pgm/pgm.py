@@ -97,6 +97,7 @@ class ProbabilisticGraphicalModel():
 
     def get_display_str_by_name(self, node_name, sample_idx=None, repl_size=1):
         if node_name in self.node_name_val_dict:
+            print("doing node " + node_name)
             return str(self.node_name_val_dict[node_name]) # calls __str__() of NodePGM
 
 

@@ -8,14 +8,8 @@ import phylojunction.calculation.discrete_sse as sseobj # type: ignore
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]):
-    """Create SSEAtomicRate as prompted by deterministic function call. Still no support for vectorization.
-
-    Args:
-        det_fn_param_dict (dict): dictionary containing parameter strings as keys, and lists of either strings or NodePGMs as value(s)
-    """
-
-    def extract_value_from_pgmnodes(pgm_node_list: ty.List[pgm.NodePGM]) -> ty.List[float]:
+def extract_value_from_pgmnodes(pgm_node_list: ty.List[pgm.NodePGM]) \
+        -> ty.List[float]:
         """_summary_
 
         Args:
@@ -23,7 +17,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
 
         Raises:
             ec.NoPlatingAllowedError: _description_
-            ec.SSEAtomicRateMisspec: _description_
+            ec.StateDependentParameterMisspec: _description_
 
         Returns:
             ty.List[ty.List[float]]: _description_
@@ -45,7 +39,7 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
                 # so mypy won't complain
                 if isinstance(v, list):
                     if len(v) > 1 and many_nodes_pgm:
-                        raise ec.SSEAtomicRateMisspec(message="If many variables are passed as arguments to initialize another variable, each of these variables can contain only a single value. Exiting...")
+                        raise ec.StateDependentParameterMisspec(message="If many variables are passed as arguments to initialize another variable, each of these variables can contain only a single value. Exiting...")
                     elif len(v) == 1 and many_nodes_pgm:
                         v_list += v # making list longer (v should be a list, which is why I don't use append)
                     elif len(v) >= 1 and not many_nodes_pgm:
@@ -54,22 +48,46 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
         return v_list
 
 
+def make_DiscreteStateDependentRate(det_fn_param_dict: \
+    ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+    -> sseobj.DiscreteStateDependentRate:
+    """Create SSEAtomicRate as prompted by deterministic function call
+
+    Args:
+        det_fn_param_dict (dict): dictionary containing parameter
+            strings as keys, and lists of either strings or NodePGMs
+            as value(s)
+    """
+
     if not det_fn_param_dict:
-        raise ec.NoSpecificationError(message="Cannot initialize SSE rate without specifications. Exiting...")
+        raise ec.NoSpecificationError(
+            message="Cannot initialize state-dependent rate without " \
+                + "specifications.")
 
     event_type = None
     value: ty.List[float] = []
     the_states: ty.List[int] = []
 
+    ######################################
+    # Checking for input correctness,    #
+    # and preparing for instantiation of #
+    # parameter objects                  #
+    ######################################
+
     # val is a list
     for arg, val in det_fn_param_dict.items():
         if arg == "value":
-            if not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without value. Exiting...")        
+            if not val:
+                raise ec.StateDependentParameterMisspec(
+                    message="Cannot initialize SSE rate without value. " \
+                        "Exiting...")
             
             # val is a list of random variable objects
             # if type(val[0]) != str:
             if isinstance(val[0], pgm.NodePGM):
-                cast_val1: ty.List[pgm.NodePGM] = ty.cast(ty.List[pgm.NodePGM], val) # need to declare cast_val separately so mypy won't complain
+                # need to declare cast_val separately so mypy won't complain
+                cast_val1: ty.List[pgm.NodePGM] = \
+                    ty.cast(ty.List[pgm.NodePGM], val)
                 value = extract_value_from_pgmnodes(cast_val1)
             
             # val is a list of strings
@@ -77,10 +95,15 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
                 cast_val2: ty.List[str] = ty.cast(ty.List[str], val)
                 value = [float(v) for v in cast_val2]
 
-        elif arg == "name" and not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without name. Exiting...")
+        elif arg == "name" and not val:
+            raise ec.StateDependentParameterMisspec(
+                message="Cannot initialize state-dependent rate without name.")
         
         elif arg == "event":
-            if not val: raise ec.SSEAtomicRateMisspec(message="Cannot initialize SSE rate without event type (e.g., \"w_speciation\"). Exiting...")
+            if not val:
+                raise ec.StateDependentParameterMisspec(
+                    message="Cannot initialize state-dependent rate without " \
+                        + "event type (e.g., \"w_speciation\"). Exiting...")
             
             # TODO: raise error if arg is not a string with quotes before and after
 
@@ -93,13 +116,13 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
             elif val[0] == "\"anc_sampling\"": event_type = sseobj.MacroevolEvent.ANCESTOR_SAMPLING
 
         elif arg == "states":
-            # TODO: raise error if arg is not a string with quotes before and after
-            # if type(val) != str: raise SSEAtomicRateMisspec(message="Cannot initialize SSEAtomicRate because argument for \'states\'" + \
-            #     " must be a string bounded by quotes without, with states separated by \'-\' (e.g., \"2-0-1\"). Exiting...")
+            # need to declare cast_val separately
+            # so mypy won't complain
+            the_states = ty.cast(ty.List[int], val)
 
-            # make it a list of integers
-            if not event_type == sseobj.MacroevolEvent.EXTINCTION:
-                the_states = ty.cast(ty.List[int], val) # need to declare cast_val separately so mypy won't complain
+    ##################################
+    # Istantiating parameter objects #
+    ##################################
 
     sse_rate_name = det_fn_param_dict["name"][0]
     
@@ -116,30 +139,119 @@ def make_SSEAtomicRate(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm
             return sseobj.DiscreteStateDependentRate(name=sse_rate_name, val=list(value), event=event_type)
 
 
-def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroevolEventHandler:
+def make_DiscreteStateDependentProbability(det_fn_param_dict: \
+    ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+    -> sseobj.DiscreteStateDependentProbability:
+    """
+    Create DiscreteStateDependentProbability as prompted by
+        deterministic function call
+
+    Args:
+        det_fn_param_dict (dict): dictionary containing parameter
+            strings as keys, and lists of either strings or NodePGMs
+            as value(s)
+    """
+
+    if not det_fn_param_dict:
+        raise ec.NoSpecificationError(
+            message="Cannot initialize state-dependent probability " \
+                "without specifications.")
+
+    value: ty.List[float] = []
+    state: ty.Optional[int] = None
+
+    ######################################
+    # Checking for input correctness,    #
+    # and preparing for instantiation of #
+    # parameter objects                  #
+    ######################################
+
+     # val is a list
+    for arg, val in det_fn_param_dict.items():
+        if arg == "value":
+            if not val:
+                raise ec.StateDependentParameterMisspec(
+                    message="Cannot initialize state-dependent probability" \
+                        + " without value.")
+            
+            # val is a list of random variable objects
+            # if type(val[0]) != str:
+            if isinstance(val[0], pgm.NodePGM):
+                # need to declare cast_val separately so mypy won't complain
+                cast_val1: ty.List[pgm.NodePGM] = \
+                    ty.cast(ty.List[pgm.NodePGM], val)
+                value = extract_value_from_pgmnodes(cast_val1)
+            
+            # val is a list of strings
+            elif isinstance(val[0], str):
+                cast_val2: ty.List[str] = ty.cast(ty.List[str], val)
+                value = [float(v) for v in cast_val2]
+
+        elif arg == "name" and not val:
+            raise ec.StateDependentParameterMisspec(
+                message="Cannot initialize state-dependent probability" \
+                    + "without name.")
+
+        elif arg == "state":
+            # need to declare cast_val separately
+            # so mypy won't complain
+            if len(val) > 1:
+                raise ec.RequireScalarError(
+                    "StateDependentProbability",
+                    "state"
+                )
+
+            state = int(val[0])
+
+    ##################################
+    # Istantiating parameter objects #
+    ##################################
+    
+    stade_dep_prob_name = det_fn_param_dict["name"][0]
+    
+    if isinstance(stade_dep_prob_name, str):
+        if state == None:
+            return sseobj.DiscreteStateDependentProbability(
+                    name=stade_dep_prob_name,
+                    val=list(value)
+                    )
+
+        else:
+            return sseobj.DiscreteStateDependentProbability(
+                name=stade_dep_prob_name,
+                val=list(value),
+                state=state
+                )
+
+
+def make_MacroevolEventHandler(
+    det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        -> sseobj.MacroevolEventHandler:
 
     if not det_fn_param_dict:
         raise ec.NoSpecificationError(message="Cannot initialize SSE stash without specifications. Exiting...")
 
-    _n_states: int = 1
-    _n_time_slices: int = 1
-    _time_slice_age_ends: ty.List[float] = []
-    _seed_age_for_time_slicing: ty.Optional[float] = None
-    _flat_rate_mat: ty.List[pgm.DeterministicNodePGM]
+    n_states: int = 1
+    n_time_slices: int = 1
+    time_slice_age_ends: ty.List[float] = []
+    seed_age_for_time_slicing: ty.Optional[float] = None
+    flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodePGM]
+    flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodePGM]
+    
     # val is a list
     for arg, val in det_fn_param_dict.items():
         # so mypy won't complain
         if isinstance(val[0], str):
             if arg == "n_states":
                 try:
-                    _n_states = int(val[0]) # TODO: Forbid different number of states here, so if len(val[0]) > 1, throw exception)
+                    n_states = int(val[0]) # TODO: Forbid different number of states here, so if len(val[0]) > 1, throw exception)
                 
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_states\'. Function was sse_stash().")
 
             if arg == "n_epochs":
                 try:
-                    _n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
+                    n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_wrap().")
 
@@ -147,54 +259,85 @@ def make_MacroevolEventHandler(det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[
                 try:
                     # TODO: Forbid different seed ages, because I will forbid different time slice age ends
                     # (if you allow different seed ages, those might be younger than time slice ends
-                    _seed_age_for_time_slicing = float(val[0])
+                    seed_age_for_time_slicing = float(val[0])
                 
                 except:
-                    raise ec.FunctionArgError(arg, "Was expecting a float. Function was sse_wrap().")
+                    raise ec.FunctionArgError(arg,
+                    "Was expecting a float. Function was sse_wrap().")
 
             if arg == "epoch_age_ends":
                 try:
-                    _time_slice_age_ends = [float(v) for v in val if isinstance(v, str)]
+                    time_slice_age_ends = \
+                        [float(v) for v in val if isinstance(v, str)]
 
                 except: 
-                    raise ec.FunctionArgError(arg, "Could not convert epoch bound ages to floats. Function was sse_wrap().")
+                    raise ec.FunctionArgError(arg,
+                        "Could not convert epoch bound ages to floats. " \
+                        + "Function was sse_wrap().")
 
-                if len(val) != (_n_time_slices - 1):
-                    raise ec.FunctionArgsMismatchError("sse_wrap", "\"sse_wrap\" expects that the number of epoch ends is equal to the number of epochs minus 1")
+                if len(val) != (n_time_slices - 1):
+                    raise ec.FunctionArgsMismatchError(
+                        "sse_wrap",
+                        "\"sse_wrap\" expects that the number of epoch ends " \
+                        + "is equal to the number of epochs minus 1")
     
     try:
-        _flat_rate_mat = [v for v in det_fn_param_dict["flat_rate_mat"] if isinstance(v, pgm.DeterministicNodePGM)] # list of NodePGM's
+        flat_state_dep_rate_mat = \
+            [v for v in det_fn_param_dict["flat_rate_mat"] \
+                if isinstance(v, pgm.DeterministicNodePGM)] # list of NodePGM's
 
         # number of rates has to be divisible by number of slices
-        if len(_flat_rate_mat) % _n_time_slices != 0:
-            raise ec.WrongDimensionError(arg, len(_flat_rate_mat))
+        if len(flat_state_dep_rate_mat) % n_time_slices != 0:
+            raise ec.WrongDimensionError(arg, len(flat_state_dep_rate_mat))
     
     except:
-        raise ec.SSEStashMisspec(message="Cannot initialize SSE stash without a vector of SSE rates. Exiting...")
+        raise ec.SSEStashMisspec(
+            message="Cannot initialize SSE stash without a vector of " \
+                + "state-dependent rates.")
         
     # _matrix_det_node_atomic_rate_params: ty.List[pgm.DeterministicNodePGM] = []
-    _matrix_atomic_rate_params: ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
-    _total_n_rate_params = len(_flat_rate_mat)
-    _n_rate_params_per_slice = int(_total_n_rate_params / _n_time_slices)
+    matrix_atomic_rate_params: ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
+    total_n_rate_params = len(flat_state_dep_rate_mat)
+    n_rate_params_per_slice = int(total_n_rate_params / n_time_slices)
     
     # iterating over time slices
-    for i in range(0, _total_n_rate_params, _n_rate_params_per_slice):
+    for i in range(0, total_n_rate_params, n_rate_params_per_slice):
 
         atomic_rate_params: ty.List[sseobj.DiscreteStateDependentRate] = []
-        for atomic_rate_param_det_nd in _flat_rate_mat[i:(i+_n_rate_params_per_slice)]:
+        for atomic_rate_param_det_nd in flat_state_dep_rate_mat[i:(i+n_rate_params_per_slice)]:
 
             # so mypy won't complain
             if isinstance(atomic_rate_param_det_nd.value, sseobj.DiscreteStateDependentRate):
                 atomic_rate_params.append(atomic_rate_param_det_nd.value)
         
-        _matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of DiscreteStateDependentRate
+        matrix_atomic_rate_params.append(atomic_rate_params) # appending a list of DiscreteStateDependentRate
                                                               # 1D: time slices, 2D: atomic SSE rate list
         
         # _matrix_det_node_atomic_rate_params.append(_flat_rate_mat[i:(i+_n_rate_params_per_slice)]) # list of lists of DeterministicNodePGM's
     
     # matrix_atomic_rate_params = [det_node_atomic_rate.value for det_node_atomic_rate in _matrix_det_node_atomic_rate_params]
         
-    # fig_rates_manager = DiscreteStateDependentParameterManager(_matrix_det_node_atomic_rate_params, _n_states)
-    fig_rates_manager = sseobj.DiscreteStateDependentParameterManager(_matrix_atomic_rate_params, _n_states, seed_age_for_time_slicing=_seed_age_for_time_slicing, list_time_slice_age_ends=_time_slice_age_ends)
+    # state_dep_rates_manager = DiscreteStateDependentParameterManager(_matrix_det_node_atomic_rate_params, _n_states)
+    state_dep_rates_manager = \
+        sseobj.DiscreteStateDependentParameterManager(
+            matrix_atomic_rate_params,
+            n_states,
+            seed_age_for_time_slicing=seed_age_for_time_slicing,
+            list_time_slice_age_ends=time_slice_age_ends
+        )
+
+    # state_dep_probs_manager = \
+    #     sseobj.DiscreteStateDependentParameterManager(
+    #         # TODO
+    #         n_states,
+    #         seed_age_for_time_slicing=seed_age_for_time_slicing,
+    #         list_time_slice_age_ends=time_slice_age_ends
+    #     )
         
-    return sseobj.MacroevolEventHandler(fig_rates_manager)
+    # return sseobj.MacroevolEventHandler(
+    #     state_dep_rates_manager,
+    #     state_dep_probs_manager,
+
+    # )
+
+    return sseobj.MacroevolEventHandler(state_dep_rates_manager)

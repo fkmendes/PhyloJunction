@@ -216,7 +216,7 @@ class DnSSE(pgm.DistributionPGM):
         #
         # 1D: time slices, 2D: list of atomic rate params
         atomic_rate_params_matrix = \
-            self.events.state_dep_par_manager.matrix_state_dep_params
+            self.events.state_dep_rate_manager.matrix_state_dep_params
 
         ############################
         # Checking rate parameters #

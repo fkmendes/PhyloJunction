@@ -17,6 +17,7 @@ class PJDetFnGrammar():
     #  All available deterministic functions #
     ##########################################
     det_fn_grammar_dict = {
+        "sse_prob": set(["name", "value", "state"]),
         "sse_rate": set(["name", "value", "event", "states"]),
         "sse_wrap": set(["flat_rate_mat", "n_states", "seed_age", "epoch_age_ends", "n_epochs"])
     }
@@ -28,18 +29,41 @@ class PJDetFnGrammar():
         return False
 
     @classmethod
-    def init_return_sse_rate(cls, det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.DiscreteStateDependentRate:
-        return detsse.make_SSEAtomicRate(det_fn_param_dict)
+    def init_return_state_dep_rate(cls,
+        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            -> sseobj.DiscreteStateDependentRate:
+        
+        return detsse.make_DiscreteStateDependentRate(det_fn_param_dict)
 
     @classmethod
-    def init_return_macroevol_handler(cls, det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> sseobj.MacroevolEventHandler:
+    def init_return_state_dep_prob(cls,
+        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            -> sseobj.DiscreteStateDependentProbability:
+        
+        return detsse.make_DiscreteStateDependentProbability(det_fn_param_dict)
+
+    @classmethod
+    def init_return_macroevol_handler(cls,
+    det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        -> sseobj.MacroevolEventHandler:
         return detsse.make_MacroevolEventHandler(det_fn_param_dict)
 
     @classmethod
-    def create_det_fn_obj(cls, det_fn_id: str, det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> ty.Optional[ty.Union[sseobj.DiscreteStateDependentRate, sseobj.MacroevolEventHandler]]:
+    def create_det_fn_obj(cls,
+        det_fn_id: str,
+        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            -> ty.Optional[
+                ty.Union[
+                    sseobj.DiscreteStateDependentRate,
+                    sseobj.MacroevolEventHandler
+                ]]:
+
         # validate input
         if det_fn_id == "sse_rate":
-            return cls.init_return_sse_rate(det_fn_param_dict)
+            return cls.init_return_state_dep_rate(det_fn_param_dict)
+
+        if det_fn_id == "sse_prob":
+            return cls.init_return_state_dep_prob(det_fn_param_dict)
 
         if det_fn_id == "sse_wrap":
             for arg in det_fn_param_dict:
@@ -63,4 +87,4 @@ if __name__ == "__main__":
     print(PJDetFnGrammar.grammar_check("sse_rate", "name")) # True
     print(PJDetFnGrammar.grammar_check("sse_rate", "cloud")) # False
 
-    # TODO: add code to run init_return_sse_rate and init_return_macroevol_handler
+    # TODO: add code to run init_return_state_dep_rate and init_return_macroevol_handler

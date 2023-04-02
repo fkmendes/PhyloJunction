@@ -106,7 +106,7 @@ class MissingStateDependentParameterError(Exception):
         symmetric_diff_set: ty.Set[ty.Any],
         message: str="") -> None: ...
 
-class SSEAtomicRateMisspec(Exception):
+class StateDependentParameterMisspec(Exception):
     message: str
     def __init__(self, message: str = ...) -> None: ...
 

@@ -503,7 +503,7 @@ if __name__ == "__main__":
     script_str37 = \
         "n_sim <- 2\n" + \
         "n_rep <- 2\n" + \
-        "birth_rate <- [0.8, 0.9, 1.0, 1.1]\n" + \
+        "birth_rate <- [0.8, 0.9]\n" + \
         "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" + \
         "meh := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" + \
         "trs ~ discrete_sse(n=n_sim, nr=n_rep, meh=meh, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"

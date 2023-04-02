@@ -155,8 +155,9 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
     
     # making sure essential parameters of distribution have been specified
-    if not any(event_handler.state_dep_par_manager.matrix_state_dep_params):
+    if not any(event_handler.state_dep_rate_manager.matrix_state_dep_params):
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"meh\" is missing.")
+    
     if not stop_values_list:
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
         
