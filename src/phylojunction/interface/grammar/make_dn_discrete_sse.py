@@ -25,7 +25,14 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # all remaining args must be specified
     n_samples: int = 1
     n_repl: int = 1
-    event_handler: sseobj.MacroevolEventHandler = sseobj.MacroevolEventHandler(sseobj.DiscreteStateDependentParameterManager([[]], 1))
+    event_handler: \
+        sseobj.MacroevolEventHandler \
+            = sseobj.MacroevolEventHandler(
+                sseobj.DiscreteStateDependentParameterManager([[]], 1))
+    state_dep_prob_handler: \
+        sseobj.DiscreteStateDependentProbabilityHandler \
+            = sseobj.DiscreteStateDependentProbabilityHandler(
+                sseobj.DiscreteStateDependentParameterManager([[]], 1))
     stop_str: str
     stop_values_list: ty.List[float] = []
     origin: bool = True
@@ -73,12 +80,16 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
             else:
                 first_val = val[0]
             
-            if arg == "meh" and isinstance(first_val, pgm.NodePGM):
+            if arg == "stash" and isinstance(first_val, pgm.NodePGM):
                 nodepgm_val = first_val.value
                 
-                if isinstance(nodepgm_val, sseobj.MacroevolEventHandler):
+                if isinstance(nodepgm_val, sseobj.SSEStash):
                 # there should be only one event handler always, but it will be in list
-                    event_handler = nodepgm_val
+                    event_handler = nodepgm_val.get_meh()
+
+                    # SSEStash will return None if prob_handler
+                    # wasn't created by user through script
+                    prob_handler = nodepgm_val.get_prob_handler()
 
             elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa", "max_rec_taxa", "abort_at_obs"):
                 try:
@@ -156,11 +167,13 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     
     # making sure essential parameters of distribution have been specified
     if not any(event_handler.state_dep_rate_manager.matrix_state_dep_params):
-        raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"meh\" is missing.")
+        raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stash\" is not storing a valid macroevolutionary event handler.")
     
     if not stop_values_list:
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
-        
+    
+    # TODO: have DnSSE take a prob_handler, and populate it if it's None upon initialization
+    # all unit test should still work if this initialization is done correctly
     return dnsse.DnSSE(
         event_handler,
         stop_values_list,
@@ -204,16 +217,19 @@ if __name__ == "__main__":
 
     matrix_atomic_rate_params = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-    fig_rates_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
+    state_dep_rates_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
-    event_handler = sseobj.MacroevolEventHandler(fig_rates_manager)
+    event_handler = sseobj.MacroevolEventHandler(state_dep_rates_manager)
 
-    det_nd_pgm = pgm.DeterministicNodePGM("events", value=event_handler, parent_nodes=None)
+    sse_stash = sseobj.SSEStash(event_handler)
+
+    # det_nd_pgm = pgm.DeterministicNodePGM("events", value=event_handler, parent_nodes=None)
+    det_nd_pgm = pgm.DeterministicNodePGM("sse_stash", value=sse_stash, parent_nodes=None)
 
     dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
     dn_param_dict["n"] = ["1"]
     dn_param_dict["nr"] = ["1"]
-    dn_param_dict["meh"] = [det_nd_pgm]
+    dn_param_dict["stash"] = [det_nd_pgm]
     dn_param_dict["start_state"] = ["0"]
     dn_param_dict["stop"] = ["\"size\""]
     dn_param_dict["stop_value"] = ["10"]

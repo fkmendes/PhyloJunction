@@ -309,7 +309,8 @@ class MissingStateDependentParameterError(Exception):
 
 class RepeatedStateDependentParameterError(Exception):
     epoch_w_repeated_param: int
-    repeated_state: ty.Union[int, ty.Tuple[int]]
+    repeated_state: ty.Tuple[int]
+    repeated_state_str: str
     message: str
 
     def __init__(self, epoch_w_repeated_param: int,
@@ -318,12 +319,32 @@ class RepeatedStateDependentParameterError(Exception):
 
         self.epoch_w_repeated_param = epoch_w_repeated_param
         self.repeated_state = repeated_state
+        self.repeated_state_str = ""
         self.message = message
+
+        if isinstance(repeated_state, int):
+            self.repeated_state_str = str(repeated_state)
+
+        elif isinstance(repeated_state, tuple):
+            self.repeated_state_str = "("
+        
+            for i in repeated_state:
+                ith_str = str(i)
+
+                if self.repeated_state_str == "(":
+                    self.repeated_state_str += ith_str
+
+                else:
+                    self.repeated_state_str += ", " + ith_str
+            
+            self.repeated_state_str += ")"
         
         super().__init__(self.message)
     
     def __str__(self) -> str:
-        return "ERROR: "
+        return "ERROR: State-dependent parameter defined by states " \
+            + self.repeated_state_str + " were repeated in epoch " \
+            + str(self.epoch_w_repeated_param)
 
 
 class StateDependentParameterMisspec(Exception):

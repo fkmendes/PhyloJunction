@@ -43,13 +43,11 @@ class PJDetFnGrammar():
         return detsse.make_DiscreteStateDependentProbability(det_fn_param_dict)
 
     @classmethod
-    def init_return_macroevol_handler(cls,
-    det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
-        -> sseobj.MacroevolEventHandler:
-        # TODO: rename make_MacroevolEventHandler()
-        # to something else, as it will also now make a
-        # DiscreteStateDependentProbabilityHandler
-        return detsse.make_MacroevolEventHandler(det_fn_param_dict)
+    def init_return_sse_stash(cls,
+        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        -> sseobj.SSEStash:
+        
+        return detsse.make_SSEStash(det_fn_param_dict)
 
     @classmethod
     def create_det_fn_obj(cls,
@@ -59,8 +57,7 @@ class PJDetFnGrammar():
                 ty.Union[
                     sseobj.DiscreteStateDependentRate,
                     sseobj.DiscreteStateDependentProbability,
-                    sseobj.MacroevolEventHandler,
-                    sseobj.DiscreteStateDependentProbabilityHandler,
+                    sseobj.SSEStash
                 ]]:
 
         # validate input
@@ -74,7 +71,7 @@ class PJDetFnGrammar():
             for arg in det_fn_param_dict:
                 if not cls.grammar_check(det_fn_id, arg):
                     raise ec.NotAParameterError(arg)
-            return cls.init_return_macroevol_handler(det_fn_param_dict)
+            return cls.init_return_sse_stash(det_fn_param_dict)
 
         return None
 
@@ -92,4 +89,4 @@ if __name__ == "__main__":
     print(PJDetFnGrammar.grammar_check("sse_rate", "name")) # True
     print(PJDetFnGrammar.grammar_check("sse_rate", "cloud")) # False
 
-    # TODO: add code to run init_return_state_dep_rate and init_return_macroevol_handler
+    # TODO: add code to run init_return_state_dep_rate and init_return_sse_stash

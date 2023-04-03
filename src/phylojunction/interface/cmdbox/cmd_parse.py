@@ -385,7 +385,7 @@ if __name__ == "__main__":
     script_str6 = "l0rate := sse_rate(name=\"lambda\", value=1.0, event=\"w_speciation\")"
     script_str6_2 = "l0rate := sse_rate(name=\"lambda\", value=[1.0, 1.1], event=\"w_speciation\")"
     script_str7 = script_str6 + "\nmeh := sse_wrap(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)"
-    script_str8 = script_str7 + "\ntr ~ discrete_sse(n=2, meh=meh, start_state=[0,0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+    script_str8 = script_str7 + "\ntr ~ discrete_sse(n=2, stash=meh, start_state=[0,0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str9 = "n <- 1000\nrv ~ unif(n=n, min=0.0, max=1.0)"
     script_str10 = \
         "l0rate := sse_rate(name=\"lambda0\", value=1.0, states=[0,0,0], event=\"w_speciation\")\n" + \
@@ -395,7 +395,7 @@ if __name__ == "__main__":
         "q01rate := sse_rate(name=\"q01\", value=0.6, states=[0,1], event=\"transition\")\n" + \
         "q10rate := sse_rate(name=\"q10\", value=0.6, states=[1,0], event=\"transition\")\n" + \
         "meh := sse_wrap(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)\n" + \
-        "tr ~ discrete_sse(n=1, meh=meh, start_state=[0], stop=\"age\", stop_value=2.5, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+        "tr ~ discrete_sse(n=1, stash=meh, start_state=[0], stop=\"age\", stop_value=2.5, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str11 = "m <- [1.0, 1.1]\ns <- [1.0, 0.9]\na ~ lognormal(n=2, mean=m, sd=s, log_space=\"false\")"
     script_str12 = "a ~ lognormal(n=3, mean=[0.0, 0.01, 0.011], sd=[1.0], log_space=\"true\")"
     script_str13 = "a ~ lognormal(mean=0.0, sd=1.0)"
@@ -406,9 +406,9 @@ if __name__ == "__main__":
     script_str18 = "l0 ~ unif(n=1, min=0.8, max=0.8)\nl0rate := sse_rate(name=\"lambda0\", value=l0, states=[0,0,0], event=\"w_speciation\")"
     script_str19 = "l0 ~ unif(n=3, min=0.8, max=0.8)\nl0rate := sse_rate(name=\"lambda0\", value=l0, states=[0,0,0], event=\"w_speciation\")"
     script_str20 = script_str18 + "\nmeh := sse_wrap(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)" + \
-        "\ntr ~ discrete_sse(n=3, meh=meh, start_state=[0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+        "\ntr ~ discrete_sse(n=3, stash=meh, start_state=[0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str21 = script_str19 + "\nmeh := sse_wrap(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)" + \
-                    "\ntr ~ discrete_sse(n=3, meh=meh, start_state=[0,0,0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+                    "\ntr ~ discrete_sse(n=3, stash=meh, start_state=[0,0,0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str22 = "rv1 ~ lognormal(n=2, mean=0.0, sd=0.25)\nrv2 ~ lognormal(n=2, mean=-1.5, sd=0.25)\nrv3 ~ normal(n=2, nr=10, mean=rv1, sd=rv2, clamp=\"true\")"
     
     # time-het yule
@@ -418,7 +418,7 @@ if __name__ == "__main__":
         "l0ratet4 := sse_rate(name=\"lambdat4\", value=0.4, event=\"w_speciation\")\n" + \
         "meh := sse_wrap(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])"
     
-    script_str24 = script_str23 + "\ntr ~ discrete_sse(n=2, meh=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+    script_str24 = script_str23 + "\ntr ~ discrete_sse(n=2, stash=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str25 = "a <- [1,2,3]\nb <- a"
     script_str26 = "a <- [1,2,3]\nb <- [a, 4, 5, 6]"
     script_str27 = "rv9 ~ exponential(n=5, rate=[0.8, 0.9, 1.0, 1.1, 1.2], clamp=\"true\")"
@@ -428,7 +428,7 @@ if __name__ == "__main__":
         "death_rate := sse_rate(name=\"mu\", value=0.5, states=[0], event=\"extinction\")\n" + \
         "fossil_rate := sse_rate(name=\"psi\", value=0.8, states=[0], event=\"anc_sampling\")\n" + \
         "meh := sse_wrap(flat_rate_mat=[birth_rate,death_rate,fossil_rate], n_states=1, n_epochs=1)\n" + \
-        "trs ~ discrete_sse(n=5, meh=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"true\", cond_surv=\"true\")"
+        "trs ~ discrete_sse(n=5, stash=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"true\", cond_surv=\"true\")"
 
     # time-het bd
     script_str29 = \
@@ -445,8 +445,8 @@ if __name__ == "__main__":
     script_str30 = "a ~ lognormal(n=10, mean=[0.0, 0.01], sd=[1.0, 0.9])"
     script_str31 = "a ~ lognormal(n=2, mean=[0.0, 0.01], sd=[1.0, 0.9, 0.8])"
     script_str32 = "l0 ~ unif(n=3, nr=2, min=0.9, max=1.1)\nl0rate := sse_rate(name=\"lambda\", value=l0, event=\"w_speciation\")"
-    script_str33 = script_str23 + "\ntr ~ discrete_sse(n=1, meh=meh, start_state=[0], stop=\"size\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
-    script_str34 = script_str23 + "\ntr ~ discrete_sse(n=1, meh=meh, start_state=[0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+    script_str33 = script_str23 + "\ntr ~ discrete_sse(n=1, stash=meh, start_state=[0], stop=\"size\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
+    script_str34 = script_str23 + "\ntr ~ discrete_sse(n=1, stash=meh, start_state=[0], stop=\"age\", stop_value=2.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
 
     # time-het geosse
     script_str35 = \
@@ -495,18 +495,30 @@ if __name__ == "__main__":
         "det_trans_rate20_t1 := sse_rate(name=\"q20_t1\", value=trans_rate20_t1, states=[2,0], event=\"transition\")\n" + \
         "det_trans_rate21_t1 := sse_rate(name=\"q21_t1\", value=trans_rate21_t1, states=[2,1], event=\"transition\")\n" + \
         "meh := sse_wrap(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate02_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate12_t0, det_b_birth_rate201_t0, det_b_birth_rate202_t0, det_b_birth_rate212_t0, det_trans_rate20_t0, det_trans_rate21_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate02_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate12_t1, det_b_birth_rate201_t1, det_b_birth_rate202_t1, det_b_birth_rate212_t1, det_trans_rate20_t1, det_trans_rate21_t1], n_states=3, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)\n" + \
-        "trs ~ discrete_sse(n=100, meh=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
+        "trs ~ discrete_sse(n=100, stash=meh, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
 
     script_str36 = "a ~ lognormal(n=2, nr=10, mean=10.0, sd=1.0)"
     
     # yule with n_sim as a model node
     script_str37 = \
-        "n_sim <- 2\n" + \
-        "n_rep <- 2\n" + \
-        "birth_rate <- [0.8, 0.9]\n" + \
-        "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" + \
-        "meh := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" + \
-        "trs ~ discrete_sse(n=n_sim, nr=n_rep, meh=meh, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
+        "n_sim <- 2\n" \
+        + "n_rep <- 2\n" \
+        + "birth_rate <- [0.8, 0.9]\n" \
+        + "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" \
+        + "meh := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" \
+        + "trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=meh, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
+
+    # yule with incomplete sampling
+    script_str38 = \
+        "n_sim <- 2\n" \
+        + "n_rep <- 2\n" \
+        + "birth_rate <- [0.8, 0.9]\n" \
+        + "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" \
+        + "sampling_rate <- [0.5, 0.5]\n" \
+        + "det_sampling_rate := sse_prob(name=\"rho\", value=sampling_rate, state=[0])\n" \
+        + "sse_stash := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" \
+        + "trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=sse_stash, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
+
 
     # for copying and pasting in GUI:
     #
@@ -519,8 +531,8 @@ if __name__ == "__main__":
     # l0 ~ unif(n=3, min=0.9, max=1.1)
     # l0rate := sse_rate(name="lambda", value=l0, event="w_speciation")
     # meh := sse_wrap(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)
-    # trs ~ discrete_sse(n=3, meh=meh, start_state=[0], stop="age", stop_value=2.0, origin="true", cond_spn="false", cond_surv="true")
-    # trs ~ discrete_sse(n=3, nr=2, meh=meh, start_state=[0], stop="age", stop_value=2.0, origin="true", cond_spn="false", cond_surv="true")
+    # trs ~ discrete_sse(n=3, stash=meh, start_state=[0], stop="age", stop_value=2.0, origin="true", cond_spn="false", cond_surv="true")
+    # trs ~ discrete_sse(n=3, nr=2, stash=meh, start_state=[0], stop="age", stop_value=2.0, origin="true", cond_spn="false", cond_surv="true")
 
     # bisse
     # l0rate := sse_rate(name="lambda0", value=1.0, states=[0,0,0], event="w_speciation")
@@ -530,7 +542,7 @@ if __name__ == "__main__":
     # q01rate := sse_rate(name="q01", value=0.6, states=[0,1], event="transition")
     # q10rate := sse_rate(name="q10", value=0.6, states=[1,0], event="transition")
     # meh := sse_wrap(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)
-    # trs ~ discrete_sse(n=5, meh=meh, start_state=[0], stop="age", stop_value=2.5, origin="true", cond_spn="false", cond_surv="true")
+    # trs ~ discrete_sse(n=5, stash=meh, start_state=[0], stop="age", stop_value=2.5, origin="true", cond_spn="false", cond_surv="true")
 
     # time-het yule
     # l0ratet1 := sse_rate(name="lambdat1", value=1.0, event="w_speciation")
@@ -538,7 +550,7 @@ if __name__ == "__main__":
     # l0ratet3 := sse_rate(name="lambdat3", value=3.0, event="w_speciation")
     # l0ratet4 := sse_rate(name="lambdat4", value=0.4, event="w_speciation")
     # meh := sse_wrap(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])
-    # tr ~ discrete_sse(n=10, meh=meh, start_state=[0], stop="age", stop_value=3.0, origin="true", cond_spn="false", cond_surv="true")
+    # tr ~ discrete_sse(n=10, stash=meh, start_state=[0], stop="age", stop_value=3.0, origin="true", cond_spn="false", cond_surv="true")
 
     # simple hierarchical
     # rv1 ~ lognormal(n=2, mean=0.0, sd=0.25)
@@ -560,4 +572,4 @@ if __name__ == "__main__":
     
     # file_handle_exception = io.StringIO(script_str36)
 
-    script2pgm(script_str29, in_pj_file=False)
+    script2pgm(script_str38, in_pj_file=False)

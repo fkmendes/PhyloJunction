@@ -224,9 +224,9 @@ def make_DiscreteStateDependentProbability(det_fn_param_dict: \
                 )
 
 
-def make_MacroevolEventHandler(
+def make_SSEStash(
     det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
-        -> sseobj.MacroevolEventHandler:
+        -> sseobj.SSEStash:
 
     if not det_fn_param_dict:
         raise ec.NoSpecificationError(message="Cannot initialize SSE stash without specifications. Exiting...")
@@ -407,4 +407,8 @@ def make_MacroevolEventHandler(
 
     # )
 
-    return sseobj.MacroevolEventHandler(state_dep_rates_manager)
+    return \
+        sseobj.SSEStash(
+            sseobj.MacroevolEventHandler(state_dep_rates_manager), \
+            sseobj.DiscreteStateDependentProbabilityHandler(state_dep_probs_manager)
+        )

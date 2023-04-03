@@ -349,7 +349,7 @@ class DiscreteStateDependentParameterManager:
 
     # NOTE: This class is flexible in that it allows different parameter
     # numbers per time slice, for whatever that is worth. However, the
-    # user interface has a check inside make_MacroevolEventHandler()
+    # user interface has a check inside make_SSEStash()
     # that forces the user to specify the same number of parameters in
     # all time slices
 
@@ -417,7 +417,7 @@ class DiscreteStateDependentParameterManager:
         # appear in all time slices ()
         #
         # some of this testing is already being done at the interface level
-        # within dn_fn_discrete_sse.py.make_MacroevolEventHandler(), but
+        # within dn_fn_discrete_sse.py.make_SSEStash(), but
         # that testing is weaker, because it just checks that the number
         # of specified parameters is a multiple of the number of time slices
         # irrespective of what parameter states are
@@ -470,22 +470,17 @@ class DiscreteStateDependentParameterManager:
                 # try states (if rate)
                 try:
                     sts = param.state_tuple
-                    states_per_epoch_dict[k].add(sts)
-
-                    if sts in states_per_epoch_dict[k]:
-                        # TODO: raise exception and write testing code
-                        pass
 
                 # if not, it's a probability, then state
                 except:
                     sts = param.state
 
-                    if sts in states_per_epoch_dict[k]:
-                        raise ec.RepeatedStateDependentParameterError(
-                            k, sts, ""
-                        )
+                if sts in states_per_epoch_dict[k]:
+                    raise ec.RepeatedStateDependentParameterError(
+                        k, sts, ""
+                    )
 
-                    states_per_epoch_dict[k].add(sts)
+                states_per_epoch_dict[k].add(sts)
 
         # debugging
         # print("states_per_epoch_dict after populating")
@@ -608,7 +603,7 @@ class DiscreteStateDependentParameterManager_old_working:
 
     # NOTE: This class is flexible in that it allows different parameter
     # numbers per time slice, for whatever that is worth. However, the
-    # user interface has a check inside make_MacroevolEventHandler()
+    # user interface has a check inside make_SSEStash()
     # that forces the user to specify the same number of parameters in
     # all time slices
 
@@ -726,7 +721,7 @@ class MacroevolEventHandler():
 
     # NOTE: This class depends on DiscreteStateDependentParameterManager, which allows different
     # parameter numbers per time slice, for whatever that is worth. However,
-    # the user interface has a check inside make_MacroevolEventHandler()
+    # the user interface has a check inside make_SSEStash()
     # that forces the user to specify the same number of parameters in
     # all time slices
 
@@ -926,7 +921,7 @@ class DiscreteStateDependentProbabilityHandler():
     # that is worth.
     # 
     # However, the user interface has a check inside
-    # make_MacroevolEventHandler() that forces the user to specify the same
+    # make_SSEStash() that forces the user to specify the same
     # number of parameters in all time slices
 
     state_dep_prob_manager: DiscreteStateDependentParameterManager
@@ -1022,6 +1017,30 @@ class DiscreteStateDependentProbabilityHandler():
 
 ##############################################################################
 
+class SSEStash():
+    """
+    Class for stashing state-dependent rate and probability handlers
+    """
+
+    meh: MacroevolEventHandler
+    prob_handler: DiscreteStateDependentProbabilityHandler
+
+    def __init__(self,
+        macroevol_event_handler: MacroevolEventHandler,
+        state_dep_prob_handler: ty.Optional[DiscreteStateDependentProbabilityHandler]=None) \
+            -> None:
+
+        self.meh = macroevol_event_handler
+        self.prob_handler = state_dep_prob_handler
+
+    def get_meh(self):
+        return self.meh
+
+    def get_prob_handler(self):
+        return self.prob_handler
+
+
+##############################################################################
 
 class StateIntoPatternConverter:
     """Stash and machinery for checking and converting character compound-states into bit patterns,

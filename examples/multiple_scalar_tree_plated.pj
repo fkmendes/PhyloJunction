@@ -11,9 +11,9 @@ rv6 ~ lognormal(n=10, nr=3, mean=0.0, sd=0.1)
 # deterministic-node variable ('det_birth_rate') assignment
 det_birth_rate := sse_rate(name="lambda", value=1.0, states=[0,0,0], event="w_speciation")
 
-# deterministic-node variable ('meh') assignment
-meh := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)
+# deterministic-node variable ('sse_stash') assignment
+sse_stash := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)
 
 # stochastic-node sampled tree variable (at the moment, support for only one tree node in PGM when writing data to file)
-trs1 ~ discrete_sse(n=10, meh=meh, start_state=[0], stop="age", stop_value=rv2, origin="true", cond_spn="true")
-trs2 ~ discrete_sse(n=10, nr=2, meh=meh, start_state=[0], stop="age", stop_value=rv2, origin="true", cond_spn="true")
+trs1 ~ discrete_sse(n=10, stash=sse_stash, start_state=[0], stop="age", stop_value=rv2, origin="true", cond_spn="true")
+trs2 ~ discrete_sse(n=10, nr=2, stash=sse_stash, start_state=[0], stop="age", stop_value=rv2, origin="true", cond_spn="true")
