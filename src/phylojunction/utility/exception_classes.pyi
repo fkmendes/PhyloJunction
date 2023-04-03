@@ -102,9 +102,13 @@ class MissingStateDependentParameterError(Exception):
     epoch_missing_param: int
     symmetric_diff_set: ty.Set[ty.Any]
     message: str
-    def __init__(self, epoch_missing_param: int,
-        symmetric_diff_set: ty.Set[ty.Any],
-        message: str="") -> None: ...
+    def __init__(self, epoch_missing_param: int, symmetric_diff_set: ty.Set[ty.Any], message: str="") -> None: ...
+
+class RepeatedStateDependentParameterError(Exception):
+    epoch_w_repeated_param: int
+    repeated_state: ty.Union[int, ty.Tuple[int]]
+    message: str
+    def __init__(self, epoch_w_repeated_param: int, repeated_state: ty.Union[int, ty.Tuple[int]], message: str="") -> None: ...
 
 class StateDependentParameterMisspec(Exception):
     message: str

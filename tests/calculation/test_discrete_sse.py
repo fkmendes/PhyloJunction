@@ -137,17 +137,17 @@ class TestDiscreteSSE(unittest.TestCase):
         
         params_state0_at_time11 = \
             state_dep_par_manager.state_dep_params_at_time(
-                params_matrix_state0, 1.1)
+                1.1, params_matrix=params_matrix_state0)
         params_state1_at_time11 = \
             state_dep_par_manager.state_dep_params_at_time(
-                params_matrix_state1, 1.1)
+                1.1, params_matrix=params_matrix_state1)
 
         params_state0_at_time09 = \
             state_dep_par_manager.state_dep_params_at_time(
-                params_matrix_state0, 0.9)
+                0.9, params_matrix=params_matrix_state0)
         params_state1_at_time09 = \
             state_dep_par_manager.state_dep_params_at_time(
-                params_matrix_state1, 0.9)
+                0.9, params_matrix=params_matrix_state1)
         
         self.assertEqual(params_state0_at_time11[0].name, "rho1_0")
         self.assertEqual(params_state1_at_time11[0].name, "rho1_1")
@@ -175,11 +175,21 @@ class TestDiscreteSSE(unittest.TestCase):
             # sseobj.DiscreteStateDependentProbability(name="rho1_1", val=0.4, state=1),
         ]
 
+        # issue: states 0 and 2 here, but in epoch 0
+        # there were just states 0 and 1 (missing 2
+        # in first epoch and 1 in second epoch)
         probs_t1_2 = [
             sseobj.DiscreteStateDependentProbability(name="rho1_0", val=0.2, state=0),
-            sseobj.DiscreteStateDependentProbability(name="rho1_1", val=0.4, state=0)
+            sseobj.DiscreteStateDependentProbability(name="rho1_1", val=0.4, state=2)
         ]
 
+        # issue: repeated state
+        probs_t1_3 = [
+            sseobj.DiscreteStateDependentProbability(name="rho1_0", val=0.2, state=0),
+            sseobj.DiscreteStateDependentProbability(name="rho1_2", val=0.4, state=0)
+        ]
+
+        # issue: mixing probabilities and rates
         prob_rate_t1 = [
             sseobj.DiscreteStateDependentProbability(name="rho1_0", val=0.2, state=0),
             sseobj.DiscreteStateDependentRate(name="lambda1_0", val=1.0,
@@ -242,7 +252,7 @@ class TestDiscreteSSE(unittest.TestCase):
 
         with self.assertRaises(ec.MissingStateDependentParameterError) as exc3:
             sseobj.DiscreteStateDependentParameterManager(
-                matrix_state_dep_probs_error3, total_n_states,
+                matrix_state_dep_probs_error3, 3,
                 seed_age_for_time_slicing=2.0,
                 list_time_slice_age_ends=[1.0]
             )
@@ -250,7 +260,7 @@ class TestDiscreteSSE(unittest.TestCase):
         self.assertEqual(str(exc3.exception),
             "ERROR: One or more state-dependent parameters were missing " \
             + "at least from time slice 1. The symmetric difference " \
-            + "between time-slice state sets is ( 1 )"
+            + "between time-slice state sets is ( 1, 2 )"
         )
 
         with self.assertRaises(ec.MissingStateDependentParameterError) as exc4:
@@ -265,6 +275,8 @@ class TestDiscreteSSE(unittest.TestCase):
             + "at least from time slice 1. The symmetric difference " \
             + "between time-slice state sets is ( (1, 1, 1) )"
         )
+
+        # TODO: update tests with rates for repeated rates (gotta add the code in DiscreteStateDependentParameterManager)
 
 
     def test_state2pattern_converter(self):

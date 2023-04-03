@@ -46,6 +46,9 @@ class PJDetFnGrammar():
     def init_return_macroevol_handler(cls,
     det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
         -> sseobj.MacroevolEventHandler:
+        # TODO: rename make_MacroevolEventHandler()
+        # to something else, as it will also now make a
+        # DiscreteStateDependentProbabilityHandler
         return detsse.make_MacroevolEventHandler(det_fn_param_dict)
 
     @classmethod
@@ -55,7 +58,9 @@ class PJDetFnGrammar():
             -> ty.Optional[
                 ty.Union[
                     sseobj.DiscreteStateDependentRate,
-                    sseobj.MacroevolEventHandler
+                    sseobj.DiscreteStateDependentProbability,
+                    sseobj.MacroevolEventHandler,
+                    sseobj.DiscreteStateDependentProbabilityHandler,
                 ]]:
 
         # validate input

@@ -71,18 +71,43 @@ class TestMacroEvolEvent(unittest.TestCase):
                 states=[1,0]
             )
         ]
+        cls.bisse_probs_t0_s0 = [
+            sseobj.DiscreteStateDependentProbability(
+                name="rho0", val=0.0,
+                state=0
+            )
+        ]
+        cls.bisse_probs_t0_s1 = [
+            sseobj.DiscreteStateDependentProbability(
+                name="rho1", val=1.0,
+                state=1
+            )
+        ]
 
         bisse_rates_t0 = cls.bisse_rates_t0_s0 + cls.bisse_rates_t0_s1
+        bisse_probs_t0 = cls.bisse_probs_t0_s0 + cls.bisse_probs_t0_s1
         
         # 1D: time slices (i)
         # 2D: all rates from all states in i-th time slice
-        bisse_matrix_atomic_rate_params = [ bisse_rates_t0 ]
+        bisse_matrix_state_dep_rates = [ bisse_rates_t0 ]
         bisse_state_dep_rates_manager = \
             sseobj.DiscreteStateDependentParameterManager(
-                bisse_matrix_atomic_rate_params, total_n_states
+                bisse_matrix_state_dep_rates, total_n_states
             )
         cls.bisse_event_handler = \
             sseobj.MacroevolEventHandler(bisse_state_dep_rates_manager)
+        
+        bisse_matrix_state_dep_probs = [ bisse_probs_t0 ]
+        bisse_state_dep_probs_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                bisse_matrix_state_dep_probs, total_n_states
+            )
+        
+        cls.bisse_state_dep_prob_handler = \
+            sseobj.DiscreteStateDependentProbabilityHandler(
+                bisse_state_dep_probs_manager
+            )
+
         cls.bisse_state_representation_dict = \
             { 0: ["nd3"], 1: ["nd4", "nd5", "nd6"] }
 
@@ -198,6 +223,12 @@ class TestMacroEvolEvent(unittest.TestCase):
         self.assertAlmostEqual(obs_proportion_birth_s0, expected_proportion_birth_s0, msg="Proportion of event is off by more than 0.01", delta=0.01)
         self.assertAlmostEqual(obs_proportion_birth_s1, expected_proportion_birth_s1, msg="Proportion of event is off by more than 0.01", delta=0.01)
 
+
+    def test_sampling_probability_bisse(self):
+        # print(self.bisse_state_dep_prob_handler.state_dep_prob_manager.state_dep_params_dict[0])
+        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 0))
+        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 1))
+
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder
     # on VSCode and that you want to run this as a standalone script,
@@ -216,14 +247,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/calculation/test_macroevol_events.py
+    # $ python3.9 tests/calculation/test_macroevol_events.py
     # 
     # or
     #
-    # $ python3 -m tests.calculation.test_macroevol_events
+    # $ python3.9 -m tests.calculation.test_macroevol_events
     #
     # or 
     #
-    # $ python3 -m unittest tests.calculation.test_macroevol_events.TestMacroEvolEvent.test_total_rate_single_epoch_bd
+    # $ python3.9 -m unittest tests.calculation.test_macroevol_events.TestMacroEvolEvent.test_total_rate_single_epoch_bd
     
     unittest.main()

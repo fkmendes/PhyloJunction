@@ -33,7 +33,7 @@ class DiscreteStateDependentParameter():
     Supports vectorization of values only.
     """
 
-    val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
+    value: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
     name: str
     state: int=0  # associated state
 
@@ -423,7 +423,7 @@ class DiscreteStateDependentParameterManager:
         # irrespective of what parameter states are
 
         self.state_dep_params_dict: \
-            ty.Dict[int, ty.List[ty.List[DiscreteStateDependentRate]]] = \
+            ty.Dict[int, ty.List[ty.List[DiscreteStateDependentParameter]]] = \
                 dict((s, [[] for j in range(self.n_time_slices)]) \
                 for s in range(self.state_count))
         
@@ -472,9 +472,19 @@ class DiscreteStateDependentParameterManager:
                     sts = param.state_tuple
                     states_per_epoch_dict[k].add(sts)
 
-                # if not, it's a parameter, then state
+                    if sts in states_per_epoch_dict[k]:
+                        # TODO: raise exception and write testing code
+                        pass
+
+                # if not, it's a probability, then state
                 except:
                     sts = param.state
+
+                    if sts in states_per_epoch_dict[k]:
+                        raise ec.RepeatedStateDependentParameterError(
+                            k, sts, ""
+                        )
+
                     states_per_epoch_dict[k].add(sts)
 
         # debugging
@@ -493,7 +503,6 @@ class DiscreteStateDependentParameterManager:
                         ),
                         ""
                     )
-
 
 
     def _init_matrix_state_dep_params_dict(self):
@@ -524,7 +533,11 @@ class DiscreteStateDependentParameterManager:
                         ". Likely the total number of states was misspecified.")
 
 
-    def state_dep_params_at_time(self, params_matrix, a_time: float):
+    def state_dep_params_at_time(self,
+        a_time: float,
+        params_matrix: ty.Optional[
+            ty.List[ty.List[DiscreteStateDependentParameter]]
+            ]=None) -> ty.List[DiscreteStateDependentParameter]:
         # see where a_time falls within (get time_slice_index)
         # grab list of atomic rate params at that time_slice_index
         # print("self.n_time_slices = " + str(self.n_time_slices))
@@ -550,13 +563,23 @@ class DiscreteStateDependentParameterManager:
                 # in which case we want the index to just be 0
                 time_slice_index = 0
 
-            break        
+            break
 
         # adjusting
         # if time_slice_index > (self.n_time_slices - 1):
         #     time_slice_index = self.n_time_slices - 1
 
-        return params_matrix[time_slice_index]
+        # params_matrix will have been provided as a
+        # matrix conditioned on a departing state
+        if params_matrix != None:
+            return params_matrix[time_slice_index]
+        
+        # when no params_matrix is specified, just grab
+        # all parameters at time t, but warning:
+        # no control for the order (in different time slices)
+        # the parameters have been passed by user!!!!
+        else:
+            return self.matrix_state_dep_params[time_slice_index]
 
 
     def __len__(self) -> int:
@@ -708,7 +731,6 @@ class MacroevolEventHandler():
     # all time slices
 
     state_dep_rate_manager: DiscreteStateDependentParameterManager
-    state_dep_prob_manager: ty.Optional[DiscreteStateDependentParameterManager]
     state_count: int
     n_time_slices: int
     seed_age: ty.Optional[float]
@@ -717,15 +739,10 @@ class MacroevolEventHandler():
     str_representation: str
 
     def __init__(self,
-        a_state_dep_rate_manager: DiscreteStateDependentParameterManager,
-        a_state_dep_prob_manager: ty.Optional[DiscreteStateDependentParameterManager]=None) \
+        state_dep_rate_manager: DiscreteStateDependentParameterManager) \
             -> None:
 
-        if a_state_dep_prob_manager == None:
-            pass
-
-        self.state_dep_rate_manager = a_state_dep_rate_manager
-        self.state_dep_prob_manager = a_state_dep_prob_manager
+        self.state_dep_rate_manager = state_dep_rate_manager
         self.state_count = self.state_dep_rate_manager.state_count
         self.n_time_slices = self.state_dep_rate_manager.n_time_slices
         self.seed_age = self.state_dep_rate_manager.seed_age
@@ -753,7 +770,13 @@ class MacroevolEventHandler():
 
 
     # this function deals with vectorization
-    def total_rate(self, a_time: float, state_representation_dict: ty.Dict[int, ty.Set[str]], value_idx: int=0, departing_state: ty.Optional[int]=None, debug: bool=False) -> ty.Union[float, ty.Tuple[float, ty.List[float]]]:
+    def total_rate(self,
+        a_time: float,
+        state_representation_dict: ty.Dict[int, ty.Set[str]],
+        value_idx: int=0,
+        departing_state: ty.Optional[int]=None,
+        debug: bool=False) -> \
+            ty.Union[float, ty.Tuple[float, ty.List[float]]]:
         """Calculate total rate for either any event, or for events conditioned on a specific state.
 
         Args:
@@ -789,7 +812,7 @@ class MacroevolEventHandler():
 
             # scoped to total_rate
             atomic_rate_params_matrix = self.state_dep_rate_manager.state_dep_params_dict[state_idx] # conditioning
-            atomic_rate_params_at_time = self.state_dep_rate_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
+            atomic_rate_params_at_time = self.state_dep_rate_manager.state_dep_params_at_time(a_time, params_matrix=atomic_rate_params_matrix)
 
             for atomic_rate_param in atomic_rate_params_at_time:
                 w = 1.0 # weight
@@ -824,7 +847,13 @@ class MacroevolEventHandler():
 
 
     # this function deals with vectorization
-    def sample_event_atomic_parameter(self, denominator: float, a_time: float, state_indices: ty.List[int], value_idx: int=0, a_seed: ty.Optional[float]=None, debug: bool=False):
+    def sample_event_atomic_parameter(self,
+        denominator: float,
+        a_time: float,
+        state_indices: ty.List[int],
+        value_idx: int=0,
+        a_seed: ty.Optional[float]=None,
+        debug: bool=False):
         """Return one-sized list with a sampled macroevolutionary event
 
         Args:
@@ -849,7 +878,7 @@ class MacroevolEventHandler():
         ws = list() # weights for sampling proportional to rate value
         for state_idx in state_indices:
             atomic_rate_params_matrix = self.state_dep_rate_manager.state_dep_params_dict[state_idx]
-            this_state_atomic_rate_params = self.state_dep_rate_manager.state_dep_params_at_time(atomic_rate_params_matrix, a_time)
+            this_state_atomic_rate_params = self.state_dep_rate_manager.state_dep_params_at_time(a_time, params_matrix=atomic_rate_params_matrix)
             all_states_atomic_rate_params += this_state_atomic_rate_params
 
             # total rate of outcomes must depend on "adjacent" states across events
@@ -881,6 +910,115 @@ class MacroevolEventHandler():
 
     def get_length(self):
         pass
+
+##############################################################################
+
+
+class DiscreteStateDependentProbabilityHandler():
+    """Class for managing time-heterogeneous state-dependent probabilities
+    
+    Time slices do not have to be the same as those for state-dependent
+    rates.
+    """
+
+    # NOTE: This class depends on DiscreteStateDependentParameterManager,
+    # which allows different parameter numbers per time slice, for whatever
+    # that is worth.
+    # 
+    # However, the user interface has a check inside
+    # make_MacroevolEventHandler() that forces the user to specify the same
+    # number of parameters in all time slices
+
+    state_dep_prob_manager: DiscreteStateDependentParameterManager
+    state_count: int
+    n_time_slices: int
+    seed_age: ty.Optional[float]
+    slice_age_ends: ty.List[float]
+    slice_t_ends: ty.List[ty.Optional[float]]
+    str_representation: str
+
+    def __init__(self,
+        state_dep_prob_manager: DiscreteStateDependentParameterManager) \
+            -> None:
+
+        self.state_dep_prob_manager = state_dep_prob_manager
+        self.state_count = self.state_dep_prob_manager.state_count
+        self.n_time_slices = self.state_dep_prob_manager.n_time_slices
+        self.seed_age = self.state_dep_prob_manager.seed_age
+        self.slice_t_ends = self.state_dep_prob_manager.slice_t_ends
+        self.slice_age_ends = self.state_dep_prob_manager.slice_age_ends
+
+        # side-effect: initializes self.str_representation
+        self._initialize_str_representation()
+
+
+    def _initialize_str_representation(self) -> None:
+        self.str_representation = "StateDependentSamplingProbabilityHandler"
+        # state s
+        for s, atomic_rates_state_mat in \
+            self.state_dep_prob_manager.state_dep_params_dict.items():
+            
+            self.str_representation += "\n  State " + str(s) + ":\n"
+
+            # time slice k
+            for k, list_state_dep_params_slice in enumerate(atomic_rates_state_mat):
+                if self.seed_age and isinstance(self.slice_t_ends, list):
+                    time_slice_t_end = ty.cast(float, self.slice_t_ends[k])
+                    self.str_representation += "    Time slice " \
+                        + str(k + 1) + " (time = " + str(round(time_slice_t_end,4)) \
+                        + ", age = " + str(round(self.slice_age_ends[k],4)) + ")\n"
+                
+                else:
+                    self.str_representation += "    Time slice " \
+                        + str(k + 1) + " (age = " \
+                        + str(round(self.slice_age_ends[k],4)) + ")\n"
+
+                for state_dep_param in list_state_dep_params_slice:
+                    self.str_representation += "      " + state_dep_param.name + " = "
+                    self.str_representation += ", ".join(
+                        str(v) for v in state_dep_param.value) + "\n"
+
+
+    def _state_dep_prob_at_time(self, a_time, state_idx) \
+        -> ty.List[DiscreteStateDependentParameter]:
+
+        # scoped to total_rate
+        state_cond_prob_matrix = self.state_dep_prob_manager.state_dep_params_dict[state_idx] # conditioning
+
+        # in the context of rates (multiple rates per departing state)
+        # state_dep_params_at_time returns a list of rates,
+        # but here, we have a single probability inside a list
+        state_cond_prob_at_time = self.state_dep_prob_manager.state_dep_params_at_time(a_time, params_matrix=state_cond_prob_matrix)
+        
+        return state_cond_prob_at_time
+
+
+    def randomly_decide_taxon_sampling_at_time_at_state(self, a_time, state_idx) \
+        -> bool:
+        
+        prob_at_state_all_slices_list = self._state_dep_prob_at_time(a_time, state_idx)
+        
+        if len(prob_at_state_all_slices_list) > 1: 
+            exit("Should only have one probability per state per slice. Exiting...")
+
+        binom_draw = np.random.binomial(
+            1, prob_at_state_all_slices_list[0].value)
+        if binom_draw:
+            return True
+        
+        else:
+            return False
+
+    def __len__(self) -> int:
+        if self.state_dep_prob_manager:
+            return len(self.state_dep_prob_manager)
+
+        else:
+            return 0
+
+
+    def __str__(self) -> str:
+        return self.str_representation
 
 ##############################################################################
 
