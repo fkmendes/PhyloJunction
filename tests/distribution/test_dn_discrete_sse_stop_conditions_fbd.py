@@ -24,7 +24,9 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
         
         state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, 1)
 
-        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+        event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+
+        cls.sse_stash = sseobj.SSEStash(event_handler)
 
 
     def test_tree_size_stop_condition_origin_fbd(self):
@@ -41,7 +43,17 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
         start_states_list = [0 for i in range(n_sim)]
     
         # simulations
-        dnsse = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12, debug=False)
+        dnsse = distsse.DnSSE(
+            self.sse_stash,
+            stop_condition_value,
+            n=n_sim,
+            stop=stop_condition,
+            origin=start_at_origin,
+            start_states_list=start_states_list,
+            condition_on_survival=True,
+            epsilon=1e-12,
+            debug=False)
+
         trs = dnsse.generate()
 
         tr_sizes = [ann_tr.n_extant_terminal_nodes for ann_tr in trs]
@@ -66,7 +78,15 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
         start_states_list = [0 for i in range(n_sim)]
     
         # simulations
-        dnsse = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)
+        dnsse = distsse.DnSSE(self.sse_stash,
+            stop_condition_value,
+            n=n_sim,
+            stop=stop_condition,
+            origin=start_at_origin,
+            start_states_list=start_states_list,
+            condition_on_survival=True,
+            epsilon=1e-12)
+        
         trs = dnsse.generate()
 
         tr_sizes = [ann_tr.n_extant_terminal_nodes for ann_tr in trs]
@@ -92,7 +112,16 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
         # seeds_list = [i+1 for i in range(n_sim)]
     
         # simulations
-        dnsse = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)
+        dnsse = distsse.DnSSE(
+            self.sse_stash,
+            stop_condition_value,
+            n=n_sim,
+            stop=stop_condition,
+            origin=start_at_origin,
+            start_states_list=start_states_list,
+            condition_on_survival=True,
+            epsilon=1e-12)
+
         trs = dnsse.generate()
 
         tr_sizes = [ann_tr.origin_age for ann_tr in trs]
@@ -119,7 +148,16 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
         # seeds_list = [i+1 for i in range(n_sim)]
     
         # simulations
-        dnsse = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin, start_states_list=start_states_list, condition_on_survival=True, epsilon=1e-12)
+        dnsse = distsse.DnSSE(
+            self.sse_stash,
+            stop_condition_value,
+            n=n_sim,
+            stop=stop_condition,
+            origin=start_at_origin,
+            start_states_list=start_states_list,
+            condition_on_survival=True,
+            epsilon=1e-12)
+            
         trs = dnsse.generate()
 
         tr_sizes = [ann_tr.root_age for ann_tr in trs]

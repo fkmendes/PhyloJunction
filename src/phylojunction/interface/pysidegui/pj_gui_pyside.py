@@ -1239,6 +1239,7 @@ class GUIMainWindow(QMainWindow):
     def quit_app_button_clicked(self):
         sys.exit()
 
+
     def print_about(self):
         self.ui.about_licensing.exec()
 

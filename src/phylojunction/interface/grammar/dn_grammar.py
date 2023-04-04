@@ -28,7 +28,7 @@ class PJDnGrammar():
             tuple(["n", "nr", "shape", "scale", "rate_parameterization"]),
         "unif":
             tuple(["n", "nr", "min", "max"]),
-        "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin", "meh",
+        "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin", "stash",
                              "start_state", "eps", "runtime_limit",
                              "cond_spn", "cond_surv"]) # meh = MacroEvol Handler
     }

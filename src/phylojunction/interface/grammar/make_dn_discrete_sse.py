@@ -25,14 +25,19 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # all remaining args must be specified
     n_samples: int = 1
     n_repl: int = 1
-    event_handler: \
-        sseobj.MacroevolEventHandler \
-            = sseobj.MacroevolEventHandler(
-                sseobj.DiscreteStateDependentParameterManager([[]], 1))
-    state_dep_prob_handler: \
-        sseobj.DiscreteStateDependentProbabilityHandler \
-            = sseobj.DiscreteStateDependentProbabilityHandler(
-                sseobj.DiscreteStateDependentParameterManager([[]], 1))
+    stash: sseobj.SSEStash = sseobj.SSEStash(
+        sseobj.MacroevolEventHandler(
+            sseobj.DiscreteStateDependentParameterManager([[]], 1)
+        )
+    )
+    # event_handler: \
+    #     sseobj.MacroevolEventHandler \
+    #         = sseobj.MacroevolEventHandler(
+    #             sseobj.DiscreteStateDependentParameterManager([[]], 1))
+    # state_dep_prob_handler: \
+    #     sseobj.DiscreteStateDependentProbabilityHandler \
+    #         = sseobj.DiscreteStateDependentProbabilityHandler(
+    #             sseobj.DiscreteStateDependentParameterManager([[]], 1))
     stop_str: str
     stop_values_list: ty.List[float] = []
     origin: bool = True
@@ -84,12 +89,13 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                 nodepgm_val = first_val.value
                 
                 if isinstance(nodepgm_val, sseobj.SSEStash):
+                    stash = nodepgm_val
                 # there should be only one event handler always, but it will be in list
-                    event_handler = nodepgm_val.get_meh()
+                    # event_handler = nodepgm_val.get_meh()
 
                     # SSEStash will return None if prob_handler
                     # wasn't created by user through script
-                    prob_handler = nodepgm_val.get_prob_handler()
+                    # prob_handler = nodepgm_val.get_prob_handler()
 
             elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa", "max_rec_taxa", "abort_at_obs"):
                 try:
@@ -166,7 +172,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
     
     # making sure essential parameters of distribution have been specified
-    if not any(event_handler.state_dep_rate_manager.matrix_state_dep_params):
+    if not any(stash.get_meh().state_dep_rate_manager.matrix_state_dep_params):
         raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stash\" is not storing a valid macroevolutionary event handler.")
     
     if not stop_values_list:
@@ -175,7 +181,7 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # TODO: have DnSSE take a prob_handler, and populate it if it's None upon initialization
     # all unit test should still work if this initialization is done correctly
     return dnsse.DnSSE(
-        event_handler,
+        stash,
         stop_values_list,
         n=n_samples,
         n_replicates=n_repl,

@@ -32,7 +32,9 @@ class TestBiSSETrees(unittest.TestCase):
 
         state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
-        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+        event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+
+        cls.sse_stash = sseobj.SSEStash(event_handler)
 
 
     def test_tree_size_state_count_max_taxa_bisse(self):
@@ -54,9 +56,17 @@ class TestBiSSETrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
-                start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                condition_on_speciation=True, condition_on_survival=True,
+            sse_sim = distsse.DnSSE(
+                self.sse_stash,
+                stop_condition_value,
+                n=n_sim,
+                stop=stop_condition,
+                origin=start_at_origin,
+                start_states_list=start_states_list,
+                epsilon=1e-12,
+                runtime_limit=3600,
+                condition_on_speciation=True,
+                condition_on_survival=True,
                 debug=False)
 
             trs = sse_sim.generate()
@@ -223,10 +233,18 @@ class TestBiSSETrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=100, stop=stop_condition, origin=start_at_origin,
-                                    start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                                    condition_on_speciation=True, condition_on_survival=True,
-                                    debug=False)
+            sse_sim = distsse.DnSSE(
+                self.sse_stash,
+                stop_condition_value,
+                n=100,
+                stop=stop_condition,
+                origin=start_at_origin,
+                start_states_list=start_states_list,
+                epsilon=1e-12,
+                runtime_limit=3600,
+                condition_on_speciation=True,
+                condition_on_survival=True,
+                debug=False)
 
             trs = sse_sim.generate()
 

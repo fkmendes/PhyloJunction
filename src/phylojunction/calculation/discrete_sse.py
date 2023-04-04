@@ -405,6 +405,9 @@ class DiscreteStateDependentParameterManager:
                         # no need to append seed_age, because
                         # self.slice_age_ends already has 0.0 in it
 
+        print("self.n_time_slices")
+        print(self.n_time_slices)
+
         if self.n_time_slices > 1:
             self._check_all_states_in_all_time_slices()
 
@@ -481,6 +484,9 @@ class DiscreteStateDependentParameterManager:
                     )
 
                 states_per_epoch_dict[k].add(sts)
+
+        print("states_per_epoch_dict")
+        print(states_per_epoch_dict)
 
         # debugging
         # print("states_per_epoch_dict after populating")
@@ -744,7 +750,7 @@ class MacroevolEventHandler():
         self.slice_t_ends = self.state_dep_rate_manager.slice_t_ends
         self.slice_age_ends = self.state_dep_rate_manager.slice_age_ends
 
-        self.str_representation = "MacroevolEventHandler"
+        self.str_representation = "State-dependent rates"
         # state s
         for s, atomic_rates_state_mat in self.state_dep_rate_manager.state_dep_params_dict.items():
             self.str_representation += "\n  State " + str(s) + ":\n"
@@ -948,7 +954,7 @@ class DiscreteStateDependentProbabilityHandler():
 
 
     def _initialize_str_representation(self) -> None:
-        self.str_representation = "StateDependentSamplingProbabilityHandler"
+        self.str_representation = "State-dependent probabilities"
         # state s
         for s, atomic_rates_state_mat in \
             self.state_dep_prob_manager.state_dep_params_dict.items():
@@ -1004,6 +1010,7 @@ class DiscreteStateDependentProbabilityHandler():
         else:
             return False
 
+
     def __len__(self) -> int:
         if self.state_dep_prob_manager:
             return len(self.state_dep_prob_manager)
@@ -1017,6 +1024,7 @@ class DiscreteStateDependentProbabilityHandler():
 
 ##############################################################################
 
+
 class SSEStash():
     """
     Class for stashing state-dependent rate and probability handlers
@@ -1024,6 +1032,7 @@ class SSEStash():
 
     meh: MacroevolEventHandler
     prob_handler: DiscreteStateDependentProbabilityHandler
+    str_representation: str
 
     def __init__(self,
         macroevol_event_handler: MacroevolEventHandler,
@@ -1033,14 +1042,92 @@ class SSEStash():
         self.meh = macroevol_event_handler
         self.prob_handler = state_dep_prob_handler
 
-    def get_meh(self):
+        if state_dep_prob_handler == None:
+            self._initialize_missing_prob_handler()
+
+        self._init_str_representation()
+
+
+    # side-effect: creates and populates self.prob_handler if user did
+    # not provide it
+    def _initialize_missing_prob_handler(self) -> None:
+        expected_n_prob \
+            = self.meh.state_count * self.meh.state_dep_rate_manager.n_time_slices
+            # have to use the rate manager number of slices, as that
+            # does not reflect that last 0.0
+        n_prob_per_slice = int(expected_n_prob / self.meh.n_time_slices)
+        
+        matrix_state_dep_probs: \
+            ty.List[ty.List[DiscreteStateDependentProbability]] = []
+
+        print("self.meh.state_dep_rate_manager.n_time_slices")
+        print(self.meh.state_dep_rate_manager.n_time_slices)
+        
+        # TODO: this code is wrong, fix it!
+        for i in range(0, expected_n_prob, n_prob_per_slice):
+
+            state_dep_probs: \
+                ty.List[DiscreteStateDependentProbability] = []
+            for j in range(self.meh.state_count):
+                print("i = " + str(i))
+                print("n_prob_per_slice = " + str(n_prob_per_slice))
+                st = j % n_prob_per_slice
+                print("st = " + str(st))
+                print("t = " + str(j // n_prob_per_slice))
+                state_dep_prob = DiscreteStateDependentProbability(
+                    name="rho" + str(st) + "_t" + str(j // n_prob_per_slice),
+                    val=1.0, state=st)
+                    
+                # so mypy won't complain
+                if isinstance(state_dep_prob,
+                    DiscreteStateDependentProbability):
+                    state_dep_probs.append(state_dep_prob)
+
+            # appending a list of DiscreteStateDependentProbability
+            # 1D: time slices, 2D: state-dep prob list
+            matrix_state_dep_probs.append(state_dep_probs)
+
+        print("matrix_state_dep_probs = ")
+        print(matrix_state_dep_probs)
+
+        # we have to throw away the last element in slice_age_ends
+        # because it has already been added a 0.0 for the youngest
+        # time slice when 'meh' was initialized; if we don't do this
+        # the number of time slices inside 'state_dep_probs_manager'
+        # will be 1 too large
+        state_dep_probs_manager = \
+            DiscreteStateDependentParameterManager(
+                matrix_state_dep_probs,
+                self.meh.state_count,
+                seed_age_for_time_slicing=self.meh.seed_age,
+                list_time_slice_age_ends=self.meh.slice_age_ends[:-1]
+            )
+
+        self.prob_handler = DiscreteStateDependentProbabilityHandler(
+            state_dep_probs_manager
+        )
+
+
+    def _init_str_representation(self) -> None:
+        self.str_representation = str(self.meh)
+
+        if self.prob_handler:
+            self.str_representation += "\n" + str(self.prob_handler)
+
+
+    def get_meh(self) -> MacroevolEventHandler:
         return self.meh
 
-    def get_prob_handler(self):
+
+    def get_prob_handler(self) -> DiscreteStateDependentProbabilityHandler:
         return self.prob_handler
 
 
+    def __str__(self):
+        return self.str_representation
+
 ##############################################################################
+
 
 class StateIntoPatternConverter:
     """Stash and machinery for checking and converting character compound-states into bit patterns,

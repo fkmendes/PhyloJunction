@@ -36,6 +36,8 @@ class TestDnSSEObject(unittest.TestCase):
 
         meh = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
+        sse_stash = sseobj.SSEStash(meh)
+
         ########
         # Tree #
         ########
@@ -45,10 +47,18 @@ class TestDnSSEObject(unittest.TestCase):
         start_at_origin = True
         start_states_list = [0 for i in range(n_sim)]
 
-        sse_sim = distsse.DnSSE(n=n_sim, stop=stop_condition, stop_value=stop_condition_value, origin=start_at_origin, event_handler=meh,
-                start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                condition_on_speciation=False, condition_on_survival=False,
-                debug=False)
+        sse_sim = distsse.DnSSE(
+            sse_stash,
+            n=n_sim,
+            stop=stop_condition,
+            stop_value=stop_condition_value,
+            origin=start_at_origin,
+            start_states_list=start_states_list,
+            epsilon=1e-12,
+            runtime_limit=3600,
+            condition_on_speciation=False,
+            condition_on_survival=False,
+            debug=False)
 
         trs = sse_sim.generate()
 
@@ -84,10 +94,10 @@ if __name__ == '__main__':
     # 
     # or
     #
-    # $ python3 -m tests.distribution.test_dn_discrete_sse_object
+    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_object
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_object.TestDnSSEObject.test_dnsse_vectorization
+    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_object.TestDnSSEObject.test_dnsse_vectorization
 
     unittest.main()

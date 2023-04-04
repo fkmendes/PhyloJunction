@@ -516,7 +516,7 @@ if __name__ == "__main__":
         + "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" \
         + "sampling_rate <- [0.5, 0.5]\n" \
         + "det_sampling_rate := sse_prob(name=\"rho\", value=sampling_rate, state=[0])\n" \
-        + "sse_stash := sse_wrap(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" \
+        + "sse_stash := sse_wrap(flat_rate_mat=[det_birth_rate], flat_prob_mat=[det_sampling_rate], n_states=1, n_epochs=1)\n" \
         + "trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=sse_stash, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
 
 

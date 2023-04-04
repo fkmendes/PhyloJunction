@@ -27,7 +27,9 @@ class TestFBDTrees(unittest.TestCase):
 
         state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
 
-        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+        event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+
+        cls.sse_stash = sseobj.SSEStash(event_handler)
 
     
     # NOTE: activate this test after I eventually implement the GSM approach as a block in
@@ -147,10 +149,18 @@ class TestFBDTrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=100, stop=stop_condition, origin=start_at_origin,
-                                    start_states_list=start_states_list, epsilon=1e-12, runtime_limit=3600,
-                                    condition_on_speciation=True, condition_on_survival=True,
-                                    debug=False)
+            sse_sim = distsse.DnSSE(
+                self.sse_stash,
+                stop_condition_value,
+                n=100,
+                stop=stop_condition,
+                origin=start_at_origin,
+                start_states_list=start_states_list,
+                epsilon=1e-12,
+                runtime_limit=3600,
+                condition_on_speciation=True,
+                condition_on_survival=True,
+                debug=False)
 
             trs = sse_sim.generate()
 
@@ -249,15 +259,15 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/distribution/test_dn_discrete_sse_fbd.py
+    # $ python3.9 tests/distribution/test_dn_discrete_sse_fbd.py
     # 
     # or
     #
-    # $ python3 -m tests.distribution.test_dn_discrete_sse_fbd
+    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_fbd
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_fbd.TestFBDTrees.test_tree_size_sa_count_max_t_fbd
+    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_fbd.TestFBDTrees.test_tree_size_sa_count_max_t_fbd
 
     #############
     # Debugging #

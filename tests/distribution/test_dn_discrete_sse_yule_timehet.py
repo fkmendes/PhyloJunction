@@ -53,7 +53,9 @@ class TestYuleTimeHetTrees(unittest.TestCase):
             list_time_slice_age_ends=cls.time_slice_age_ends
         )
 
-        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+        event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+
+        cls.sse_stash = sseobj.SSEStash(event_handler)
 
 
     def test_tree_size_state_count_max_taxa_timehet_yule(self):
@@ -80,7 +82,7 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.event_handler, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
+            sse_sim = distsse.DnSSE(self.sse_stash, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
                     start_states_list=start_states_list,
                     epsilon=1e-12, runtime_limit=runtime_limit,
                     condition_on_speciation=True, condition_on_survival=True,
@@ -208,14 +210,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/distribution/test_dn_discrete_sse_yule_timehet.py
+    # $ python3.9 tests/distribution/test_dn_discrete_sse_yule_timehet.py
     # 
     # or
     #
-    # $ python3 -m tests.distribution.test_dn_discrete_sse_yule_timehet
+    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_yule_timehet
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_yule_timehet.TestYuleTimeHetTrees.test_tree_size_state_count_max_taxa_timehet_yule
+    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_yule_timehet.TestYuleTimeHetTrees.test_tree_size_state_count_max_taxa_timehet_yule
 
     unittest.main()

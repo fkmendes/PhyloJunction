@@ -34,13 +34,13 @@ class DnSSE(pgm.DistributionPGM):
     This is not a recursive simulator (in which each lineage would take care of
     growing only itself, and recur upon birth events).
 
-    Attributes
-        n_sim (int): Number of simulations one wants.
-        n_repl (int): Number of (successful) trees per simulation.
+    Attributes:
+        event_handler (MacroevolEventHandler): Object holding all rates we need to simulate.
+        n (int): Number of simulations one wants.
+        n_replicates (int): Number of tree replicates per simulation.
         stop (str): If "age", stops when origin or root age is equal to 'stop_condition_value'. If "size", stops when tree has 'stop_condition_value' observable nodes.
         stop_val (float): Either maximum tree age, or maximum count of observable nodes.
         start_at_origin (bool): Simulation starts at origin (i.e., seed == origin).
-        events (MacroevolEventHandler): Object holding all parameter values we need to simulate.
         start_states (int): List of integer representing the starting states of all n_sim simulations.
         state_count (int): Number of discrete states (obtained from 'events').
         n_time_slices (int): Number of time slices (obtained from 'events').
@@ -74,7 +74,9 @@ class DnSSE(pgm.DistributionPGM):
     min_rec_taxa: int
     max_rec_taxa: int
     abort_at_obs: int
+    sse_stash: sseobj.SSEStash
     events: sseobj.MacroevolEventHandler
+    prob_handler: sseobj.DiscreteStateDependentProbabilityHandler
     start_states: ty.List[int]
     state_count: int
     n_time_slices: int
@@ -87,7 +89,7 @@ class DnSSE(pgm.DistributionPGM):
 
     # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
     def __init__(self,
-                 event_handler: sseobj.MacroevolEventHandler,
+                 sse_stash: sseobj.SSEStash,
                  stop_value: ty.List[float]=[],
                  n: int=1,
                  n_replicates: int=1,
@@ -122,14 +124,17 @@ class DnSSE(pgm.DistributionPGM):
         self.max_rec_taxa = max_rec_taxa
         self.abort_at_obs = abort_at_obs
 
-        # model parameters
+        # model parameters #
         self.start_states = start_states_list
-        self.events = event_handler # carries all parameters, number of states and of slices
+        self.sse_stash = sse_stash
+        # all rates, number of states and of slices
+        self.events = sse_stash.get_meh()
         self.state_count = self.events.state_count
         self.n_time_slices = self.events.n_time_slices
-        # if isinstance(self.events.slice_t_ends, list):
-        #     self.slice_t_ends = [float(t_end) for t_end in self.events.slice_t_ends if t_end] # so mypy won't complain
-        # else:
+        # sampling probabilities, if provided
+        self.prob_handler = sse_stash.get_prob_handler()
+
+        # for time-heterogeneous processes
         self.slice_t_ends = self.events.slice_t_ends
         self.seed_age = self.events.seed_age # used just for verifying inputs
 
@@ -139,8 +144,8 @@ class DnSSE(pgm.DistributionPGM):
         self.runtime_limit = runtime_limit
         self.debug = debug
 
-        # checking number of provided values, and vectorizing if necessary
-        self.check_sample_size()
+        # checking number of provided values (vectorizing if necessary)
+        self._check_sample_size()
 
         ##################
         # Input checking #
@@ -207,16 +212,20 @@ class DnSSE(pgm.DistributionPGM):
                         raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (tree height) cannot be negative. Exiting...")
                 
 
-    #########################
-    # Vectorization methods #
-    #########################
-    def check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
+    ##########################
+    # Initialization methods #
+    ##########################
+
+    def _check_sample_size(self) -> None:
         # changing atomic_rate_params_matrix here
-        # should affect fig_rates_manager
+        # should affect state_dep_rate_manager
         #
         # 1D: time slices, 2D: list of atomic rate params
         atomic_rate_params_matrix = \
             self.events.state_dep_rate_manager.matrix_state_dep_params
+
+        state_dep_probs_matrix = \
+            self.prob_handler.state_dep_prob_manager.matrix_state_dep_params
 
         ############################
         # Checking rate parameters #
@@ -229,6 +238,21 @@ class DnSSE(pgm.DistributionPGM):
                 # we multiply values if one is provided, but > 1 sims
                 if n_val == 1 and (self.n_sim > 1):
                     arp.value = [arp.value[0] for i in range(self.n_sim)]
+                
+                # do not know how to multiply, error!
+                elif n_val > 1 and n_val != self.n_sim:
+                    raise ec.DimensionalityError(self.DN_NAME)
+
+        ###################################
+        # Checking sampling probabilities #
+        ###################################
+        for k, list_state_dep_probs in enumerate(state_dep_probs_matrix):
+            for state_dep_prob in list_state_dep_probs:
+                n_val = len(state_dep_prob.value)
+
+                # we multiply values if one is provided, but > 1 sims
+                if n_val == 1 and (self.n_sim > 1):
+                    state_dep_prob.value = [state_dep_prob.value[0] for i in range(self.n_sim)]
                 
                 # do not know how to multiply, error!
                 elif n_val > 1 and n_val != self.n_sim:
@@ -260,6 +284,7 @@ class DnSSE(pgm.DistributionPGM):
     ######################
     # Simulation methods #
     ######################
+    
     def get_next_event_time(self, total_rate: float, a_seed: ty.Optional[int]=None) -> float:
         """Draw next exponentially distributed event time
 
@@ -887,6 +912,9 @@ class DnSSE(pgm.DistributionPGM):
 
         return last_chosen_node, cumulative_node_count, cumulative_sa_count
 
+    ##########################
+    # Main simulation method #
+    ##########################
 
     def simulate(self, a_start_state: int, a_stop_value: ty.Union[int, float], value_idx: int=0, a_seed: ty.Optional[int]=None) -> AnnotatedTree:
         """Sample (simulate) tree with states at its terminal nodes]
@@ -1363,11 +1391,12 @@ class DnSSE(pgm.DistributionPGM):
             # TODO: remove these two ifs after done with FIG validation
             # reconstructed tree is too small
             if ann_tr.n_extant_terminal_nodes < self.min_rec_taxa:
-                print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
+                # print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
+            
             # reconstructed tree is too large
             if ann_tr.n_extant_terminal_nodes > self.max_rec_taxa:
-                print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
+                # print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
 
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):

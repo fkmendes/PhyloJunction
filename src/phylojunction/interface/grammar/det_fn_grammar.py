@@ -19,7 +19,7 @@ class PJDetFnGrammar():
     det_fn_grammar_dict = {
         "sse_prob": set(["name", "value", "state"]),
         "sse_rate": set(["name", "value", "event", "states"]),
-        "sse_wrap": set(["flat_rate_mat", "n_states", "seed_age", "epoch_age_ends", "n_epochs"])
+        "sse_wrap": set(["flat_rate_mat", "flat_prob_mat", "n_states", "seed_age", "epoch_age_ends", "n_epochs"])
     }
 
     @classmethod

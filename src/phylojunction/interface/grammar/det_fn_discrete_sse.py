@@ -282,15 +282,15 @@ def make_SSEStash(
                         "\"sse_wrap\" expects that the number of epoch ends " \
                         + "is equal to the number of epochs minus 1")
 
-            if arg == "flat_prob_mat":
-                if det_fn_param_dict["flat_prob_mat"]:
-                    flat_state_dep_prob_mat = \
-                        [v for v in det_fn_param_dict["flat_prob_mat"] \
-                            if isinstance(v, pgm.DeterministicNodePGM)]
+        if arg == "flat_prob_mat":
+            if det_fn_param_dict["flat_prob_mat"]:
+                flat_state_dep_prob_mat = \
+                    [v for v in det_fn_param_dict["flat_prob_mat"] \
+                        if isinstance(v, pgm.DeterministicNodePGM)]
 
-                # total number of rates has to be divisible by number of slices
-                if len(flat_state_dep_prob_mat) % n_time_slices != 0:
-                    raise ec.WrongDimensionError(arg, len(flat_state_dep_prob_mat))
+            # total number of rates has to be divisible by number of slices
+            if len(flat_state_dep_prob_mat) % n_time_slices != 0:
+                raise ec.WrongDimensionError(arg, len(flat_state_dep_prob_mat))
 
     try:
         flat_state_dep_rate_mat = \
@@ -310,21 +310,6 @@ def make_SSEStash(
         ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
     total_n_rate = len(flat_state_dep_rate_mat)
     n_rates_per_slice = int(total_n_rate / n_time_slices)
-
-    matrix_state_dep_probs: \
-        ty.List[ty.List[sseobj.DiscreteStateDependentProbability]] = []
-    expected_n_prob_per_slice = n_states * n_time_slices
-    total_n_prob = n_states * n_time_slices # initialize to expected
-    n_prob_per_slice = int(total_n_prob / n_time_slices)
-
-    # must provide one probability parameter per state
-    # per time slice!
-    probs_were_provided = False
-    if len(flat_state_dep_prob_mat) > 0 and \
-        (n_prob_per_slice != expected_n_prob_per_slice):
-        probs_were_provided = True
-        # TODO: write exception
-        pass
     
     # populating state-dependent rate matrix #
     for i in range(0, total_n_rate, n_rates_per_slice):
@@ -348,50 +333,87 @@ def make_SSEStash(
             list_time_slice_age_ends=time_slice_age_ends
         )
 
+
+    matrix_state_dep_probs: \
+        ty.List[ty.List[sseobj.DiscreteStateDependentProbability]] = []
+    expected_n_prob_per_slice = n_states * n_time_slices
+    total_n_prob = n_states * n_time_slices # initialize to expected
+    n_prob_per_slice = int(total_n_prob / n_time_slices)
+
+    # must provide one probability parameter per state
+    # per time slice!
+    probs_were_provided = False
+    if len(flat_state_dep_prob_mat) > 0:
+        if n_prob_per_slice != expected_n_prob_per_slice:
+            # TODO: write exception
+            pass
+        
+        probs_were_provided = True
+
+    state_dep_probs_manager: \
+        sseobj.DiscreteStateDependentParameterManager = None
+        
     # populating state-dependent prob matrix #
     #
     # this iteration here is effectively over
     # time-slices if dimensions are indeed all
     # correct
-    for i in range(0, total_n_prob, n_prob_per_slice):
-
-        state_dep_probs: ty.List[sseobj.DiscreteStateDependentProbability] = []
-        if probs_were_provided:
+    if probs_were_provided:
+        for i in range(0, total_n_prob, n_prob_per_slice):
+            state_dep_probs: ty.List[sseobj.DiscreteStateDependentProbability] = []
+            
             for state_dep_prob_det_nd in flat_state_dep_prob_mat[i:(i+n_prob_per_slice)]:
-
                 # so mypy won't complain
                 if isinstance(state_dep_prob_det_nd.value,
                     sseobj.DiscreteStateDependentProbability):
                     state_dep_probs.append(state_dep_prob_det_nd.value)
 
-        # else here means we will have i being
-        # one integer per probability (per state
-        # per slice)
-        #
-        # we will make all probabilities 1.0 by
-        # default
-        else:
-            st = i % n_prob_per_slice
-            state_dep_prob = sseobj.DiscreteStateDependentProbability(
-                name="rho" + str(st) + "_t" + str(i // n_prob_per_slice),
-                val=1.0, state=st)
-                
-            # so mypy won't complain
-            if isinstance(state_dep_prob,
-                sseobj.DiscreteStateDependentProbability):
-                state_dep_probs.append(state_dep_prob)
-
-            # appending a list of DiscreteStateDependentProbability
-            # 1D: time slices, 2D: state-dep prob list
+            # appending a list of DiscreteStateDependentRate
+            # 1D: time slices, 2D: state-dep rate list
             matrix_state_dep_probs.append(state_dep_probs) 
 
-    state_dep_probs_manager = \
-        sseobj.DiscreteStateDependentParameterManager(
-            matrix_state_dep_probs,
-            n_states,
-            seed_age_for_time_slicing=seed_age_for_time_slicing,
-            list_time_slice_age_ends=time_slice_age_ends
-        )
+        state_dep_probs_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_probs,
+                n_states,
+                seed_age_for_time_slicing=seed_age_for_time_slicing,
+                list_time_slice_age_ends=time_slice_age_ends
+            )
+
+        return \
+                sseobj.SSEStash(
+                    sseobj.MacroevolEventHandler(state_dep_rates_manager), \
+                    sseobj.DiscreteStateDependentProbabilityHandler(state_dep_probs_manager)
+                )
+
+        # # else here means we will have i being
+        # # one integer per probability (per state
+        # # per slice)
+        # #
+        # # we will make all probabilities 1.0 by
+        # # default
+        # else:
+        #     st = i % n_prob_per_slice
+        #     state_dep_prob = sseobj.DiscreteStateDependentProbability(
+        #         name="rho" + str(st) + "_t" + str(i // n_prob_per_slice),
+        #         val=1.0, state=st)
+                
+        #     # so mypy won't complain
+        #     if isinstance(state_dep_prob,
+        #         sseobj.DiscreteStateDependentProbability):
+        #         state_dep_probs.append(state_dep_prob)
+
+        #     # appending a list of DiscreteStateDependentProbability
+        #     # 1D: time slices, 2D: state-dep prob list
+        #     matrix_state_dep_probs.append(state_dep_probs) 
+
+        #     state_dep_probs_manager = \
+        #         sseobj.DiscreteStateDependentParameterManager(
+        #             matrix_state_dep_probs,
+        #             n_states,
+        #             seed_age_for_time_slicing=seed_age_for_time_slicing,
+        #             list_time_slice_age_ends=time_slice_age_ends
+        #         )
 
     # state_dep_probs_manager = \
     #     sseobj.DiscreteStateDependentParameterManager(
@@ -409,6 +431,5 @@ def make_SSEStash(
 
     return \
         sseobj.SSEStash(
-            sseobj.MacroevolEventHandler(state_dep_rates_manager), \
-            sseobj.DiscreteStateDependentProbabilityHandler(state_dep_probs_manager)
+            sseobj.MacroevolEventHandler(state_dep_rates_manager)
         )
