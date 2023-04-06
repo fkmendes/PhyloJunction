@@ -23,6 +23,7 @@ class AnnotatedTree(dp.Tree):
     no_event: bool
     state_count_dict: ty.Dict[int, int]
     alive_state_count_dict: ty.Dict[int, int]
+    alive_sampled_state_count_dict: ty.Dict[int, int]
     dead_state_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
@@ -31,11 +32,14 @@ class AnnotatedTree(dp.Tree):
     slice_age_ends: ty.Optional[ty.List[float]]
     sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]
     at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]]
-    n_extant_obs_nodes: int
-    n_extinct_obs_nodes: int
+    n_extant_terminal_nodes: int
+    n_extinct_terminal_nodes: int
+    n_extant_sampled_terminal_nodes: int
+    n_extant_sampled_terminal_nodes: int
     n_sa_obs_nodes: int
-    extant_obs_nodes_labels: ty.Tuple[str, ...]
-    extinct_obs_nodes_labels: ty.Tuple[str, ...]
+    extant_terminal_nodes_labels: ty.Tuple[str, ...]
+    extinct_terminal_nodes_labels: ty.Tuple[str, ...]
+    extant_sampled_terminal_nodes_labels: ty.Tuple[str, ...]
     root_edge_length: Incomplete
     def __init__(self,
                  a_tree: dp.Tree,

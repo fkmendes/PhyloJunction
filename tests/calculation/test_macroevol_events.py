@@ -226,8 +226,8 @@ class TestMacroEvolEvent(unittest.TestCase):
 
     def test_sampling_probability_bisse(self):
         # print(self.bisse_state_dep_prob_handler.state_dep_prob_manager.state_dep_params_dict[0])
-        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 0))
-        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 1))
+        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 0, 0))
+        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 1, 0))
 
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder

@@ -20,6 +20,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -27,12 +28,14 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # left child of root node after ancestor sampling happens on who would have been the left child ("sp1")
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
 
         # right child of root node
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.5)
         extant_sp2.alive = False
+        extant_sp2.sampled = False
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -43,6 +46,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -51,6 +55,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=1.0)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -124,6 +129,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -131,6 +137,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # left child of root node after ancestor sampling happens on who would have been the left child ("sp1")
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         dummy_node.is_sa_lineage = False
@@ -138,6 +145,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # right child of root node
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.5)
         extant_sp2.alive = False
+        extant_sp2.sampled = False
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -148,6 +156,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -156,6 +165,7 @@ class TestAnnotateTreeWithSAsFromRoot(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.5)
         extant_sp1.alive = False
+        extant_sp1.sampled = False
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False

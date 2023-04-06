@@ -27,9 +27,11 @@ class TestAnnotateTree(unittest.TestCase):
         # TODO: replace this one with an origin node that is alive and no root
         origin_node1 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node1.alive = False
+        origin_node1.sampled = False
         origin_node1.is_sa = False
         brosc_node1 = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
         brosc_node1.alive = True
+        brosc_node1.sampled = True
         brosc_node1.is_sa = False
         origin_node1.add_child(brosc_node1)
         tr_no_spn_built = Tree(seed_node=origin_node1)
@@ -42,9 +44,11 @@ class TestAnnotateTree(unittest.TestCase):
         # correctly)
         origin_node2 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node2.alive = False
+        origin_node2.sampled = False
         origin_node2.is_sa = False
         brosc_node2 = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=0.5)
         brosc_node2.alive = False
+        brosc_node2.sampled = False
         brosc_node2.is_sa = False
         origin_node2.add_child(brosc_node2)
         tr_no_spn_dead_built = Tree(seed_node=origin_node2)
@@ -63,20 +67,24 @@ class TestAnnotateTree(unittest.TestCase):
         # for testing the parsing of states into AnnotatedTree member dictionary
         origin_node3 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node3.alive = False
+        origin_node3.sampled = False
         origin_node3.is_sa = False
         origin_node3.state = 0
         root_node3 = Node(taxon=Taxon(label="root"), label="root", edge_length=0.5)
         root_node3.alive = False
+        root_node3.sampled = False
         root_node3.is_sa = False
         root_node3.state = 0
         origin_node3.add_child(root_node3)
         child_left = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
         child_left.alive = True
+        child_left.sampled = True
         child_left.is_sa = False
         child_left.state = 0
         root_node3.add_child(child_left)
         child_right = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=1.0)
         child_right.alive = True
+        child_right.sampled = True
         child_right.is_sa = False
         child_right.state = 1
         root_node3.add_child(child_right)
@@ -134,11 +142,11 @@ class TestAnnotateTree(unittest.TestCase):
         # tree starting at origin and either surviving without spn, or dying without speciation
         # extant nodes
         self.assertEqual(self.tree_no_spn_built.n_extant_terminal_nodes, 1, "Count of observable terminal nodes should be 1.")
-        self.assertEqual(self.tree_no_spn_built.extant_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").")
+        self.assertEqual(self.tree_no_spn_built.extant_terminal_nodes_labels, ("brosc",), "Labels should be (\"brosc\").")
 
         # extinct nodes
         self.assertEqual(self.tree_no_spn_dead_built.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(self.tree_no_spn_dead_built.extinct_obs_nodes_labels, ("brosc",), "Labels should be (\"brosc\").")
+        self.assertEqual(self.tree_no_spn_dead_built.extinct_terminal_nodes_labels, ("brosc",), "Labels should be (\"brosc\").")
         
         # extinct node label check
         # self.assertSequenceEqual(self.tree_origin.extinct_obs_nodes_labels, ("nd7", "nd4"), "Labels should be (\"nd7\", \"nd4\").")
@@ -172,14 +180,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/data/test_tree_annot.py
+    # $ python3.9 tests/data/test_tree_annot.py
     # 
     # or
     #
-    # $ python3 -m tests.data.test_tree_annot
+    # $ python3.9 -m tests.data.test_tree_annot
     #
     # or 
     #
-    # $ python3 -m unittest tests.data.test_tree_annot.TestAnnotateTree.test_root_origin_age_rootedge_length
+    # $ python3.9 -m unittest tests.data.test_tree_annot.TestAnnotateTree.test_root_origin_age_rootedge_length
 
     unittest.main()

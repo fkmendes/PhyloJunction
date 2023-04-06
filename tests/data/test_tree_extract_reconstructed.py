@@ -18,12 +18,14 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -33,6 +35,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -40,6 +43,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root_node
         internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.5)
         internal_node1.alive = False
+        internal_node1.sampled = False
         internal_node1.is_sa = False
         internal_node1.is_sa_dummy_parent = False
         internal_node1.is_sa_lineage = False
@@ -50,6 +54,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd2
         extant_sp2 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.5)
         extant_sp2.alive = True
+        extant_sp2.sampled = True
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -57,6 +62,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd2
         extant_sp3 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.5)
         extant_sp3.alive = True
+        extant_sp3.sampled = True
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -98,12 +104,14 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -113,6 +121,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root
         internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
         internal_node1.alive = False
+        internal_node1.sampled = False
         internal_node1.is_sa = False
         internal_node1.is_sa_dummy_parent = False
         internal_node1.is_sa_lineage = False
@@ -120,6 +129,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of internal_node1
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.5)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -127,6 +137,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of internal_node1
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=0.5)
         extant_sp2.alive = False
+        extant_sp2.sampled = False
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -137,6 +148,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root
         internal_node2 = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=1.0)
         internal_node2.alive = False
+        internal_node2.sampled = False
         internal_node2.is_sa = False
         internal_node2.is_sa_dummy_parent = False
         internal_node2.is_sa_lineage = False
@@ -144,6 +156,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of internal_node2
         extant_sp3 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.4)
         extant_sp3.alive = False
+        extant_sp3.sampled = False
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -151,6 +164,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of internal_node2
         internal_node3 = Node(taxon=Taxon(label="nd3"), label="nd3", edge_length=0.25)
         internal_node3.alive = False
+        internal_node3.sampled = False
         internal_node3.is_sa = False
         internal_node3.is_sa_dummy_parent = False
         internal_node3.is_sa_lineage = False
@@ -158,6 +172,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of internal_node3
         extant_sp4 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.25)
         extant_sp4.alive = True
+        extant_sp4.sampled = True
         extant_sp4.is_sa = False
         extant_sp4.is_sa_dummy_parent = False
         extant_sp4.is_sa_lineage = False
@@ -165,6 +180,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of internal_node3
         extant_sp5 = Node(taxon=Taxon(label="sp5"), label="sp5", edge_length=0.25)
         extant_sp5.alive = True
+        extant_sp5.sampled = True
         extant_sp5.is_sa = False
         extant_sp5.is_sa_dummy_parent = False
         extant_sp5.is_sa_lineage = False
@@ -218,12 +234,14 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -233,6 +251,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
         extant_sp1.alive = False
+        extant_sp1.sampled = False
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -240,6 +259,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root_node
         internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.5)
         internal_node1.alive = False
+        internal_node1.sampled = False
         internal_node1.is_sa = False
         internal_node1.is_sa_dummy_parent = False
         internal_node1.is_sa_lineage = False
@@ -250,6 +270,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd2
         extant_sp2 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.5)
         extant_sp2.alive = True
+        extant_sp2.sampled = True
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -257,6 +278,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd2
         extant_sp3 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.5)
         extant_sp3.alive = True
+        extant_sp3.sampled = True
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -302,6 +324,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -309,6 +332,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root node after ancestor sampling happens on who would have been the left child ("sp1")
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         dummy_node.is_sa_lineage = False
@@ -316,18 +340,21 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root
         int_node = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.75)
         int_node.alive = False
+        int_node.sampled = False
         int_node.is_sa = False
         int_node.is_sa_dummy_parent = False
         int_node.is_sa_lineage = False
 
         extinct_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
         extinct_sp2.alive = False
+        extinct_sp2.sampled = False
         extinct_sp2.is_sa = False
         extinct_sp2.is_sa_dummy_parent = False
         extinct_sp2.is_sa_lineage = False
 
         extant_sp3 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=1.25)
         extant_sp3.alive = True
+        extant_sp3.sampled = True
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -338,6 +365,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.alive = True
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -346,6 +374,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=1.0)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = True
@@ -410,6 +439,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -417,6 +447,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root node after ancestor sampling happens on who would have been the left child ("sp1")
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         dummy_node.is_sa_lineage = False
@@ -424,18 +455,21 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root
         int_node = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=0.75)
         int_node.alive = False
+        int_node.sampled = False
         int_node.is_sa = False
         int_node.is_sa_dummy_parent = False
         int_node.is_sa_lineage = False
 
         extinct_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=0.8)
         extinct_sp2.alive = False
+        extinct_sp2.sampled = False
         extinct_sp2.is_sa = False
         extinct_sp2.is_sa_dummy_parent = False
         extinct_sp2.is_sa_lineage = False
 
         extant_sp3 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.8)
         extant_sp3.alive = False
+        extant_sp3.sampled = False
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -446,6 +480,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -454,6 +489,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.75)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -674,6 +710,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -681,6 +718,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root_node
         extinct_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.8)
         extinct_sp1.alive = False
+        extinct_sp1.sampled = False
         extinct_sp1.is_sa = False
         extinct_sp1.is_sa_dummy_parent = False
         extinct_sp1.is_sa_lineage = False
@@ -688,6 +726,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root_node
         internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
         internal_node1.alive = True
+        internal_node1.sampled = True
         internal_node1.is_sa = False
         internal_node1.is_sa_dummy_parent = False
         internal_node1.is_sa_lineage = False
@@ -698,6 +737,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd1
         extant_sp1 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -705,6 +745,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd1
         internal_node2 = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=0.5)
         internal_node2.alive = False
+        internal_node2.sampled = False
         internal_node2.is_sa = False
         internal_node2.is_sa_dummy_parent = False
         internal_node2.is_sa_lineage = False
@@ -715,6 +756,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd2
         extant_sp2 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.5)
         extant_sp2.alive = True
+        extant_sp2.sampled = True
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -722,6 +764,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd2
         extant_sp3 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.5)
         extant_sp3.alive = True
+        extant_sp3.sampled = True
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -857,6 +900,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
@@ -864,6 +908,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # only child of origin node
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         dummy_node.is_sa_lineage = False
@@ -873,6 +918,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -880,6 +926,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of dummy node, goes extinct
         brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
         brosc_node.alive = True
+        brosc_node.sampled = True
         brosc_node.is_sa = False
         brosc_node.is_sa_dummy_parent = False
         brosc_node.is_sa_lineage = True
@@ -941,6 +988,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
@@ -948,6 +996,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # only child of origin node
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         dummy_node.is_sa_lineage = False
@@ -955,6 +1004,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -962,6 +1012,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of dummy node
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -969,6 +1020,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd1
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=1.0)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -976,6 +1028,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd1
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
         extant_sp2.alive = True
+        extant_sp2.sampled = True
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -1043,12 +1096,14 @@ class TestExtractReconstructedTree(unittest.TestCase):
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=1.0)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -1058,6 +1113,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of root_node
         extinct_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.8)
         extinct_sp1.alive = False
+        extinct_sp1.sampled = False
         extinct_sp1.is_sa = False
         extinct_sp1.is_sa_dummy_parent = False
         extinct_sp1.is_sa_lineage = False
@@ -1065,6 +1121,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of root_node
         internal_node1 = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
         internal_node1.alive = True
+        internal_node1.sampled = True
         internal_node1.is_sa = False
         internal_node1.is_sa_dummy_parent = False
         internal_node1.is_sa_lineage = False
@@ -1075,6 +1132,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd1
         extant_sp1 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=1.0)
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -1082,6 +1140,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd1
         internal_node2 = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=0.5)
         internal_node2.alive = False
+        internal_node2.sampled = False
         internal_node2.is_sa = False
         internal_node2.is_sa_dummy_parent = False
         internal_node2.is_sa_lineage = False
@@ -1092,6 +1151,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # left child of nd2
         extant_sp2 = Node(taxon=Taxon(label="sp3"), label="sp3", edge_length=0.5)
         extant_sp2.alive = True
+        extant_sp2.sampled = True
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -1099,6 +1159,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # right child of nd2
         extant_sp3 = Node(taxon=Taxon(label="sp4"), label="sp4", edge_length=0.5)
         extant_sp3.alive = True
+        extant_sp3.sampled = True
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False

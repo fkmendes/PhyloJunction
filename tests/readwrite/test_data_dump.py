@@ -75,11 +75,13 @@ class TestDataDump(unittest.TestCase):
         # 2D: all rates from all states in i-th time slice
         matrix_atomic_rate_params = [ rates_t0 ]
         
-        fig_rates_manager = sseobj.DiscreteStateDependentParameterManager(
+        state_dep_param_manager = sseobj.DiscreteStateDependentParameterManager(
             matrix_atomic_rate_params, total_n_states
         )
 
-        meh = sseobj.MacroevolEventHandler(fig_rates_manager)
+        meh = sseobj.MacroevolEventHandler(state_dep_param_manager)
+
+        sse_stash = sseobj.SSEStash(meh)
         
         ########
         # Tree #
@@ -92,7 +94,7 @@ class TestDataDump(unittest.TestCase):
         start_states_list = [0 for i in range(n_sim)]
 
         sse_sim = dnsse.DnSSE(
-            meh,
+            sse_stash,
             stop_condition_value,
             n=n_sim,
             n_replicates=n_repl,

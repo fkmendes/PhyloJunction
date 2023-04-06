@@ -42,6 +42,7 @@ class AnnotatedTree(dp.Tree):
     no_event: bool
     state_count_dict: ty.Dict[int, int]
     alive_state_count_dict: ty.Dict[int, int]
+    alive_sampled_state_count_dict: ty.Dict[int, int]
     dead_state_count_dict: ty.Dict[int, int]
     obs_count_dict: ty.Dict[int, int]
     node_heights_dict: ty.Dict[str, float]
@@ -49,11 +50,14 @@ class AnnotatedTree(dp.Tree):
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]] # { node_name: { attr: value }}
     slice_t_ends: ty.List[ty.Optional[float]]
     slice_age_ends: ty.Optional[ty.List[float]] # can be None
-    n_extant_obs_nodes: int
-    n_extinct_obs_nodes: int
+    n_extant_terminal_nodes: int
+    n_extinct_terminal_nodes: int
+    n_extant_sampled_terminal_nodes: int
+    n_extinct_sampled_terminal_nodes: int
     n_sa_obs_nodes: int
-    extant_obs_nodes_labels: ty.Tuple[str, ...]
-    extinct_obs_nodes_labels: ty.Tuple[str, ...]
+    extant_terminal_nodes_labels: ty.Tuple[str, ...]
+    extinct_terminal_nodes_labels: ty.Tuple[str, ...]
+    extant_sampled_terminal_nodes_labels: ty.Tuple[str, ...]
     sa_obs_nodes_labels: ty.Tuple[str, ...]
 
     # for plotting #
@@ -300,11 +304,14 @@ class AnnotatedTree(dp.Tree):
         ###############
         self.n_extant_terminal_nodes = 0
         self.n_extinct_terminal_nodes = 0
+        self.n_extant_sampled_terminal_nodes = 0
         self.n_sa = 0
 
         # initializes
-        # (i)  self.extant_obs_nodes_labels
-        # (ii) self.extinct_obs_nodes_labels
+        # (i)  self.extant_terminal_nodes_labels
+        # (ii) self.extinct_terminal_nodes_labels
+        # (iii)  self.extant_sampled_terminal_nodes_labels
+        # (iv) self.extinct_sampled_terminal_nodes_labels
         self._count_terminal_nodes() 
 
         # initializes
@@ -345,6 +352,7 @@ class AnnotatedTree(dp.Tree):
         # we assume the tree died
         return True
 
+
     # side-effect:
     # populates: self.n_sa_obs_nodes
     #            self.sa_obs_nodes_labels
@@ -361,14 +369,17 @@ class AnnotatedTree(dp.Tree):
 
 
     # side-effect:
-    # populates: self.extant_obs_nodes_labels
-    #            self.extinct_obs_nodes_labels
+    # populates: self.extant_terminal_nodes_labels
+    #            self.extinct_terminal_nodes_labels
+    #            self.extant_sampled_terminal_nodes_labels
+    #            self.extinct_sampled_terminal_nodes_labels
     def _count_terminal_nodes(self) -> None:
         """Count extant and extinct nodes, store counts and node labels into class members (side-effect)"""
 
         # nd.distance_from_root() gives distance to seed!
-        extant_obs_nodes_labels_list: ty.List[str] = []
-        extinct_obs_nodes_labels_list: ty.List[str] = []
+        extant_terminal_nodes_labels_list: ty.List[str] = []
+        extinct_terminal_nodes_labels_list: ty.List[str] = []
+        extant_sampled_terminal_nodes_labels_list: ty.List[str] = []
 
         #################################################################
         # Annoying case: Tree died before stop condition was met;       #
@@ -380,14 +391,14 @@ class AnnotatedTree(dp.Tree):
             if self.brosc_node:
                 self.n_extinct_terminal_nodes = 1 # brosc node
                 # if self.brosc_node:
-                extinct_obs_nodes_labels_list.append(self.brosc_node.label)
+                extinct_terminal_nodes_labels_list.append(self.brosc_node.label)
             
             # with root, every lineage died
             else:
                 for nd in self.tree.leaf_node_iter():
                     if not nd.is_sa and not nd.alive:
                         self.n_extinct_terminal_nodes += 1
-                        extinct_obs_nodes_labels_list.append(nd.label)
+                        extinct_terminal_nodes_labels_list.append(nd.label)
 
         ###################################################
         # Tree did not die before stop condition was met, #
@@ -405,21 +416,28 @@ class AnnotatedTree(dp.Tree):
                     if abs(self.seed_age - nd.distance_from_root()) <= self.epsilon:
                         if self.tree_read_as_newick_by_dendropy:
                             self.n_extant_terminal_nodes += 1
-                            extant_obs_nodes_labels_list.append(nd.taxon.label)
+                            extant_terminal_nodes_labels_list.append(nd.taxon.label)
                         # if tree was created via simulation (and .alive a member of Node)
+                        
                         elif nd.alive:
                             self.n_extant_terminal_nodes += 1
-                            extant_obs_nodes_labels_list.append(nd.label)
+                            extant_terminal_nodes_labels_list.append(nd.label)
+
+                            if nd.sampled:
+                                self.n_extant_sampled_terminal_nodes += 1
+                                extant_sampled_terminal_nodes_labels_list.append(nd.label)
 
                     # if terminal node's path is not maximal
                     else:
                         if self.tree_read_as_newick_by_dendropy:
                             self.n_extinct_terminal_nodes += 1
-                            extinct_obs_nodes_labels_list.append(nd.taxon.label)
+                            extinct_terminal_nodes_labels_list.append(nd.taxon.label)
+                        
                         # if tree was created via simulation (and .alive a member of Node)
                         elif not nd.alive:
                             self.n_extinct_terminal_nodes += 1
-                            extinct_obs_nodes_labels_list.append(nd.label)
+                            extinct_terminal_nodes_labels_list.append(nd.label)
+                        
                         else:
                             raise ec.AnnotatedTreeLineageMissannotation("Taxon had non-maximal age, but had \'.alive == True\'. This is not allowed. Exiting...")
 
@@ -427,8 +445,9 @@ class AnnotatedTree(dp.Tree):
         if self.n_extant_terminal_nodes == 0:
             self.tree_died = True
 
-        self.extant_obs_nodes_labels = tuple(extant_obs_nodes_labels_list)
-        self.extinct_obs_nodes_labels = tuple(extinct_obs_nodes_labels_list)
+        self.extant_terminal_nodes_labels = tuple(extant_terminal_nodes_labels_list)
+        self.extinct_terminal_nodes_labels = tuple(extinct_terminal_nodes_labels_list)
+        self.extant_sampled_terminal_nodes_labels = tuple(extant_sampled_terminal_nodes_labels_list)
 
 
     # side-effect:
@@ -448,6 +467,9 @@ class AnnotatedTree(dp.Tree):
             try:
                 if nd.alive:
                     self.alive_state_count_dict[nd.state] += 1
+
+                    if nd.sampled:
+                        self.alive_sampled_state_count_dict[nd.state] += 1
                     
                 else:
                     self.dead_state_count_dict[nd.state] += 1
@@ -457,7 +479,10 @@ class AnnotatedTree(dp.Tree):
             except:
                 pass
 
+
     # TODO: add to .pyi
+    # TODO: this function is currently checking just extant nodes, not
+    # extant AND sampled nodes...
     def find_if_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
         """
         Return True if there is at least one extant taxon or sampled ancestor
@@ -590,7 +615,7 @@ class AnnotatedTree(dp.Tree):
         if self.tree_reconstructed:
             return self.tree_reconstructed
 
-        filter_fn = lambda nd: nd.is_sa or (nd.is_leaf() and nd.alive)
+        filter_fn = lambda nd: nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
         self.tree_reconstructed = copy.deepcopy(self.tree)
 
         # if tree went extinct, return empty new tree

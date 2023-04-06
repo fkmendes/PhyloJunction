@@ -29,6 +29,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
@@ -43,6 +44,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -50,6 +52,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # left child of dummy node
         brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
         brosc_node.alive = True
+        brosc_node.sampled = True
         brosc_node.is_sa = False
         brosc_node.is_sa_dummy_parent = False
         brosc_node.is_sa_lineage = True
@@ -133,12 +136,14 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = True
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         dummy_node1 = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=0.5)
         dummy_node1.alive = False
+        dummy_node1.sampled = False
         dummy_node1.is_sa = False
         dummy_node1.is_sa_dummy_parent = True
         
@@ -147,6 +152,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # right child of dummy_node1 
         sa_node1 = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node1.alive = False
+        sa_node1.sampled = False
         sa_node1.is_sa = True
         sa_node1.is_sa_dummy_parent = False
         sa_node1.is_sa_lineage = False
@@ -154,6 +160,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # left child of dummy_node1
         dummy_node2 = Node(taxon=Taxon(label="dummy2"), label="dummy2", edge_length=0.5)
         dummy_node2.alive = False
+        dummy_node2.sampled = False
         dummy_node2.is_sa = False
         dummy_node2.is_sa_dummy_parent = True
 
@@ -163,6 +170,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # right child of dummy_node2
         sa_node2 = Node(taxon=Taxon(label="sa2"), label="sa2", edge_length=0.0)
         sa_node2.alive = False
+        sa_node2.sampled = False
         sa_node2.is_sa = True
         sa_node2.is_sa_dummy_parent = False
         sa_node2.is_sa_lineage = False
@@ -170,6 +178,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # left child of dummy_node2
         brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
         brosc_node.alive = True
+        brosc_node.sampled = True
         brosc_node.is_sa = False
         brosc_node.is_sa_dummy_parent = False
         brosc_node.is_sa_lineage = True
@@ -492,12 +501,14 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         
@@ -506,6 +517,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.alive = False
+        sa_node.sampled = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -513,6 +525,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # left child of dummy node
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.5)
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = True
@@ -523,6 +536,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.25)
         extant_sp1.alive = False
+        extant_sp1.sampled = False
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -530,6 +544,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         # right child of root node
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=0.5)
         extant_sp2.alive = True
+        extant_sp2.sampled = True
         extant_sp2.is_sa = False
         extant_sp2.is_sa_dummy_parent = False
         extant_sp2.is_sa_lineage = False
@@ -613,15 +628,15 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/data/test_tree_annot_with_sas_from_origin.py
+    # $ python3.9 tests/data/test_tree_annot_with_sas_from_origin.py
     # 
     # or
     #
-    # $ python3 -m tests.data.test_tree_annot_with_sas_from_origin
+    # $ python3.9 -m tests.data.test_tree_annot_with_sas_from_origin
     #
     # or 
     #
-    # $ python3 -m unittest tests.data.test_tree_annot_with_sas_from_origin.TestAnnotateTreeWithSAsFromOrigin.test_node_counting_oneSA_no_spn_survives_max_age
+    # $ python3.9 -m unittest tests.data.test_tree_annot_with_sas_from_origin.TestAnnotateTreeWithSAsFromOrigin.test_node_counting_oneSA_no_spn_survives_max_age
 
     unittest.main()
 

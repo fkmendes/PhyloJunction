@@ -105,6 +105,8 @@ class TestDiscreteSSE(unittest.TestCase):
 
     def test_state_dep_param_manager(self):
         """
+        Test probabilities are correctly retrieved by parameter manager
+        depending on which time-slice they are
         """
         
         total_n_states = 2
@@ -153,6 +155,66 @@ class TestDiscreteSSE(unittest.TestCase):
         self.assertEqual(params_state1_at_time11[0].name, "rho1_1")
         self.assertEqual(params_state0_at_time09[0].name, "rho0_0")
         self.assertEqual(params_state1_at_time09[0].name, "rho0_1")
+
+
+    def test_state_dep_param_prob_handler(self):
+        """
+        Test probability handler correctly applies state-dependent
+        probability depending on time-slice
+        """
+
+        total_n_states = 2
+
+        probs_t0 = [
+            sseobj.DiscreteStateDependentProbability(name="rho0_t0", val=0.0, state=0),
+            sseobj.DiscreteStateDependentProbability(name="rho1_t0", val=1.0, state=1),
+        ]
+
+        probs_t1 = [
+            sseobj.DiscreteStateDependentProbability(name="rho0_t1", val=1.0, state=0),
+            sseobj.DiscreteStateDependentProbability(name="rho1_t1", val=0.0, state=1),
+        ]
+
+        # 1D: time slices (i)
+        # 2D: all rates from all states in i-th time slice
+        matrix_state_dep_probs = [ probs_t0, probs_t1 ]
+
+        state_dep_par_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_probs, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
+
+        state_dep_prob_handler = \
+            sseobj.DiscreteStateDependentProbabilityHandler(
+                state_dep_par_manager
+            )
+
+        state0_sampled_t0 = state_dep_prob_handler. \
+            randomly_decide_taxon_sampling_at_time_at_state(
+                1.1, 0, 0
+            )
+
+        state1_sampled_t0 = state_dep_prob_handler. \
+            randomly_decide_taxon_sampling_at_time_at_state(
+                1.1, 1, 0
+            )
+
+        state0_sampled_t1 = state_dep_prob_handler. \
+            randomly_decide_taxon_sampling_at_time_at_state(
+                0.9, 0, 0
+            )
+
+        state1_sampled_t1 = state_dep_prob_handler. \
+            randomly_decide_taxon_sampling_at_time_at_state(
+                0.9, 1, 0
+            )
+
+        self.assertTrue(state0_sampled_t0)
+        self.assertFalse(state1_sampled_t0)
+        self.assertTrue(state1_sampled_t1)
+        self.assertFalse(state0_sampled_t1)
 
 
     def test_state_dep_param_manager_init_error(self):

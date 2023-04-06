@@ -405,9 +405,6 @@ class DiscreteStateDependentParameterManager:
                         # no need to append seed_age, because
                         # self.slice_age_ends already has 0.0 in it
 
-        print("self.n_time_slices")
-        print(self.n_time_slices)
-
         if self.n_time_slices > 1:
             self._check_all_states_in_all_time_slices()
 
@@ -994,17 +991,27 @@ class DiscreteStateDependentProbabilityHandler():
         return state_cond_prob_at_time
 
 
-    def randomly_decide_taxon_sampling_at_time_at_state(self, a_time, state_idx) \
+    def randomly_decide_taxon_sampling_at_time_at_state(
+        self, a_time, state_idx, sample_idx) \
         -> bool:
         
-        prob_at_state_all_slices_list = self._state_dep_prob_at_time(a_time, state_idx)
-        
-        if len(prob_at_state_all_slices_list) > 1: 
-            exit("Should only have one probability per state per slice. Exiting...")
+        prob_at_state_in_slice_list = \
+            self._state_dep_prob_at_time(a_time, state_idx)
 
-        binom_draw = np.random.binomial(
-            1, prob_at_state_all_slices_list[0].value)
-        if binom_draw:
+        if len(prob_at_state_in_slice_list) > 1: 
+            exit("Should only have one probability deterministic node " \
+                + " per state per slice. Exiting...")
+
+        prob_at_state_in_slice_ith_sample = \
+            prob_at_state_in_slice_list[0].value[sample_idx]
+
+        if prob_at_state_in_slice_ith_sample == 1.0:
+            return True
+
+        elif prob_at_state_in_slice_ith_sample == 0.0:
+            return False
+        
+        elif np.random.binomial(1, prob_at_state_in_slice_ith_sample):
             return True
         
         else:
@@ -1059,9 +1066,6 @@ class SSEStash():
         
         matrix_state_dep_probs: \
             ty.List[ty.List[DiscreteStateDependentProbability]] = []
-
-        print("self.meh.state_dep_rate_manager.n_time_slices")
-        print(self.meh.state_dep_rate_manager.n_time_slices)
         
         # TODO: this code is wrong, fix it!
         for i in range(0, expected_n_prob, n_prob_per_slice):
@@ -1069,11 +1073,7 @@ class SSEStash():
             state_dep_probs: \
                 ty.List[DiscreteStateDependentProbability] = []
             for j in range(self.meh.state_count):
-                print("i = " + str(i))
-                print("n_prob_per_slice = " + str(n_prob_per_slice))
                 st = j % n_prob_per_slice
-                print("st = " + str(st))
-                print("t = " + str(j // n_prob_per_slice))
                 state_dep_prob = DiscreteStateDependentProbability(
                     name="rho" + str(st) + "_t" + str(j // n_prob_per_slice),
                     val=1.0, state=st)
@@ -1086,9 +1086,6 @@ class SSEStash():
             # appending a list of DiscreteStateDependentProbability
             # 1D: time slices, 2D: state-dep prob list
             matrix_state_dep_probs.append(state_dep_probs)
-
-        print("matrix_state_dep_probs = ")
-        print(matrix_state_dep_probs)
 
         # we have to throw away the last element in slice_age_ends
         # because it has already been added a 0.0 for the youngest
