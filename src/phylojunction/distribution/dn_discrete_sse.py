@@ -946,8 +946,8 @@ class DnSSE(pgm.DistributionPGM):
             # print("Sample " + str(sample_idx) + ", checking if node " + living_nd.label + " in state " \
             #     + str(living_nd.state) + " is sampled: " + str(is_sampled))
 
-            if is_sampled:
-                living_nd.sampled = is_sampled
+            living_nd.sampled = is_sampled
+
 
     ##########################
     # Main simulation method #
@@ -1023,6 +1023,7 @@ class DnSSE(pgm.DistributionPGM):
             brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"), label="brosc", edge_length=0.0)
             brosc_node.state = start_state
             brosc_node.annotations.add_bound_attribute("state")
+            brosc_node.sampled = True
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = False

@@ -98,6 +98,7 @@ class AnnotatedTree(dp.Tree):
         self.state_count = total_state_count
         self.state_count_dict = dict((int(s), 0) for s in range(self.state_count))
         self.alive_state_count_dict = dict((int(s), 0) for s in range(self.state_count))
+        self.alive_sampled_state_count_dict = dict((int(s), 0) for s in range(self.state_count))
         self.dead_state_count_dict = dict((int(s), 0) for s in range(self.state_count))
         self.obs_state_count_dict = dict((int(s), 0) for s in range(self.state_count)) # TODO: later deal with this
 
@@ -423,9 +424,13 @@ class AnnotatedTree(dp.Tree):
                             self.n_extant_terminal_nodes += 1
                             extant_terminal_nodes_labels_list.append(nd.label)
 
+                            # try:
                             if nd.sampled:
                                 self.n_extant_sampled_terminal_nodes += 1
                                 extant_sampled_terminal_nodes_labels_list.append(nd.label)
+                            # except:
+                            #     exit("Problematic node is " + nd.label)
+
 
                     # if terminal node's path is not maximal
                     else:

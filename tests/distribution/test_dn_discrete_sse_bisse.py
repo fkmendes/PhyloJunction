@@ -28,9 +28,9 @@ class TestBiSSETrees(unittest.TestCase):
 
         # original implementation
         # matrix_atomic_rate_params = [ [rates_t0_s0, rates_t0_s1] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
-        matrix_atomic_rate_params = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
+        matrix_atomic_rates = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
 
-        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
+        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rates, total_n_states)
 
         event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
 

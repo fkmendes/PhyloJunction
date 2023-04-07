@@ -147,11 +147,11 @@ class TestYuleTrees(unittest.TestCase):
         batch_cis = list()
         in_ci_count = 0
         for i, batch in enumerate(sim_batches):
-            n_extant_obs_nodes = [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
-            stdevs = statistics.stdev(n_extant_obs_nodes)
+            n_extant_terminal_nodes = [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
+            stdevs = statistics.stdev(n_extant_terminal_nodes)
             sterr = stdevs / math.sqrt(n_sim)
             diff = 1.96 * sterr
-            avg_size = statistics.mean(n_extant_obs_nodes)
+            avg_size = statistics.mean(n_extant_terminal_nodes)
             batch_cis = (avg_size - diff, avg_size + diff)
 
             if exp_size >= batch_cis[0] and exp_size <= batch_cis[1]:
@@ -161,8 +161,11 @@ class TestYuleTrees(unittest.TestCase):
         exp_count = int(0.95 * n_batches)
         a_delta = math.ceil(0.07 * exp_count)
         
-        self.assertAlmostEqual(in_ci_count, exp_count,
-                                msg="Truth should be contained within 95%-CI " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.", delta=a_delta)
+        self.assertAlmostEqual(
+            in_ci_count, exp_count,
+            msg="Truth should be contained within 95%-CI " \
+            + str(exp_count) + " (+/- " + str(a_delta) \
+            + ") out of 100 times.", delta=a_delta)
 
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder
