@@ -544,6 +544,7 @@ def plot_node_histogram(axes: plt.Axes, values_list: ty.List[float], sample_idx:
     
     axes.axes.xaxis.set_ticklabels([np.round(i,decimals=2) for i in bins])
 
+
 def plot_blank(axes: plt.Axes) -> None:
     axes.cla()
     axes.patch.set_alpha(0.0)

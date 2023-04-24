@@ -97,23 +97,35 @@ def make_DiscreteStateDependentRate(det_fn_param_dict: \
 
         elif arg == "name" and not val:
             raise ec.StateDependentParameterMisspec(
-                message="Cannot initialize state-dependent rate without name.")
+                message="Cannot initialize state-dependent rate without " \
+                    + "name.")
         
         elif arg == "event":
             if not val:
                 raise ec.StateDependentParameterMisspec(
-                    message="Cannot initialize state-dependent rate without " \
-                        + "event type (e.g., \"w_speciation\"). Exiting...")
+                    message="Cannot initialize state-dependent rate " \
+                        + "without event type (e.g., \"w_speciation\"). " \
+                        + "Exiting...")
             
             # TODO: raise error if arg is not a string with quotes before and after
 
-            # TODO: deal with vectorization later
-            if val[0] == "\"w_speciation\"": event_type = sseobj.MacroevolEvent.W_SPECIATION
-            elif val[0] == "\"bw_speciation\"": event_type = sseobj.MacroevolEvent.BW_SPECIATION
-            elif val[0] == "\"asym_speciation\"": event_type = sseobj.MacroevolEvent.ASYM_SPECIATION
-            elif val[0] == "\"extinction\"": event_type = sseobj.MacroevolEvent.EXTINCTION
-            elif val[0] == "\"transition\"": event_type = sseobj.MacroevolEvent.ANAGENETIC_TRANSITION
-            elif val[0] == "\"anc_sampling\"": event_type = sseobj.MacroevolEvent.ANCESTOR_SAMPLING
+            if val[0] == "\"w_speciation\"" or val[0] == "\"speciation\"":
+                event_type = sseobj.MacroevolEvent.W_SPECIATION
+
+            elif val[0] == "\"bw_speciation\"":
+                event_type = sseobj.MacroevolEvent.BW_SPECIATION
+
+            elif val[0] == "\"asym_speciation\"":
+                event_type = sseobj.MacroevolEvent.ASYM_SPECIATION
+
+            elif val[0] == "\"extinction\"":
+                event_type = sseobj.MacroevolEvent.EXTINCTION
+
+            elif val[0] == "\"transition\"":
+                event_type = sseobj.MacroevolEvent.ANAGENETIC_TRANSITION
+
+            elif val[0] == "\"anc_sampling\"":
+                event_type = sseobj.MacroevolEvent.ANCESTOR_SAMPLING
 
         elif arg == "states":
             # need to declare cast_val separately
@@ -254,7 +266,7 @@ def make_SSEStash(
                     n_time_slices = int(val[0]) # TODO: Forbid different number of epochs here, so if len(val[0]) > 1, throw exception)
                 
                 except:
-                    raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_wrap().")
+                    raise ec.FunctionArgError(arg, "Was expecting an integer for \'n_epochs\'. Function was sse_stash().")
 
             if arg == "seed_age":
                 try:
@@ -264,7 +276,7 @@ def make_SSEStash(
                 
                 except:
                     raise ec.FunctionArgError(arg,
-                    "Was expecting a float. Function was sse_wrap().")
+                    "Was expecting a float. Function was sse_stash().")
 
             if arg == "epoch_age_ends":
                 try:
@@ -274,11 +286,11 @@ def make_SSEStash(
                 except: 
                     raise ec.FunctionArgError(arg,
                         "Could not convert epoch bound ages to floats. " \
-                        + "Function was sse_wrap().")
+                        + "Function was sse_stash().")
 
                 if len(val) != (n_time_slices - 1):
                     raise ec.FunctionArgsMismatchError(
-                        "sse_wrap",
+                        "sse_stash",
                         "\"sse_wrap\" expects that the number of epoch ends " \
                         + "is equal to the number of epochs minus 1")
 

@@ -19,7 +19,7 @@ class PJDetFnGrammar():
     det_fn_grammar_dict = {
         "sse_prob": set(["name", "value", "state"]),
         "sse_rate": set(["name", "value", "event", "states"]),
-        "sse_wrap": set(["flat_rate_mat", "flat_prob_mat", "n_states", "seed_age", "epoch_age_ends", "n_epochs"])
+        "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states", "seed_age", "epoch_age_ends", "n_epochs"])
     }
 
     @classmethod
@@ -67,7 +67,7 @@ class PJDetFnGrammar():
         if det_fn_id == "sse_prob":
             return cls.init_return_state_dep_prob(det_fn_param_dict)
 
-        if det_fn_id == "sse_wrap":
+        if det_fn_id == "sse_stash":
             for arg in det_fn_param_dict:
                 if not cls.grammar_check(det_fn_id, arg):
                     raise ec.NotAParameterError(arg)

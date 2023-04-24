@@ -15,16 +15,19 @@ import phylojunction.interface.cmdbox.cmd_parse as cmdp
 from tabulate import tabulate # type: ignore
 
 
-def write_str_list(outfile_handle: ty.IO, content_string_list: ty.List[str]) -> None:
+def write_str_list(outfile_handle: ty.IO,
+    content_string_list: ty.List[str]) -> None:
     content_string = "\n".join(content_string_list)
     outfile_handle.write(content_string)
 
 
-def write_fig_to_file(outfile_path: str, fig: plt.Figure) -> None:
-    fig.savefig(outfile_path, bbox_inches="tight", dpi=300)
+def write_fig_to_file(outfile_path: str,
+    fig_obj: plt.Figure) -> None:
+    fig_obj.savefig(outfile_path, bbox_inches="tight", dpi=300)
 
 
-def write_data_df(outfile_handle: ty.IO, data_df: pd.DataFrame, format="csv") -> None:
+def write_data_df(outfile_handle: ty.IO,
+    data_df: pd.DataFrame, format="csv") -> None:
     """Write a pandas DataFrame to the specified output file stream using the specified format
 
     Args:
@@ -120,10 +123,10 @@ def initialize_tree_dataframe(sample_size: int, n_repl: int=1, summaries: bool=F
 
 
 def prep_data_df(pgm_obj: pgm.ProbabilisticGraphicalModel,
-                 write_nex_states: bool=False) \
-        -> ty.Tuple[
-            ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
-            ty.List[ty.Dict[str, pd.DataFrame]]]:
+    write_nex_states: bool=False) \
+    -> ty.Tuple[
+        ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
+        ty.List[ty.Dict[str, pd.DataFrame]]]:
     """
     Return two pandas DataFrame's, with scalar and tree random
     variables
@@ -561,10 +564,12 @@ def prep_data_filepaths_dfs(
     if not scalar_output_stash[0].empty:
         output_fp_list.append("scalar_constants.csv")
         output_df_str_list.append(scalar_output_stash[0])
+    
     if scalar_output_stash[1]:
         for n_repl, df in scalar_output_stash[1].items():
             output_fp_list.append("scalar_rvs_" + str(n_repl) + "repl.csv")
             output_df_str_list.append(df)
+    
     if not scalar_output_stash[2].empty:
         output_fp_list.append("scalar_rvs_stats_summary.csv")
         output_df_str_list.append(scalar_output_stash[2])

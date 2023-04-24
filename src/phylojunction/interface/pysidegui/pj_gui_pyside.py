@@ -183,7 +183,8 @@ class GUIMainWindow(QMainWindow):
         # save plot #
         self.ui.ui_pages.save_pgm_node_plot.clicked.connect(
             lambda plot2fig: self.write_plot_to_file(
-                self.ui.ui_pages.pgm_page_matplotlib_widget.fig
+                self.ui.ui_pages.pgm_page_matplotlib_widget.fig,
+                self.ui.ui_pages.pgm_page_matplotlib_widget.axes
             )
         )
 
@@ -200,7 +201,8 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.draw_violins_button.clicked.connect(self.draw_violin)
         self.ui.ui_pages.save_violins_button.clicked.connect(
             lambda plot2fig: self.write_plot_to_file(
-                self.ui.ui_pages.compare_page_matplotlib_widget.fig
+                self.ui.ui_pages.compare_page_matplotlib_widget.fig,
+                self.ui.ui_pages.compare_page_matplotlib_widget.axes
             )
         )
 
@@ -209,10 +211,13 @@ class GUIMainWindow(QMainWindow):
         #################
         self.ui.ui_pages.read_hpd_csv_button.clicked.connect(self.read_coverage_hpd_csv)
         self.ui.ui_pages.coverage_node_list.itemClicked.connect(self.do_selected_node_coverage_page)
+        
+        # side-effect: sets xticklabels in 
         self.ui.ui_pages.draw_cov_button.clicked.connect(self.draw_cov)
         self.ui.ui_pages.save_cov_button.clicked.connect(
             lambda plot2fig: self.write_plot_to_file(
-                self.ui.ui_pages.coverage_page_matplotlib_widget.fig
+                self.ui.ui_pages.coverage_page_matplotlib_widget.fig,
+                self.ui.ui_pages.coverage_page_matplotlib_widget.axes
             )
         )
 
@@ -718,7 +723,10 @@ class GUIMainWindow(QMainWindow):
     def read_coverage_hpd_csv(self):
 
         # read file path #
-        coverage_hpd_csv_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Read HPDs .csv", dir=".", filter="*.csv")
+        coverage_hpd_csv_fp, filter = \
+            QFileDialog.getOpenFileName(
+                parent=self, caption="Read HPDs .csv", dir=".",
+                filter="*.csv")
 
         if coverage_hpd_csv_fp:
             if not os.path.isfile(coverage_hpd_csv_fp):
@@ -753,10 +761,10 @@ class GUIMainWindow(QMainWindow):
     # writing events #
     ##################
 
-    def write_plot_to_file(self, fig_obj):
+    def write_plot_to_file(self, fig_obj, axes_obj):        
         is_plot = True
-        if not fig_obj.axes[0].properties()["xticklabels"] \
-            and not fig_obj.axes[0].properties()["yticklabels"]:
+        if len(axes_obj.get_xticklabels()) == 0 \
+            and len(axes_obj.get_yticklabels()) == 0:
             is_plot = False
 
         if is_plot:
@@ -767,10 +775,19 @@ class GUIMainWindow(QMainWindow):
             head, tail = os.path.split(fig_fp)
             prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
 
-            pjwrite.write_fig_to_file(
-                head + "/" + prefix + "_" + tail,
-                fig_obj
-            )
+            # should user cancel, then no error!
+            if head and tail:
+                if prefix:
+                    pjwrite.write_fig_to_file(
+                        head + "/" + prefix + "_" + tail,
+                        fig_obj
+                    )
+                
+                else:
+                    pjwrite.write_fig_to_file(
+                        head + "/" + tail,
+                        fig_obj
+                    )
 
 
     def write_model_to_file(self, prefix: str=""):
@@ -814,7 +831,6 @@ class GUIMainWindow(QMainWindow):
 
 
     def draw_violin(self):
-        node_name: str = ""
         thing_to_compare: str = ""
         compare_node_list_empty = self.ui.ui_pages.compare_node_list.count() == 0
         summary_stat_list_empty = self.ui.ui_pages.summary_stats_list.count() == 0
@@ -826,7 +842,7 @@ class GUIMainWindow(QMainWindow):
         
         # first get selected node's name #
         selected_node_name: str = ""
-        active_item = self.ui.ui_pages.coverage_node_list.currentItem()
+        active_item = self.ui.ui_pages.compare_node_list.currentItem()
         if active_item:
             selected_node_name = active_item.text()
 
@@ -841,7 +857,7 @@ class GUIMainWindow(QMainWindow):
                 # scalar
                 if isinstance(node_pgm.value[0], (int, float, np.float64)):
                     if not self.is_avg_repl_check:
-                        thing_to_compare = node_name
+                        thing_to_compare = selected_node_name
                     
                     # averaging over replicates
                     else:
@@ -864,12 +880,14 @@ class GUIMainWindow(QMainWindow):
                             pass
 
                 # debugging
+                # print("node_pgm.is_sampled = " + str(node_pgm.is_sampled))
                 # print(tabulate(self.pj_comparison_df, self.pj_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
                 # print(tabulate(self.other_comparison_df, self.other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
 
                 joint_dataframe = pjorg.join_dataframes(
-                    self.pj_comparison_df, self.other_comparison_df,
-                    value_to_compare=thing_to_compare,
+                    self.pj_comparison_df,
+                    self.other_comparison_df,
+                    thing_to_compare,
                     summaries_avg_over_repl=False)
 
                 # something went wrong,

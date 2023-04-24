@@ -13,7 +13,7 @@ import phylojunction.readwrite.pj_read as pjread
 def join_dataframes(
     pj_df: pd.DataFrame,
     compare_to_df: pd.DataFrame,
-    value_to_compare: str,
+    thing_to_compare: str,
     summaries_avg_over_repl: bool=False) -> pd.DataFrame:
     """_summary_
 
@@ -28,6 +28,7 @@ def join_dataframes(
     """
 
     # debugging
+    # print("thing_to_compare = " + thing_to_compare)
     # print(tabulate(compare_to_df, compare_to_df.head(), tablefmt="plain", showindex=False).lstrip())
     # print(tabulate(pj_df, pj_df.head(), tablefmt="plain", showindex=False).lstrip())
 
@@ -40,25 +41,26 @@ def join_dataframes(
     #     pj_df will be program, sample, value_to_compare, make sure value to compare is float
     #     compare_to_df will be program, sample, value_to_compare, make sure value to compare is float
     #
+    
     else:
-        type_dict = { "program": str, "sample": int, "replicate": int, locals()["value_to_compare"]: float }
-        
+        type_dict = { "program": str, "sample": int, "replicate": int, locals()["thing_to_compare"]: float }
+
         try:
-            sub_pj_df = pj_df.loc[:,["program", "sample", "replicate", value_to_compare]]
+            sub_pj_df = pj_df.loc[:,["program", "sample", "replicate", thing_to_compare]]
             sub_pj_df = sub_pj_df.astype(type_dict)
             # print(tabulate(sub_pj_df, sub_pj_df.head(), tablefmt="pretty", showindex=False).lstrip())
         
         except:
-            print("Could not build joint dataframe from PJ in order to compare " + value_to_compare + ". For now, ignoring. Later implement Exception.")
+            print("Could not build joint dataframe from PJ in order to compare " + thing_to_compare + ". For now, ignoring. Later implement Exception.")
             return pd.DataFrame()
 
         try:
-            sub_compare_to_df = compare_to_df.loc[:,["program", "sample", "replicate", value_to_compare]]
+            sub_compare_to_df = compare_to_df.loc[:,["program", "sample", "replicate", thing_to_compare]]
             sub_compare_to_df = sub_compare_to_df.astype(type_dict)
             # print(tabulate(sub_compare_to_df, sub_compare_to_df.head(), tablefmt="pretty", showindex=False).lstrip())
         
         except:
-            print("Could not build sub-dataframe from other simulator data in order to compare " + value_to_compare + ". For now, ignoring. Later implement Exception.")
+            print("Could not build sub-dataframe from other simulator data in order to compare " + thing_to_compare + ". For now, ignoring. Later implement Exception.")
             return pd.DataFrame()
     
     joint_df = pd.concat([sub_pj_df, sub_compare_to_df], axis=0)
@@ -126,18 +128,38 @@ if __name__ == "__main__":
     scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj) # still prefixless
     _, output_df_list = pjwrite.prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)
     
-    for df in output_df_list:
-        df["program"] = "PJ"
+    # output_df_list[0] # df with sample, replicate, rv1, rv2
+    # output_df_list[1] # df with sample, replicate, rv3, rv4
+    # output_df_list[2] # df with sample, replicate, rv5
+    # output_df_list[3] # df with sample, replicate, rv6
+    # output_df_list[4] # df with sample, summary, rv5, rv6
+    # output_df_list[5] # df with sample, replicate, trs1 complete
+    # output_df_list[6] # df with sample, replicate, trs2 complete
+    # output_df_list[7] # df with sample, replicate, trs1 annotated complete
+    # output_df_list[8] # df with sample, replicate, trs2 annotated complete
+    # output_df_list[9] # df with sample, replicate, trs1 reconstructed
+    # output_df_list[10] # df with sample, replicate, trs2 reconstructed
+    # output_df_list[11] # df with sample, replicate, trs1 annotated reconstructed
+    # output_df_list[12] # df with sample, replicate, trs2 annotated reconstructed
+    # output_df_list[13] # df with sample, replicate, origin_age, root_age, n_total, n_extant, n_extinct, n_sa for trs1
+    # output_df_list[14] # df with sample, replicate, origin_age, root_age, n_total, n_extant, n_extinct, n_sa for trs2
+    # output_df_list[15] # df with average and std. dev for each sample origin_age, root_age, n_total, n_extant, n_extinct, n_sa for trs2 (?)
+    # print(output_df_list[16]) # df with internal node states # keep checking later
+
+    # for df in output_df_list:
+    #     df["program"] = "PJ"
+    
+    output_df_list[2]["program"] = "PJ"
 
     # getting dataframe to compare to
-    # csv_fp = "examples/compare_files/comparison_multiple_scalar_tree_plated_rv5.csv"
-    csv_fp = "examples/compare_files/comparison_multiple_scalar_tree_plated_trs2.csv"
+    csv_fp = "examples/compare_files/comparison_multiple_scalar_tree_plated_rv5.csv"
+    # csv_fp = "examples/compare_files/comparison_multiple_scalar_tree_plated_trs2.csv"
     compare_to_df = pjread.read_csv_into_dataframe(csv_fp)
     
     # try to join dataframes
     # output_df_list[2] has data for "rv5", output_df_list[8] has data for "trs2"
-    # joint_df = join_dataframes(output_df_list[2], compare_to_df, value_to_compare="rv5", summaries_avg_over_repl=False)
-    joint_df = join_dataframes(compare_to_df, output_df_list[8], value_to_compare="root_age", summaries_avg_over_repl=False)
+    joint_df = join_dataframes(output_df_list[2], compare_to_df, thing_to_compare="rv5", summaries_avg_over_repl=False)
+    # joint_df = join_dataframes(compare_to_df, output_df_list[8], value_to_compare="root_age", summaries_avg_over_repl=False)
 
     #################################
     # Testing parsing functions for #
@@ -145,7 +167,7 @@ if __name__ == "__main__":
     #################################
 
     # initializing model
-    model_fp = "examples/validate_files/r_b.pj"
+    model_fp = "examples/coverage_files/r_b_exp1.pj"
     pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
 
     # reading true values
@@ -154,12 +176,12 @@ if __name__ == "__main__":
     # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(), tablefmt="pretty", showindex=False))
     
     # reading hpd table
-    hpd_df = pjread.read_csv_into_dataframe("./examples/validate_files/r_b.csv")
+    hpd_df = pjread.read_csv_into_dataframe("./examples/coverage_files/r_b_exp1.csv")
     # print(tabulate(hpd_df, headers=hpd_df.head(), tablefmt="pretty"))
 
     full_cov_df = pd.concat([scalar_constant_df, hpd_df], axis=1)
 
     full_cov_df = add_within_hpd_col(full_cov_df, "r_b")
-    print(tabulate(full_cov_df, headers=full_cov_df.head(), tablefmt="pretty", showindex=False).lstrip())
+    # print(tabulate(full_cov_df, headers=full_cov_df.head(), tablefmt="pretty", showindex=False).lstrip())
 
     # print(full_cov_df)

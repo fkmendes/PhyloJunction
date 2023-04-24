@@ -230,7 +230,7 @@ if __name__ == "__main__":
     sse_stash = sseobj.SSEStash(event_handler)
 
     # det_nd_pgm = pgm.DeterministicNodePGM("events", value=event_handler, parent_nodes=None)
-    det_nd_pgm = pgm.DeterministicNodePGM("sse_stash", value=sse_stash, parent_nodes=None)
+    det_nd_pgm = pgm.DeterministicNodePGM("sse_stash", value=stash, parent_nodes=None)
 
     dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
     dn_param_dict["n"] = ["1"]

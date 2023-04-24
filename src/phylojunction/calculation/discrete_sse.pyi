@@ -6,12 +6,13 @@ MacroevolEvent: Incomplete
 class DiscreteStateDependentRate:
     value: ty.List[float]
     name: Incomplete
+    states: ty.List[int]
     state_tuple: ty.Tuple[int]
-    departing_state: Incomplete
-    arriving_states: Incomplete
-    event: Incomplete
+    departing_state: int
+    arriving_states: ty.Union[int, ty.Tuple[int]]
+    event: MacroevolEvent
     str_representation: str
-    def __init__(self, val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], event: MacroevolEvent, name: str = ..., states: ty.List[int] = ...) -> None: ...
+    def __init__(self, val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], event: MacroevolEvent, name: str = ..., states: ty.List[int]=[]) -> None: ...
     def sample(self) -> None: ...
     def get_length(self): ...
     def get_gcf(self) -> None: ...

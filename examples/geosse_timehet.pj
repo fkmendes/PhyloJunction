@@ -49,8 +49,8 @@ det_trans_rate1_2_t0 := sse_rate(name="q1_2_t0", value=trans_rate1_2_t0, states=
 
 # state 2
 det_b_birth_rate2_0_1_t0 := sse_rate(name="lambda201_t0", value=b_birth_rate2_0_1_t0, states=[2,0,1], event="bw_speciation")
-det_b_birth_rate2_0_2_t0 := sse_rate(name="lambda202_t0", value=b_birth_rate2_0_2_t0, states=[2,0,2], event="bw_speciation")
-det_b_birth_rate2_1_2_t0 := sse_rate(name="lambda212_t0", value=b_birth_rate2_1_2_t0, states=[2,1,2], event="bw_speciation")
+det_b_birth_rate2_0_2_t0 := sse_rate(name="lambda202_t0", value=b_birth_rate2_0_2_t0, states=[2,0,2], event="asym_speciation")
+det_b_birth_rate2_1_2_t0 := sse_rate(name="lambda212_t0", value=b_birth_rate2_1_2_t0, states=[2,1,2], event="asym_speciation")
 det_trans_rate2_0_t0 := sse_rate(name="q2_0_t0", value=trans_rate2_0_t0, states=[2,0], event="transition")
 det_trans_rate2_1_t0 := sse_rate(name="q2_1_t0", value=trans_rate2_1_t0, states=[2,1], event="transition")
 
@@ -66,14 +66,14 @@ det_death_rate1_t1 := sse_rate(name="mu1_t1", value=death_rate1_t1, states=[1], 
 det_trans_rate1_2_t1 := sse_rate(name="q1_2_t1", value=trans_rate1_2_t1, states=[1,2], event="transition")
 
 # state 2
-det_b_birth_rate2_0_1_t1 := sse_rate(name="lambda2_0_1_t0", value=b_birth_rate2_0_1_t1, states=[2,0,1], event="bw_speciation")
-det_b_birth_rate2_0_2_t1 := sse_rate(name="lambda2_0_2_t0", value=b_birth_rate2_0_2_t1, states=[2,0,2], event="bw_speciation")
-det_b_birth_rate2_1_2_t1 := sse_rate(name="lambda2_1_2_t0", value=b_birth_rate2_1_2_t1, states=[2,1,2], event="bw_speciation")
+det_b_birth_rate2_0_1_t1 := sse_rate(name="lambda2_0_1_t1", value=b_birth_rate2_0_1_t1, states=[2,0,1], event="bw_speciation")
+det_b_birth_rate2_0_2_t1 := sse_rate(name="lambda2_0_2_t1", value=b_birth_rate2_0_2_t1, states=[2,0,2], event="asym_speciation")
+det_b_birth_rate2_1_2_t1 := sse_rate(name="lambda2_1_2_t1", value=b_birth_rate2_1_2_t1, states=[2,1,2], event="asym_speciation")
 det_trans_rate2_0_t1 := sse_rate(name="q2_0_t1", value=trans_rate2_0_t1, states=[2,0], event="transition")
 det_trans_rate2_1_t1 := sse_rate(name="q2_1_t1", value=trans_rate2_1_t1, states=[2,1], event="transition")
 
 # wrapping up all rates
-sse_stash := sse_wrap(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate0_2_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate1_2_t0, det_b_birth_rate2_0_1_t0, det_b_birth_rate2_0_2_t0, det_b_birth_rate2_1_2_t0, det_trans_rate2_0_t0, det_trans_rate2_1_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate0_2_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate1_2_t1, det_b_birth_rate2_0_1_t1, det_b_birth_rate2_0_2_t1, det_b_birth_rate2_1_2_t1, det_trans_rate2_0_t1, det_trans_rate2_1_t1], n_states=3, n_epochs=2, seed_age=3.0, epoch_age_ends=[1.5])
+stash := sse_stash(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate0_2_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate1_2_t0, det_b_birth_rate2_0_1_t0, det_b_birth_rate2_0_2_t0, det_b_birth_rate2_1_2_t0, det_trans_rate2_0_t0, det_trans_rate2_1_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate0_2_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate1_2_t1, det_b_birth_rate2_0_1_t1, det_b_birth_rate2_0_2_t1, det_b_birth_rate2_1_2_t1, det_trans_rate2_0_t1, det_trans_rate2_1_t1], n_states=3, n_epochs=2, seed_age=3.0, epoch_age_ends=[1.5])
 
 # stochastic-node variable ('trs') assignment
-trs ~ discrete_sse(n=2, nr=5, stash=sse_stash, start_state=[0], stop="age", stop_value=3.0, origin="true")
+trs ~ discrete_sse(n=2, nr=5, stash=stash, start_state=[0], stop="age", stop_value=3.0, origin="true")

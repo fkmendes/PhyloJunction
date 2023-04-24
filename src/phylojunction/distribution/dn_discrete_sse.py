@@ -87,25 +87,24 @@ class DnSSE(pgm.DistributionPGM):
     runtime_limit: int
     debug: bool
 
-    # TODO: later make event_handler mandatory and update typing everywhere, as well as fix all tests
     def __init__(self,
-                 sse_stash: sseobj.SSEStash,
-                 stop_value: ty.List[float]=[],
-                 n: int=1,
-                 n_replicates: int=1,
-                 stop: str="",
-                 origin: bool=True,
-                 start_states_list: ty.List[int]=[],
-                 condition_on_speciation: bool=False,
-                 condition_on_survival: bool=True,
-                 condition_on_obs_both_sides_root: bool=False,
-                 min_rec_taxa: int=0,
-                 max_rec_taxa: int=int(1e12),
-                 abort_at_obs: int=int(1e12),
-                 seeds_list: ty.Optional[ty.List[int]]=None,
-                 epsilon: float=1e-12,
-                 runtime_limit: int=15,
-                 debug: bool=False) -> None:
+        sse_stash: sseobj.SSEStash,
+        stop_value: ty.List[float]=[],
+        n: int=1,
+        n_replicates: int=1,
+        stop: str="",
+        origin: bool=True,
+        start_states_list: ty.List[int]=[],
+        condition_on_speciation: bool=False,
+        condition_on_survival: bool=True,
+        condition_on_obs_both_sides_root: bool=False,
+        min_rec_taxa: int=0,
+        max_rec_taxa: int=int(1e12),
+        abort_at_obs: int=int(1e12),
+        seeds_list: ty.Optional[ty.List[int]]=None,
+        epsilon: float=1e-12,
+        runtime_limit: int=15,
+        debug: bool=False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
@@ -285,7 +284,8 @@ class DnSSE(pgm.DistributionPGM):
     # Simulation methods #
     ######################
     
-    def get_next_event_time(self, total_rate: float, a_seed: ty.Optional[int]=None) -> float:
+    def get_next_event_time(self,
+        total_rate: float, a_seed: ty.Optional[int]=None) -> float:
         """Draw next exponentially distributed event time
 
         Args:
@@ -305,16 +305,16 @@ class DnSSE(pgm.DistributionPGM):
 
 
     def execute_birth(self,
-                    tr_namespace: dp.TaxonNamespace,
-                    chosen_node: dp.Node,
-                    state_representation_dict: ty.Dict[int, ty.Set[str]],
-                    sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-                    state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
-                    untargetable_node_set: ty.Set[str],
-                    cumulative_node_count: int,
-                    macroevol_atomic_param: sseobj.DiscreteStateDependentRate,
-                    event_t: float,
-                    debug=False) -> ty.Tuple[dp.Node, int]:
+        tr_namespace: dp.TaxonNamespace,
+        chosen_node: dp.Node,
+        state_representation_dict: ty.Dict[int, ty.Set[str]],
+        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+        untargetable_node_set: ty.Set[str],
+        cumulative_node_count: int,
+        macroevol_atomic_param: sseobj.DiscreteStateDependentRate,
+        event_t: float,
+        debug=False) -> ty.Tuple[dp.Node, int]:
         """Execute lineage birth (side-effect and return)
 
         Args:
@@ -580,14 +580,14 @@ class DnSSE(pgm.DistributionPGM):
 
 
     def execute_anatrans(self,
-                        tr_namespace: dp.TaxonNamespace,
-                        chosen_node: dp.Node,
-                        state_representation_dict: ty.Dict[int, ty.Set[str]],
-                        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
-                        untargetable_node_set: ty.Set[str],
-                        macroevol_rate_param: sseobj.DiscreteStateDependentRate,
-                        event_t: float,
-                        debug: bool=False) -> None:
+        tr_namespace: dp.TaxonNamespace,
+        chosen_node: dp.Node,
+        state_representation_dict: ty.Dict[int, ty.Set[str]],
+        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+        untargetable_node_set: ty.Set[str],
+        macroevol_rate_param: sseobj.DiscreteStateDependentRate,
+        event_t: float,
+        debug: bool=False) -> None:
         """
         Execute anagenetic trait-state transition on path to chosen
         node (side-effect)
@@ -673,14 +673,14 @@ class DnSSE(pgm.DistributionPGM):
 
 
     def execute_sample_ancestor(self,
-                                tr_namespace: dp.TaxonNamespace,
-                                chosen_node: dp.Node,
-                                state_representation_dict: ty.Dict[int, ty.Set[str]],
-                                sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-                                untargetable_node_set,
-                                cumulative_sa_count: int,
-                                event_t: float,
-                                debug: bool=False) -> int:
+        tr_namespace: dp.TaxonNamespace,
+        chosen_node: dp.Node,
+        state_representation_dict: ty.Dict[int, ty.Set[str]],
+        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+        untargetable_node_set,
+        cumulative_sa_count: int,
+        event_t: float,
+        debug: bool=False) -> int:
         """Execute sampling of direct lineage ancestor (side-effect and return)
 
         Args:
@@ -792,10 +792,10 @@ class DnSSE(pgm.DistributionPGM):
 
 
     def update_sa_lineage_dict(self,
-                                a_time: float,
-                                sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-                                sa_lineage_node_labels: ty.List[str], 
-                                debug: bool=False) -> None:
+        a_time: float,
+        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+        sa_lineage_node_labels: ty.List[str], 
+        debug: bool=False) -> None:
         """Update sa_lineage_dict (side-effect) when lineage node undergoes event and at tree stop condition
         
         This function is called every time a node (whose subtending branch has sampled ancestors, by asking if
@@ -836,18 +836,18 @@ class DnSSE(pgm.DistributionPGM):
 
 
     def execute_event(self,
-                        tr_namespace,
-                        macroevol_rate_param: sseobj.DiscreteStateDependentRate,
-                        chosen_node: dp.Node,
-                        state_representation_dict: ty.Dict[int, ty.Set[str]],
-                        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
-                        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-                        untargetable_node_set: ty.Set[str],
-                        cumulative_node_count: int,
-                        cumulative_sa_count: int,
-                        last_chosen_node,
-                        event_t: float,
-                        debug: bool=False) -> ty.Tuple[dp.Node, int, int]:
+        tr_namespace,
+        macroevol_rate_param: sseobj.DiscreteStateDependentRate,
+        chosen_node: dp.Node,
+        state_representation_dict: ty.Dict[int, ty.Set[str]],
+        state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+        sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+        untargetable_node_set: ty.Set[str],
+        cumulative_node_count: int,
+        cumulative_sa_count: int,
+        last_chosen_node,
+        event_t: float,
+        debug: bool=False) -> ty.Tuple[dp.Node, int, int]:
         """Execute event on chosen node and bookkeep things
 
         Args:

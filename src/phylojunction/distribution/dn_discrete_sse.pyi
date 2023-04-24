@@ -23,6 +23,7 @@ class DnSSE(pgm.DistributionPGM):
     min_rec_taxa: int
     max_rec_taxa: int
     abort_at_obs: int
+    sse_stash: sseobj.SSEStash
     events: sseobj.MacroevolEventHandler
     start_states: ty.List[int]
     state_count: int
@@ -34,7 +35,7 @@ class DnSSE(pgm.DistributionPGM):
     runtime_limit: int
     debug: bool
     def __init__(self,
-                 event_handler: sseobj.MacroevolEventHandler = ...,
+                 sse_stash: sseobj.SSEStash = ...,
                  stop_value: ty.List[float] = ...,
                  n: int = ...,
                  n_replicates: int = ...,

@@ -203,19 +203,28 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
     
     def __init__(self,
         val: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
-        event: MacroevolEvent, name: str="", states: ty.List[int]=[0,0,0]):
+        event: MacroevolEvent, name: str="",
+        states: ty.List[int]=[]) -> None:
 
         # side-effect: initializes self.value, self.name, self.state
-        state = int(states[0])
+        self.states: ty.List[int] = []
+        if len(states) == 0:
+            self.states = [0, 0, 0]
+
+        else:
+            self.states = states
+
+        state = int(self.states[0])
         super().__init__(val=val, name=name, state=state)
 
-        self.state_tuple = tuple(int(s) for s in states)
+        self.state_tuple = tuple(int(s) for s in self.states)
         self.departing_state = self.state_tuple[0]
         self.arriving_states = self.state_tuple[1:] # does not include time_slice_index 1
         
         # making sure inputs are ok
         self.event = event
-        if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
+        if self.event == MacroevolEvent.EXTINCTION and self.arriving_states \
+            and (len(states) > 0):
             raise ec.StateDependentParameterMisspec(message="Extinction only takes a " \
                 + "departing state (and no arriving states).")
 

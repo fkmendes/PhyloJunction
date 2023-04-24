@@ -42,47 +42,57 @@ def plot_violins(fig: Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xl
     fig.canvas.draw()
     
 
-def plot_intervals(fig: plt.Figure, ax: plt.Axes, df: pd.DataFrame, x: str, y: str, xlab: ty.Optional[str]=None, ylab: ty.Optional[str]="Posterior mean"):
-    """_summary_
+def plot_intervals(fig_obj: plt.Figure,
+    axes_obj: plt.Axes,
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    xlab: ty.Optional[str]=None,
+    ylab: ty.Optional[str]="Posterior mean") -> None:
+    """Draw coverage plot on provided plt.Figure instance
 
     Args:
-        fig (matplotlib.Figure): _description_
-        ax (plt.Axes): _description_
-        df (pd.DataFrame): _description_
-        x (str): _description_
-        y (str, optional): _description_. Defaults to "posterior_mean".
-        xlab (ty.Optional[str], optional): _description_. Defaults to None.
-        ylab (ty.Optional[str], optional): _description_. Defaults to None.
+        fig_obj (matplotlib.Figure): Figure object to draw coverage plot on
+        axes_obj (plt.Axes): Axes object associated with figure instance
+        df (pd.DataFrame): pandas dataframe holding interval information
+        x (str): Label for x-axis on pandas dataframe.
+        y (str, optional): Label for y-axis on pandas dataframe. Defaults to "posterior_mean".
+        xlab (ty.Optional[str], optional): User-provided overriding label for x-axis. Defaults to None.
+        ylab (ty.Optional[str], optional): User-provided overriding label for y-axis. Defaults to None.
 
     Returns:
         None
     """
-    ax.spines['left'].set_visible(True)
-    ax.spines['bottom'].set_visible(True)
-    
-    ax.set_ylabel(ylab)
+    axes_obj.spines['left'].set_visible(True)
+    axes_obj.spines['bottom'].set_visible(True)
     
     if xlab != None:
-        ax.set_xlabel(xlab)
+        axes_obj.set_xlabel(xlab)
     
     else:
-        ax.set_xlabel(x)
+        axes_obj.set_xlabel(x)
+
+    if ylab != None:
+        axes_obj.set_ylabel(ylab)
+    
+    else:
+        axes_obj.set_xlabel(y)
 
     # blue
     for i in range(len(df.index)):
         if df.at[i, "within_hpd"] == 1.0:
             line_color = "darkturquoise"
-            ax.vlines(float(df.at[i, x]), float(df.at[i, "lower_95hpd"]), float(df.at[i, "higher_95hpd"]), line_color, linewidth=3.0, alpha=0.25)
-            ax.plot(float(df.at[i, x]), float(df.at[i, y]), marker="o", markersize=3, color=line_color)
+            axes_obj.vlines(float(df.at[i, x]), float(df.at[i, "lower_95hpd"]), float(df.at[i, "higher_95hpd"]), line_color, linewidth=3.0, alpha=0.25)
+            axes_obj.plot(float(df.at[i, x]), float(df.at[i, y]), marker="o", markersize=3, color=line_color)
         
     # place red on top of blue
     for i in range(len(df.index)):
         if df.at[i, "within_hpd"] == 0.0:
             line_color = "orangered"
-            ax.vlines(float(df.at[i, x]), float(df.at[i, "lower_95hpd"]), float(df.at[i, "higher_95hpd"]), line_color, alpha=0.8)
-            ax.plot(float(df.at[i, x]), float(df.at[i, y]), marker="o", markersize=3, color=line_color)
+            axes_obj.vlines(float(df.at[i, x]), float(df.at[i, "lower_95hpd"]), float(df.at[i, "higher_95hpd"]), line_color, alpha=0.8)
+            axes_obj.plot(float(df.at[i, x]), float(df.at[i, y]), marker="o", markersize=3, color=line_color)
 
-    fig.canvas.draw()
+    fig_obj.canvas.draw()
 
 
 if __name__ == "__main__":
