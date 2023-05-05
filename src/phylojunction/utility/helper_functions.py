@@ -1,7 +1,7 @@
 import sys
 import time
 import typing as ty
-import numpy as np # type: ignore
+import numpy as np  # type: ignore
 from collections import defaultdict
 
 # pj imports
@@ -14,12 +14,13 @@ def print_progress(idx: int, iterator_len: int) -> None:
 
     Args:
         idx (int): Index to keep track of where in iteration one is
-        iterator_len (int): Size of the iterator whose progress is keeping track of
+        iterator_len (int): Size of the iterator whose progress is
+            keeping track of
     """
 
     j = (idx + 1) / iterator_len
     sys.stdout.write('\r')
-    sys.stdout.write("[%-20s] %d%%" % ('='*int(20*j), 100*j))
+    sys.stdout.write("[%-20s] %d%%" % ('=' * int(20 * j), 100 * j))
     sys.stdout.flush()
     time.sleep(0.25)
 
@@ -33,14 +34,23 @@ def create_str_defaultdict() -> defaultdict:
     return defaultdict(str)
 
 
-def verify_or_convert2_vector(param_list: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]], dn_name: str, size_to_grow=1) -> ty.List[ty.List[ty.Union[int, float, str]]]:
+def verify_or_convert2_vector(
+        param_list:
+        ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
+        dn_name: str, size_to_grow=1) \
+        -> ty.List[ty.List[ty.Union[int, float, str]]]:
     """
 
     Args:
-        size_to_grow (int): This will be the number of simulations (n_draws inside a DistributionPGM object)
-    """    
-    param_list_array: ty.Any = np.array(param_list, dtype=object) # using numpy array as a hack to get nested-ness of param_list
-    n_params = len(param_list_array.shape) # each entry in shape is a dimension
+        size_to_grow (int): This will be the number of simulations
+            (n_draws inside a DistributionPGM object)
+    """
+
+    # using numpy array as a hack to get nested-ness of param_list
+    param_list_array: ty.Any = np.array(param_list, dtype=object)
+
+    # each entry in shape is a dimension
+    n_params = len(param_list_array.shape)
 
     vectorizable_param_list = param_list
     vectorized_param_list: ty.List[ty.List[ty.Union[int, float, str]]] = []
@@ -57,38 +67,48 @@ def verify_or_convert2_vector(param_list: ty.Union[int, float, str, ty.List[ty.U
     # dealing with weird cases -- must set some flags
     # and/or initialize variables appropriately
     elif isinstance(param_list, list):
-        # single scalar provided by itself inside list, e.g, param_list = [1.0]        
+        # single scalar provided by itself inside list,
+        # e.g, param_list = [1.0]
         if len(param_list) == 1:
             one_scalar_in_list_provided = True
+
         # we have a single parameter inside a list of size_to_grow already,
         # but no nestedness; this happens when we do
         # rv ~ someDn(n=5, param=[1, 2, 3, 4, 5])
         #
-        # here, we want to just paste those values as-is, inside vectorized_param_list,
-        # but we do need to initialize this second dimension already so the
-        # nestedness is correct
+        # here, we want to just paste those values as-is, inside
+        # vectorized_param_list, but we do need to initialize this second
+        # dimension already so the nestedness is correct
         elif len(param_list) == size_to_grow and n_params == 1:
             one_par_right_value_count = True
             vectorized_param_list.append([])
 
-    # each v here will be a different parameter (e.g., mean and sd) in case there
-    # is more than one parameter
+    # each v here will be a different parameter (e.g., mean and sd)
+    # in case there is more than one parameter
     if isinstance(vectorizable_param_list, list):
         for v in vectorizable_param_list:
-            # a single value was provided as scalar, either by itself, or inside a list by itself
+
+            # a single value was provided as scalar, either by itself, or
+            # inside a list by itself
             if isinstance(v, (int, float, str)):
                 # param list is a single scalar, e.g., mean=1.0
                 if one_scalar_provided:
-                    vectorized_param_list.append([v for i in range(size_to_grow)])
-                # param list is a single scalar, by itself, inside a list, e.g., mean=[[1.0]]
+                    vectorized_param_list.append(
+                        [v for i in range(size_to_grow)])
+
+                # param list is a single scalar, by itself, inside a list,
+                # e.g., mean=[[1.0]]
                 elif one_scalar_in_list_provided:
                     vectorized_param_list.append([v] * size_to_grow)
-                # param list contains a single parameter, and we already have the right number of values
+
+                # param list contains a single parameter, and we already have
+                # the right number of values
                 elif one_par_right_value_count:
                     vectorized_param_list[0].append(v)
 
             elif type(v) == list:
                 n_val = len(v)
+
                 # more values than specified number of samples
                 if n_val > size_to_grow:
                     raise ec.DimensionalityError(dn_name)
@@ -99,7 +119,8 @@ def verify_or_convert2_vector(param_list: ty.Union[int, float, str, ty.List[ty.U
 
                 # a single value was provided as list
                 elif n_val == 1:
-                    vectorized_param_list.append([v[0] for i in range(size_to_grow)])
+                    vectorized_param_list.append(
+                        [v[0] for i in range(size_to_grow)])
 
                 # more than 1 value, but same as specified number of samples
                 else:
@@ -118,13 +139,17 @@ def get_ellapsed_time_in_minutes(start: float, end: float) -> int:
     Returns:
         int: Ellapsed time in minutes in time window
     """
-    ellapsed_minutes, ellapsed_secs = divmod(end-start, 60) # returns (min, sec)
+    # returns (min, sec)
+    ellapsed_minutes, ellapsed_secs = divmod(end - start, 60)
 
     # return int(ellapsed_minutes * 60 + ellapsed_secs) # in seconds
     return int(ellapsed_minutes)
 
 
-def is_val_in_interval(val: ty.Union[int, float, np.float64], lower: ty.Union[int, float, np.float64], upper: ty.Union[int, float, np.float64]) -> bool:
+def is_val_in_interval(
+        val: ty.Union[int, float, np.float64],
+        lower: ty.Union[int, float, np.float64],
+        upper: ty.Union[int, float, np.float64]) -> bool:
     """Return True/False if numerical value is in (lower, upper]
 
     Args:
@@ -135,42 +160,44 @@ def is_val_in_interval(val: ty.Union[int, float, np.float64], lower: ty.Union[in
     Returns:
         bool: Whether val is in (lower, upper]
     """
-    if lower < val and val <= upper: 
+    if lower < val and val <= upper:
         return True
     else:
         return False
 
 
-def symmetric_difference(set1: ty.Set[ty.Any], set2: ty.Set[ty.Any]) -> ty.Set[ty.Any]:
+def symmetric_difference(
+        set1: ty.Set[ty.Any],
+        set2: ty.Set[ty.Any]) -> ty.Set[ty.Any]:
     """Return symmetric difference among two sets"""
     result = set1
-    
+
     for elem in set2:
         try:
             result.remove(elem)
-        
+
         except KeyError:
             result.add(elem)
-    
+
     return result
 
 ##############################################################################
 
 if __name__ == "__main__":
     # can be called from utility/
-    # $ python3 helper_functions.py
-    # 
+    # $ python3.9 helper_functions.py
+    #
     # can also be called from phylojunction/
-    # $ python3 utility/helper_functions.py
+    # $ python3.9 utility/helper_functions.py
     # or
-    # $ python3 -m utility.helper_functions
+    # $ python3.9 -m utility.helper_functions
     #
     # can also be called from VS Code, if open folder is phylojuction/
-    
-   d = autovivify(levels=3, final=dict)
-   d[0][1][2] = 3
-   print(d)
 
-   print_progress(49, 100)
+    d = autovivify(levels=3, final=dict)
+    d[0][1][2] = 3
+    print(d)
 
-   print(get_ellapsed_time_in_minutes(0.0, 125)) # 2 minutes (and 5 seconds)
+    print_progress(49, 100)
+
+    print(get_ellapsed_time_in_minutes(0.0, 125))  # 2 minutes (and 5 seconds)

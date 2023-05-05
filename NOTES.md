@@ -103,7 +103,7 @@ Stubs must be kept up-to-date by developers so `mypy` can find incongruencies.
 
 Sometimes I have noticed that calling `mypy` on individual modules that depend on other modules within the same package fails (e.g., `helper_functions.py` is in the same package as, and depends on `exception_classes.py`).
 Fixing it can be done by guiding `mypy`'s import discovery; 
-This is what the flags `--namespace-packages` together with `--explicit-package-bases` do  above.
+This is what the flags `--namespace-packages` together with `--explicit-package-bases` do above.
 They are necessary even when an `__init__.py` is present in the same folder as the modules being type checked.
 
 PJ has a script that calls `mypy` automatically on everything:
@@ -114,6 +114,26 @@ python3 typecheck.py
 ```
 
 This script should be called and be successful every time new code is written, before committing and pushing.
+
+## Style convention: PEP8
+
+In order to check for PEP8 style convention rules, you need the `pep8` python package installed.
+Checking one file can be done with:
+
+```
+pep8 --first [path to .py]
+```
+
+It is recommended to do that from within VS Code's terminal, for example, that way it is easy to jump immediately to the violating line.
+
+A couple of rules are always broken because of type hinting, and because of an automatic newline character probably added by VS Code.
+These are rules E701 and W391.
+We can ask pep8 to ignore them:
+
+```
+pep8 --first --ignore=E701,W391 [path to .py]
+```
+
 
 ## Editable pip install for developers
 
