@@ -121,17 +121,19 @@ In order to check for PEP8 style convention rules, you need the `pep8` python pa
 Checking one file can be done with:
 
 ```
-pep8 --first [path to .py]
+pep8 [path to .py]
 ```
 
 It is recommended to do that from within VS Code's terminal, for example, that way it is easy to jump immediately to the violating line.
 
 A couple of rules are always broken because of type hinting, and because of an automatic newline character probably added by VS Code.
 These are rules E701 and W391.
+Sometimes, excessive indentation (which should be avoided anyway) causes lines to be > 79 characters.
+This violates rule E501.
 We can ask pep8 to ignore them:
 
 ```
-pep8 --first --ignore=E701,W391 [path to .py]
+pep8 --ignore=E501,E701,W391 [path to .py]
 ```
 
 
