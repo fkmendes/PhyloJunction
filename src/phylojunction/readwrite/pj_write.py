@@ -827,7 +827,8 @@ def dump_pgm_data(dir_string: str,
     # print("\n\n" + "\n".join(data_df_full_fp_list))
     # for df_or_str in output_df_str_list:
     #     if isinstance(df_or_str, pd.DataFrame):
-    #         print(tabulate(df, df.head(), tablefmt="plain", showindex=False).lstrip())
+    #         print(tabulate(df, df.head(), tablefmt="plain",
+    #               showindex=False).lstrip())
 
     # write! #
     for idx, full_fp in enumerate(data_df_full_fp_list):

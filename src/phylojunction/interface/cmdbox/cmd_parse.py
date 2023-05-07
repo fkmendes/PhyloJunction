@@ -1,7 +1,7 @@
 import re
 import io
 import typing as ty
-import matplotlib.pyplot as plt # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -16,18 +16,21 @@ import phylojunction.utility.exception_classes as ec
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pgm.ProbabilisticGraphicalModel:
-    """Go through lines in file object or specification string and populate probabilistic graphical model
+
+def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) \
+    -> pgm.ProbabilisticGraphicalModel:
+    """Go through .pj lines and populate graphical model
 
     Args:
-        script_file_path_or_model_spec (str): Path to script .pj file or full string specifying model directly
+        script_file_path_or_model_spec (str): Path to script .pj
+            file or full string specifying model directly
     """
 
-    def _execute_spec_lines(all_lines_list: ty.List[str], pgm_obj: pgm.ProbabilisticGraphicalModel) -> None:
+    def _execute_spec_lines(all_lines_list: ty.List[str],
+                            pgm_obj: pgm.ProbabilisticGraphicalModel) -> None:
         for line in all_lines_list:
             # clear padding whitespaces
             line = line.lstrip().rstrip()
-            
             _ = cmdline2pgm(pgm_obj, line)
 
     pgm_obj = pgm.ProbabilisticGraphicalModel()
@@ -50,8 +53,11 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
     # seeing trees in script strings in main()
     # for node_name, node_pgm in pgm_obj.node_name_val_dict.items():    
         # if node_name == "trs":
-        #     fig = plt.figure() # note that pjgui uses matplotlib.figure.Figure (which is part of Matplotlib's OOP class library)
-        #                              # here, we instead use pyplot's figure, which is the Matlab-like state-machine API
+        # # note that pjgui uses matplotlib.figure.Figure
+        # # (which is part of Matplotlib's OOP class library)
+        # # here, we instead use pyplot's figure, which is the
+        # # Matlab-like state-machine API
+        #     fig = plt.figure() 
         #     ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
         #     ax.patch.set_alpha(0.0)
         #     ax.xaxis.set_ticks([])
@@ -60,9 +66,9 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
         #     ax.spines['bottom'].set_visible(False)
         #     ax.spines['right'].set_visible(False)
         #     ax.spines['top'].set_visible(False)
-    
+
         #     print(node_pgm.value[0].tree.as_string(schema="newick"))
-    
+
         #     pjtr.plot_ann_tree(
         #         node_pgm.value[0],
         #         ax,
@@ -70,47 +76,69 @@ def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool=True) -> pg
         #         start_at_origin=True,
         #         sa_along_branches=True
         #     )
-            
+
         #     plt.show()
 
         # print(node_pgm.get_node_stats_str(0, len(node_pgm.value), 0))
 
     # as if we had clicked "See" in the inference tab
-    # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, "./inference_test/", mcmc_chain_length=1000, prefix="test")
+    # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = \
+    #     pjinf.pgm_obj_to_rev_inference_spec(
+    #         pgm_obj,
+    #         "./inference_test/",
+    #         mcmc_chain_length=1000,
+    #         prefix="test")
     # for i, ith_sim_model_spec in enumerate(all_sims_model_spec_list):
     #     print(ith_sim_model_spec)
     #     print(all_sims_mcmc_logging_spec_list[i])
 
-    # pjio.output_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix="test")
+    # pjio.output_inference_rev_scripts(
+    #     all_sims_model_spec_list,
+    #     all_sims_mcmc_logging_spec_list,
+    #     dir_list,
+    #     prefix="test")
 
     ##########################
     # End of debugging space #
     ##########################
-    
+
     return pgm_obj
 
-def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel, cmd_line: str) -> str:
-    """Update ProbabilisticGraphicalModel object using user-entered command line in PJ's language
+def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
+                cmd_line: str) -> str:
+    """Update PGM object with user-entered .pj command
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): Object that will hold all stochastic nodes (random variables) created by user via commands
-        cmd_line (str): Command line string provided by user through static script or via GUI
+        pgm_obj (ProbabilisticGraphicalModel): Object that will hold
+            all stochastic nodes (random variables) created by user
+            via commands.
+        cmd_line (str): Command line string provided by user through
+            static script or via GUI.
 
     Returns:
         str: Command string if there was nothing wrong with it
     """
 
     # skip lines without useful commands
-    if cmd_line.startswith("#") or cmd_line.startswith("\n") or not cmd_line: return ""
+    if cmd_line.startswith("#") or \
+            cmd_line.startswith("\n") or not \
+            cmd_line:
+        return ""
 
     ##################################
     # Checking command line is valid #
     ##################################
     if re.match(cmdu.cannot_start_with_this_regex, cmd_line):
-        raise ec.ScriptSyntaxError(cmd_line, "A special character or digit was detected as the first character in this line, but this is not allowed. Exiting...")
+        raise ec.ScriptSyntaxError(
+            cmd_line,
+            "A special character or digit was detected as the first " +
+            "character in this line, but this is not allowed. Exiting...")
 
     if re.search(cmdu.cannot_end_with_this_regex, cmd_line):
-        raise ec.ScriptSyntaxError(cmd_line, "Cannot end command with special characters, apart from \']\' and \')\'. Exiting...")
+        raise ec.ScriptSyntaxError(
+            cmd_line,
+            "Cannot end command with special characters, apart from \']\' " +
+            "and \')\'. Exiting...")
 
     assignment_call_count = len(re.findall(cmdu.assign_regex, cmd_line))
     sampled_as_call_count = len(re.findall(cmdu.sampled_as_regex, cmd_line))
