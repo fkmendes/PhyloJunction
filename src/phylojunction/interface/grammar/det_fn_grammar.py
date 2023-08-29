@@ -45,11 +45,12 @@ class PJDetFnGrammar():
                 raise ec.NotAParameterError(arg)
 
         try:
-            detsse.make_DiscreteStateDependentRate(
+            return detsse.make_DiscreteStateDependentRate(
                 "sse_rate", det_fn_param_dict)
 
         except (ec.MissingSpecificationError,
-                ec.MissingArgumentError) as e:
+                ec.MissingArgumentError,
+                ec.FunctionArgError) as e:
             raise ec.DetFnInitFailError("sse_rate", e.message)
 
     @classmethod

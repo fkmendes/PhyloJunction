@@ -12,14 +12,9 @@ __email__ = "f.mendes@wustl.edu"
 
 
 def make_discrete_SSE_dn(
+    dn_name: str,
     dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
         -> pgm.DistributionPGM:
-
-    ############################
-    # Validating dn_param_dict #
-    ############################
-    if not dn_param_dict:
-        raise ec.MissingSpecificationError(message="Cannot initialize discrete SSE distribution without specifications. Exiting...")
 
     #############################
     # IMPORTANT: Default values #
@@ -93,8 +88,6 @@ def make_discrete_SSE_dn(
 
                 if isinstance(nodepgm_val, sseobj.SSEStash):
                     stash = nodepgm_val
-                # there should be only one event handler always, but it will be in list
-                    # event_handler = nodepgm_val.get_meh()
 
                     # SSEStash will return None if prob_handler
                     # wasn't created by user through script
@@ -108,9 +101,7 @@ def make_discrete_SSE_dn(
                         int_val = int(first_val)
 
                 except:
-                    raise ec.FunctionArgError(
-                        arg, ("Was expecting an integer. Distribution "
-                              "discrete_sse() could not be initialized."))
+                    raise ec.RequireIntegerError(dn_name, arg)
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
                 if arg == "n": n_samples = int_val
@@ -125,22 +116,40 @@ def make_discrete_SSE_dn(
                     stop_str = first_val.replace("\"", "")
 
             # defaults: True, False, True
-            elif arg in ("origin", "cond_spn", "cond_surv", "cond_obs_both_sides"):
-                if first_val != "\"true\"" and first_val != "\"false\"":
-                    raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\". Distribution discrete_sse() could not be initialized.")
+            elif arg in ("origin",
+                         "cond_spn",
+                         "cond_surv",
+                         "cond_obs_both_sides"):
+                if first_val not in ("\"true\"", "\"false\""):
+                    raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\".")
 
                 else:
                     if isinstance(first_val, str):
                         parsed_val = first_val.replace("\"", "")
 
-                    if arg == "origin" and parsed_val == "true": origin = True
-                    elif arg == "origin" and parsed_val == "false": origin = False
-                    elif arg == "cond_spn" and parsed_val == "true": cond_spn = True
-                    elif arg == "cond_spn" and parsed_val == "false": cond_spn = False
-                    elif arg == "cond_surv" and parsed_val == "true": cond_surv = True
-                    elif arg == "cond_surv" and parsed_val == "false": cond_surv = False
-                    elif arg == "cond_obs_both_sides" and parsed_val == "true": cond_obs_both_sides = True
-                    elif arg == "cond_obs_both_sides" and parsed_val == "false": cond_obs_both_sides = False
+                    if arg == "origin" and parsed_val == "true":
+                        origin = True
+
+                    elif arg == "origin" and parsed_val == "false":
+                        origin = False
+
+                    elif arg == "cond_spn" and parsed_val == "true":
+                        cond_spn = True
+
+                    elif arg == "cond_spn" and parsed_val == "false":
+                        cond_spn = False
+
+                    elif arg == "cond_surv" and parsed_val == "true":
+                        cond_surv = True
+
+                    elif arg == "cond_surv" and parsed_val == "false":
+                        cond_surv = False
+
+                    elif arg == "cond_obs_both_sides" and parsed_val == "true":
+                        cond_obs_both_sides = True
+
+                    elif arg == "cond_obs_both_sides" and parsed_val == "false":
+                        cond_obs_both_sides = False
 
             # if user specified epsilon, we use it, otherwise default is used
             elif arg == "eps":
@@ -150,7 +159,7 @@ def make_discrete_SSE_dn(
                         float_val = float(first_val)
 
                 except:
-                    raise ec.FunctionArgError(arg, "Was expecting a double. Distribution discrete_sse() could not be initialized.")
+                    raise ec.RequireNumericError(dn_name, arg)
 
                 eps = float_val
 
@@ -158,38 +167,39 @@ def make_discrete_SSE_dn(
             # Vectorized values #
             #####################
             elif arg == "stop_value":
-                _is_negative = False
+                is_negative = False
 
                 try:
-                    stop_values_list = [float(v) for v in extracted_val if isinstance(v, str)]
-
-                    for sv in stop_values_list:
-                        if sv < 0.0:
-                            _is_negative = True
+                    stop_values_list = \
+                        [float(v) for v in extracted_val if isinstance(v, str)]
 
                 except:
-                    if _is_negative:
-                        raise ec.FunctionArgError(arg, "Stop value cannot be negative. Distribution discrete_sse() could not be initialized.")
+                    raise ec.RequireNumericError(dn_name, arg)
+                    
+                for sv in stop_values_list:
+                    if sv < 0.0:
+                        is_negative = True
 
-                    raise ec.FunctionArgError(arg, "Was expecting number for stopping value(s). Distribution discrete_sse() could not be initialized.")
+                if is_negative:
+                    raise ec.FunctionArgError(
+                        arg, "\'stop_value\' cannot be negative.")
 
             elif arg == "start_state":
                 try:
-                    start_states_list = [int(v) for v in extracted_val if isinstance(v, str)]
+                    start_states_list = \
+                        [int(v) for v in extracted_val if isinstance(v, str)]
 
                 except:
-                    raise ec.FunctionArgError(
-                        arg,
-                        ("Was expecting integers for starting states. "
-                         "Distribution discrete_sse() could not be "
-                         "initialized."))
+                    raise ec.RequireIntegerError(dn_name, arg)
 
     # making sure essential parameters of distribution have been specified
-    if not any(stash.get_meh().state_dep_rate_manager.matrix_state_dep_params):
-        raise ec.MissingParameterError("\"discrete_sse\"", "Parameter \"stash\" is not storing a valid macroevolutionary event handler.")
+    if not any(stash.get_meh()\
+               .state_dep_rate_manager\
+               .matrix_state_dep_params):
+        raise ec.MissingArgumentError("stash")
 
     if not stop_values_list:
-        raise ec.MissingParameterError("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
+        raise ec.MissingParameterError("stop_value")
 
     # TODO: have DnSSE take a prob_handler, and populate it if it's None upon initialization
     # all unit test should still work if this initialization is done correctly

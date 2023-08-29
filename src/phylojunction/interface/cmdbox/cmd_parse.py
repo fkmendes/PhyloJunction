@@ -316,8 +316,7 @@ def parse_variable_assignment(
 
     # if scalar variable
     else:
-        # if len(re.findall("\.", stoch_node_spec)) > 1:
-        if len(re.findall(".", stoch_node_spec)) > 1:
+        if len(re.findall("\.", stoch_node_spec)) > 1:
             raise ec.ScriptSyntaxError(
                 stoch_node_spec,
                 ("Something went wrong during variable assignment. It looks "
@@ -654,7 +653,7 @@ if __name__ == "__main__":
         "m1rate := sse_rate(name=\"mu1\", value=0.8, states=[1], event=\"extinction\")\n" + \
         "q01rate := sse_rate(name=\"q01\", value=0.6, states=[0,1], event=\"transition\")\n" + \
         "q10rate := sse_rate(name=\"q10\", value=0.6, states=[1,0], event=\"transition\")\n" + \
-        "stash :=stash(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)\n" + \
+        "stash := sse_stash(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)\n" + \
         "tr ~ discrete_sse(n=1, stash=stash, start_state=[0], stop=\"age\", stop_value=1.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
 
     script_str11 = "m <- [1.0, 1.1]\ns <- [1.0, 0.9]\na ~ lognormal(n=2, mean=m, sd=s, log_space=\"false\")"
@@ -677,7 +676,7 @@ if __name__ == "__main__":
         "l0ratet2 := sse_rate(name=\"lambdat2\", value=0.25, event=\"w_speciation\")\n" + \
         "l0ratet3 := sse_rate(name=\"lambdat3\", value=3.0, event=\"w_speciation\")\n" + \
         "l0ratet4 := sse_rate(name=\"lambdat4\", value=0.4, event=\"w_speciation\")\n" + \
-        "stash :=stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])"
+        "stash := sse_stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])"
 
     script_str24 = script_str23 + "\ntr ~ discrete_sse(n=2, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str25 = "a <- [1,2,3]\nb <- a"
@@ -688,7 +687,7 @@ if __name__ == "__main__":
         "birth_rate := sse_rate(name=\"lambda\", value=1.0, states=[0,0,0], event=\"w_speciation\")\n" + \
         "death_rate := sse_rate(name=\"mu\", value=0.5, states=[0], event=\"extinction\")\n" + \
         "fossil_rate := sse_rate(name=\"psi\", value=0.8, states=[0], event=\"anc_sampling\")\n" + \
-        "stash :=stash(flat_rate_mat=[birth_rate,death_rate,fossil_rate], n_states=1, n_epochs=1)\n" + \
+        "stash := sse_stash(flat_rate_mat=[birth_rate,death_rate,fossil_rate], n_states=1, n_epochs=1)\n" + \
         "trs ~ discrete_sse(n=5, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"true\", cond_surv=\"true\")"
 
     # time-het bd
@@ -701,7 +700,7 @@ if __name__ == "__main__":
         "det_death_rate_t0 := sse_rate(name=\"mu_t0\", value=death_rate_t0, states=[0], event=\"extinction\")\n" + \
         "det_birth_rate_t1 := sse_rate(name=\"lambda_t1\", value=birth_rate_t1, states=[0,0,0], event=\"w_speciation\")\n" + \
         "det_death_rate_t1 := sse_rate(name=\"mu_t1\", value=death_rate_t1, states=[0], event=\"extinction\")\n" + \
-        "stash :=stash(flat_rate_mat=[det_birth_rate_t0, det_death_rate_t0, det_birth_rate_t1, det_death_rate_t1], n_states=1, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)"
+        "stash := sse_stash(flat_rate_mat=[det_birth_rate_t0, det_death_rate_t0, det_birth_rate_t1, det_death_rate_t1], n_states=1, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)"
 
     script_str30 = "a ~ lognormal(n=10, mean=[0.0, 0.01], sd=[1.0, 0.9])"
     script_str31 = "a ~ lognormal(n=2, mean=[0.0, 0.01], sd=[1.0, 0.9, 0.8])"
@@ -766,7 +765,7 @@ if __name__ == "__main__":
         + "n_rep <- 2\n" \
         + "birth_rate <- [0.8, 0.9]\n" \
         + "det_birth_rate := sse_rate(name=\"lambda\", value=birth_rate, states=[0,0,0], event=\"w_speciation\")\n" \
-        + "stash :=stash(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" \
+        + "stash := sse_stash(flat_rate_mat=[det_birth_rate], n_states=1, n_epochs=1)\n" \
         + "trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=stash, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
 
     # yule with incomplete sampling
@@ -833,8 +832,8 @@ if __name__ == "__main__":
     # script_str45 = "a <- 1.0.0"
 
     # TODO: this is not caught!
-    script_str47 = "a ~ normal(mean=0.0, sd=0.5, sd=1.0)"
+    # script_str47 = "a ~ normal(mean=0.0, sd=0.5, sd=1.0)"
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    script2pgm(script_str_error3, in_pj_file=False)
+    script2pgm(script_str29, in_pj_file=False)

@@ -450,9 +450,15 @@ class MissingArgumentError(Exception):
     par_name: str
     message: str
 
-    def __init__(self, par_name: str) -> None:
+    def __init__(self, par_name: str, arg_name: str = "") -> None:
         self.par_name = par_name
-        self.message = "Argument for \'" + par_name + "\' is missing."
+        self.message = "Argument "
+        
+        if arg_name:
+            self.message += "\'" + arg_name + "\' "
+            
+        self.message += "for \'" + par_name + "\' is missing."
+        
         super().__init__(self.message)
 
     def __str__(self) -> str:

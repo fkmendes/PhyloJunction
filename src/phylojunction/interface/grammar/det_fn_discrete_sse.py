@@ -273,83 +273,92 @@ def make_SSEStash(
     n_time_slices: int = 1
     time_slice_age_ends: ty.List[float] = []
     seed_age_for_time_slicing: ty.Optional[float] = None
-    flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodePGM]
+    flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodePGM] = []
     flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodePGM] = []
 
     #############################################
     # Reading all arguments and checking health #
     #############################################
 
-    # val is a list
+    # val is a list of strings or nodes
     for arg, val in det_fn_param_dict.items():
+        first_element = val[0]
+        extracted_value = first_element  # can be scalar or container
+
+        if isinstance(first_element, pgm.NodePGM) \
+            and len(val) == 1:
+            extracted_value = first_element.value
+
         # so mypy won't complain
-        if isinstance(val[0], str):
-            if arg in ("n_states", "n_epochs", "seed_age"):
-                # none of the above can be more than one value
-                if isinstance(val, list) and len(val[0]) > 1:
-                    # should provide only one number of states
-                    raise ec.RequireSingleValueError(det_fn_name, arg)
+        # if isinstance(val[0], str):
+        if arg in ("n_states", "n_epochs", "seed_age"):
+            # none of the above can be more than one value
+            if isinstance(extracted_value, list) and \
+                len(extracted_value) > 1:
+                # should provide only one number of states
+                raise ec.RequireSingleValueError(det_fn_name, arg)
 
-            if arg == "n_states":
-                try:
-                    n_states = int(val[0])
+        if arg == "n_states":
+            try:
+                n_states = int(extracted_value)
 
-                except ValueError:
-                    raise ec.RequireSingleValueError(det_fn_name, arg)
+            except ValueError:
+                raise ec.RequireIntegerError(det_fn_name, arg)
 
-            elif arg == "n_epochs":
-                try:
-                    n_time_slices = int(val[0])
+        elif arg == "n_epochs":
+            try:
+                n_time_slices = int(extracted_value)
 
-                except ValueError:
-                    raise ec.RequireIntegerError(det_fn_name)
+            except ValueError:
+                raise ec.RequireIntegerError(det_fn_name, arg)
 
-            elif arg == "seed_age":
-                try:
-                    seed_age_for_time_slicing = float(val[0])
+        elif arg == "seed_age":
+            try:
+                seed_age_for_time_slicing = float(extracted_value)
 
-                except ValueError:
-                    raise ec.RequireNumericError(det_fn_name, arg)
+            except ValueError:
+                raise ec.RequireNumericError(det_fn_name, arg)
 
-            elif arg == "epoch_age_ends":
-                if len(val) != (n_time_slices - 1):
-                    raise ec.IncorrectDimensionError(
-                        "epoch_age_ends",
-                        len(val),
-                        exp_len=(n_time_slices - 1))
+        elif arg == "epoch_age_ends":
+            if len(val) != (n_time_slices - 1):
+                raise ec.IncorrectDimensionError(
+                    "epoch_age_ends",
+                    len(val),
+                    exp_len=(n_time_slices - 1))
 
-                try:
-                    time_slice_age_ends = \
-                        [float(v) for v in val if isinstance(v, str)]
+            try:
+                time_slice_age_ends = \
+                    [float(v) for v in val 
+                        if isinstance(v, str)]
 
-                except ValueError:
-                    raise ec.RequireNumericError(det_fn_name, arg)
+            except ValueError:
+                raise ec.RequireNumericError(det_fn_name, arg)
 
-            elif arg == "flat_prob_mat":
-                if det_fn_param_dict["flat_prob_mat"]:
-                    flat_state_dep_prob_mat = \
-                        [v for v in det_fn_param_dict["flat_prob_mat"]
-                            if isinstance(v, pgm.DeterministicNodePGM)]
+        elif arg == "flat_prob_mat":
+            if det_fn_param_dict["flat_prob_mat"]:
+                flat_state_dep_prob_mat = \
+                    [v for v in det_fn_param_dict["flat_prob_mat"]
+                        if isinstance(v, pgm.DeterministicNodePGM)]
+
+            # total number of rates has to be divisible by number of slices
+            if len(flat_state_dep_prob_mat) % n_time_slices != 0:
+                raise ec.IncorrectDimensionError(
+                    arg, len(flat_state_dep_prob_mat))
+
+        elif arg == "flat_rate_mat":
+            if det_fn_param_dict["flat_rate_mat"]:
+                # list of NodePGM's
+                flat_state_dep_rate_mat = \
+                    [v for v in det_fn_param_dict["flat_rate_mat"]
+                        if isinstance(v, pgm.DeterministicNodePGM)]
 
                 # total number of rates has to be divisible by number of slices
-                if len(flat_state_dep_prob_mat) % n_time_slices != 0:
+                if len(flat_state_dep_rate_mat) % n_time_slices != 0:
                     raise ec.IncorrectDimensionError(
-                        arg, len(flat_state_dep_prob_mat))
+                        arg, len(flat_state_dep_rate_mat))
 
-            elif arg == "flat_rate_mat":
-                if det_fn_param_dict["flat_rate_mat"]:
-                    # list of NodePGM's
-                    flat_state_dep_rate_mat = \
-                        [v for v in det_fn_param_dict["flat_rate_mat"]
-                            if isinstance(v, pgm.DeterministicNodePGM)]
-
-                    # total number of rates has to be divisible by number of slices
-                    if len(flat_state_dep_rate_mat) % n_time_slices != 0:
-                        raise ec.IncorrectDimensionError(
-                            arg, len(flat_state_dep_rate_mat))
-
-                else:
-                    raise ec.MissingParameterError(arg)
+            else:
+                raise ec.MissingParameterError(arg)
 
     ##################################
     # Putting rates in their manager #
@@ -362,7 +371,6 @@ def make_SSEStash(
 
     # populating state-dependent rate matrix #
     for i in range(0, total_n_rate, n_rates_per_slice):
-
         state_dep_rates: ty.List[sseobj.DiscreteStateDependentRate] = []
         for state_dep_rate_det_nd in \
                 flat_state_dep_rate_mat[i:(i + n_rates_per_slice)]:

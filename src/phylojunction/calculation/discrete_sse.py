@@ -491,9 +491,6 @@ class DiscreteStateDependentParameterManager:
 
                 states_per_epoch_dict[k].add(sts)
 
-        print("states_per_epoch_dict")
-        print(states_per_epoch_dict)
-
         # debugging
         # print("states_per_epoch_dict after populating")
         # print(states_per_epoch_dict)

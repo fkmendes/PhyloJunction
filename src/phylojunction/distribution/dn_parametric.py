@@ -208,7 +208,7 @@ class DnNormal(pgm.DistributionPGM):
                     # if isinstance(mean_params[i], (int, float)) and isinstance(sd_params[i], (int, float)):
                     #     mean_param = ty.cast(float, mean_params[i])
                     #     sd_param = ty.cast(float, sd_params[i])
-                        # repl = ty.cast(ty.List, DnNormal.draw_normal(self.n_repl, mean_param, sd_param).tolist())
+                    #     # repl = ty.cast(ty.List, DnNormal.draw_normal(self.n_repl, mean_param, sd_param).tolist())
                     repl = ty.cast(
                         ty.List,
                         DnNormal.draw_normal(

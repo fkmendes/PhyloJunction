@@ -49,9 +49,11 @@ class PJDnGrammar():
         cls,
         dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
             -> pgm.DistributionPGM:
-        # dn_param_dict is validated inside
 
-        return make_dnsse.make_discrete_SSE_dn(dn_param_dict)
+        if not dn_param_dict:
+            raise ec.MissingSpecificationError("discrete_sse")
+
+        return make_dnsse.make_discrete_SSE_dn("discrete_sse", dn_param_dict)
 
     @classmethod
     def create_dn_obj(
