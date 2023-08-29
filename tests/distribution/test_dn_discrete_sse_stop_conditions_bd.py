@@ -187,7 +187,7 @@ class TestSSEStopConditionsBD(unittest.TestCase):
         start_at_origin = True
 
         # (1) Negative number of terminal nodes
-        with self.assertRaises(ec.DnInitMisspec) as exc:
+        with self.assertRaises(ec.MissingParameterError) as exc:
             distsse.DnSSE(
                 self.sse_stash,
                 stop_condition_value,
@@ -205,7 +205,7 @@ class TestSSEStopConditionsBD(unittest.TestCase):
 
         # (2) Number of terminal nodes being a float that cannot be converted to integer
         stop_condition_value = [0.5, 2]
-        with self.assertRaises(ec.DnInitMisspec) as exc:
+        with self.assertRaises(ec.MissingParameterError) as exc:
             distsse.DnSSE(
                 self.sse_stash,
                 stop_condition_value,
@@ -225,7 +225,7 @@ class TestSSEStopConditionsBD(unittest.TestCase):
         stop_condition = "age"
         stop_condition_value = [0.0, -0.1]
 
-        with self.assertRaises(ec.DnInitMisspec) as exc:
+        with self.assertRaises(ec.MissingParameterError) as exc:
             distsse.DnSSE(
                 self.sse_stash,
                 stop_condition_value,

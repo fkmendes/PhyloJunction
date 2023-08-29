@@ -20,7 +20,7 @@ __email__ = "f.mendes@wustl.edu"
 R = ty.TypeVar('R')
 
 
-def abstract_attribute(obj: ty.Callable[[ty.Any], R]=None) -> R:
+def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
 
     class DummyAttribute:
         pass
@@ -102,7 +102,10 @@ class ProbabilisticGraphicalModel():
         try:
             self.node_dict[node_pgm] = node_pgm.value
 
-        except:
+        # have to double-check this can ever be a problem
+        except AttributeError:
+            print(("\n\n\nSomehow we could not grab a node's value."
+                  "Come back to this line of code!"))
             self.node_dict[node_pgm] = None
 
         self.node_name_val_dict[node_pgm.node_name] = node_pgm
@@ -156,7 +159,7 @@ class DistributionPGM(ABC):
     @abstractmethod
     def _check_sample_size(
         self,
-        param_list: ty.List[ty.Any]=[]) \
+        param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         """Check sample size against number of provided parameter values
 
@@ -180,13 +183,13 @@ class NodePGM(ABC):
     def __init__(self,
                  node_name: str,
                  sample_size: int,
-                 value: ty.Optional[ty.List[ty.Any]]=None,
-                 replicate_size: int=1,
-                 call_order_idx: ty.Optional[int]=None,
-                 sampled: bool=False,
-                 deterministic: bool=False,
-                 clamped: bool=False,
-                 parent_nodes: ty.Optional[ty.List[NodePGM]]=None):
+                 value: ty.Optional[ty.List[ty.Any]] = None,
+                 replicate_size: int = 1,
+                 call_order_idx: ty.Optional[int] = None,
+                 sampled: bool = False,
+                 deterministic: bool = False,
+                 clamped: bool = False,
+                 parent_nodes: ty.Optional[ty.List[NodePGM]] = None):
 
         self.node_name = node_name
         self.value = value
@@ -241,8 +244,8 @@ class NodePGM(ABC):
     def get_start2end_str(self,
                           start: int,
                           end: int,
-                          repl_idx: int=0,
-                          is_tree: bool=False) -> str:
+                          repl_idx: int = 0,
+                          is_tree: bool = False) -> str:
         if isinstance(self.value, np.ndarray):
             self.value = \
                 ", ".join(str(v) for v in self.value.tolist()[start:end])
@@ -259,9 +262,11 @@ class NodePGM(ABC):
                         return "\n".join(
                             str(v) for v in self.value[start:end])
 
+                # not a tree
                 else:
                     return str(self.value[start + repl_idx])
 
+            # single element in value
             else:
                 return str(self.value[0])
 
@@ -275,11 +280,15 @@ class NodePGM(ABC):
 
     # stringify _all_ values
     def __str__(self) -> str:
-        try:
-            if isinstance(self.value, list):
-                return self.get_start2end_str(0, len(self.value))
+        # try:
+        if isinstance(self.value, list):
+            return self.get_start2end_str(0, len(self.value))
 
-        except:
+        # if this blows up at some point, find out
+        # what kind of error is possible and
+        # reimplement the except making it non-bare
+        # except:
+        else:
             return str(self.value)
 
         # cosmetic return required by mypy
@@ -302,7 +311,10 @@ class NodePGM(ABC):
                 else:
                     raise ec.ReplicateNumberError(node_name=self.node_name)
 
-        except:
+        # just being ultra-safe...
+        # self.value has no len()
+        # n_repls is None
+        except TypeError:
             return 1
 
         # cosmetic return required by mypy
@@ -311,10 +323,10 @@ class NodePGM(ABC):
     @abstractmethod
     def plot_node(self,
                   axes: plt.Axes,
-                  sample_idx: ty.Optional[int]=None,
-                  repl_idx: int=0,
-                  repl_size: int=1,
-                  branch_attr: ty.Optional[str]="state") -> None:
+                  sample_idx: ty.Optional[int] = None,
+                  repl_idx: int = 0,
+                  repl_size: int = 1,
+                  branch_attr: ty.Optional[str] = "state") -> None:
         pass
 
     @abstractmethod
@@ -381,14 +393,14 @@ class NodePGM(ABC):
                             try:
                                 float_stat_v = float(stat_v)
 
-                            except:
-                                # TODO: throw cannot convert to float Exception
-                                pass
+                            except ValueError:
+                                raise ec.NodePGMNodeStatCantFloatError(
+                                    self.node_name)
 
                             try:
                                 repl_all_stats_dict[st].append(float_stat_v)
 
-                            except:
+                            except KeyError:
                                 repl_all_stats_dict[st] = [float_stat_v]
 
                             # getting focal replicate stats
@@ -454,13 +466,13 @@ class StochasticNodePGM(NodePGM):
     def __init__(self,
                  node_name: str,
                  sample_size: int,
-                 sampled_from: ty.Optional[DistributionPGM]=None,
-                 value: ty.Optional[ty.List[ty.Any]]=None,
-                 replicate_size: int=1,
-                 call_order_idx: ty.Optional[int]=None,
-                 deterministic: bool=False,
-                 clamped: bool=False,
-                 parent_nodes: ty.Optional[ty.List[ty.Any]]=None):
+                 sampled_from: ty.Optional[DistributionPGM] = None,
+                 value: ty.Optional[ty.List[ty.Any]] = None,
+                 replicate_size: int = 1,
+                 call_order_idx: ty.Optional[int] = None,
+                 deterministic: bool = False,
+                 clamped: bool = False,
+                 parent_nodes: ty.Optional[ty.List[ty.Any]] = None):
 
         super().__init__(
             node_name,
@@ -500,10 +512,10 @@ class StochasticNodePGM(NodePGM):
 
     def plot_node(self,
                   axes: plt.Axes,
-                  sample_idx: ty.Optional[int]=None,
-                  repl_idx: int=0,
-                  repl_size: int=1,
-                  branch_attr: ty.Optional[str]="state") -> None:
+                  sample_idx: ty.Optional[int] = None,
+                  repl_idx: int = 0,
+                  repl_size: int = 1,
+                  branch_attr: ty.Optional[str] = "state") -> None:
         """_summary_
 
         Args:
@@ -571,9 +583,9 @@ class StochasticNodePGM(NodePGM):
 
         else:
             # TODO: later see how rev moves 2D-arrays and tree nodes
-            raise RuntimeError("Could not determine dimension of " +
-                               "StochasticNodePGM when figuring out " +
-                               "operator weight. Exiting...")
+            raise RuntimeError(
+                ("Could not determine dimension of StochasticNodePGM when"
+                 " figuring out operator weight. Exiting..."))
 
     def get_node_stats_str(self, start: int, end: int, repl_idx: int) -> str:
         return super().get_node_stats_str(start, end, repl_idx)
@@ -610,10 +622,10 @@ class DeterministicNodePGM(NodePGM):
 
     def plot_node(self,
                   axes: plt.Axes,
-                  sample_idx: ty.Optional[int]=None,
-                  repl_idx: ty.Optional[int]=0,
-                  repl_size: ty.Optional[int]=1,
-                  branch_attr: ty.Optional[str]="state") -> None:
+                  sample_idx: ty.Optional[int] = None,
+                  repl_idx: ty.Optional[int] = 0,
+                  repl_size: ty.Optional[int] = 1,
+                  branch_attr: ty.Optional[str] = "state") -> None:
 
         plot_blank(axes)
 
@@ -629,8 +641,8 @@ class DeterministicNodePGM(NodePGM):
 ############
 def plot_node_histogram(axes: plt.Axes,
                         values_list: ty.List[float],
-                        sample_idx: ty.Optional[int]=None,
-                        repl_size: int=1) -> None:
+                        sample_idx: ty.Optional[int] = None,
+                        repl_size: int = 1) -> None:
 
     values_list_to_plot = list()
     # if not sample_idx == None:
@@ -698,7 +710,8 @@ def extract_value_from_nodepgm(
         elif isinstance(v, StochasticNodePGM) and v.value:
             try:
                 extracted_val_list.extend([str(i) for i in v.value])
-            except:
+
+            except (AttributeError, TypeError) as e:
                 raise ec.VariableMisspec(str(v))
 
     # will be empty if DeterministicNodePGM is in val_list

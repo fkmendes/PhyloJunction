@@ -10,13 +10,16 @@ import phylojunction.utility.exception_classes as ec
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
-def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) -> pgm.DistributionPGM:
+
+def make_discrete_SSE_dn(
+    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        -> pgm.DistributionPGM:
 
     ############################
     # Validating dn_param_dict #
     ############################
     if not dn_param_dict:
-        raise ec.NoSpecificationError(message="Cannot initialize discrete SSE distribution without specifications. Exiting...")
+        raise ec.MissingSpecificationError(message="Cannot initialize discrete SSE distribution without specifications. Exiting...")
 
     #############################
     # IMPORTANT: Default values #
@@ -48,46 +51,46 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
     # of observed taxa in reconstructed tree
     min_rec_taxa = 0
     max_rec_taxa = int(1e12)
-    abort_at_obs = int(1e12) # for trees out of control
-    
+    abort_at_obs = int(1e12)  # for trees out of control
+
     # if set to True by user, rejection sampling happens;
     # if False, reconstructed trees are printed whatever
     # they may be, upon writing (i.e., no rejection sampling)
     cond_obs_both_sides: bool = False
-    
+
     start_states_list: ty.List[int] = []
     eps: float = 1e-12
-    runtime_limit: int = 5 # 5 minutes
+    runtime_limit: int = 5  # 5 minutes
 
     # input validation (only things that are not already done by DnSSE)
     for arg, val in dn_param_dict.items():
-        
+
         # val is a list!
         if val:
 
             # if element in val is string: remains unchanged
             #
             # if StochasticNodePGM: we get its string-fied value
-            extracted_val = pgm.extract_value_from_nodepgm(val) 
+            extracted_val = pgm.extract_value_from_nodepgm(val)
 
             ############################
             # Non-vectorized arguments #
             ############################
-            
+
             # ... thus using only the first value!
             first_val: ty.Union[str, pgm.NodePGM]
-            
+
             if len(extracted_val) >= 1:
-                first_val = extracted_val[0] 
-            
+                first_val = extracted_val[0]
+
             # if DeterministicNodePGM is in val
             # e.g., val = [pgm.DeterministicNodePGM]
             else:
                 first_val = val[0]
-            
+
             if arg == "stash" and isinstance(first_val, pgm.NodePGM):
                 nodepgm_val = first_val.value
-                
+
                 if isinstance(nodepgm_val, sseobj.SSEStash):
                     stash = nodepgm_val
                 # there should be only one event handler always, but it will be in list
@@ -97,12 +100,17 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
                     # wasn't created by user through script
                     # prob_handler = nodepgm_val.get_prob_handler()
 
-            elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa", "max_rec_taxa", "abort_at_obs"):
+            elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa",
+                         "max_rec_taxa", "abort_at_obs"):
                 try:
                     if isinstance(first_val, str):
-                        int_val = int(first_val) # no vectorization allowed here
+                        # no vectorization allowed here
+                        int_val = int(first_val)
+
                 except:
-                    raise ec.FunctionArgError(arg, "Was expecting an integer. Distribution discrete_sse() could not be initialized.")
+                    raise ec.FunctionArgError(
+                        arg, ("Was expecting an integer. Distribution "
+                              "discrete_sse() could not be initialized."))
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
                 if arg == "n": n_samples = int_val
@@ -138,7 +146,9 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
             elif arg == "eps":
                 try:
                     if isinstance(first_val, str):
-                        float_val = float(first_val) # no vectorization allowed here
+                        # no vectorization allowed here
+                        float_val = float(first_val)
+
                 except:
                     raise ec.FunctionArgError(arg, "Was expecting a double. Distribution discrete_sse() could not be initialized.")
 
@@ -149,10 +159,10 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
             #####################
             elif arg == "stop_value":
                 _is_negative = False
-                
+
                 try:
                     stop_values_list = [float(v) for v in extracted_val if isinstance(v, str)]
-                    
+
                     for sv in stop_values_list:
                         if sv < 0.0:
                             _is_negative = True
@@ -163,21 +173,24 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
 
                     raise ec.FunctionArgError(arg, "Was expecting number for stopping value(s). Distribution discrete_sse() could not be initialized.")
 
-
             elif arg == "start_state":
                 try:
                     start_states_list = [int(v) for v in extracted_val if isinstance(v, str)]
-                except:
-                    raise ec.FunctionArgError(arg, "Was expecting integers for starting states. Distribution discrete_sse() could not be initialized.")
 
-    
+                except:
+                    raise ec.FunctionArgError(
+                        arg,
+                        ("Was expecting integers for starting states. "
+                         "Distribution discrete_sse() could not be "
+                         "initialized."))
+
     # making sure essential parameters of distribution have been specified
     if not any(stash.get_meh().state_dep_rate_manager.matrix_state_dep_params):
-        raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stash\" is not storing a valid macroevolutionary event handler.")
-    
+        raise ec.MissingParameterError("\"discrete_sse\"", "Parameter \"stash\" is not storing a valid macroevolutionary event handler.")
+
     if not stop_values_list:
-        raise ec.DnInitMisspec("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
-    
+        raise ec.MissingParameterError("\"discrete_sse\"", "Parameter \"stop_value\" is missing.")
+
     # TODO: have DnSSE take a prob_handler, and populate it if it's None upon initialization
     # all unit test should still work if this initialization is done correctly
     return dnsse.DnSSE(
@@ -198,10 +211,11 @@ def make_discrete_SSE_dn(dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.N
         runtime_limit=runtime_limit
     )
 
+
 if __name__ == "__main__":
     # can be called from interface/grammar/
     # $ python3 make_dn_discrete_sse.py
-    # 
+    #
     # can also be called from phylojunction/
     # $ python3 interface/grammar/make_dn_discrete_sse.py
     # or
@@ -211,26 +225,59 @@ if __name__ == "__main__":
 
     total_n_states = 2
 
-    rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-                        sseobj.DiscreteStateDependentRate(name="mu0", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[0]),
-                        sseobj.DiscreteStateDependentRate(name="q01", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[0,1]) ]
+    rates_t0_s0 = [
+        sseobj.DiscreteStateDependentRate(
+            name="lambda0",
+            val=0.5,
+            event=sseobj.MacroevolEvent.W_SPECIATION,
+            states=[0, 0, 0]),
+        sseobj.DiscreteStateDependentRate(
+            name="mu0",
+            val=0.25,
+            event=sseobj.MacroevolEvent.EXTINCTION,
+            states=[0]),
+        sseobj.DiscreteStateDependentRate(
+            name="q01",
+            val=0.75,
+            event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
+            states=[0, 1])]
 
-    rates_t0_s1 = [ sseobj.DiscreteStateDependentRate(name="lambda1", val=1.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1]),
-                        sseobj.DiscreteStateDependentRate(name="mu1", val=0.25, event=sseobj.MacroevolEvent.EXTINCTION, states=[1]),
-                        sseobj.DiscreteStateDependentRate(name="q10", val=0.75, event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION, states=[1,0]) ]
+    rates_t0_s1 = [
+        sseobj.DiscreteStateDependentRate(
+            name="lambda1",
+            val=1.5,
+            event=sseobj.MacroevolEvent.W_SPECIATION,
+            states=[1, 1, 1]),
+        sseobj.DiscreteStateDependentRate(
+            name="mu1",
+            val=0.25,
+            event=sseobj.MacroevolEvent.EXTINCTION,
+            states=[1]),
+        sseobj.DiscreteStateDependentRate(
+            name="q10",
+            val=0.75,
+            event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
+            states=[1, 0])]
 
     rates_t0 = rates_t0_s0 + rates_t0_s1
 
-    matrix_atomic_rate_params = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
+    # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
+    matrix_atomic_rate_params = [rates_t0]
 
-    state_dep_rates_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
+    state_dep_rates_manager = \
+        sseobj.DiscreteStateDependentParameterManager(
+            matrix_atomic_rate_params, total_n_states)
 
     event_handler = sseobj.MacroevolEventHandler(state_dep_rates_manager)
 
     sse_stash = sseobj.SSEStash(event_handler)
 
-    # det_nd_pgm = pgm.DeterministicNodePGM("events", value=event_handler, parent_nodes=None)
-    det_nd_pgm = pgm.DeterministicNodePGM("sse_stash", value=stash, parent_nodes=None)
+    # det_nd_pgm = pgm.DeterministicNodePGM(
+        # "events", value=event_handler, parent_nodes=None)
+    det_nd_pgm = pgm.DeterministicNodePGM(
+        "sse_stash",
+        value=sse_stash,
+        parent_nodes=None)
 
     dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
     dn_param_dict["n"] = ["1"]

@@ -7,12 +7,15 @@ class ScriptSyntaxError(Exception):
 
     def __init__(self, cmd_line: str, message: str) -> None:
         self.cmd_line = cmd_line
-        self.message = message
+        self.message = "\n\nERROR: " \
+            + self.cmd_line \
+            + ("\n\nThe line above had a syntax problem and could not "
+               "be tokenized. ") \
+            + message
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "ERROR: " + self.cmd_line + \
-            "\n\nThe line above had a syntax problem. " + self.message
+        return self.message
 
 
 class InexistentVariableError(Exception):
@@ -34,7 +37,7 @@ class VariableAssignmentError(Exception):
     rv_name: str
     message: str
 
-    def __init__(self, rv_name: str, message: str="") -> None:
+    def __init__(self, rv_name: str, message: str = "") -> None:
         self.message = message
         self.rv_name = rv_name
         super().__init__(self.message)
@@ -56,31 +59,6 @@ class VariableMisspec(Exception):
     def __str__(self) -> str:
         return "ERROR: Could not parse value out of variable \'" \
             + self.rv_name + "\'."
-
-
-class NoSpecificationError(Exception):
-    message: str
-
-    def __init__(self, message: str) -> None:
-        self.message = message
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: Function call had not arguments. " + self.message
-
-
-class FunctionArgError(Exception):
-    par_name: str
-    message: str
-
-    def __init__(self, par_name: str, message: str) -> None:
-        self.par_name = par_name
-        self.message = message
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: Could not set value for function parameter " \
-            + self.par_name + ". " + self.message
 
 
 # TODO: coalesce with exception above, maybe grab arg name?
@@ -113,25 +91,11 @@ class FunctionArgsMismatchError(Exception):
             + self.message
 
 
-class NotAParameterError(Exception):
-    par_name: str
-    message: str
-
-    def __init__(self, par_name: str, message: str="") -> None:
-        self.par_name = par_name
-        self.message = message
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: \'" + self.par_name + "\' does not seem to be " \
-            + "a valid parameter." + self.message
-
-
 class NotBetweenZeroAndOneError(Exception):
     par_name: str
     message: str
 
-    def __init__(self, par_name: str, message: str="") -> None:
+    def __init__(self, par_name: str, message: str = "") -> None:
         self.par_name = par_name
         self.message = message
         super().__init__(self.message)
@@ -142,7 +106,7 @@ class NotBetweenZeroAndOneError(Exception):
             + "."
 
 
-class WrongDimensionError(Exception):
+class IncorrectDimensionError(Exception):
     container_name: str
     obs_len: int
     exp_len: int
@@ -151,17 +115,22 @@ class WrongDimensionError(Exception):
     def __init__(self,
                  container_name: str,
                  obs_len: int,
-                 exp_len: int=0,
-                 message: str="") -> None:
+                 exp_len: int = 0) -> None:
         self.obj_name = container_name
         self.obs_len = obs_len
         self.exp_len = exp_len
-        self.message = message
+        self.message = \
+            "Incorrect dimension of container " + self.obj_name \
+            + ", which was of size " + str(obs_len)  + ". "
+        
+        if exp_len != 0:
+            self.message += "The expected dimension was " + str(exp_len) \
+            + "."
+        
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "ERROR: Container " + self.obj_name + " had a different " \
-            + "dimension than expected. " + self.message + "."
+        return self.message
 
 
 class DimensionalityError(Exception):
@@ -206,7 +175,7 @@ class NoPlatingAllowedError(Exception):
     def __init__(self,
                  det_name: str,
                  problematic_node_pgm_name: str,
-                 message: str="") -> None:
+                 message: str = "") -> None:
         self.det_name = det_name
         self.message = message
         self.node_pgm_name = problematic_node_pgm_name
@@ -216,21 +185,6 @@ class NoPlatingAllowedError(Exception):
         return "ERROR: When executing " + self.det_name + "(), replicates " \
             + "were detected for argument " + self.node_pgm_name \
             + ". Plating is not supported for this deterministic function."
-
-
-class RequireScalarError(Exception):
-    obj_name: str
-    message: str
-
-    def __init__(self, obj_name: str, arg: str) -> None:
-        self.obj_name = obj_name
-        self.arg = arg
-        self.message = ""
-
-    def __str__(self) -> str:
-        return "ERROR: When specifying object " + self.obj_name \
-            + "'s parameter \'" + self.arg + "\', more than one value was " \
-            + "provided. A scalar is required."
 
 
 class RequireSameParameterType(Exception):
@@ -272,14 +226,14 @@ class DimensionalityWarning(Exception):
     dn_name: str
     message: str
 
-    def __init__(self, rv_name: str, dn_name: str, message: str="") -> None:
+    def __init__(self, rv_name: str, dn_name: str, message: str = "") -> None:
         self.rv_name = rv_name
         self.dn_name = dn_name
         self.message = message
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "\Warning: Distribution " + self.dn_name \
+        return "Warning: Distribution " + self.dn_name \
             + " will be called to sample " + self.rv_name \
             + " using vectorization."
 
@@ -293,7 +247,7 @@ class MissingStateDependentParameterError(Exception):
     def __init__(self,
                  epoch_missing_param: int,
                  symmetric_diff_set: ty.Set[ty.Any],
-                 message: str="") -> None:
+                 message: str = "") -> None:
         self.epoch_missing_param = epoch_missing_param
         self.symmetric_diff_str = "( "
 
@@ -335,7 +289,7 @@ class RepeatedStateDependentParameterError(Exception):
     def __init__(self,
                  epoch_w_repeated_param: int,
                  repeated_state: ty.Union[int, ty.Tuple[int]],
-                 message: str="") -> None:
+                 message: str = "") -> None:
         self.epoch_w_repeated_param = epoch_w_repeated_param
         self.repeated_state = repeated_state
         self.repeated_state_str = ""
@@ -369,7 +323,7 @@ class RepeatedStateDependentParameterError(Exception):
 class StateDependentParameterMisspec(Exception):
     message: str
 
-    def __init__(self, message: str="") -> None:
+    def __init__(self, message: str = "") -> None:
         self.message = message
         super().__init__(self.message)
 
@@ -389,20 +343,6 @@ class SSEStashMisspec(Exception):
         return "ERROR: Misspecified SSE stash parameter input. " + self.message
 
 
-class DnInitMisspec(Exception):
-    dn_name: str
-    message: str
-
-    def __init__(self, dn_name: str, message: str) -> None:
-        self.dn_name = dn_name
-        self.message = message
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: Distribution " + self.dn_name + " was not " \
-            + "properly initialized. " + self.message
-
-
 class InvalidMCMCChainLength(Exception):
     message: str
 
@@ -412,6 +352,163 @@ class InvalidMCMCChainLength(Exception):
 
     def __str__(self) -> str:
         return "ERROR: " + self.message
+
+
+# Syntax errors: sampling distribution, det. function exceptions #
+class FunctionArgError(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str, message: str) -> None:
+        self.par_name = par_name
+        self.message = "Could not set value for function parameter " \
+            + self.par_name + ". " + message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return  self.message
+
+
+class NotAParameterError(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str) -> None:
+        self.par_name = par_name
+        self.message = "\'" + par_name + "\' is not a valid parameter."
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+    
+
+class RequireSingleValueError(Exception):
+    obj_name: str
+    message: str
+
+    def __init__(self, obj_name: str, arg: str) -> None:
+        self.obj_name = obj_name
+        self.arg = arg
+        self.message = \
+            "When specifying object " + obj_name + "'s parameter \'" \
+                + self.arg + ("\', more than one value was "
+                              "provided. A scalar is required.")
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class RequireIntegerError(Exception):
+    obj_name: str
+    message: str
+
+    def __init__(self, obj_name: str, arg: str) -> None:
+        self.obj_name = obj_name
+        self.arg = arg
+        self.message = \
+            "When specifying object " + obj_name + "'s parameter \'" \
+                + self.arg + ("\', something other than an integer was "
+                              "provided. An integer is required.")
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class RequireNumericError(Exception):
+    obj_name: str
+    message: str
+
+    def __init__(self, obj_name: str, arg: str) -> None:
+        self.obj_name = obj_name
+        self.arg = arg
+        self.message = \
+            "When specifying object " + obj_name + "'s parameter \'" \
+                + self.arg + ("\', something other than a number was "
+                              "provided. An number is required.")
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class MissingParameterError(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str) -> None:
+        self.par_name = par_name
+        self.message = "Parameter \'" + par_name + "\' is missing."
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class MissingArgumentError(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str) -> None:
+        self.par_name = par_name
+        self.message = "Argument for \'" + par_name + "\' is missing."
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class MissingSpecificationError(Exception):
+    message: str
+
+    def __init__(self, obj2spec_name: str) -> None:
+        self.message = "Missing specification when calling \'" \
+            + obj2spec_name + "\'."
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class DnInitFailError(Exception):
+    dn_name: str
+    message: str
+
+    def __init__(self, dn_name: str, message: str) -> None:
+        self.dn_name = dn_name
+        self.message = "Distribution \'" + self.dn_name \
+            + "\' could not be instantiated. " + message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class DetFnInitFailError(Exception):
+    det_fn_name: str
+    message: str
+
+    def __init__(self, det_fn_name: str, message: str) -> None:
+        self.det_fn_name = det_fn_name
+        self.message = "Deterministic output from \'" + det_fn_name \
+            + "\' could not be instantiated. " + message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+# PGM exceptions #
+class NodePGMNodeStatCantFloatError(Exception):
+    message: str
+
+    def __init__(self, node_name: str) -> None:
+        self.message = "ERROR: When summarizing " + node_name \
+            + " into string, a node statistic could not be float-ified"
+
+    def __str__(self) -> str:
+        return self.message
 
 
 # Tree exceptions #
@@ -436,3 +533,14 @@ class AnnotatedTreeLineageMissannotation(Exception):
     def __str__(self) -> str:
         return "ERROR: AnnotatedTree cannot be annotated this way. " \
             + self.message
+
+# Generation exceptions #
+class GenerateFailError(Exception):
+    message: str
+
+    def __init__(self, dn_name: str, message: str) -> None:
+        self.message = "ERROR: Could not generate a sample from " \
+            + dn_name + ". " + message
+        
+    def __str__(self) -> str:
+        return self.message

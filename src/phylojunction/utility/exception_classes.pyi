@@ -21,10 +21,6 @@ class VariableMisspec(Exception):
     message: str
     def __init__(self, rv_name: str) -> None: ...
 
-class NoSpecificationError(Exception):
-    message: str
-    def __init__(self, message: str) -> None: ...
-
 class FunctionArgError(Exception):
     par_name: str
     message: str
@@ -40,24 +36,19 @@ class FunctionArgsMismatchError(Exception):
     message: str
     def __init__(self, fn_name: str, message: str) -> None: ...
 
-class NotAParameterError(Exception):
-    par_name: str
-    message: str
-    def __init__(self, par_name: str, message: str = ...) -> None: ...
-
 class NotBetweenZeroAndOneError(Exception):
     par_name: str
     message: str
     def __init__(self, par_name: str, message: str="") -> None: ...
     def __str__(self) -> str: ...
 
-class WrongDimensionError(Exception):
+class IncorrectDimensionError(Exception):
     container_name: str
     obs_len: int
     exp_len: int
     message: str
     obj_name: Incomplete
-    def __init__(self, container_name: str, obs_len: int, exp_len: int = ..., message: str = ...) -> None: ...
+    def __init__(self, container_name: str, obs_len: int, exp_len: int = ...) -> None: ...
 
 class DimensionalityError(Exception):
     dn_name: str
@@ -74,12 +65,6 @@ class NoPlatingAllowedError(Exception):
     message: str
     node_pgm_name: str
     def __init__(self, det_name: str, problematic_node_pgm_name: str, message: str = ...) -> None: ...
-
-class RequireScalarError(Exception):
-    dn_name: str
-    message: str
-    arg: Incomplete
-    def __init__(self, dn_name: str, arg: str) -> None: ...
 
 class RequireSameParameterType(Exception):
     message: str
@@ -118,20 +103,75 @@ class SSEStashMisspec(Exception):
     message: str
     def __init__(self, message: str) -> None: ...
 
+class InvalidMCMCChainLength(Exception):
+    message: str
+    def __init__(self, message: str) -> None: ...
+
+# Sampling distribution, det. functions exceptions #
+class NotAParameterError(Exception):
+    par_name: str
+    message: str
+    def __init__(self, par_name: str) -> None: ...
+
+class RequireSingleValueError(Exception):
+    dn_name: str
+    message: str
+    arg: Incomplete
+    def __init__(self, dn_name: str, arg: str) -> None: ...
+
+class RequireIntegerError(Exception):
+    dn_name: str
+    message: str
+    arg: Incomplete
+    def __init__(self, dn_name: str, arg: str) -> None: ...
+
+class RequireNumericError(Exception):
+    dn_name: str
+    message: str
+    arg: Incomplete
+    def __init__(self, dn_name: str, arg: str) -> None: ...
+
+class MissingParameterError(Exception):
+    par_name: str
+    message: str
+    def __init__(self, par_name: str) -> None: ...
+
+class MissingArgumentError(Exception):
+    par_name: str
+    message: str
+    def __init__(self, par_name: str) -> None: ...
+
+class MissingSpecificationError(Exception):
+    message: str
+    def __init__(self, obj2spec_name: str) -> None: ...
+
+class DnInitFailError(Exception):
+    dn_name: str
+    def __init__(self, dn_name: str, message: str) -> None: ...
+    
+class DetFnInitFailError(Exception):
+    det_fn_name: str
+    def __init__(self, det_fn_name: str, message: str) -> None: ...
+
+# PGM exceptions #
+class NodePGMNodeStatCantFloatError(Exception):
+    message: str
+    def __init__(self, node_name: str) -> None: ...
+    def __str__(self) -> str: ...
+    
+# Tree exceptions #
 class AnnotatedTreeMisspec(Exception):
     message: str
     def __init__(self, message) -> None: ...
+    def __str__(self) -> str: ...
 
 class AnnotatedTreeLineageMissannotation(Exception):
     message: str
     def __init__(self, message) -> None: ...
     def __str__(self) -> str: ...
 
-class DnInitMisspec(Exception):
-    dn_name: str
+# Generation exceptions #
+class GenerateFailError(Exception):
     message: str
     def __init__(self, dn_name: str, message: str) -> None: ...
-
-class InvalidMCMCChainLength(Exception):
-    message: str
-    def __init__(self, message: str) -> None: ...
+    def __str__(self) -> str: ...

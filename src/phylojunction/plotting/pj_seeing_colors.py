@@ -10,6 +10,7 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
         cmap(np.linspace(minval, maxval, n)))
     return new_cmap
 
+
 # matplotlib color palette name, n colors
 cmap = matplotlib.pyplot.cm.get_cmap('seismic', 5)
 for i in range(cmap.N):

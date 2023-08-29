@@ -16,8 +16,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
     
     def test_sampling_unif_assignment(self):
         """
-        Test if uniform sampling distribution assignments are correctly evaluated
-        and result in the right probabilistic graphical model
+        Test if uniform sampling distribution assignments are correctly
+        evaluated and result in the right probabilistic graphical model
         """
         
         pgm_obj = pgm.ProbabilisticGraphicalModel()
@@ -38,10 +38,11 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
     def test_sampling_unif_vectorized_assignment(self):
         """
-        Test if uniform (with vectorized inputs) sampling distribution assignments
-        are correctly evaluated and result in the right probabilistic graphical model
+        Test if uniform (with vectorized inputs) sampling distribution
+        assignments are correctly evaluated and result in the right
+        probabilistic graphical model
         """
-        
+
         mins = [0.0, 1.0, 2.0, 3.0, 4.0]
         maxs = [1.0, 2.0, 3.0, 4.0, 5.0]
         tups = tuple((i, maxs[idx])for idx, i in enumerate(mins))
@@ -65,47 +66,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
             self.assertTrue(tup[0] <= a_node_pgm.value[idx * 2 + 1] < tup[1])
         self.assertEqual(2, pgm_obj.n_nodes)
         
-
-    def test_unif_misspec(self):
-        """
-        Test uniform sampling distribution assignment throws exception
-        if mandatory parameters are missing
-        """
-        
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
-
-        cmd_line1 = "u ~ unif(n=1, nr=1, max=1.0)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line1)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj,
-                stoch_node_name,
-                stoch_node_spec,
-                cmd_line1)        
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Uniform\" was not properly initialized. " +
-            "Parameter \"min\" is missing.")
-        
-        cmd_line2 = "u ~ unif(n=1, nr=1, min=0.0)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line2)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj,
-                stoch_node_name,
-                stoch_node_spec,
-                cmd_line2)        
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Uniform\" was not properly initialized. " + \
-            "Parameter \"max\" is missing.")
-
 
     def test_sampling_exp_assignment(self):
         """
@@ -147,31 +107,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(len(a_node_pgm2.value), 100000)
         self.assertAlmostEqual(0.5, mean(a_node_pgm2.value), delta=0.05)
         self.assertEqual(2, pgm_obj.n_nodes)
-
-
-    def test_exp_misspec(self):
-        """
-        Test exponential sampling distribution assignment throws
-        exception if mandatory parameters are missing
-        """
-        
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
-
-        cmd_line = "e ~ exponential(n=1, nr=1)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj,
-                stoch_node_name,
-                stoch_node_spec,
-                cmd_line)        
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Exponential\" was not properly " \
-            + "initialized. Parameter \"rate\" is missing.")
 
 
     def test_sampling_gamma_assignment(self):
@@ -220,41 +155,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(2, pgm_obj.n_nodes)
 
 
-    def test_gamma_misspec(self):
-        """
-        Test gamma sampling distribution assignment throws exception
-        if mandatory parameters are missing
-        """
-        
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
-
-        cmd_line1 = "g ~ gamma(n=1, nr=1, shape=0.5)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line1)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)      
-
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Gamma\" was not properly " \
-            + "initialized. Parameter \"scale\" is missing.")
-        
-        cmd_line2 = "g ~ gamma(n=1, nr=1, scale=0.5)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line2)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Gamma\" was not properly " \
-            + "initialized. Parameter \"shape\" is missing.")
-
-
     def test_sampling_normal_assignment(self):
         """
         Test if normal sampling distribution assignments are correctly
@@ -278,41 +178,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(len(a_node_pgm.value), 100000)
         self.assertAlmostEqual(0.5, mean(a_node_pgm.value), delta=0.1)
         self.assertEqual(1, pgm_obj.n_nodes)
-
-
-    def test_normal_misspec(self):
-        """
-        Test normal sampling distribution assignment throws exception
-        if mandatory parameters are missing
-        """
-        
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
-
-        cmd_line1 = "n ~ normal(n=1, nr=1, sd=0.1)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line1)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Normal\" was not properly initialized. " \
-            + "Parameter \"mean\" is missing.")
-        
-        cmd_line2 = "n ~ normal(n=1, nr=1, mean=0.5)"
-
-        stoch_node_name, _, stoch_node_spec = \
-            re.split(cmdu.sampled_as_regex, cmd_line2)
-
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Normal\" was not properly initialized. " \
-            + "Parameter \"sd\" is missing.")
 
 
     def test_sampling_ln_assignment(self):
@@ -365,12 +230,243 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(2, pgm_obj.n_nodes)
 
 
+    def test_unif_misspec(self):
+        """
+        Test uniform sampling distribution assignment throws exception
+        if mandatory parameters are missing
+        """
+
+        pgm_obj = pgm.ProbabilisticGraphicalModel()
+
+        cmd_line1 = "u ~ unif(n=1, nr=1, max=1.0)"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line1)
+
+        self.assertEqual(
+            str(exc_outer.exception),
+            ("\n\nERROR: u ~ unif(n=1, nr=1, max=1.0)\n\nThe line above had a "
+             "syntax problem and could not be tokenized. Distribution "
+             "\'unif\' could not be instantiated. Parameter \'min\' is "
+             "missing."))
+
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+
+        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj,
+                stoch_node_name,
+                stoch_node_spec,
+                cmd_line1)
+
+        self.assertEqual(str(exc_inner.exception),
+            "Distribution \'unif\' could not be instantiated. " +
+            "Parameter \'min\' is missing.")
+
+        cmd_line2 = "u ~ unif(n=1, rate=1.0)"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line2)
+
+        self.assertEqual(
+            str(exc_outer.exception),
+            ("\n\nERROR: u ~ unif(n=1, rate=1.0)\n\nThe line above had a "
+             "syntax problem and could not be tokenized. Distribution "
+             "\'unif\' could not be instantiated. \'rate\' is not a valid "
+             "parameter."))
+
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
+
+        with self.assertRaises(ec.DnInitFailError) as exc:
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj,
+                stoch_node_name,
+                stoch_node_spec,
+                cmd_line2)        
+
+        self.assertEqual(str(exc.exception),
+            ("Distribution \'unif\' could not be instantiated. "
+             "\'rate\' is not a valid parameter."))
+
+        cmd_line3 = "u ~ unif()"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer2:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line3)
+
+        self.assertEqual(
+            str(exc_outer2.exception),
+            ("\n\nERROR: u ~ unif()\n\nThe line above had a syntax problem "
+             "and could not be tokenized. Something went wrong during "
+             "sampling distribution specification. Could not find both "
+             "the name of a distribution (e.g., \'normal\') and its "
+             "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+
+
+    def test_exp_misspec(self):
+        """
+        Test exponential sampling distribution assignment throws
+        exception if mandatory parameters are missing
+        """
+
+        pgm_obj = pgm.ProbabilisticGraphicalModel()
+
+        cmd_line1 = "e ~ exponential(n=1, nr=1)"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line1)
+
+        self.assertEqual(
+            str(exc_outer.exception),
+            ("\n\nERROR: e ~ exponential(n=1, nr=1)\n\nThe line above had a "
+             "syntax problem and could not be tokenized. Distribution "
+             "\'exponential\' could not be instantiated. Parameter \'rate\' is "
+             "missing."))
+
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+
+        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj,
+                stoch_node_name,
+                stoch_node_spec,
+                cmd_line1)        
+
+        self.assertEqual(str(exc_inner.exception),
+            "Distribution \'exponential\' could not be instantiated. " \
+            + "Parameter \'rate\' is missing.")
+
+        cmd_line2 = "e ~ exponential(n=1, min=-1)"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line2)
+
+        self.assertEqual(
+            str(exc_outer.exception),
+            ("\n\nERROR: e ~ exponential(n=1, min=-1)\n\nThe line above had a "
+             "syntax problem and could not be tokenized. Distribution "
+             "\'exponential\' could not be instantiated. \'min\' is not a valid "
+             "parameter."))
+
+        cmd_line3 = "e ~ exponential()"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer2:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line3)
+
+        self.assertEqual(
+            str(exc_outer2.exception),
+            ("\n\nERROR: e ~ exponential()\n\nThe line above had a syntax problem "
+             "and could not be tokenized. Something went wrong during "
+             "sampling distribution specification. Could not find both "
+             "the name of a distribution (e.g., \'normal\') and its "
+             "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+
+
+    def test_gamma_misspec(self):
+        """
+        Test gamma sampling distribution assignment throws exception
+        if mandatory parameters are missing
+        """
+
+        pgm_obj = pgm.ProbabilisticGraphicalModel()
+
+        cmd_line1 = "g ~ gamma(n=1, nr=1, shape=0.5)"
+
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+
+        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+            cmdp.parse_samp_dn_assignment(
+                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)      
+
+        self.assertEqual(str(exc_inner.exception),
+            "Distribution \'gamma\' could not be instantiated. "
+            "Parameter \'scale\' is missing.")
+
+        cmd_line2 = "g ~ gamma(n=1, nr=1, rate=0.5)"
+
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line2)
+
+        self.assertEqual(
+            str(exc_outer.exception),
+            ("\n\nERROR: g ~ gamma(n=1, nr=1, rate=0.5)\n\nThe line above had a "
+             "syntax problem and could not be tokenized. Distribution "
+             "\'gamma\' could not be instantiated. \'rate\' is not a valid "
+             "parameter."))
+
+        cmd_line3 = "g ~ gamma()"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer2:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line3)
+
+        self.assertEqual(
+            str(exc_outer2.exception),
+            ("\n\nERROR: g ~ gamma()\n\nThe line above had a syntax problem "
+             "and could not be tokenized. Something went wrong during "
+             "sampling distribution specification. Could not find both "
+             "the name of a distribution (e.g., \'normal\') and its "
+             "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+
+
+    def test_normal_misspec(self):
+            """
+            Test normal sampling distribution assignment throws exception
+            if mandatory parameters are missing
+            """
+
+            pgm_obj = pgm.ProbabilisticGraphicalModel()
+
+            cmd_line1 = "n ~ normal(n=1, nr=1, sd=0.1)"
+
+            stoch_node_name, _, stoch_node_spec = \
+                re.split(cmdu.sampled_as_regex, cmd_line1)
+
+            with self.assertRaises(ec.DnInitFailError) as exc_inner:
+                cmdp.parse_samp_dn_assignment(
+                    pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
+
+            self.assertEqual(str(exc_inner.exception),
+                "Distribution \'normal\' could not be instantiated. " \
+                + "Parameter \'mean\' is missing.")
+
+            cmd_line2 = "n ~ normal(n=1, rate=1.0)"
+
+            with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+                cmdp.cmdline2pgm(pgm_obj, cmd_line2)
+
+            self.assertEqual(
+                str(exc_outer.exception),
+                ("\n\nERROR: n ~ normal(n=1, rate=1.0)\n\nThe line above had a "
+                "syntax problem and could not be tokenized. Distribution "
+                "\'normal\' could not be instantiated. \'rate\' is not a valid "
+                "parameter."))
+
+            cmd_line3 = "n ~ normal()"
+
+            with self.assertRaises(ec.ScriptSyntaxError) as exc_outer2:
+                cmdp.cmdline2pgm(pgm_obj, cmd_line3)
+
+            self.assertEqual(
+                str(exc_outer2.exception),
+                ("\n\nERROR: n ~ normal()\n\nThe line above had a syntax problem "
+                "and could not be tokenized. Something went wrong during "
+                "sampling distribution specification. Could not find both "
+                "the name of a distribution (e.g., \'normal\') and its "
+                "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+
+
     def test_ln_misspec(self):
         """
         Test log-normal sampling distribution assignment throws
         exception if mandatory parameters are missing
         """
-        
+
         pgm_obj = pgm.ProbabilisticGraphicalModel()
 
         cmd_line1 = "ln ~ lognormal(n=1, nr=1, sd=0.25)"
@@ -378,26 +474,41 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
 
-        with self.assertRaises(ec.DnInitMisspec) as exc:
+        with self.assertRaises(ec.DnInitFailError) as exc_inner:
             cmdp.parse_samp_dn_assignment(
                 pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
-        
-        self.assertEqual(str(exc.exception), 
-            "ERROR: Distribution \"Log-normal\" was not properly " \
-            "initialized. Parameter \"mean\" is missing.")
-        
-        cmd_line2 = "ln ~ lognormal(n=1, nr=1, mean=-3.25)"
+
+        self.assertEqual(str(exc_inner.exception), 
+            "Distribution \'lognormal\' could not be instantiated. " \
+            "Parameter \'mean\' is missing.")
+
+        cmd_line2 = "ln ~ lognormal(n=1, rate=1.0)"
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line2)
 
-        with self.assertRaises(ec.DnInitMisspec) as exc:
-            cmdp.parse_samp_dn_assignment(
-                pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)        
-        
-        self.assertEqual(str(exc.exception),
-            "ERROR: Distribution \"Log-normal\" was not properly " \
-            + "initialized. Parameter \"sd\" is missing.")
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line2)        
+
+        self.assertEqual(
+                str(exc_outer.exception),
+                ("\n\nERROR: ln ~ lognormal(n=1, rate=1.0)\n\nThe line above had a "
+                "syntax problem and could not be tokenized. Distribution "
+                "\'lognormal\' could not be instantiated. \'rate\' is not a valid "
+                "parameter."))
+
+        cmd_line3 = "ln ~ lognormal()"
+
+        with self.assertRaises(ec.ScriptSyntaxError) as exc_outer2:
+            cmdp.cmdline2pgm(pgm_obj, cmd_line3)
+
+        self.assertEqual(
+            str(exc_outer2.exception),
+            ("\n\nERROR: ln ~ lognormal()\n\nThe line above had a syntax problem "
+            "and could not be tokenized. Something went wrong during "
+            "sampling distribution specification. Could not find both "
+            "the name of a distribution (e.g., \'normal\') and its "
+            "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
 
 
 if __name__ == "__main__":
@@ -418,14 +529,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/interface/test_cmd_parametric_sampling_dn_assignment.py
+    # $ python3.9 tests/interface/test_cmd_parametric_sampling_dn_assignment.py
     # 
     # or
     #
-    # $ python3 -m tests.interface.test_cmd_parametric_sampling_dn_assignment
+    # $ python3.9 -m tests.interface.test_cmd_parametric_sampling_dn_assignment
     #
     # or 
     #
-    # $ python3 -m unittest tests.interface.test_cmd_parametric_sampling_dn_assignment.TestParametricSamplingDnAssignment.test_sampling_unif_assignment
+    # $ python3.9 -m unittest tests.interface.test_cmd_parametric_sampling_dn_assignment.TestParametricSamplingDnAssignment.test_sampling_unif_assignment
     
     unittest.main()

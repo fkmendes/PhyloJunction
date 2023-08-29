@@ -18,8 +18,8 @@ def plot_violins(fig: Figure,
                  df: pd.DataFrame,
                  x: str,
                  y: str,
-                 xlab: ty.Optional[str]=None,
-                 ylab: ty.Optional[str]=None) -> None:
+                 xlab: ty.Optional[str] = None,
+                 ylab: ty.Optional[str] = None) -> None:
     """Draw violin plots, one variable and 2+ factors
 
     Args:
@@ -57,8 +57,8 @@ def plot_intervals(
         df: pd.DataFrame,
         x: str,
         y: str,
-        xlab: ty.Optional[str]=None,
-        ylab: ty.Optional[str]="Posterior mean") -> None:
+        xlab: ty.Optional[str] = None,
+        ylab: ty.Optional[str] = "Posterior mean") -> None:
     """Draw coverage plot on provided plt.Figure instance
 
     Args:

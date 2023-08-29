@@ -89,9 +89,10 @@ def is_csv(fp_string: str) -> bool:
             # umlauts...
             if not all([c in string.printable or c.isprintable()
                         for c in start]):
-                print("Inside readwrite.pj_read.is_csv():\n    ERROR: " +
-                      "Attempted to read CSV file, but it does not seem " +
-                      "to be in CSV format.")
+                print(("Inside readwrite.pj_read.is_csv():\n    ERROR: "
+                       "Attempted to read CSV file, but it does not seem "
+                       "to be in CSV format."))
+
                 return False
 
             dialect = csv.Sniffer().sniff(start)
@@ -100,6 +101,7 @@ def is_csv(fp_string: str) -> bool:
 
     except csv.Error:
         # could not get a csv dialect -> probably not a csv.
-        print("Inside readwrite.pj_read.is_csv():\n    ERROR: Attempted to " +
-              "read CSV file, but it does not seem to be in CSV format.")
-        return False 
+        print(("Inside readwrite.pj_read.is_csv():\n    ERROR: Attempted to "
+               "read CSV file, but it does not seem to be in CSV format."))
+
+        return False

@@ -106,7 +106,7 @@ def verify_or_convert2_vector(
                 elif one_par_right_value_count:
                     vectorized_param_list[0].append(v)
 
-            elif type(v) == list:
+            elif isinstance(v, list):
                 n_val = len(v)
 
                 # more values than specified number of samples
@@ -182,6 +182,7 @@ def symmetric_difference(
     return result
 
 ##############################################################################
+
 
 if __name__ == "__main__":
     # can be called from utility/

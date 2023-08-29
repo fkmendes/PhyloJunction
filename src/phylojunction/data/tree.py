@@ -841,10 +841,21 @@ class AnnotatedTree(dp.Tree):
 
 
     def get_stats_dict(self) -> ty.Dict[str, ty.Union[int, float]]:
-        ks = [ "Origin age", "Root age", "Total taxon count", "Extant taxon count", "Extinct taxon count", "Direct ancestor count" ]
-        vs = [ self.origin_age, self.root_age, (self.n_extant_terminal_nodes + self.n_extinct_terminal_nodes), self.n_extant_terminal_nodes, self.n_extinct_terminal_nodes, self.n_sa]
+        ks = [ "Origin age",
+              "Root age",
+              "Total taxon count",
+              "Extant taxon count",
+              "Extinct taxon count",
+              "Direct ancestor count" ]
+        vs = [ self.origin_age,
+              self.root_age,
+              (self.n_extant_terminal_nodes + self.n_extinct_terminal_nodes),
+              self.n_extant_terminal_nodes,
+              self.n_extinct_terminal_nodes,
+              self.n_sa]
         
         return dict((ks[i], str(vs[i])) for i in range(len(ks)))
+
 
     # TODO: add to .pyi
     def _get_taxon_states_dict(self) -> ty.Dict[str, int]:

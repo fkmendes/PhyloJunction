@@ -302,7 +302,7 @@ class TestDiscreteSSE(unittest.TestCase):
         # parameters does not match default number of
         # slices (as a result of not explicitly passing
         # a number of time slices
-        with self.assertRaises(ec.WrongDimensionError) as exc1:
+        with self.assertRaises(ec.IncorrectDimensionError) as exc1:
             state_dep_par_manager = \
             sseobj.DiscreteStateDependentParameterManager(
                 matrix_state_dep_probs_error1, total_n_states

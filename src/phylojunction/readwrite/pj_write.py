@@ -52,8 +52,8 @@ def write_data_df(
 
 def initialize_scalar_dataframe(
         sample_size: int,
-        n_repl: int=1,
-        summaries_avg_over_repl: bool=False) -> pd.DataFrame:
+        n_repl: int = 1,
+        summaries_avg_over_repl: bool = False) -> pd.DataFrame:
     """_summary_
 
     Args:
@@ -93,9 +93,9 @@ def initialize_scalar_dataframe(
 
 def initialize_tree_dataframe(
         sample_size: int,
-        n_repl: int=1,
-        summaries: bool=False,
-        summaries_avg_over_repl: bool=False) -> pd.DataFrame:
+        n_repl: int = 1,
+        summaries: bool = False,
+        summaries_avg_over_repl: bool = False) -> pd.DataFrame:
     """Initialize pandas DataFrame to hold tree information
 
     Args:
@@ -168,7 +168,7 @@ def initialize_tree_dataframe(
 
 def prep_data_df(
         pgm_obj: pgm.ProbabilisticGraphicalModel,
-        write_nex_states: bool=False) -> \
+        write_nex_states: bool = False) -> \
     ty.Tuple[ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
              ty.List[ty.Dict[str, pd.DataFrame]]]:
     """
@@ -287,7 +287,7 @@ def prep_data_df(
                 try:
                     scalar_value_df_dict[n_repl].empty
 
-                except:
+                except (AttributeError, NameError) as e:
                     scalar_value_df_dict[n_repl] = \
                         initialize_scalar_dataframe(
                             sample_size,
@@ -345,7 +345,7 @@ def prep_data_df(
                 try:
                     tree_value_df_dict[rv_name].empty
 
-                except:
+                except (AttributeError, NameError) as e:
                     tree_value_df_dict[rv_name] = \
                         initialize_tree_dataframe(
                             sample_size,
@@ -438,7 +438,8 @@ def prep_data_df(
                 ####################################
                 try:
                     tree_summary_df_dict[rv_name].empty
-                except:
+
+                except (AttributeError, NameError) as e:
                     tree_summary_df_dict[rv_name] = \
                         initialize_tree_dataframe(
                             sample_size,
@@ -489,7 +490,7 @@ def prep_data_df(
                     try:
                         tree_repl_summary_df_dict[rv_name].empty
 
-                    except:
+                    except (AttributeError, NameError) as e:
                         tree_repl_summary_df_dict[rv_name] = \
                             initialize_tree_dataframe(
                                 sample_size,
@@ -515,16 +516,16 @@ def prep_data_df(
                                 try:
                                     float_stat_v = float(stat_v)
 
-                                except:
+                                except ValueError:
                                     # TODO: throw cannot convert to
                                     # float Exception
                                     pass
 
                                 try:
-                                    repls_all_stats_dict[st] \
-                                        .append(float_stat_v)
+                                    repls_all_stats_dict[st].append(
+                                        float_stat_v)
 
-                                except:
+                                except KeyError:
                                     repls_all_stats_dict[st] = [float_stat_v]
 
                         if "Origin age" in repls_all_stats_dict:
@@ -778,8 +779,8 @@ def prep_data_filepaths_dfs(
 
 def dump_pgm_data(dir_string: str,
                   pgm_obj: pgm.ProbabilisticGraphicalModel,
-                  prefix: str="",
-                  write_nex_states: bool=False) -> None:
+                  prefix: str = "",
+                  write_nex_states: bool = False) -> None:
     """Write stochastic-node sampled values in specified directory
 
     Args:
@@ -861,7 +862,7 @@ def dump_serialized_pgm(
         file_name: str,
         pgm_obj: pgm.ProbabilisticGraphicalModel,
         cmd_log_list: ty.List[str],
-        prefix: str="", to_folder: bool=False) -> None:
+        prefix: str = "", to_folder: bool = False) -> None:
     """Write serialized PGM in specified directory
 
     Args:
@@ -900,8 +901,8 @@ def get_write_inference_rev_scripts(
         all_sims_model_spec_list: ty.List[str],
         all_sims_mcmc_logging_spec_list: ty.List[str],
         dir_list: ty.List[str],
-        prefix: str="",
-        write2file: bool=False) -> ty.List[str]:
+        prefix: str = "",
+        write2file: bool = False) -> ty.List[str]:
     """Get and/or write full inference .Rev scripts
 
     Args:

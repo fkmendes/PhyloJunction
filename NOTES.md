@@ -117,11 +117,11 @@ This script should be called and be successful every time new code is written, b
 
 ## Style convention: PEP8
 
-In order to check for PEP8 style convention rules, you need the `pep8` python package installed.
+In order to check for PEP8 style convention rules, you need the `pycodestyle` (previously called `pep8`) python package installed.
 Checking one file can be done with:
 
 ```
-pep8 [path to .py]
+pycodestyle [path to .py]
 ```
 
 It is recommended to do that from within VS Code's terminal, for example, that way it is easy to jump immediately to the violating line.
@@ -130,10 +130,11 @@ A couple of rules are always broken because of type hinting, and because of an a
 These are rules E701 and W391.
 Sometimes, excessive indentation (which should be avoided anyway) causes lines to be > 79 characters.
 This violates rule E501.
-We can ask pep8 to ignore them:
+We can also ignore indentation in comments (E116) and no newline at the end of file (W292)
+We can ask pycodestyle to ignore them:
 
 ```
-pep8 --ignore=E501,E701,W391 [path to .py]
+pycodestyle --ignore=E116,E501,E701,W391 [path to .py]
 ```
 
 

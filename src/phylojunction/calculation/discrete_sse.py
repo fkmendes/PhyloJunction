@@ -518,7 +518,7 @@ class DiscreteStateDependentParameterManager:
         for k, list_params in enumerate(self.matrix_state_dep_params):
 
             if (k - self.n_time_slices) > -1:
-                raise ec.WrongDimensionError(
+                raise ec.IncorrectDimensionError(
                     "DiscreteStateDependentParameterManager",
                     self.n_time_slices, len(self.matrix_state_dep_params),
                     message=str(self.n_time_slices) + " time slices was" \
@@ -1228,9 +1228,18 @@ if __name__ == "__main__":
     # matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice        
     # state_dep_par_manager = DiscreteStateDependentParameterManager(matrix_atomic_rate_params, 1)
 
-    n_characters = 3 # regions A and B
+    # n_characters = 3 # regions A and B
+    # n_states_per_char = 2 # presence/absence
+    # svc = StateIntoPatternConverter(n_characters, n_states_per_char)
+
+    # print(svc.int2set_dict)
+    # print(svc.set2int_dict)
+
+    n_characters = 8 # regions A and B
     n_states_per_char = 2 # presence/absence
     svc = StateIntoPatternConverter(n_characters, n_states_per_char)
 
-    print(svc.int2set_dict)
-    print(svc.set2int_dict)
+    # print(svc.int2set_dict)
+    for k, v in svc.int2set_dict.items():
+        print(k + "\t" + v)
+    # print(svc.set2int_dict)

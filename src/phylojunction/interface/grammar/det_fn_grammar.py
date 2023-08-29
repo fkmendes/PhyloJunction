@@ -9,6 +9,7 @@ import phylojunction.pgm.pgm as pgm
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
+
 class PJDetFnGrammar():
 
     det_fn_grammar_dict: ty.Dict[str, ty.Set[str]]
@@ -19,7 +20,8 @@ class PJDetFnGrammar():
     det_fn_grammar_dict = {
         "sse_prob": set(["name", "value", "state"]),
         "sse_rate": set(["name", "value", "event", "states"]),
-        "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states", "seed_age", "epoch_age_ends", "n_epochs"])
+        "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states",
+                          "seed_age", "epoch_age_ends", "n_epochs"])
     }
 
     @classmethod
@@ -29,28 +31,77 @@ class PJDetFnGrammar():
         return False
 
     @classmethod
-    def init_return_state_dep_rate(cls,
-        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+    def init_return_state_dep_rate(
+        cls,
+        det_fn_param_dict:
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
             -> sseobj.DiscreteStateDependentRate:
-        
-        return detsse.make_DiscreteStateDependentRate(det_fn_param_dict)
+
+        if not det_fn_param_dict:
+            raise ec.MissingSpecificationError("sse_rate")
+
+        for arg in det_fn_param_dict:
+            if not cls.grammar_check("sse_rate", arg):
+                raise ec.NotAParameterError(arg)
+
+        try:
+            detsse.make_DiscreteStateDependentRate(
+                "sse_rate", det_fn_param_dict)
+
+        except (ec.MissingSpecificationError,
+                ec.MissingArgumentError) as e:
+            raise ec.DetFnInitFailError("sse_rate", e.message)
 
     @classmethod
-    def init_return_state_dep_prob(cls,
-        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+    def init_return_state_dep_prob(
+        cls,
+        det_fn_param_dict:
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
             -> sseobj.DiscreteStateDependentProbability:
-        
-        return detsse.make_DiscreteStateDependentProbability(det_fn_param_dict)
+
+        if not det_fn_param_dict:
+            raise ec.MissingSpecificationError("sse_prob")
+
+        for arg in det_fn_param_dict:
+            if not cls.grammar_check("sse_prob", arg):
+                raise ec.NotAParameterError(arg)
+
+        try:
+            return detsse.make_DiscreteStateDependentProbability(
+                "sse_prob",
+                det_fn_param_dict)
+
+        except (ec.MissingArgumentError,
+                ec.RequireSingleValueError) as e:
+            raise ec.DetFnInitFailError("sse_prob", e.message)
 
     @classmethod
-    def init_return_sse_stash(cls,
-        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
-        -> sseobj.SSEStash:
-        
-        return detsse.make_SSEStash(det_fn_param_dict)
+    def init_return_sse_stash(
+        cls,
+        det_fn_param_dict:
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            -> sseobj.SSEStash:
+
+        if not det_fn_param_dict:
+            raise ec.MissingSpecificationError("sse_stash")
+
+        for arg in det_fn_param_dict:
+            if not cls.grammar_check("sse_stash", arg):
+                raise ec.NotAParameterError(arg)
+
+        try:
+            return detsse.make_SSEStash("sse_stash", det_fn_param_dict)
+
+        except (ec.RequireSingleValueError,
+                ec.RequireIntegerError,
+                ec.RequireNumericError,
+                ec.IncorrectDimensionError,
+                ec.MissingParameterError) as e:
+            raise ec.DetFnInitFailError("sse_stash", e.message)
 
     @classmethod
-    def create_det_fn_obj(cls,
+    def create_det_fn_obj(
+        cls,
         det_fn_id: str,
         det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
             -> ty.Optional[
@@ -59,26 +110,39 @@ class PJDetFnGrammar():
                     sseobj.DiscreteStateDependentProbability,
                     sseobj.SSEStash
                 ]]:
+        """
+        Build and return deterministic function object.
+
+        Args:
+            det_fn_id (str): Name of deterministic function to create
+            det_fn_param_dict (dict): Dictionary containing deterministic
+                function parameter names (str) as keys and lists (of either
+                strings or NodePGMs) as values
+
+        Returns:
+            Object: one of a variety of objects containing information for
+                later building a sampling distribution
+        """
 
         # validate input
         if det_fn_id == "sse_rate":
+            # health checks inside
             return cls.init_return_state_dep_rate(det_fn_param_dict)
 
         if det_fn_id == "sse_prob":
+            # health checks inside
             return cls.init_return_state_dep_prob(det_fn_param_dict)
 
         if det_fn_id == "sse_stash":
-            for arg in det_fn_param_dict:
-                if not cls.grammar_check(det_fn_id, arg):
-                    raise ec.NotAParameterError(arg)
             return cls.init_return_sse_stash(det_fn_param_dict)
 
         return None
 
+
 if __name__ == "__main__":
     # can be called from interface/grammar/
     # $ python3 det_fn_grammar.py
-    # 
+    #
     # can also be called from phylojunction/
     # $ python3 interface/grammar/det_fn_grammar.py
     # or
@@ -86,7 +150,7 @@ if __name__ == "__main__":
     #
     # can also be called from VS Code, if open folder is phylojuction/
 
-    print(PJDetFnGrammar.grammar_check("sse_rate", "name")) # True
-    print(PJDetFnGrammar.grammar_check("sse_rate", "cloud")) # False
+    print(PJDetFnGrammar.grammar_check("sse_rate", "name"))  # True
+    print(PJDetFnGrammar.grammar_check("sse_rate", "cloud"))  # False
 
     # TODO: add code to run init_return_state_dep_rate and init_return_sse_stash

@@ -150,26 +150,26 @@ class DnSSE(pgm.DistributionPGM):
         # Input checking #
         ##################
         if self.n_sim < 1:
-            raise ec.DnInitMisspec(self.DN_NAME, "Please specify a number of simulations >= 1. Exiting...")
+            raise ec.MissingParameterError(self.DN_NAME, "Please specify a number of simulations >= 1. Exiting...")
         
         if not self.start_states:
-            raise ec.DnInitMisspec(self.DN_NAME, "You must provide a list of " + str(self.n_sim) + " starting states. Exiting...")
+            raise ec.MissingParameterError(self.DN_NAME, "You must provide a list of " + str(self.n_sim) + " starting states. Exiting...")
         
         if self.stop != "age" and self.stop != "size":
-            raise ec.DnInitMisspec(self.DN_NAME, "Stop condition must be \"age\" or \"size\". Exiting...")
+            raise ec.MissingParameterError(self.DN_NAME, "Stop condition must be \"age\" or \"size\". Exiting...")
         
         if self.n_time_slices > 1 and not self.stop == "age":
-            raise ec.DnInitMisspec(self.DN_NAME, "If you specified more than a single time slice, you need to provide a maximum age as stopping condition to anchor the absolute slice ages. Exiting...")
+            raise ec.MissingParameterError(self.DN_NAME, "If you specified more than a single time slice, you need to provide a maximum age as stopping condition to anchor the absolute slice ages. Exiting...")
         
         if self.n_time_slices > 1 and not self.seed_age:
-            raise ec.DnInitMisspec(self.DN_NAME, "When providing time-slice age ends, you must specify a seed (origin or root) age to anchor the tree and ensure the tree spans those slices. Exiting...")
+            raise ec.MissingParameterError(self.DN_NAME, "When providing time-slice age ends, you must specify a seed (origin or root) age to anchor the tree and ensure the tree spans those slices. Exiting...")
         
         if self.stop == "age" and self.seed_age:
             # TODO: make sure seed age in FIGManager is vectorized and that in script, the same variable is used for both DiscreteStateDependentParameterManager and stop condition value in the spec of this distribution
             for idx, a_stop_val in enumerate(self.stop_val):
                 # TODO: will need to do self.seed_age[idx] later when vectorization is added
                 if a_stop_val != self.seed_age:
-                    raise ec.DnInitMisspec(self.DN_NAME, "The max. stopping age(s) for the simulation must match the specified seed (origin or root) age(s). Exiting...")
+                    raise ec.MissingParameterError(self.DN_NAME, "The max. stopping age(s) for the simulation must match the specified seed (origin or root) age(s). Exiting...")
         
         # the checks below are also carried out at the grammar level, but we do it again
         # in case distribution is used without a script
@@ -177,7 +177,7 @@ class DnSSE(pgm.DistributionPGM):
             for idx, a_stop_val in enumerate(self.stop_val):
                 # must be a number
                 if not isinstance(a_stop_val, (int, float)):
-                    raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) must be a number. Exiting...")
+                    raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) must be a number. Exiting...")
                 # it is a number...
                 else:
                     # can be a int-convertible float
@@ -186,29 +186,29 @@ class DnSSE(pgm.DistributionPGM):
                             self.stop_val[idx] = int(a_stop_val)
                         # float must be convertible to integer
                         else: 
-                            raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) could not be converted to integer. Exiting...")
+                            raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) could not be converted to integer. Exiting...")
                     # ideally should be int
                     elif isinstance(a_stop_val, int):
                         self.stop_val[idx] = a_stop_val
                     # once self.stop_val[idx] is initialized, it must be >= 0
                     if self.stop_val[idx] < 0:
-                        raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be negative. Exiting...")
+                        raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be negative. Exiting...")
                     # if it is 1, then the process cannot start at a root node, which by definition has two children already
                     if self.stop_val[idx] == 1 and not self.with_origin:
                         # TODO: add this check to the grammar level
-                        raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be 1 for a process starting at the root." + \
+                        raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be 1 for a process starting at the root." + \
                             " This is only allowed if the process starts at the origin. Exiting...")
         
         if self.stop == "age":
             for idx, a_stop_val in enumerate(self.stop_val):
                 # must be an integer
                 if not isinstance(a_stop_val, float):
-                    raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (tree height) must be an integer. Exiting...")
+                    raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (tree height) must be an integer. Exiting...")
                 else:
                     self.stop_val[idx] = a_stop_val
                     # must be >= 0
                     if self.stop_val[idx] < 0.0:
-                        raise ec.DnInitMisspec(self.DN_NAME, "Stop condition value (tree height) cannot be negative. Exiting...")
+                        raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (tree height) cannot be negative. Exiting...")
                 
 
     ##########################

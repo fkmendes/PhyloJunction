@@ -15,7 +15,7 @@ def join_dataframes(
     pj_df: pd.DataFrame,
     compare_to_df: pd.DataFrame,
     thing_to_compare: str,
-    summaries_avg_over_repl: bool=False) \
+    summaries_avg_over_repl: bool = False) \
         -> pd.DataFrame:
     """_summary_
 
@@ -82,10 +82,12 @@ def join_dataframes(
                          ).lstrip()
             )
 
+        # TODO: (PEP8) This is a bare except that needs to be made more explicit
+        # later. I need to see what kinds of errors I may bump into later.
         except:
-            print("Could not build joint dataframe from PJ in order to " +
-                  "compare " + thing_to_compare + ". For now, ignoring. " +
-                  "Later implement Exception.")
+            print(("Could not build joint dataframe from PJ in order to "
+                   "compare " + thing_to_compare + ". For now, ignoring. "
+                   "Later implement Exception."))
             return pd.DataFrame()
 
         try:
@@ -108,10 +110,12 @@ def join_dataframes(
             #         ).lstrip()
             # )
 
+        # TODO: (PEP8) This is a bare except that needs to be made more explicit
+        # later. I need to see what kinds of errors I may bump into later.
         except:
-            print("Could not build sub-dataframe from other simulator data " +
-                  "in order to compare " + thing_to_compare + ". For now," +
-                  " ignoring. Later implement Exception.")
+            print(("Could not build sub-dataframe from other simulator data "
+                   "in order to compare " + thing_to_compare + ". For now,"
+                   " ignoring. Later implement Exception."))
             return pd.DataFrame()
 
     joint_df = pd.concat([sub_pj_df, sub_compare_to_df], axis=0)
@@ -142,8 +146,8 @@ def add_within_hpd_col(
     """
 
     if df.empty:
-        print("Could not add a coverage column because dataframe is empty." +
-              " For now, ignoring. Later implement Exception")
+        print(("Could not add a coverage column because dataframe is empty."
+               " For now, ignoring. Later implement Exception"))
 
     else:
         for i in range(len(df.index)):
