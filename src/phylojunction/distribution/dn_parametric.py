@@ -72,7 +72,7 @@ class DnLogNormal(pgm.DistributionPGM):
 
         # for inference, we need to keep track of parent node names
         if isinstance(parent_node_tracker, pgm.DeterministicNodePGM):
-            raise ec.InvalidFunctionArgError(self.DN_NAME, "One of the arguments is a deterministic node. This is not allowed. Ignoring command...")
+            raise ec.ObjInitInvalidArgError(self.DN_NAME, "One of the arguments is a deterministic node. This is not allowed. Ignoring command...")
 
         self.parent_node_tracker = parent_node_tracker
 
@@ -95,7 +95,9 @@ class DnLogNormal(pgm.DistributionPGM):
                 return sampled_values
 
         except:
-            raise ec.MissingParameterError(self.DN_NAME, "A \'mean_param\', \'sd_param\', and \'log_space\' must be specified.")
+            raise ec.GenerateFailError(
+                self.DN_NAME,
+                "A \'mean_param\' and \'sd_param\' must be specified.")
 
 
     def _check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
@@ -150,6 +152,7 @@ class DnNormal(pgm.DistributionPGM):
             norm_mean_param: ty.List[float],
             norm_sd_param: ty.List[float],
             parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
+
         self.param_dict = dict()
 
         # so mypy won't complain...
@@ -189,11 +192,15 @@ class DnNormal(pgm.DistributionPGM):
 
             # use single provided mean and sd for all (n_draws * n_repl) draws
             # if len(mean_params) == 1 and len(sd_params) == 1:
-            if len(self.norm_mean_param_list) == 1 and len(self.norm_sd_param_list) == 1:
+            if len(self.norm_mean_param_list) == 1 and \
+                len(self.norm_sd_param_list) == 1:
                 # so mypy won't complain
                 # if isinstance(mean_params, float) and isinstance(sd_params, float):
                 # return ty.cast(ty.List, DnNormal.draw_normal(self.n_draws * self.n_repl, mean_params[0], sd_params[0]).tolist())
-                return ty.cast(ty.List, DnNormal.draw_normal(self.n_draws * self.n_repl, self.norm_mean_param_list[0], self.norm_sd_param_list[0]).tolist())
+                return ty.cast(ty.List, DnNormal.draw_normal(
+                    self.n_draws * self.n_repl,
+                    self.norm_mean_param_list[0],
+                    self.norm_sd_param_list[0]).tolist())
 
 
             # (DnNormal sould have taken care of checking dimensions)
@@ -222,7 +229,7 @@ class DnNormal(pgm.DistributionPGM):
         except:
             raise ec.GenerateFailError(
                 self.DN_NAME,
-                "A \'mean_param\' and \'sd_param\' must be specified.")
+                "A \'norm_mean_param\' and \'norm_sd_param\' must be specified.")
 
     def _check_sample_size(
             self,
@@ -357,7 +364,9 @@ class DnExponential(pgm.DistributionPGM):
                 return sampled_values
 
         except:
-            raise ec.MissingParameterError("rate")
+            raise ec.GenerateFailError(
+                self.DN_NAME,
+                "A \'scale_or_rate_param\' and \'rate_parameterization\' must be specified.")
 
     def _check_sample_size(self, param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
@@ -514,7 +523,7 @@ class DnGamma(pgm.DistributionPGM):
                 return sampled_values
 
         except:
-            raise ec.MissingParameterError(self.DN_NAME, "A \'shape_param\' and \'scale_or_rate_param\' must be specified.")
+            raise ec.ParseMissingParameterError(self.DN_NAME, "A \'shape_param\' and \'scale_or_rate_param\' must be specified.")
 
     def _check_sample_size(
         self,
@@ -638,7 +647,7 @@ class DnUnif(pgm.DistributionPGM):
         # mypy doesn't understand this except is mandatory and would necessarily
         # quit the program
         except:
-            raise ec.MissingParameterError(self.DN_NAME, "A \'min_param\' and \'max_param\' must be specified. Exiting...")
+            raise ec.ParseMissingParameterError(self.DN_NAME, "A \'min_param\' and \'max_param\' must be specified. Exiting...")
 
     def _check_sample_size(
         self,

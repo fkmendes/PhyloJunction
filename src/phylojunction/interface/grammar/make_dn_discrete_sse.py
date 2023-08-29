@@ -101,7 +101,7 @@ def make_discrete_SSE_dn(
                         int_val = int(first_val)
 
                 except:
-                    raise ec.RequireIntegerError(dn_name, arg)
+                    raise ec.ParseRequireIntegerError(dn_name, arg)
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
                 if arg == "n": n_samples = int_val
@@ -121,7 +121,7 @@ def make_discrete_SSE_dn(
                          "cond_surv",
                          "cond_obs_both_sides"):
                 if first_val not in ("\"true\"", "\"false\""):
-                    raise ec.FunctionArgError(arg, "Was expecting either \"true\" or \"false\".")
+                    raise ec.ParseFunctionArgError(arg, "Was expecting either \"true\" or \"false\".")
 
                 else:
                     if isinstance(first_val, str):
@@ -159,7 +159,7 @@ def make_discrete_SSE_dn(
                         float_val = float(first_val)
 
                 except:
-                    raise ec.RequireNumericError(dn_name, arg)
+                    raise ec.ParseRequireNumericError(dn_name, arg)
 
                 eps = float_val
 
@@ -174,14 +174,14 @@ def make_discrete_SSE_dn(
                         [float(v) for v in extracted_val if isinstance(v, str)]
 
                 except:
-                    raise ec.RequireNumericError(dn_name, arg)
+                    raise ec.ParseRequireNumericError(dn_name, arg)
                     
                 for sv in stop_values_list:
                     if sv < 0.0:
                         is_negative = True
 
                 if is_negative:
-                    raise ec.FunctionArgError(
+                    raise ec.ParseFunctionArgError(
                         arg, "\'stop_value\' cannot be negative.")
 
             elif arg == "start_state":
@@ -190,16 +190,16 @@ def make_discrete_SSE_dn(
                         [int(v) for v in extracted_val if isinstance(v, str)]
 
                 except:
-                    raise ec.RequireIntegerError(dn_name, arg)
+                    raise ec.ParseRequireIntegerError(dn_name, arg)
 
     # making sure essential parameters of distribution have been specified
     if not any(stash.get_meh()\
                .state_dep_rate_manager\
                .matrix_state_dep_params):
-        raise ec.MissingArgumentError("stash")
+        raise ec.ParseMissingArgumentError("stash")
 
     if not stop_values_list:
-        raise ec.MissingParameterError("stop_value")
+        raise ec.ParseMissingParameterError("stop_value")
 
     # TODO: have DnSSE take a prob_handler, and populate it if it's None upon initialization
     # all unit test should still work if this initialization is done correctly

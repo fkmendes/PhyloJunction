@@ -220,7 +220,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
                 rv_dn_spec,
                 cmd_line)
 
-        except ec.DnInitFailError as e:
+        except ec.ParseDnInitFailError as e:
             raise ec.ScriptSyntaxError(
                 cmd_line,
                 e.message)
@@ -251,7 +251,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
                 det_fn_spec,
                 cmd_line)
 
-        except ec.DnInitFailError as e:
+        except ec.ParseDnInitFailError as e:
             raise ec.ScriptSyntaxError(
                 cmd_line,
                 e.message)
@@ -435,11 +435,11 @@ def parse_samp_dn_assignment(
             dn_obj = \
                 dngrammar.PJDnGrammar.create_dn_obj(dn_name, spec_dict)
 
-        except (ec.NotAParameterError,
-                ec.RequireSingleValueError,
-                ec.RequireIntegerError,
-                ec.MissingParameterError) as e:
-            raise ec.DnInitFailError(dn_name, e.message)
+        except (ec.ParseNotAParameterError,
+                ec.ParseRequireSingleValueError,
+                ec.ParseRequireIntegerError,
+                ec.ParseMissingParameterError) as e:
+            raise ec.ParseDnInitFailError(dn_name, e.message)
 
         ####################
         # Clamping, if any #
@@ -612,12 +612,12 @@ def parse_deterministic_function_assignment(
                     detgrammar.PJDetFnGrammar.create_det_fn_obj(
                         det_fn_name, spec_dict)
 
-            except (ec.MissingSpecificationError,
-                    ec.NotAParameterError,
-                    ec.MissingParameterError) as e:
-                raise ec.DetFnInitFailError(det_fn_name, e.message)
+            except (ec.ParseMissingSpecificationError,
+                    ec.ParseNotAParameterError,
+                    ec.ParseMissingParameterError) as e:
+                raise ec.ParseDetFnInitFailError(det_fn_name, e.message)
 
-            except ec.DetFnInitFailError as e:
+            except ec.ParseDetFnInitFailError as e:
                 # re-raises the DetFnInitFailError exception from
                 # within .create_det_fn_obj()
                 raise
@@ -836,4 +836,7 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    script2pgm(script_str29, in_pj_file=False)
+    pgm_obj = script2pgm(script_str4, in_pj_file=False)
+
+    for node_pgm in pgm_obj.get_sorted_node_pgm_list():
+        print(node_pgm.node_name)

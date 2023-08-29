@@ -245,15 +245,15 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer.exception),
-            ("\n\nERROR: u ~ unif(n=1, nr=1, max=1.0)\n\nThe line above had a "
-             "syntax problem and could not be tokenized. Distribution "
-             "\'unif\' could not be instantiated. Parameter \'min\' is "
+            ("\n\nERROR: u ~ unif(n=1, nr=1, max=1.0)\n\nThe line above "
+             "had a syntax problem and could not be tokenized. Parsing "
+             "the specification of \'unif\' failed. Parameter \'min\' is "
              "missing."))
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
 
-        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+        with self.assertRaises(ec.ParseDnInitFailError) as exc_inner:
             cmdp.parse_samp_dn_assignment(
                 pgm_obj,
                 stoch_node_name,
@@ -261,8 +261,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
                 cmd_line1)
 
         self.assertEqual(str(exc_inner.exception),
-            "Distribution \'unif\' could not be instantiated. " +
-            "Parameter \'min\' is missing.")
+                         ("Parsing the specification of \'unif\' failed. "
+                          "Parameter \'min\' is missing."))
 
         cmd_line2 = "u ~ unif(n=1, rate=1.0)"
 
@@ -272,14 +272,14 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(
             str(exc_outer.exception),
             ("\n\nERROR: u ~ unif(n=1, rate=1.0)\n\nThe line above had a "
-             "syntax problem and could not be tokenized. Distribution "
-             "\'unif\' could not be instantiated. \'rate\' is not a valid "
+             "syntax problem and could not be tokenized. Parsing the "
+             "specification of \'unif\' failed. \'rate\' is not a valid "
              "parameter."))
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line2)
 
-        with self.assertRaises(ec.DnInitFailError) as exc:
+        with self.assertRaises(ec.ParseDnInitFailError) as exc:
             cmdp.parse_samp_dn_assignment(
                 pgm_obj,
                 stoch_node_name,
@@ -287,7 +287,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
                 cmd_line2)        
 
         self.assertEqual(str(exc.exception),
-            ("Distribution \'unif\' could not be instantiated. "
+            ("Parsing the specification of \'unif\' failed. "
              "\'rate\' is not a valid parameter."))
 
         cmd_line3 = "u ~ unif()"
@@ -320,14 +320,14 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(
             str(exc_outer.exception),
             ("\n\nERROR: e ~ exponential(n=1, nr=1)\n\nThe line above had a "
-             "syntax problem and could not be tokenized. Distribution "
-             "\'exponential\' could not be instantiated. Parameter \'rate\' is "
+             "syntax problem and could not be tokenized. Parsing the "
+             "specification of \'exponential\' failed. Parameter \'rate\' is "
              "missing."))
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
 
-        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+        with self.assertRaises(ec.ParseDnInitFailError) as exc_inner:
             cmdp.parse_samp_dn_assignment(
                 pgm_obj,
                 stoch_node_name,
@@ -335,7 +335,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
                 cmd_line1)        
 
         self.assertEqual(str(exc_inner.exception),
-            "Distribution \'exponential\' could not be instantiated. " \
+            "Parsing the specification of \'exponential\' failed. " \
             + "Parameter \'rate\' is missing.")
 
         cmd_line2 = "e ~ exponential(n=1, min=-1)"
@@ -346,8 +346,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(
             str(exc_outer.exception),
             ("\n\nERROR: e ~ exponential(n=1, min=-1)\n\nThe line above had a "
-             "syntax problem and could not be tokenized. Distribution "
-             "\'exponential\' could not be instantiated. \'min\' is not a valid "
+             "syntax problem and could not be tokenized. Parsing the "
+             "specification of \'exponential\' failed. \'min\' is not a valid "
              "parameter."))
 
         cmd_line3 = "e ~ exponential()"
@@ -377,12 +377,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
 
-        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+        with self.assertRaises(ec.ParseDnInitFailError) as exc_inner:
             cmdp.parse_samp_dn_assignment(
                 pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)      
 
         self.assertEqual(str(exc_inner.exception),
-            "Distribution \'gamma\' could not be instantiated. "
+            "Parsing the specification of \'gamma\' failed. "
             "Parameter \'scale\' is missing.")
 
         cmd_line2 = "g ~ gamma(n=1, nr=1, rate=0.5)"
@@ -396,8 +396,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(
             str(exc_outer.exception),
             ("\n\nERROR: g ~ gamma(n=1, nr=1, rate=0.5)\n\nThe line above had a "
-             "syntax problem and could not be tokenized. Distribution "
-             "\'gamma\' could not be instantiated. \'rate\' is not a valid "
+             "syntax problem and could not be tokenized. Parsing the "
+             "specification of \'gamma\' failed. \'rate\' is not a valid "
              "parameter."))
 
         cmd_line3 = "g ~ gamma()"
@@ -427,12 +427,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
             stoch_node_name, _, stoch_node_spec = \
                 re.split(cmdu.sampled_as_regex, cmd_line1)
 
-            with self.assertRaises(ec.DnInitFailError) as exc_inner:
+            with self.assertRaises(ec.ParseDnInitFailError) as exc_inner:
                 cmdp.parse_samp_dn_assignment(
                     pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
 
             self.assertEqual(str(exc_inner.exception),
-                "Distribution \'normal\' could not be instantiated. " \
+                "Parsing the specification of \'normal\' failed. " \
                 + "Parameter \'mean\' is missing.")
 
             cmd_line2 = "n ~ normal(n=1, rate=1.0)"
@@ -443,8 +443,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
             self.assertEqual(
                 str(exc_outer.exception),
                 ("\n\nERROR: n ~ normal(n=1, rate=1.0)\n\nThe line above had a "
-                "syntax problem and could not be tokenized. Distribution "
-                "\'normal\' could not be instantiated. \'rate\' is not a valid "
+                "syntax problem and could not be tokenized. Parsing the "
+                "specification of \'normal\' failed. \'rate\' is not a valid "
                 "parameter."))
 
             cmd_line3 = "n ~ normal()"
@@ -474,12 +474,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
 
-        with self.assertRaises(ec.DnInitFailError) as exc_inner:
+        with self.assertRaises(ec.ParseDnInitFailError) as exc_inner:
             cmdp.parse_samp_dn_assignment(
                 pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)        
 
         self.assertEqual(str(exc_inner.exception), 
-            "Distribution \'lognormal\' could not be instantiated. " \
+            "Parsing the specification of \'lognormal\' failed. " \
             "Parameter \'mean\' is missing.")
 
         cmd_line2 = "ln ~ lognormal(n=1, rate=1.0)"
@@ -493,8 +493,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(
                 str(exc_outer.exception),
                 ("\n\nERROR: ln ~ lognormal(n=1, rate=1.0)\n\nThe line above had a "
-                "syntax problem and could not be tokenized. Distribution "
-                "\'lognormal\' could not be instantiated. \'rate\' is not a valid "
+                "syntax problem and could not be tokenized. Parsing the "
+                "specification of \'lognormal\' failed. \'rate\' is not a valid "
                 "parameter."))
 
         cmd_line3 = "ln ~ lognormal()"

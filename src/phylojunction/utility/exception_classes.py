@@ -61,21 +61,6 @@ class VariableMisspec(Exception):
             + self.rv_name + "\'."
 
 
-# TODO: coalesce with exception above, maybe grab arg name?
-class InvalidFunctionArgError(Exception):
-    function_name: str
-    message: str
-
-    def __init__(self, function_name: str, message: str) -> None:
-        self.function_name = function_name
-        self.message = message
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: Could not specify function " \
-            + self.function_name + ". " + self.message
-
-
 class FunctionArgsMismatchError(Exception):
     fn_name: str
     message: str
@@ -354,8 +339,68 @@ class InvalidMCMCChainLength(Exception):
         return "ERROR: " + self.message
 
 
+# Initialization errors
+class ObjInitInvalidArgError(Exception):
+    dn_name: str
+    message: str
+
+    def __init__(self, dn_name: str, par_name: str, message: str = "") -> None:
+        self.dn_name = dn_name
+        self.message = "Could not initialize the object of \'" + dn_name + \
+            "\'. The argument provided to " + par_name + " was invalid."
+        if message:
+            self.message += " " + message
+        
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ObjInitMissingParameterError(Exception):
+    obj_name: str
+    message: str
+
+    def __init__(self, obj_name: str, par_name: str, message: str = "") -> None:
+        self.obj_name = obj_name
+        self.message = "Could not initialize the object of " + obj_name + \
+            " . Parameter " + par_name + " was not provided an argument."
+        if message:
+            self.message += " " + message
+        
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ObjInitIncorrectDimensionError(Exception):
+    obj_name: str
+    message: str
+
+    def __init__(self,
+                 obj_name: str,
+                 container_name: str,
+                 obs_len: int,
+                 exp_len: int = 0) -> None:
+        self.obj_name = obj_name
+        self.obs_len = obs_len
+        self.exp_len = exp_len
+        self.message = "Could not initialize the object of " + obj_name \
+            + ". Incorrect dimension of container " + container_name \
+            + ", which was of size " + str(obs_len) + ". "
+        
+        if exp_len != 0:
+            self.message += "The expected dimension was " + str(exp_len) \
+            + "."
+        
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
 # Syntax errors: sampling distribution, det. function exceptions #
-class FunctionArgError(Exception):
+class ParseFunctionArgError(Exception):
     par_name: str
     message: str
 
@@ -369,7 +414,7 @@ class FunctionArgError(Exception):
         return  self.message
 
 
-class NotAParameterError(Exception):
+class ParseNotAParameterError(Exception):
     par_name: str
     message: str
 
@@ -382,7 +427,7 @@ class NotAParameterError(Exception):
         return self.message
     
 
-class RequireSingleValueError(Exception):
+class ParseRequireSingleValueError(Exception):
     obj_name: str
     message: str
 
@@ -399,7 +444,7 @@ class RequireSingleValueError(Exception):
         return self.message
 
 
-class RequireIntegerError(Exception):
+class ParseRequireIntegerError(Exception):
     obj_name: str
     message: str
 
@@ -416,7 +461,7 @@ class RequireIntegerError(Exception):
         return self.message
 
 
-class RequireNumericError(Exception):
+class ParseRequireNumericError(Exception):
     obj_name: str
     message: str
 
@@ -433,7 +478,7 @@ class RequireNumericError(Exception):
         return self.message
 
 
-class MissingParameterError(Exception):
+class ParseMissingParameterError(Exception):
     par_name: str
     message: str
 
@@ -446,7 +491,7 @@ class MissingParameterError(Exception):
         return self.message
 
 
-class MissingArgumentError(Exception):
+class ParseMissingArgumentError(Exception):
     par_name: str
     message: str
 
@@ -465,7 +510,7 @@ class MissingArgumentError(Exception):
         return self.message
 
 
-class MissingSpecificationError(Exception):
+class ParseMissingSpecificationError(Exception):
     message: str
 
     def __init__(self, obj2spec_name: str) -> None:
@@ -477,21 +522,21 @@ class MissingSpecificationError(Exception):
         return self.message
 
 
-class DnInitFailError(Exception):
+class ParseDnInitFailError(Exception):
     dn_name: str
     message: str
 
     def __init__(self, dn_name: str, message: str) -> None:
         self.dn_name = dn_name
-        self.message = "Distribution \'" + self.dn_name \
-            + "\' could not be instantiated. " + message
+        self.message = "Parsing the specification of \'" + self.dn_name \
+            + "\' failed. " + message
         super().__init__(self.message)
 
     def __str__(self) -> str:
         return self.message
 
 
-class DetFnInitFailError(Exception):
+class ParseDetFnInitFailError(Exception):
     det_fn_name: str
     message: str
 

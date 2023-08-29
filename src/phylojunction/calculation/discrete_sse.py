@@ -350,7 +350,8 @@ class DiscreteStateDependentParameterManager:
     might become vectorized.
     """
 
-    matrix_state_dep_params: ty.List[ty.List[DiscreteStateDependentParameter]]
+    matrix_state_dep_params: \
+        ty.List[ty.List[DiscreteStateDependentParameter]]
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
@@ -363,12 +364,13 @@ class DiscreteStateDependentParameterManager:
     # all time slices
 
     def __init__(self,
-                 matrix_state_dep_params: ty.List[ty.List[DiscreteStateDependentParameter]],
+                 matrix_state_dep_params: \
+                    ty.List[ty.List[DiscreteStateDependentParameter]],
                  total_state_count: int,
-                 seed_age_for_time_slicing: ty.Optional[float]=None,
-                 list_time_slice_age_ends: ty.Optional[ty.List[float]]=None,
+                 seed_age_for_time_slicing: ty.Optional[float] = None,
+                 list_time_slice_age_ends: ty.Optional[ty.List[float]] = None,
                  epsilon: float=1e-12):
-        
+
         # 1D: time slices
         # 2D: list of atomic rate params
         self.matrix_state_dep_params = matrix_state_dep_params 
@@ -515,13 +517,14 @@ class DiscreteStateDependentParameterManager:
         for k, list_params in enumerate(self.matrix_state_dep_params):
 
             if (k - self.n_time_slices) > -1:
-                raise ec.IncorrectDimensionError(
+                raise ec.ObjInitIncorrectDimensionError(
                     "DiscreteStateDependentParameterManager",
-                    self.n_time_slices, len(self.matrix_state_dep_params),
+                    self.n_time_slices,
+                    len(self.matrix_state_dep_params),
                     message=str(self.n_time_slices) + " time slices was" \
-                        + " (were) specified, but from the matrix of" \
-                        + " state-dependent parameters, it looks like" \
-                        + " there are " \
+                        + (" (were) specified, but from the matrix of"
+                           " state-dependent parameters, it looks like"
+                           " there are ") \
                         + str(len(self.matrix_state_dep_params)) + " slices"
                 )
 

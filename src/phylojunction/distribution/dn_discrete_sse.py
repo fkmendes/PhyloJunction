@@ -1,5 +1,3 @@
-"""dn_discrete_sse.py: Class for distribution of discrete state-dependent speciation and extinction process"""
-
 import typing as ty
 import time
 import numpy
@@ -89,22 +87,22 @@ class DnSSE(pgm.DistributionPGM):
 
     def __init__(self,
         sse_stash: sseobj.SSEStash,
-        stop_value: ty.List[float]=[],
-        n: int=1,
-        n_replicates: int=1,
-        stop: str="",
+        stop_value: ty.List[float] = [],
+        n: int = 1,
+        n_replicates: int = 1,
+        stop: str = "",
         origin: bool=True,
-        start_states_list: ty.List[int]=[],
-        condition_on_speciation: bool=False,
-        condition_on_survival: bool=True,
-        condition_on_obs_both_sides_root: bool=False,
-        min_rec_taxa: int=0,
-        max_rec_taxa: int=int(1e12),
-        abort_at_obs: int=int(1e12),
-        seeds_list: ty.Optional[ty.List[int]]=None,
-        epsilon: float=1e-12,
-        runtime_limit: int=15,
-        debug: bool=False) -> None:
+        start_states_list: ty.List[int] = [],
+        condition_on_speciation: bool = False,
+        condition_on_survival: bool = True,
+        condition_on_obs_both_sides_root: bool = False,
+        min_rec_taxa: int = 0,
+        max_rec_taxa: int = int(1e12),
+        abort_at_obs: int = int(1e12),
+        seeds_list: ty.Optional[ty.List[int]] = None,
+        epsilon: float = 1e-12,
+        runtime_limit: int = 15,
+        debug: bool = False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
@@ -150,66 +148,115 @@ class DnSSE(pgm.DistributionPGM):
         # Input checking #
         ##################
         if self.n_sim < 1:
-            raise ec.MissingParameterError(self.DN_NAME, "Please specify a number of simulations >= 1. Exiting...")
-        
+            raise ec.ObjInitInvalidArgError(
+                self.DN_NAME,
+                "\'n_sim\'",
+                "Please specify a number of simulations >= 1.")
+
         if not self.start_states:
-            raise ec.MissingParameterError(self.DN_NAME, "You must provide a list of " + str(self.n_sim) + " starting states. Exiting...")
-        
+            raise ec.ObjInitInvalidArgError(
+                self.DN_NAME,
+                "\'start_states_list\'",
+                "You must provide a list of " + str(self.n_sim) \
+                + " starting states.")
+
         if self.stop != "age" and self.stop != "size":
-            raise ec.MissingParameterError(self.DN_NAME, "Stop condition must be \"age\" or \"size\". Exiting...")
-        
+            raise ec.ObjInitInvalidArgError(
+                self.DN_NAME,
+                "\'stop\'",
+                "Stop condition must be \"age\" or \"size\".")
+
         if self.n_time_slices > 1 and not self.stop == "age":
-            raise ec.MissingParameterError(self.DN_NAME, "If you specified more than a single time slice, you need to provide a maximum age as stopping condition to anchor the absolute slice ages. Exiting...")
-        
+            raise ec.ObjInitInvalidArgError(
+                self.DN_NAME,
+                "\'age\'",
+                ("If you specified more than a single time slice, you "
+                 "need to provide a maximum age as stopping condition "
+                 "to anchor the absolute slice ages."))
+
         if self.n_time_slices > 1 and not self.seed_age:
-            raise ec.MissingParameterError(self.DN_NAME, "When providing time-slice age ends, you must specify a seed (origin or root) age to anchor the tree and ensure the tree spans those slices. Exiting...")
+            raise ec.ObjInitMissingParameterError(
+                self.DN_NAME,
+                "\'events\'",
+                ("When providing time-slice age ends, you must give a "
+                 "seed age (origin or root) to the SSEStash to anchor "
+                 "the tree and ensure the tree spans those slices."))
         
         if self.stop == "age" and self.seed_age:
-            # TODO: make sure seed age in FIGManager is vectorized and that in script, the same variable is used for both DiscreteStateDependentParameterManager and stop condition value in the spec of this distribution
+            # TODO: make sure seed age in FIGManager is vectorized and
+            # that in script, the same variable is used for both
+            # DiscreteStateDependentParameterManager and stop condition value in the spec of this distribution
             for idx, a_stop_val in enumerate(self.stop_val):
-                # TODO: will need to do self.seed_age[idx] later when vectorization is added
+                # TODO: will need to do self.seed_age[idx]
+                # later when vectorization is added
                 if a_stop_val != self.seed_age:
-                    raise ec.MissingParameterError(self.DN_NAME, "The max. stopping age(s) for the simulation must match the specified seed (origin or root) age(s). Exiting...")
-        
+                    raise ec.ObjInitInvalidArgError(
+                        self.DN_NAME,
+                        "\'stop\'",
+                        ("The max. stopping age(s) for the simulation "
+                         "must match the specified seed (origin or root) "
+                         "age(s)."))
+
         # the checks below are also carried out at the grammar level, but we do it again
         # in case distribution is used without a script
         if self.stop == "size":
             for idx, a_stop_val in enumerate(self.stop_val):
                 # must be a number
                 if not isinstance(a_stop_val, (int, float)):
-                    raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) must be a number. Exiting...")
+                    raise ec.ParseMissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) must be a number. Exiting...")
+
                 # it is a number...
                 else:
                     # can be a int-convertible float
                     if isinstance(a_stop_val, float):
                         if a_stop_val.is_integer():
                             self.stop_val[idx] = int(a_stop_val)
+
                         # float must be convertible to integer
                         else: 
-                            raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) could not be converted to integer. Exiting...")
+                            raise ec.ObjInitInvalidArgError(
+                                self.DN_NAME,
+                                "\'stop\'",
+                                ("Stop condition value (number of terminal "
+                                 "nodes) could not be converted to integer."))
+
                     # ideally should be int
                     elif isinstance(a_stop_val, int):
                         self.stop_val[idx] = a_stop_val
+
                     # once self.stop_val[idx] is initialized, it must be >= 0
                     if self.stop_val[idx] < 0:
-                        raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be negative. Exiting...")
+                        raise ec.ObjInitInvalidArgError(
+                            self.DN_NAME,
+                            "\'stop\'",
+                            ("Stop condition value (number of terminal nodes) "
+                             "cannot be negative."))
+
                     # if it is 1, then the process cannot start at a root node, which by definition has two children already
                     if self.stop_val[idx] == 1 and not self.with_origin:
                         # TODO: add this check to the grammar level
-                        raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be 1 for a process starting at the root." + \
+                        raise ec.ParseMissingParameterError(self.DN_NAME, "Stop condition value (number of terminal nodes) cannot be 1 for a process starting at the root." + \
                             " This is only allowed if the process starts at the origin. Exiting...")
         
         if self.stop == "age":
             for idx, a_stop_val in enumerate(self.stop_val):
                 # must be an integer
                 if not isinstance(a_stop_val, float):
-                    raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (tree height) must be an integer. Exiting...")
+                    raise ec.ObjInitInvalidArgError(
+                        self.DN_NAME,
+                        "\'stop\'",
+                        ("Stop condition value (tree height) must be "
+                        "an integer"))
+
                 else:
                     self.stop_val[idx] = a_stop_val
                     # must be >= 0
                     if self.stop_val[idx] < 0.0:
-                        raise ec.MissingParameterError(self.DN_NAME, "Stop condition value (tree height) cannot be negative. Exiting...")
-                
+                        raise ec.ObjInitInvalidArgError(
+                            self.DN_NAME,
+                            "\'stop\'",
+                            ("Stop condition value (tree height) cannot be "
+                             "negative."))
 
     ##########################
     # Initialization methods #

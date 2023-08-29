@@ -79,7 +79,7 @@ def make_DiscreteStateDependentRate(
     """
 
     if not det_fn_param_dict:
-        raise ec.MissingSpecificationError(det_fn_name)
+        raise ec.ParseMissingSpecificationError(det_fn_name)
 
     event_type = None
     value: ty.List[float] = []
@@ -94,7 +94,7 @@ def make_DiscreteStateDependentRate(
     # val is a list
     for arg, val in det_fn_param_dict.items():
         if not val:
-            raise ec.MissingArgumentError(arg)
+            raise ec.ParseMissingArgumentError(arg)
 
         if arg == "value":
             # val is a list of random variable objects
@@ -113,7 +113,7 @@ def make_DiscreteStateDependentRate(
         elif arg == "event":
             if not (val[0].startswith("\"") or val[0].startswith("\'")) or \
                     not (val[0].endswith("\"") or val[0].endswith("\'")):
-                raise ec.FunctionArgError(
+                raise ec.ParseFunctionArgError(
                     arg, ("Event name must start and end with either single "
                           "(\') or double (\") quotes."))
 
@@ -136,7 +136,7 @@ def make_DiscreteStateDependentRate(
                 event_type = sseobj.MacroevolEvent.ANCESTOR_SAMPLING
 
             else:
-                raise ec.FunctionArgError(
+                raise ec.ParseFunctionArgError(
                     arg, ("Did not recognize event name. Please check "
                           "documentation for allowed events"))
 
@@ -191,7 +191,7 @@ def make_DiscreteStateDependentProbability(
     """
 
     if not det_fn_param_dict:
-        raise ec.MissingSpecificationError(det_fn_name)
+        raise ec.ParseMissingSpecificationError(det_fn_name)
 
     value: ty.List[float] = []
     state: ty.Optional[int] = None
@@ -205,7 +205,7 @@ def make_DiscreteStateDependentProbability(
     # val is a list
     for arg, val in det_fn_param_dict.items():
         if not val:
-            raise ec.MissingArgumentError(arg)
+            raise ec.ParseMissingArgumentError(arg)
 
         if arg == "value":
             # val is a list of random variable objects
@@ -225,7 +225,7 @@ def make_DiscreteStateDependentProbability(
             # need to declare cast_val separately
             # so mypy won't complain
             if len(val) > 1:
-                raise ec.RequireSingleValueError(
+                raise ec.ParseRequireSingleValueError(
                     det_fn_name,
                     arg
                 )
@@ -296,28 +296,28 @@ def make_SSEStash(
             if isinstance(extracted_value, list) and \
                 len(extracted_value) > 1:
                 # should provide only one number of states
-                raise ec.RequireSingleValueError(det_fn_name, arg)
+                raise ec.ParseRequireSingleValueError(det_fn_name, arg)
 
         if arg == "n_states":
             try:
                 n_states = int(extracted_value)
 
             except ValueError:
-                raise ec.RequireIntegerError(det_fn_name, arg)
+                raise ec.ParseRequireIntegerError(det_fn_name, arg)
 
         elif arg == "n_epochs":
             try:
                 n_time_slices = int(extracted_value)
 
             except ValueError:
-                raise ec.RequireIntegerError(det_fn_name, arg)
+                raise ec.ParseRequireIntegerError(det_fn_name, arg)
 
         elif arg == "seed_age":
             try:
                 seed_age_for_time_slicing = float(extracted_value)
 
             except ValueError:
-                raise ec.RequireNumericError(det_fn_name, arg)
+                raise ec.ParseRequireNumericError(det_fn_name, arg)
 
         elif arg == "epoch_age_ends":
             if len(val) != (n_time_slices - 1):
@@ -332,7 +332,7 @@ def make_SSEStash(
                         if isinstance(v, str)]
 
             except ValueError:
-                raise ec.RequireNumericError(det_fn_name, arg)
+                raise ec.ParseRequireNumericError(det_fn_name, arg)
 
         elif arg == "flat_prob_mat":
             if det_fn_param_dict["flat_prob_mat"]:
@@ -358,7 +358,7 @@ def make_SSEStash(
                         arg, len(flat_state_dep_rate_mat))
 
             else:
-                raise ec.MissingParameterError(arg)
+                raise ec.ParseMissingParameterError(arg)
 
     ##################################
     # Putting rates in their manager #

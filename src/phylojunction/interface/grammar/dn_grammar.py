@@ -51,7 +51,7 @@ class PJDnGrammar():
             -> pgm.DistributionPGM:
 
         if not dn_param_dict:
-            raise ec.MissingSpecificationError("discrete_sse")
+            raise ec.ParseMissingSpecificationError("discrete_sse")
 
         return make_dnsse.make_discrete_SSE_dn("discrete_sse", dn_param_dict)
 
@@ -105,17 +105,17 @@ class PJDnGrammar():
                     extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("lognormal", arg):
-                        raise ec.NotAParameterError(arg)
+                        raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(dnpar.DnLogNormal.DN_NAME, arg)
+                            raise ec.ParseRequireSingleValueError(dnpar.DnLogNormal.DN_NAME, arg)
                         # only one element always
                         ln_n_draws = int(extracted_val[0])
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(dnpar.DnLogNormal.DN_NAME, arg)
+                            raise ec.ParseRequireSingleValueError(dnpar.DnLogNormal.DN_NAME, arg)
                         # only one element always
                         ln_n_repl = int(extracted_val[0])
 
@@ -139,7 +139,7 @@ class PJDnGrammar():
             # making sure essential parameters of distribution have been specified
             for par_obj, par_name in ((ln_mean, "mean"), (ln_sd, "sd")):
                 if not par_obj:
-                    raise ec.MissingParameterError(par_name)
+                    raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnLogNormal(pars, parent_node_tracker)
             return dnpar.DnLogNormal(ln_n_draws, ln_n_repl, ln_mean, ln_sd, ln_log_space, parent_node_tracker)
@@ -166,25 +166,25 @@ class PJDnGrammar():
                     extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("normal", arg):
-                        raise ec.NotAParameterError(arg)
+                        raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                         norm_n_draws = int(extracted_val[0])
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                         try:
                             norm_n_repl = int(extracted_val[0])
 
                         except ValueError:
-                            raise ec.RequireIntegerError(
+                            raise ec.ParseRequireIntegerError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "mean":
@@ -198,7 +198,7 @@ class PJDnGrammar():
             # making sure essential parameters of distribution have been specified
             for par_obj, par_name in ((norm_mean, "mean"), (norm_sd, "sd")):
                 if not par_obj:
-                    raise ec.MissingParameterError(par_name)
+                    raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnNormal(pars, parent_node_tracker)
             return dnpar.DnNormal(norm_n_draws, norm_n_repl, norm_mean, norm_sd, parent_node_tracker)
@@ -225,18 +225,18 @@ class PJDnGrammar():
                     extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("exponential", arg):
-                        raise ec.NotAParameterError(arg)
+                        raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnExponential.DN_NAME, arg)
                         # pars[0] = int(_extracted_val[0])
                         exp_n_draws = int(extracted_val[0])
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnExponential.DN_NAME, arg)
                         # pars[1] = int(_extracted_val[0])
                         exp_n_repl = int(extracted_val[0])
@@ -256,7 +256,7 @@ class PJDnGrammar():
 
             # making sure essential parameters of distribution have been specified
             if not exp_scale_or_rate:
-                raise ec.MissingParameterError("rate")
+                raise ec.ParseMissingParameterError("rate")
 
             # return dnpar.DnExponential(pars, parent_node_tracker)
             return dnpar.DnExponential(
@@ -289,18 +289,18 @@ class PJDnGrammar():
                     extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("gamma", arg):
-                        raise ec.NotAParameterError(arg)
+                        raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnGamma.DN_NAME, arg)
                         # pars[0] = int(_extracted_val[0])
                         gamma_n_draws = int(extracted_val[0])
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnGamma.DN_NAME, arg)
                         # pars[1] = int(_extracted_val[0])
                         gamma_n_repl = int(extracted_val[0])
@@ -326,7 +326,7 @@ class PJDnGrammar():
             for par_obj, par_name in \
                     ((gamma_shape, "shape"), (gamma_scale_or_rate, "scale")):
                 if not par_obj:
-                    raise ec.MissingParameterError(par_name)
+                    raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnGamma(pars, parent_node_tracker)
             return dnpar.DnGamma(
@@ -358,17 +358,17 @@ class PJDnGrammar():
                     extracted_val = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("unif", arg):
-                        raise ec.NotAParameterError(arg)
+                        raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnUnif.DN_NAME, arg)
                         unif_n_draws = int(extracted_val[0])
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
-                            raise ec.RequireSingleValueError(
+                            raise ec.ParseRequireSingleValueError(
                                 dnpar.DnUnif.DN_NAME, arg)
                         unif_n_repl = int(extracted_val[0])
 
@@ -381,7 +381,7 @@ class PJDnGrammar():
             # making sure essential parameters of distribution have been specified
             for par_obj, par_name in ((unif_min, "min"), (unif_max, "max")):
                 if not par_obj:
-                    raise ec.MissingParameterError(par_name)
+                    raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnUnif(pars, parent_node_tracker)
             return dnpar.DnUnif(unif_n_draws, unif_n_repl, unif_min, unif_max, parent_node_tracker)

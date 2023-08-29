@@ -38,20 +38,20 @@ class PJDetFnGrammar():
             -> sseobj.DiscreteStateDependentRate:
 
         if not det_fn_param_dict:
-            raise ec.MissingSpecificationError("sse_rate")
+            raise ec.ParseMissingSpecificationError("sse_rate")
 
         for arg in det_fn_param_dict:
             if not cls.grammar_check("sse_rate", arg):
-                raise ec.NotAParameterError(arg)
+                raise ec.ParseNotAParameterError(arg)
 
         try:
             return detsse.make_DiscreteStateDependentRate(
                 "sse_rate", det_fn_param_dict)
 
-        except (ec.MissingSpecificationError,
-                ec.MissingArgumentError,
-                ec.FunctionArgError) as e:
-            raise ec.DetFnInitFailError("sse_rate", e.message)
+        except (ec.ParseMissingSpecificationError,
+                ec.ParseMissingArgumentError,
+                ec.ParseFunctionArgError) as e:
+            raise ec.ParseDetFnInitFailError("sse_rate", e.message)
 
     @classmethod
     def init_return_state_dep_prob(
@@ -61,20 +61,20 @@ class PJDetFnGrammar():
             -> sseobj.DiscreteStateDependentProbability:
 
         if not det_fn_param_dict:
-            raise ec.MissingSpecificationError("sse_prob")
+            raise ec.ParseMissingSpecificationError("sse_prob")
 
         for arg in det_fn_param_dict:
             if not cls.grammar_check("sse_prob", arg):
-                raise ec.NotAParameterError(arg)
+                raise ec.ParseNotAParameterError(arg)
 
         try:
             return detsse.make_DiscreteStateDependentProbability(
                 "sse_prob",
                 det_fn_param_dict)
 
-        except (ec.MissingArgumentError,
-                ec.RequireSingleValueError) as e:
-            raise ec.DetFnInitFailError("sse_prob", e.message)
+        except (ec.ParseMissingArgumentError,
+                ec.ParseRequireSingleValueError) as e:
+            raise ec.ParseDetFnInitFailError("sse_prob", e.message)
 
     @classmethod
     def init_return_sse_stash(
@@ -84,21 +84,21 @@ class PJDetFnGrammar():
             -> sseobj.SSEStash:
 
         if not det_fn_param_dict:
-            raise ec.MissingSpecificationError("sse_stash")
+            raise ec.ParseMissingSpecificationError("sse_stash")
 
         for arg in det_fn_param_dict:
             if not cls.grammar_check("sse_stash", arg):
-                raise ec.NotAParameterError(arg)
+                raise ec.ParseNotAParameterError(arg)
 
         try:
             return detsse.make_SSEStash("sse_stash", det_fn_param_dict)
 
-        except (ec.RequireSingleValueError,
-                ec.RequireIntegerError,
-                ec.RequireNumericError,
+        except (ec.ParseRequireSingleValueError,
+                ec.ParseRequireIntegerError,
+                ec.ParseRequireNumericError,
                 ec.IncorrectDimensionError,
-                ec.MissingParameterError) as e:
-            raise ec.DetFnInitFailError("sse_stash", e.message)
+                ec.ParseMissingParameterError) as e:
+            raise ec.ParseDetFnInitFailError("sse_stash", e.message)
 
     @classmethod
     def create_det_fn_obj(

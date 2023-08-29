@@ -21,16 +21,6 @@ class VariableMisspec(Exception):
     message: str
     def __init__(self, rv_name: str) -> None: ...
 
-class FunctionArgError(Exception):
-    par_name: str
-    message: str
-    def __init__(self, par_name: str, message: str) -> None: ...
-
-class InvalidFunctionArgError(Exception):
-    function_name: str
-    message: str
-    def __init__(self, function_name: str, message: str) -> None: ...
-
 class FunctionArgsMismatchError(Exception):
     fn_name: str
     message: str
@@ -107,49 +97,73 @@ class InvalidMCMCChainLength(Exception):
     message: str
     def __init__(self, message: str) -> None: ...
 
-# Sampling distribution, det. functions exceptions #
-class NotAParameterError(Exception):
+# Initialization errors
+class ObjInitInvalidArgError(Exception):
+    dn_name: str
+    message: str
+    def __init__(self, dn_name: str, par_name: str, message: str = "") -> None: ...
+    def __str__(self) -> str: ...
+
+class ObjInitMissingParameterError(Exception):
+    dn_name: str
+    message: str
+    def __init__(self, dn_name: str, par_name: str, message: str = "") -> None: ...
+    def __str__(self) -> str: ...
+
+class ObjInitIncorrectDimensionError(Exception):
+    obj_name: str
+    message: str
+    def __init__(self, obj_name: str, container_name: str, obs_len: int, exp_len: int = 0) -> None: ...
+    def __str__(self) -> str: ...
+
+# Syntax errors: Sampling distribution, det. functions exceptions #
+class ParseFunctionArgError(Exception):
+    par_name: str
+    message: str
+    def __init__(self, par_name: str, message: str) -> None: ...
+
+class ParseNotAParameterError(Exception):
     par_name: str
     message: str
     def __init__(self, par_name: str) -> None: ...
 
-class RequireSingleValueError(Exception):
+class ParseRequireSingleValueError(Exception):
     dn_name: str
     message: str
     arg: Incomplete
     def __init__(self, dn_name: str, arg: str) -> None: ...
 
-class RequireIntegerError(Exception):
+class ParseRequireIntegerError(Exception):
     dn_name: str
     message: str
     arg: Incomplete
     def __init__(self, dn_name: str, arg: str) -> None: ...
 
-class RequireNumericError(Exception):
+class ParseRequireNumericError(Exception):
     dn_name: str
     message: str
     arg: Incomplete
     def __init__(self, dn_name: str, arg: str) -> None: ...
 
-class MissingParameterError(Exception):
+class ParseMissingParameterError(Exception):
     par_name: str
     message: str
     def __init__(self, par_name: str) -> None: ...
 
-class MissingArgumentError(Exception):
+class ParseMissingArgumentError(Exception):
     par_name: str
     message: str
     def __init__(self, par_name: str) -> None: ...
 
-class MissingSpecificationError(Exception):
+class ParseMissingSpecificationError(Exception):
     message: str
     def __init__(self, obj2spec_name: str) -> None: ...
 
-class DnInitFailError(Exception):
+class ParseDnInitFailError(Exception):
     dn_name: str
     def __init__(self, dn_name: str, message: str) -> None: ...
     
-class DetFnInitFailError(Exception):
+class ParseDetFnInitFailError(Exception):
     det_fn_name: str
     def __init__(self, det_fn_name: str, message: str) -> None: ...
 

@@ -187,7 +187,7 @@ class TestSSEStopConditionsBD(unittest.TestCase):
         start_at_origin = True
 
         # (1) Negative number of terminal nodes
-        with self.assertRaises(ec.MissingParameterError) as exc:
+        with self.assertRaises(ec.ObjInitInvalidArgError) as exc:
             distsse.DnSSE(
                 self.sse_stash,
                 stop_condition_value,
@@ -196,16 +196,17 @@ class TestSSEStopConditionsBD(unittest.TestCase):
                 origin=start_at_origin,
                 start_states_list=start_states_list,
                 condition_on_survival=True,
-                epsilon=1e-12)       
-        
+                epsilon=1e-12)
+
         self.assertEqual(str(exc.exception),
-            "ERROR: Distribution DnSSE was not properly initialized. " + \
-            "Stop condition value (number of terminal nodes) cannot be " + \
-            "negative. Exiting...")
+            ("Could not initialize the object of 'DnSSE'. "
+             "The argument provided to 'stop' was invalid. "
+             "Stop condition value (number of terminal nodes) "
+             "cannot be negative."))
 
         # (2) Number of terminal nodes being a float that cannot be converted to integer
         stop_condition_value = [0.5, 2]
-        with self.assertRaises(ec.MissingParameterError) as exc:
+        with self.assertRaises(ec.ObjInitInvalidArgError) as exc:
             distsse.DnSSE(
                 self.sse_stash,
                 stop_condition_value,
@@ -217,15 +218,16 @@ class TestSSEStopConditionsBD(unittest.TestCase):
                 epsilon=1e-12)       
         
         self.assertEqual(str(exc.exception),
-            "ERROR: Distribution DnSSE was not properly initialized. " + \
-            "Stop condition value (number of terminal nodes) could not be " + \
-            "converted to integer. Exiting...")
+            ("Could not initialize the object of 'DnSSE'. "
+             "The argument provided to \'stop\' was invalid. "
+             "Stop condition value (number of terminal "
+             "nodes) could not be converted to integer."))
 
         # (3) Negative tree height
         stop_condition = "age"
         stop_condition_value = [0.0, -0.1]
 
-        with self.assertRaises(ec.MissingParameterError) as exc:
+        with self.assertRaises(ec.ObjInitInvalidArgError) as exc:
             distsse.DnSSE(
                 self.sse_stash,
                 stop_condition_value,
@@ -234,12 +236,12 @@ class TestSSEStopConditionsBD(unittest.TestCase):
                 origin=start_at_origin, 
                 start_states_list=start_states_list,
                 condition_on_survival=True,
-                epsilon=1e-12)       
-        
+                epsilon=1e-12)
+
         self.assertEqual(str(exc.exception),
-            "ERROR: Distribution DnSSE was not properly initialized. " + \
-            "Stop condition value (tree height) cannot be negative. " + \
-            "Exiting...")
+            ("Could not initialize the object of \'DnSSE\'. "
+             "The argument provided to 'stop' was invalid. "
+             "Stop condition value (tree height) cannot be negative."))
 
 
 if __name__ == "__main__":
