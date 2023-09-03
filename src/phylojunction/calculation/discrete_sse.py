@@ -463,7 +463,7 @@ class DiscreteStateDependentParameterManager:
                     different_par_type_set.add(this_param_type)
 
         if len(different_par_type_set) >= 2:
-            raise(ec.RequireSameParameterType(
+            raise(ec.ObjInitRequireSameParameterTypeError(
                 "DiscreteStateDependentParameterManager",
                 len(different_par_type_set))
             )
@@ -487,8 +487,8 @@ class DiscreteStateDependentParameterManager:
                     sts = param.state
 
                 if sts in states_per_epoch_dict[k]:
-                    raise ec.RepeatedStateDependentParameterError(
-                        k, sts, ""
+                    raise ec.ObjInitRepeatedStateDependentParameterError(
+                        k, sts
                     )
 
                 states_per_epoch_dict[k].add(sts)
@@ -501,13 +501,12 @@ class DiscreteStateDependentParameterManager:
         for k, state_tup_set in states_per_epoch_dict.items():
             if k > 0:
                 if oldest_epoch_state_set != state_tup_set:
-                    raise ec.MissingStateDependentParameterError(
+                    raise ec.ObjInitMissingStateDependentParameterError(
                         k,
                         pjh.symmetric_difference(
                             oldest_epoch_state_set,
                             state_tup_set
-                        ),
-                        ""
+                        )
                     )
 
 
@@ -519,13 +518,9 @@ class DiscreteStateDependentParameterManager:
             if (k - self.n_time_slices) > -1:
                 raise ec.ObjInitIncorrectDimensionError(
                     "DiscreteStateDependentParameterManager",
-                    self.n_time_slices,
+                    "matrix_state_dep_params",
                     len(self.matrix_state_dep_params),
-                    message=str(self.n_time_slices) + " time slices was" \
-                        + (" (were) specified, but from the matrix of"
-                           " state-dependent parameters, it looks like"
-                           " there are ") \
-                        + str(len(self.matrix_state_dep_params)) + " slices"
+                    exp_len=self.n_time_slices
                 )
 
             for param in list_params:

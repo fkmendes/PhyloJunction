@@ -56,7 +56,7 @@ class NoPlatingAllowedError(Exception):
     node_pgm_name: str
     def __init__(self, det_name: str, problematic_node_pgm_name: str, message: str = ...) -> None: ...
 
-class RequireSameParameterType(Exception):
+class ObjInitRequireSameParameterTypeError(Exception):
     message: str
     obj_name: str
     n_diff_par: int
@@ -72,18 +72,6 @@ class DimensionalityWarning(Exception):
     dn_name: str
     message: str
     def __init__(self, rv_name: str, dn_name: str, message: str = ...) -> None: ...
-
-class MissingStateDependentParameterError(Exception):
-    epoch_missing_param: int
-    symmetric_diff_set: ty.Set[ty.Any]
-    message: str
-    def __init__(self, epoch_missing_param: int, symmetric_diff_set: ty.Set[ty.Any], message: str="") -> None: ...
-
-class RepeatedStateDependentParameterError(Exception):
-    epoch_w_repeated_param: int
-    repeated_state: ty.Union[int, ty.Tuple[int]]
-    message: str
-    def __init__(self, epoch_w_repeated_param: int, repeated_state: ty.Union[int, ty.Tuple[int]], message: str="") -> None: ...
 
 class StateDependentParameterMisspec(Exception):
     message: str
@@ -114,6 +102,15 @@ class ObjInitIncorrectDimensionError(Exception):
     obj_name: str
     message: str
     def __init__(self, obj_name: str, container_name: str, obs_len: int, exp_len: int = 0) -> None: ...
+    def __str__(self) -> str: ...
+
+class ObjInitMissingStateDependentParameterError(Exception):
+    message: str
+    def __init__(self, epoch_missing_param: int, symmetric_diff_set: ty.Set[ty.Any]) -> None: ...
+
+class ObjInitRepeatedStateDependentParameterError(Exception):
+    message: str
+    def __init__(self, epoch_w_repeated_param: int, repeated_state: ty.Union[int, ty.Tuple[int]]) -> None: ...
     def __str__(self) -> str: ...
 
 # Syntax errors: Sampling distribution, det. functions exceptions #

@@ -287,7 +287,7 @@ def prep_data_df(
                 try:
                     scalar_value_df_dict[n_repl].empty
 
-                except (AttributeError, NameError) as e:
+                except (KeyError, AttributeError, NameError) as e:
                     scalar_value_df_dict[n_repl] = \
                         initialize_scalar_dataframe(
                             sample_size,
@@ -345,7 +345,7 @@ def prep_data_df(
                 try:
                     tree_value_df_dict[rv_name].empty
 
-                except (AttributeError, NameError) as e:
+                except (KeyError, AttributeError, NameError) as e:
                     tree_value_df_dict[rv_name] = \
                         initialize_tree_dataframe(
                             sample_size,
@@ -439,7 +439,7 @@ def prep_data_df(
                 try:
                     tree_summary_df_dict[rv_name].empty
 
-                except (AttributeError, NameError) as e:
+                except (KeyError, AttributeError, NameError) as e:
                     tree_summary_df_dict[rv_name] = \
                         initialize_tree_dataframe(
                             sample_size,
@@ -490,7 +490,7 @@ def prep_data_df(
                     try:
                         tree_repl_summary_df_dict[rv_name].empty
 
-                    except (AttributeError, NameError) as e:
+                    except (KeyError, AttributeError, NameError) as e:
                         tree_repl_summary_df_dict[rv_name] = \
                             initialize_tree_dataframe(
                                 sample_size,
@@ -598,7 +598,8 @@ def prep_data_df(
                                     + str(sample_idx + 1) + "_repl" \
                                     + str(repl_idx + 1) + ".nex"
                                 nexus_str = node_val[idx].get_taxon_states_str(nexus=True)
-                                tree_living_nd_states_str_nexus_dict[states_nex_fp] = nexus_str
+                                tree_living_nd_states_str_nexus_dict[
+                                    states_nex_fp] = nexus_str
 
                             repl_idx += 1
                             idx += 1

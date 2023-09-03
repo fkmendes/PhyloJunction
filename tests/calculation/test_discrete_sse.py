@@ -298,106 +298,104 @@ class TestDiscreteSSE(unittest.TestCase):
         matrix_state_dep_rates_error2 = [ rates_t0, rates_t1_2 ]
         matrix_state_dep_rates_error3 = [ rates_t0, rates_t1_3 ]
 
-        # number of time slices deduced from matrix of
-        # parameters does not match default number of
-        # slices (as a result of not explicitly passing
-        # a number of time slices
+        # number of time slices deduced from matrix of parameters does
+        # not match default number of slices (as a result of not
+        # explicitly passing a number of time slices)
         with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc1:
             state_dep_par_manager = \
             sseobj.DiscreteStateDependentParameterManager(
                 matrix_state_dep_probs_error1, total_n_states
             )
 
-        print(str(exc1.exception))
-
-        # self.assertEqual(str(exc1.exception),
-        #     "ERROR: Container DiscreteStateDependentParameterManager " \
-        #     + "had a different dimension than expected. 1 time slices was " \
-        #     + "(were) specified, but from the matrix of state-dependent " \
-        #     + "parameters, it looks like there are 2 slices."
-        # )
+        self.assertEqual(str(exc1.exception),
+            ("Could not initialize the object of "
+             "\'DiscreteStateDependentParameterManager\'. "
+             "Incorrect dimension of container \'matrix_state_dep_params\', " \
+             "which was of size 2. The expected dimension was 1.")
+        )
 
         # rate and prob both passed together
         # but only one type allowed
-        # with self.assertRaises(ec.RequireSameParameterType) as exc2:
-        #     state_dep_par_manager = \
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_probs_error2, total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
+        with self.assertRaises(ec.ObjInitRequireSameParameterTypeError) \
+            as exc2:
+            state_dep_par_manager = \
+                sseobj.DiscreteStateDependentParameterManager(
+                    matrix_state_dep_probs_error2, total_n_states,
+                    seed_age_for_time_slicing=2.0,
+                    list_time_slice_age_ends=[1.0]
+                )
 
-        # self.assertEqual(str(exc2.exception),
-        #     "ERROR: When specifying object " \
-        #     + "DiscreteStateDependentParameterManager " \
-        #     + "only one type of parameter is allowed. Found 2."
-        # )
+        self.assertEqual(str(exc2.exception),
+            ("When specifying object DiscreteStateDependentParameterManager "
+             "only one type of parameter is allowed. Found 2."))
 
-        # with self.assertRaises(ec.MissingStateDependentParameterError) as exc3:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_probs_error3, total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
+        with self.assertRaises(
+            ec.ObjInitMissingStateDependentParameterError) as exc3:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_probs_error3, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
 
-        # self.assertEqual(str(exc3.exception),
-        #     "ERROR: One or more state-dependent parameters were missing " \
-        #     + "at least from time slice 1. The symmetric difference " \
-        #     + "between time-slice state sets is ( 1, 2 )"
-        # )
+        self.assertEqual(str(exc3.exception),
+            "One or more state-dependent parameters were missing " \
+            + "at least from time slice 1. The symmetric difference " \
+            + "between time-slice state sets is ( 1, 2 )."
+        )
 
-        # with self.assertRaises(ec.RepeatedStateDependentParameterError) as exc4:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_probs_error4, total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
+        with self.assertRaises(
+            ec.ObjInitRepeatedStateDependentParameterError) as exc4:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_probs_error4, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
 
-        # self.assertEqual(str(exc4.exception),
-        #     "ERROR: State-dependent parameter defined by states 0 were " \
-        #         + "repeated in epoch 1"
-        # )
+        self.assertEqual(str(exc4.exception),
+            "State-dependent parameter defined by states 0 were repeated " \
+            + "in epoch 1."
+        )
 
-        # with self.assertRaises(
-        #     ec.MissingStateDependentParameterError) as exc5:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_rates_error1, total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
+        with self.assertRaises(
+            ec.ObjInitMissingStateDependentParameterError) as exc5:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_rates_error1, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
 
-        # self.assertEqual(str(exc5.exception),
-        #     "ERROR: One or more state-dependent parameters were missing " \
-        #     + "at least from time slice 1. The symmetric difference " \
-        #     + "between time-slice state sets is ( (1, 1, 1) )"
-        # )
+        self.assertEqual(str(exc5.exception),
+            "One or more state-dependent parameters were missing " \
+            + "at least from time slice 1. The symmetric difference " \
+            + "between time-slice state sets is ( (1, 1, 1) )."
+        )
 
-        # with self.assertRaises(
-        #     ec.RepeatedStateDependentParameterError) as exc6:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_rates_error2, total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
+        with self.assertRaises(
+            ec.ObjInitRepeatedStateDependentParameterError) as exc6:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_rates_error2, total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
 
-        # self.assertEqual(str(exc6.exception),
-        #     "ERROR: State-dependent parameter defined by states " \
-        #     + "(0, 0, 0) were repeated in epoch 1"
-        # )
+        self.assertEqual(str(exc6.exception),
+            "State-dependent parameter defined by states " \
+            + "(0, 0, 0) were repeated in epoch 1."
+        )
 
-        # with self.assertRaises(
-        #     ec.MissingStateDependentParameterError) as exc7:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_rates_error3, 3,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
+        with self.assertRaises(
+            ec.ObjInitMissingStateDependentParameterError) as exc7:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_rates_error3, 3,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
 
-        # self.assertEqual(str(exc7.exception),
-        #     "ERROR: One or more state-dependent parameters were missing " \
-        #     + "at least from time slice 1. The symmetric difference " \
-        #     + "between time-slice state sets is ( (1, 1, 1), (2, 2, 2) )"
-        # )
+        self.assertEqual(str(exc7.exception),
+            "One or more state-dependent parameters were missing " \
+            + "at least from time slice 1. The symmetric difference " \
+            + "between time-slice state sets is ( (1, 1, 1), (2, 2, 2) )."
+        )
 
         # TODO: update tests with rates for repeated rates (gotta add the code in DiscreteStateDependentParameterManager)
 

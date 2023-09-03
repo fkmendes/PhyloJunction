@@ -13,7 +13,7 @@ __email__ = "f.mendes@wustl.edu"
 class TestBiSSETrees(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         total_n_states = 2
 
         rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda0", val=0.5, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),

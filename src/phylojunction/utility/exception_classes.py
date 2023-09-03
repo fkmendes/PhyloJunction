@@ -172,23 +172,6 @@ class NoPlatingAllowedError(Exception):
             + ". Plating is not supported for this deterministic function."
 
 
-class RequireSameParameterType(Exception):
-    message: str
-    obj_name: str
-    n_diff_par: int
-
-    def __init__(self, obj_name: str, n_diff_par: int) -> None:
-
-        self.obj_name = obj_name
-        self.n_diff_par = n_diff_par
-        self.message = ""
-
-    def __str__(self) -> str:
-        return "ERROR: When specifying object " + self.obj_name \
-            + " only one type of parameter is allowed. Found " \
-            + str(self.n_diff_par) + "."
-
-
 class ReplicateNumberError(Exception):
     node_name: str
     message: str
@@ -221,88 +204,6 @@ class DimensionalityWarning(Exception):
         return "Warning: Distribution " + self.dn_name \
             + " will be called to sample " + self.rv_name \
             + " using vectorization."
-
-
-class MissingStateDependentParameterError(Exception):
-    epoch_missing_param: int
-    symmetric_diff_set: ty.Set[ty.Any]
-    symmetric_diff_str: str
-    message: str
-
-    def __init__(self,
-                 epoch_missing_param: int,
-                 symmetric_diff_set: ty.Set[ty.Any],
-                 message: str = "") -> None:
-        self.epoch_missing_param = epoch_missing_param
-        self.symmetric_diff_str = "( "
-
-        for i in symmetric_diff_set:
-            ith_str = ""
-
-            if isinstance(i, int):
-                ith_str = str(i)
-
-            elif isinstance(i, tuple):
-                ith_str = "(" + ", ".join(str(j) for j in i) + ")"
-
-            if self.symmetric_diff_str == "( ":
-                self.symmetric_diff_str += ith_str
-
-            else:
-                self.symmetric_diff_str += ", " + ith_str
-
-        self.symmetric_diff_str += " )"
-
-        self.message = message
-
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: One or more state-dependent parameters were " \
-            + "missing at least from time slice " \
-            + str(self.epoch_missing_param) + ". The symmetric " \
-            + "difference between time-slice state sets is " \
-            + self.symmetric_diff_str
-
-
-class RepeatedStateDependentParameterError(Exception):
-    epoch_w_repeated_param: int
-    repeated_state: ty.Tuple[int]
-    repeated_state_str: str
-    message: str
-
-    def __init__(self,
-                 epoch_w_repeated_param: int,
-                 repeated_state: ty.Union[int, ty.Tuple[int]],
-                 message: str = "") -> None:
-        self.epoch_w_repeated_param = epoch_w_repeated_param
-        self.repeated_state = repeated_state
-        self.repeated_state_str = ""
-        self.message = message
-
-        if isinstance(repeated_state, int):
-            self.repeated_state_str = str(repeated_state)
-
-        elif isinstance(repeated_state, tuple):
-            self.repeated_state_str = "("
-
-            for i in repeated_state:
-                ith_str = str(i)
-
-                if self.repeated_state_str == "(":
-                    self.repeated_state_str += ith_str
-
-                else:
-                    self.repeated_state_str += ", " + ith_str
-
-            self.repeated_state_str += ")"
-
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: State-dependent parameter defined by states " \
-            + self.repeated_state_str + " were repeated in epoch " \
-            + str(self.epoch_w_repeated_param)
 
 
 class StateDependentParameterMisspec(Exception):
@@ -386,9 +287,9 @@ class ObjInitIncorrectDimensionError(Exception):
         self.obj_name = obj_name
         self.obs_len = obs_len
         self.exp_len = exp_len
-        self.message = "Could not initialize the object of " + obj_name \
-            + ". Incorrect dimension of container " + container_name \
-            + ", which was of size " + str(obs_len) + ". "
+        self.message = "Could not initialize the object of \'" + obj_name \
+            + "\'. Incorrect dimension of container \'" + container_name \
+            + "\', which was of size " + str(obs_len) + ". "
         
         if exp_len != 0:
             self.message += "The expected dimension was " + str(exp_len) \
@@ -398,6 +299,97 @@ class ObjInitIncorrectDimensionError(Exception):
 
     def __str__(self) -> str:
         return self.message
+
+
+class ObjInitRequireSameParameterTypeError(Exception):
+    message: str
+    obj_name: str
+    n_diff_par: int
+
+    def __init__(self, obj_name: str, n_diff_par: int) -> None:
+        self.obj_name = obj_name
+        self.n_diff_par = n_diff_par
+        self.message = "When specifying object " + self.obj_name \
+            + " only one type of parameter is allowed. Found " \
+            + str(self.n_diff_par) + "."
+        
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ObjInitMissingStateDependentParameterError(Exception):
+    symmetric_diff_str: str
+    message: str
+
+    def __init__(self,
+                 epoch_missing_param: int,
+                 symmetric_diff_set: ty.Set[ty.Any]) -> None:
+        self.symmetric_diff_str = "( "
+
+        for i in symmetric_diff_set:
+            ith_str = ""
+
+            if isinstance(i, int):
+                ith_str = str(i)
+
+            elif isinstance(i, tuple):
+                ith_str = "(" + ", ".join(str(j) for j in i) + ")"
+
+            if self.symmetric_diff_str == "( ":
+                self.symmetric_diff_str += ith_str
+
+            else:
+                self.symmetric_diff_str += ", " + ith_str
+
+        self.symmetric_diff_str += " )."
+
+        self.message = ("One or more state-dependent parameters were missing "
+                "at least from time slice ") + str(epoch_missing_param) \
+                + ". The symmetric difference between time-slice state " \
+                + "sets is " + self.symmetric_diff_str
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ObjInitRepeatedStateDependentParameterError(Exception):
+    message: str
+
+    def __init__(self,
+                 epoch_w_repeated_param: int,
+                 repeated_state: ty.Union[int, ty.Tuple[int]]) -> None:
+        repeated_state_str = ""
+
+        if isinstance(repeated_state, int):
+            repeated_state_str = str(repeated_state)
+
+        elif isinstance(repeated_state, tuple):
+            repeated_state_str = "("
+
+            for i in repeated_state:
+                ith_str = str(i)
+
+                if repeated_state_str == "(":
+                    repeated_state_str += ith_str
+
+                else:
+                    repeated_state_str += ", " + ith_str
+
+            repeated_state_str += ")"
+
+        self.message = "State-dependent parameter defined by states " \
+            + repeated_state_str + " were repeated in epoch " \
+            + str(epoch_w_repeated_param) + "."
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
 
 # Syntax errors: sampling distribution, det. function exceptions #
 class ParseFunctionArgError(Exception):

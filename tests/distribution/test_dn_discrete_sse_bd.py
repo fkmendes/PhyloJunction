@@ -14,7 +14,7 @@ __email__ = "f.mendes@wustl.edu"
 class TestBDTrees(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         # not state-dependent (just state 0, and no transition)
         total_n_states = 1
 

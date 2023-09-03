@@ -13,7 +13,7 @@ __email__ = "f.mendes@wustl.edu"
 class TestClaSSETrees(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         total_n_states = 3
 
         # calling state 0 "1" to match R unit test

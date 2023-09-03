@@ -14,7 +14,7 @@ __email__ = "f.mendes@wustl.edu"
 class TestYuleTrees(unittest.TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         # not state-dependent (just state 0, and no transition)
         rates_t0_s0 = [ 
             sseobj.DiscreteStateDependentRate(
