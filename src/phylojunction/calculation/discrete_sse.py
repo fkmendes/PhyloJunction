@@ -779,22 +779,33 @@ class MacroevolEventHandler():
         departing_state: ty.Optional[int]=None,
         debug: bool=False) -> \
             ty.Union[float, ty.Tuple[float, ty.List[float]]]:
-        """Calculate total rate for either any event, or for events conditioned on a specific state.
+        """
+        Calculate total rate for either any event, or for events
+        conditioned on a specific state.
 
         Args:
-            a_time (float): Forward time (not age!) we want to recover rates with.
-            state_representation_dict (dict): Dictionary with (int) states as keys and list of (str) node labels at that state.
-            value_idx (int, optional): Index specifying which parameter value (within a vector of #-of-simulations-size) we care about. Defaults to 0 (first element).
-            departing_state (int, optional): State we can condition rates on. Defaults to None.
-            debug (bool, optional): Flag for printing debugging messages. Defaults to False.
+            a_time (float): Forward time (not age!) we want to recover
+                rates with.
+            state_representation_dict (dict): Dictionary with (int) states
+                as keys and list of (str) node labels at that state.
+            value_idx (int, optional): Index specifying which parameter
+                value (within a vector of #-of-simulations-size) we care about.
+                Defaults to 0 (first element).
+            departing_state (int, optional): State we can condition rates on.
+                Defaults to None.
+            debug (bool, optional): Flag for printing debugging messages.
+                Defaults to False.
 
         Returns:
-            (float): If no departing_state is provided, returns the global rate. Otherwise, returns a state-conditioned total rate and a list with each state total rate.
+            (float): If no departing_state is provided, returns the global
+                rate. Otherwise, returns a state-conditioned total rate and
+                a list with each state total rate.
         """
 
         if debug:
             if departing_state is None:
                 print("\nCalculating rate for exponential:")
+
             else:
                 print("\nCalculating denominator for sampling event:")
 
@@ -844,6 +855,7 @@ class MacroevolEventHandler():
 
         if departing_state is None:
             return total_rate, state_rates
+
         else:
             return total_rate
 
@@ -859,12 +871,18 @@ class MacroevolEventHandler():
         """Return one-sized list with a sampled macroevolutionary event
 
         Args:
-            denominator (float): Normalization term for computing weights of different events.
+            denominator (float): Normalization term for computing weights
+                of different events.
             a_time (float): When the event will take place.
-            state_indices (int): Event is conditioned on departing from this state(s).
-            value_idx (int, optional): Index specifying which parameter value (within a vector of #-of-simulations-size) we care about. Defaults to 0 (first element).
-            a_seed (int, optional): Random seed for simulation (not working at the moment). Defaults to None.
-            debug (bool, optional): Flag for printing debugging messages. Defaults to False.
+            state_indices (int): Event is conditioned on departing from
+                this state(s).
+            value_idx (int, optional): Index specifying which parameter
+                value (within a vector of #-of-simulations-size) we care
+                about. Defaults to 0 (first element).
+            a_seed (int, optional): Random seed for simulation (not
+                working at the moment). Defaults to None.
+            debug (bool, optional): Flag for printing debugging messages.
+                Defaults to False.
 
         Returns:
             MacroevolEvent: Sampled macroevolutionary event that will take place
@@ -880,7 +898,9 @@ class MacroevolEventHandler():
         ws = list() # weights for sampling proportional to rate value
         for state_idx in state_indices:
             atomic_rate_params_matrix = self.state_dep_rate_manager.state_dep_params_dict[state_idx]
-            this_state_atomic_rate_params = self.state_dep_rate_manager.state_dep_params_at_time(a_time, params_matrix=atomic_rate_params_matrix)
+            this_state_atomic_rate_params = \
+                self.state_dep_rate_manager.state_dep_params_at_time(
+                    a_time, params_matrix=atomic_rate_params_matrix)
             all_states_atomic_rate_params += this_state_atomic_rate_params
 
             # total rate of outcomes must depend on "adjacent" states across events

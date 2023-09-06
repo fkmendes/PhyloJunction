@@ -18,7 +18,12 @@ from phylojunction.interface.pysidegui.pjguipages.gui_pages \
 from phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons \
     import PJPushButton  # type: ignore
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
+
 my_dir_path = Path(__file__)
+
 
 class ContentGUIMainWindow(object):
     def setup_ui(self, parent):
@@ -199,12 +204,11 @@ class ContentGUIMainWindow(object):
             text="Settings",
             icon_path="icon_settings.svg"
         )
-        
+
         self.warning_button = PJPushButton(
             text="Warnings",
             icon_path="icon_warning.svg"
         )
-
 
         #########
         # Pages #
@@ -243,7 +247,6 @@ class ContentGUIMainWindow(object):
         # clear_model_icon = QIcon(icon_dir_path + "icon_covg.svg")
         # self.ui_pages.clear_model.setIconSize(QSize(36, 36))
 
-
         ##################
         # Adding widgets #
         ##################
@@ -275,7 +278,6 @@ class ContentGUIMainWindow(object):
         self.content_layout.addWidget(self.top_bar)
         self.content_layout.addWidget(self.pages, alignment=Qt.AlignCenter)
         self.content_layout.addWidget(self.bottom_bar)
-
 
         ###################
         # Setting widgets #

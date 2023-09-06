@@ -52,21 +52,21 @@ class TestDataDump(unittest.TestCase):
             event=sseobj.MacroevolEvent.W_SPECIATION,
             states=[1,1,1]
         )
-        
+
         mu1rate = sseobj.DiscreteStateDependentRate(
             name="mu1",
             val=0.25,
             event=sseobj.MacroevolEvent.EXTINCTION,
             states=[1]
         )
-        
+
         q10rate = sseobj.DiscreteStateDependentRate(
             name="q10",
             val=0.75,
             event=sseobj.MacroevolEvent.ANAGENETIC_TRANSITION,
             states=[1,0]
         )
-        
+
         rates_t0_s1 = [ l1rate, mu1rate, q10rate ]
         
         rates_t0 = rates_t0_s0 + rates_t0_s1
@@ -74,7 +74,7 @@ class TestDataDump(unittest.TestCase):
         # 1D: time slices (i)
         # 2D: all rates from all states in i-th time slice
         matrix_atomic_rate_params = [ rates_t0 ]
-        
+
         state_dep_param_manager = sseobj.DiscreteStateDependentParameterManager(
             matrix_atomic_rate_params, total_n_states
         )
@@ -126,7 +126,7 @@ class TestDataDump(unittest.TestCase):
                 "mu0", n_sim, value=mu0, sampled_from="Log-normal"
             )
         )
-        
+
         # deterministic
         cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("l0r", value=l0rate))
         cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("mu0r", value=mu0rate))
@@ -145,7 +145,7 @@ class TestDataDump(unittest.TestCase):
         )
 
         # sorted_node_pgm_list = bisse_pgm.get_sorted_node_pgm_list()
-            
+
         ###################
         # Output handling #
         ###################

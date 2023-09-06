@@ -316,7 +316,7 @@ def parse_variable_assignment(
 
     # if scalar variable
     else:
-        if len(re.findall("\.", stoch_node_spec)) > 1:
+        if len(re.findall(r"\.", stoch_node_spec)) > 1:
             raise ec.ScriptSyntaxError(
                 stoch_node_spec,
                 ("Something went wrong during variable assignment. It looks "
@@ -403,9 +403,9 @@ def parse_samp_dn_assignment(
         raise ec.ScriptSyntaxError(
             cmd_line,
             ("Something went wrong during sampling distribution "
-             "specification. Could not find both the name of a distribution "
-             "(e.g., \'normal\') and its specification (e.g., "
-             "\'(mean=0.0, sd=1.0)\')."))
+             "specification. Could not find either the name of a "
+             "distribution (e.g., \'normal\') or its specification "
+             "(e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
     # ok!
     else:
@@ -438,6 +438,7 @@ def parse_samp_dn_assignment(
         except (ec.ParseNotAParameterError,
                 ec.ParseRequireSingleValueError,
                 ec.ParseRequireIntegerError,
+                ec.ParseRequireNumericError,
                 ec.ParseMissingParameterError) as e:
             raise ec.ParseDnInitFailError(dn_name, e.message)
 
@@ -819,7 +820,8 @@ if __name__ == "__main__":
     # should throw exceptions (in tests)
     script_str_error1 = "u ~ unif(n=1, nr=1, max=1.0)"
     script_str_error2 = "u ~ unif(n=1, rate=1.0)"
-    script_str_error3 = "u ~ unif()"
+    script_str_error3 = "u ~ unif(n=1, min=\"a\", max=2)"
+    script_str_error4 = "u ~ unif()"
     # script_str36 = "1.0 + 1.0"
     # script_str37 = "~ lognormal(n=10, mean=0.0, sd=1.0)"
     # script_str38 = "a <-- 1.0"
@@ -836,7 +838,7 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm(script_str4, in_pj_file=False)
+    pgm_obj = script2pgm(script_str_error3, in_pj_file=False)
 
-    for node_pgm in pgm_obj.get_sorted_node_pgm_list():
-        print(node_pgm.node_name)
+    # for node_pgm in pgm_obj.get_sorted_node_pgm_list():
+    #     print(node_pgm.node_name)

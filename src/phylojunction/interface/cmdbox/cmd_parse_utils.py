@@ -6,26 +6,37 @@ import re
 import phylojunction.pgm.pgm as pgm
 import phylojunction.utility.exception_classes as ec
 
-# general
-cannot_start_with_this_regex = re.compile('[\(\[\{|^&+\-%*/=!><_~0-9]')
-cannot_end_with_this_regex = re.compile('[\(\[\{|^&+\-%*/=!><_~]$')
-whitespace_regex = re.compile("\s+")
-int_or_float_regex = re.compile("(\d+(?:\.\d+)?)")
-vector_value_regex = re.compile("[\[\]]")
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
+
+# note that in string literals, backslash "\" has a special
+# meaning in that it escapes characters; importantly in string
+# literals, some characters cannot be escaped, like "s" or "\n",
+# i.e., "\s" does not escape "s"
+# 
+# if one wants to match "\s" or other non-escapable characters,
+# e.g., "[", either one must use double backslashes, or make the
+# string raw with "r"
+cannot_start_with_this_regex = re.compile(r"[\(\[\{|^&+\-%*/=!><_~0-9]")
+cannot_end_with_this_regex = re.compile(r"[\(\[\{|^&+\-%*/=!><_~]$")
+whitespace_regex = re.compile(r"\s+")
+int_or_float_regex = re.compile(r"(\d+(?:\.\d+)?)")
+vector_value_regex = re.compile(r"[\[\]]")
 
 # assignment
 # Would two '-' make into this regex?
-assign_regex = re.compile("\s*(<-)\s*")
+assign_regex = re.compile(r"\s*(<-)\s*")
 
-character_value_regex = re.compile("\s*([a-zA-Z]+)\s*")
-quoted_character_value_regex = re.compile("\s*(\"[a-zA-Z]+\")\s*")
+character_value_regex = re.compile(r"\s*([a-zA-Z]+)\s*")
+quoted_character_value_regex = re.compile(r"\s*(\"[a-zA-Z]+\")\s*")
 
 # sampling dn
-sampled_as_regex = re.compile("\s*(~)\s*")
-sampling_dn_spec_regex = re.compile("([a-zA-Z]+_*[a-zA-Z]*)\((.+)\)")
+sampled_as_regex = re.compile(r"\s*(~)\s*")
+sampling_dn_spec_regex = re.compile(r"([a-zA-Z]+_*[a-zA-Z]*)\((.+)\)")
 
 # det functions
-deterministic_regex = re.compile("\s*(:=)\s*")
+deterministic_regex = re.compile(r"\s*(:=)\s*")
 
 
 def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
@@ -55,7 +66,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
     val_or_obj_list: ty.List[ty.Union[pgm.NodePGM, str]] = []
 
     for v in val:
-        if type(v) == str:
+        if isinstance(v, str):
             # checking if string could potentially be a node object that
             # has a name
             if re.match(character_value_regex, v):
@@ -64,7 +75,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
                     # appending StochasticNodePGM
                     val_or_obj_list.append(pgm_obj.node_name_val_dict[v])
 
-                except:
+                except KeyError:
                     raise ec.InexistentVariableError(v)
 
             # if string is instead number, or a word enclosed in quotes,
@@ -116,7 +127,7 @@ def parse_spec(
         # }
 
         for vo in val_obj_list:
-            if type(vo) == pgm.NodePGM:
+            if isinstance(vo, pgm.NodePGM):
                 parent_pgm_nodes.append(vo)
 
     # values in spec_dict will be lists of strings or lists of NodePGMs
@@ -141,9 +152,9 @@ def parse_val_vector(vec_str: str) -> ty.List[str]:
     if len(re.findall(vector_value_regex, vec_str)) > 2:
         raise ec.ScriptSyntaxError(
             vec_str,
-            "Something went wrong during variable assignment. If a vector " +
-            "of values is specified, there can only be one left and one " +
-            "right squared brackets. Exiting.")
+            ("Something went wrong during variable assignment. If a vector "
+             "of values is specified, there can only be one left and one "
+             "right squared brackets. Exiting."))
 
     # ok!
     else:
@@ -225,6 +236,7 @@ def tokenize_fn_spec(fn_spec_str: str, cmd_line: str) -> ty.Dict[str, str]:
         spec_dict[last_key_token] = token
 
     return spec_dict
+
 
 if __name__ == "__main__":
     # can be called from interface/

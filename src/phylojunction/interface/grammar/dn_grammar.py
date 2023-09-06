@@ -109,23 +109,45 @@ class PJDnGrammar():
 
                     elif arg == "n":
                         if len(extracted_val) > 1:
-                            raise ec.ParseRequireSingleValueError(dnpar.DnLogNormal.DN_NAME, arg)
+                            raise ec.ParseRequireSingleValueError(
+                                dnpar.DnLogNormal.DN_NAME, arg)
+
                         # only one element always
-                        ln_n_draws = int(extracted_val[0])
+                        try:
+                            ln_n_draws = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
-                            raise ec.ParseRequireSingleValueError(dnpar.DnLogNormal.DN_NAME, arg)
+                            raise ec.ParseRequireSingleValueError(
+                                dnpar.DnLogNormal.DN_NAME, arg)
+
                         # only one element always
-                        ln_n_repl = int(extracted_val[0])
+                        try:
+                            ln_n_repl = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "mean":
-                        # pars[2] = [float(v) for v in _extracted_val]
-                        ln_mean = [float(v) for v in extracted_val]
+                        try:
+                            ln_mean = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "sd":
-                        # pars[3] = [float(v) for v in _extracted_val]
-                        ln_sd = [float(v) for v in extracted_val]
+                        try:
+                            ln_sd = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "log_space":
                         if extracted_val[0] in ("\"true\"", "\"T\"", "\"True\""):
@@ -142,7 +164,13 @@ class PJDnGrammar():
                     raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnLogNormal(pars, parent_node_tracker)
-            return dnpar.DnLogNormal(ln_n_draws, ln_n_repl, ln_mean, ln_sd, ln_log_space, parent_node_tracker)
+            return dnpar.DnLogNormal(
+                ln_n_draws,
+                ln_n_repl,
+                ln_mean,
+                ln_sd,
+                ln_log_space,
+                parent_node_tracker)
 
         elif dn_id == "normal":
             #############################
@@ -173,7 +201,12 @@ class PJDnGrammar():
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
-                        norm_n_draws = int(extracted_val[0])
+                        try:
+                            norm_n_draws = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
@@ -188,12 +221,20 @@ class PJDnGrammar():
                                 dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "mean":
-                        # pars[2] = [float(v) for v in extracted_val]
-                        norm_mean = [float(v) for v in extracted_val]
+                        try:
+                            norm_mean = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "sd":
-                        # pars[3] = [float(v) for v in extracted_val]
-                        norm_sd = [float(v) for v in extracted_val]
+                        try:
+                            norm_sd = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DnNormal.DN_NAME, arg)
 
             # making sure essential parameters of distribution have been specified
             for par_obj, par_name in ((norm_mean, "mean"), (norm_sd, "sd")):
@@ -201,7 +242,12 @@ class PJDnGrammar():
                     raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnNormal(pars, parent_node_tracker)
-            return dnpar.DnNormal(norm_n_draws, norm_n_repl, norm_mean, norm_sd, parent_node_tracker)
+            return dnpar.DnNormal(
+                norm_n_draws,
+                norm_n_repl,
+                norm_mean,
+                norm_sd,
+                parent_node_tracker)
 
         elif dn_id == "exponential":
             #############################
@@ -295,31 +341,50 @@ class PJDnGrammar():
                         if len(extracted_val) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnGamma.DN_NAME, arg)
-                        # pars[0] = int(_extracted_val[0])
-                        gamma_n_draws = int(extracted_val[0])
+
+                        try:
+                            gamma_n_draws = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DnGamma.DN_NAME, arg)
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnGamma.DN_NAME, arg)
-                        # pars[1] = int(_extracted_val[0])
-                        gamma_n_repl = int(extracted_val[0])
+                        
+                        try:
+                            gamma_n_repl = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DN_NAME, arg)
 
                     elif arg == "shape":
-                        # pars[2] = [float(v) for v in _extracted_val]
-                        gamma_shape = [float(v) for v in extracted_val]
+                        try:
+                            gamma_shape = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DN_NAME, arg)
 
                     elif arg == "scale":
-                        # pars[3] = [float(v) for v in _extracted_val]
-                        gamma_scale_or_rate = [float(v) for v in extracted_val]
+                        try:
+                            gamma_scale_or_rate = \
+                                [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DN_NAME, arg)
 
                     elif arg == "rate_parameterization":
-                        if extracted_val[0] in ("\"true\"", "\"T\"", "\"True\""):
-                            # pars[3] = True
+                        if extracted_val[0] in \
+                            ("\"true\"", "\"T\"", "\"True\""):
                             gamma_rate_parameterization = True
 
-                        elif extracted_val[0] in ("\"false\"", "\"F\"", "\"False\""):
-                            # pars[3] = False
+                        elif extracted_val[0] in \
+                            ("\"false\"", "\"F\"", "\"False\""):
                             gamma_rate_parameterization = False
 
             # making sure essential parameters of distribution have been specified
@@ -364,27 +429,55 @@ class PJDnGrammar():
                         if len(extracted_val) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnUnif.DN_NAME, arg)
-                        unif_n_draws = int(extracted_val[0])
+
+                        try:
+                            unif_n_draws = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DnUnif.DN_NAME, arg)
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnUnif.DN_NAME, arg)
-                        unif_n_repl = int(extracted_val[0])
+                        
+                        try:
+                            unif_n_repl = int(extracted_val[0])
+
+                        except ValueError:
+                            raise ec.ParseRequireIntegerError(
+                                dnpar.DnUnif.DN_NAME, arg)
 
                     elif arg == "min":
-                        unif_min = [float(v) for v in extracted_val]
+                        try:
+                            unif_min = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DnUnif.DN_NAME, arg)
 
                     elif arg == "max":
-                        unif_max = [float(v) for v in extracted_val]
+                        try:
+                            unif_max = [float(v) for v in extracted_val]
+
+                        except ValueError:
+                            raise ec.ParseRequireNumericError(
+                                dnpar.DnUnif.DN_NAME, arg)
 
             # making sure essential parameters of distribution have been specified
-            for par_obj, par_name in ((unif_min, "min"), (unif_max, "max")):
+            for par_obj, par_name in \
+                ((unif_min, "min"), (unif_max, "max")):
                 if not par_obj:
                     raise ec.ParseMissingParameterError(par_name)
 
             # return dnpar.DnUnif(pars, parent_node_tracker)
-            return dnpar.DnUnif(unif_n_draws, unif_n_repl, unif_min, unif_max, parent_node_tracker)
+            return dnpar.DnUnif(
+                unif_n_draws,
+                unif_n_repl,
+                unif_min,
+                unif_max,
+                parent_node_tracker)
 
         #################################
         #  Non-parametric distributions #

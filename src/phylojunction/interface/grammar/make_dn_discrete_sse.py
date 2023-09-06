@@ -100,7 +100,7 @@ def make_discrete_SSE_dn(
                         # no vectorization allowed here
                         int_val = int(first_val)
 
-                except:
+                except ValueError:
                     raise ec.ParseRequireIntegerError(dn_name, arg)
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
@@ -158,7 +158,7 @@ def make_discrete_SSE_dn(
                         # no vectorization allowed here
                         float_val = float(first_val)
 
-                except:
+                except ValueError:
                     raise ec.ParseRequireNumericError(dn_name, arg)
 
                 eps = float_val
@@ -173,9 +173,9 @@ def make_discrete_SSE_dn(
                     stop_values_list = \
                         [float(v) for v in extracted_val if isinstance(v, str)]
 
-                except:
+                except ValueError:
                     raise ec.ParseRequireNumericError(dn_name, arg)
-                    
+
                 for sv in stop_values_list:
                     if sv < 0.0:
                         is_negative = True
@@ -189,12 +189,12 @@ def make_discrete_SSE_dn(
                     start_states_list = \
                         [int(v) for v in extracted_val if isinstance(v, str)]
 
-                except:
+                except ValueError:
                     raise ec.ParseRequireIntegerError(dn_name, arg)
 
     # making sure essential parameters of distribution have been specified
-    if not any(stash.get_meh()\
-               .state_dep_rate_manager\
+    if not any(stash.get_meh()
+               .state_dep_rate_manager
                .matrix_state_dep_params):
         raise ec.ParseMissingArgumentError("stash")
 

@@ -286,7 +286,7 @@ def make_SSEStash(
         extracted_value = first_element  # can be scalar or container
 
         if isinstance(first_element, pgm.NodePGM) \
-            and len(val) == 1:
+                and len(val) == 1:
             extracted_value = first_element.value
 
         # so mypy won't complain
@@ -294,7 +294,7 @@ def make_SSEStash(
         if arg in ("n_states", "n_epochs", "seed_age"):
             # none of the above can be more than one value
             if isinstance(extracted_value, list) and \
-                len(extracted_value) > 1:
+                    len(extracted_value) > 1:
                 # should provide only one number of states
                 raise ec.ParseRequireSingleValueError(det_fn_name, arg)
 
@@ -328,8 +328,7 @@ def make_SSEStash(
 
             try:
                 time_slice_age_ends = \
-                    [float(v) for v in val 
-                        if isinstance(v, str)]
+                    [float(v) for v in val if isinstance(v, str)]
 
             except ValueError:
                 raise ec.ParseRequireNumericError(det_fn_name, arg)

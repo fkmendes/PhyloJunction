@@ -1,5 +1,8 @@
 import typing as ty
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 
 class ScriptSyntaxError(Exception):
     cmd_line: str
@@ -7,7 +10,7 @@ class ScriptSyntaxError(Exception):
 
     def __init__(self, cmd_line: str, message: str) -> None:
         self.cmd_line = cmd_line
-        self.message = "\n\nERROR: " \
+        self.message = "ERROR: " \
             + self.cmd_line \
             + ("\n\nThe line above had a syntax problem and could not "
                "be tokenized. ") \
@@ -106,12 +109,12 @@ class IncorrectDimensionError(Exception):
         self.exp_len = exp_len
         self.message = \
             "Incorrect dimension of container " + self.obj_name \
-            + ", which was of size " + str(obs_len)  + ". "
-        
+            + ", which was of size " + str(obs_len) + ". "
+
         if exp_len != 0:
             self.message += "The expected dimension was " + str(exp_len) \
-            + "."
-        
+                + "."
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -251,7 +254,7 @@ class ObjInitInvalidArgError(Exception):
             "\'. The argument provided to " + par_name + " was invalid."
         if message:
             self.message += " " + message
-        
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -268,7 +271,7 @@ class ObjInitMissingParameterError(Exception):
             " . Parameter " + par_name + " was not provided an argument."
         if message:
             self.message += " " + message
-        
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -290,11 +293,11 @@ class ObjInitIncorrectDimensionError(Exception):
         self.message = "Could not initialize the object of \'" + obj_name \
             + "\'. Incorrect dimension of container \'" + container_name \
             + "\', which was of size " + str(obs_len) + ". "
-        
+
         if exp_len != 0:
             self.message += "The expected dimension was " + str(exp_len) \
-            + "."
-        
+                + "."
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -312,7 +315,7 @@ class ObjInitRequireSameParameterTypeError(Exception):
         self.message = "When specifying object " + self.obj_name \
             + " only one type of parameter is allowed. Found " \
             + str(self.n_diff_par) + "."
-        
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -345,10 +348,11 @@ class ObjInitMissingStateDependentParameterError(Exception):
 
         self.symmetric_diff_str += " )."
 
-        self.message = ("One or more state-dependent parameters were missing "
-                "at least from time slice ") + str(epoch_missing_param) \
-                + ". The symmetric difference between time-slice state " \
-                + "sets is " + self.symmetric_diff_str
+        self.message = \
+            ("One or more state-dependent parameters were missing "
+             "at least from time slice ") + str(epoch_missing_param) \
+            + ". The symmetric difference between time-slice state " \
+            + "sets is " + self.symmetric_diff_str
 
         super().__init__(self.message)
 
@@ -403,7 +407,7 @@ class ParseFunctionArgError(Exception):
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return  self.message
+        return self.message
 
 
 class ParseNotAParameterError(Exception):
@@ -417,7 +421,7 @@ class ParseNotAParameterError(Exception):
 
     def __str__(self) -> str:
         return self.message
-    
+
 
 class ParseRequireSingleValueError(Exception):
     obj_name: str
@@ -428,8 +432,9 @@ class ParseRequireSingleValueError(Exception):
         self.arg = arg
         self.message = \
             "When specifying object " + obj_name + "'s parameter \'" \
-                + self.arg + ("\', more than one value was "
-                              "provided. A scalar is required.")
+            + self.arg + ("\', more than one value was "
+                          "provided. A scalar is required.")
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -445,8 +450,8 @@ class ParseRequireIntegerError(Exception):
         self.arg = arg
         self.message = \
             "When specifying object " + obj_name + "'s parameter \'" \
-                + self.arg + ("\', something other than an integer was "
-                              "provided. An integer is required.")
+            + self.arg + ("\', something other than an integer was "
+                          "provided. An integer is required.")
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -462,8 +467,8 @@ class ParseRequireNumericError(Exception):
         self.arg = arg
         self.message = \
             "When specifying object " + obj_name + "'s parameter \'" \
-                + self.arg + ("\', something other than a number was "
-                              "provided. An number is required.")
+            + self.arg + ("\', something other than a number was "
+                          "provided. A number is required.")
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -490,12 +495,12 @@ class ParseMissingArgumentError(Exception):
     def __init__(self, par_name: str, arg_name: str = "") -> None:
         self.par_name = par_name
         self.message = "Argument "
-        
+
         if arg_name:
             self.message += "\'" + arg_name + "\' "
-            
+
         self.message += "for \'" + par_name + "\' is missing."
-        
+
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -577,6 +582,7 @@ class AnnotatedTreeLineageMissannotation(Exception):
         return "ERROR: AnnotatedTree cannot be annotated this way. " \
             + self.message
 
+
 # Generation exceptions #
 class GenerateFailError(Exception):
     message: str
@@ -584,6 +590,6 @@ class GenerateFailError(Exception):
     def __init__(self, dn_name: str, message: str) -> None:
         self.message = "ERROR: Could not generate a sample from " \
             + dn_name + ". " + message
-        
+
     def __str__(self) -> str:
         return self.message

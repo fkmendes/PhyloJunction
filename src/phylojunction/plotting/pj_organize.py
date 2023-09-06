@@ -10,6 +10,9 @@ import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.readwrite.pj_read as pjread
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 
 def join_dataframes(
     pj_df: pd.DataFrame,

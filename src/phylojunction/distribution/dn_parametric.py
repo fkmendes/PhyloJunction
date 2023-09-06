@@ -1,9 +1,8 @@
 import sys
-sys.path.extend(["../", "../phylojunction"]) # necessary to run it as standalone on command line (from phylojunction/ or phylojunction/distribution/)
 import typing as ty
 import math
 import numpy as np
-from scipy.stats import expon, lognorm, norm, gamma, uniform # type: ignore
+from scipy.stats import expon, lognorm, norm, gamma, uniform  # type: ignore
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -12,8 +11,12 @@ import phylojunction.utility.exception_classes as ec
 import phylojunction.utility.helper_functions as pjh
 import phylojunction.inference.revbayes.rb_dn_parametric as rbpar
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
+
 class DnLogNormal(pgm.DistributionPGM):
-    
+
     DN_NAME = "Log-normal"
 
     n_draws: int
@@ -26,15 +29,23 @@ class DnLogNormal(pgm.DistributionPGM):
     parent_node_tracker: ty.Optional[ty.Dict[str, str]] = dict()
 
     @staticmethod
-    def draw_ln(n_draws: int, mean_param: float, sd_param: float, scale: float=1.0, log_space: bool=True) -> ty.Union[np.float64, np.ndarray]:
+    def draw_ln(
+            n_draws: int,
+            mean_param: float,
+            sd_param: float,
+            scale: float = 1.0,
+            log_space: bool = True) -> ty.Union[np.float64, np.ndarray]:
         """Return sample from log-normal distribution.
 
         Args:
             n_draws (int): Number of draws (sample size).
             mean_param (float): Mean (location) of log-normal in log-space.
-            sd_param (float): Std. deviation (shape) of log-normal distribution in log-space.
-            scale (float): Median (scale) of log-normal distribution in log-space. Defaults to 1.0.
-            log_space (bool, optional): Mean and std. deviation are provided in natural space. Defaults to True.
+            sd_param (float): Std. deviation (shape) of log-normal
+                distribution in log-space.
+            scale (float): Median (scale) of log-normal distribution in
+                log-space. Defaults to 1.0.
+            log_space (bool, optional): Mean and std. deviation are provided
+                in natural space. Defaults to True.
 
         Returns:
             list of float(s): Sample (list) from log-normal distribution.
@@ -43,7 +54,7 @@ class DnLogNormal(pgm.DistributionPGM):
         if not log_space:
             # debugging
             # print("log-normal in natural space: mean = " + str(mean_param) + " sd = " + str(sd_param))
-            
+
             # have to use scale if in natural space
             return lognorm.rvs(s=sd_param, scale=math.exp(mean_param), size=n_draws)
 
@@ -54,7 +65,15 @@ class DnLogNormal(pgm.DistributionPGM):
         return lognorm.rvs(s=math.exp(sd_param), loc=math.exp(mean_param), scale=1.0, size=n_draws)
 
     # validation of pars happens in phylojunction_grammar
-    def __init__(self, n_draws: int, n_repl: int, ln_mean: ty.List[float], ln_sd: ty.List[float], ln_log_space: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
+    def __init__(
+            self,
+            n_draws: int,
+            n_repl: int,
+            ln_mean: ty.List[float],
+            ln_sd: ty.List[float],
+            ln_log_space: bool,
+            parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
+
         self.param_dict = dict()
         self.n_draws = n_draws
         self.n_repl = n_repl
@@ -62,7 +81,11 @@ class DnLogNormal(pgm.DistributionPGM):
         self.ln_sd_arg = ln_sd
         self.ln_log_space = ln_log_space
 
-        check_sample_size_return = self._check_sample_size([self.ln_mean_arg, self.ln_sd_arg]) # one element per parameter
+        # one element per parameter
+        check_sample_size_return = \
+            self._check_sample_size([self.ln_mean_arg,
+                                     self.ln_sd_arg])
+
         if isinstance(check_sample_size_return, list):
             self.vectorized_params = check_sample_size_return
 
@@ -72,42 +95,61 @@ class DnLogNormal(pgm.DistributionPGM):
 
         # for inference, we need to keep track of parent node names
         if isinstance(parent_node_tracker, pgm.DeterministicNodePGM):
-            raise ec.ObjInitInvalidArgError(self.DN_NAME, "One of the arguments is a deterministic node. This is not allowed. Ignoring command...")
+            raise ec.ObjInitInvalidArgError(
+                self.DN_NAME,
+                ("One of the arguments is a deterministic node. "
+                 "This is not allowed. Ignoring command..."))
 
         self.parent_node_tracker = parent_node_tracker
-
 
     def generate(self) -> ty.List[float]:
         sampled_values: ty.List[float] = list()
 
         try:
             if len(self.ln_mean_list) == 1 and len(self.ln_sd_list) == 1:
-                return ty.cast(ty.List[float], DnLogNormal.draw_ln(self.n_draws * self.n_repl, self.ln_mean_list[0], self.ln_sd_list[0], log_space=self.ln_log_space).tolist())
+                return ty.cast(
+                    ty.List[float],
+                    DnLogNormal.draw_ln(
+                        self.n_draws * self.n_repl,
+                        self.ln_mean_list[0],
+                        self.ln_sd_list[0],
+                        log_space=self.ln_log_space).tolist())
 
-            # (DnLogNormal sould have taken care of checking dimensions)
+            # (DnLogNormal sould have taken
             # otherwise, use one mean and sd for each n_repl draws for each simulation
             else:
                 for i in range(len(self.ln_mean_list)):
-                    # so mypy won't complain             
-                    repl = ty.cast(ty.List, DnLogNormal.draw_ln(self.n_repl, self.ln_mean_list[i], self.ln_sd_list[i], log_space=self.ln_log_space).tolist())
+                    # so mypy won't complain
+                    repl = ty.cast(
+                        ty.List,
+                        DnLogNormal.draw_ln(
+                            self.n_repl,
+                            self.ln_mean_list[i],
+                            self.ln_sd_list[i],
+                            log_space=self.ln_log_space).tolist())
                     sampled_values += repl
 
                 return sampled_values
 
-        except:
+        except Exception as e:
+            print("An error occurred: ", type(e).__name__, " - ", e)
+
             raise ec.GenerateFailError(
                 self.DN_NAME,
                 "A \'mean_param\' and \'sd_param\' must be specified.")
 
-
-    def _check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
+    def _check_sample_size(
+            self,
+            param_list: ty.List[ty.Any] = []) \
+            -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
 
-
     def get_rev_inference_spec_info(self) -> ty.List[str]:
-        return rbpar.get_ln_rev_inference_spec_info(self.n_draws, self.ln_mean_list, self.ln_sd_list, self.parent_node_tracker)
-
-##############################################################################
+        return rbpar.get_ln_rev_inference_spec_info(
+            self.n_draws,
+            self.ln_mean_list,
+            self.ln_sd_list,
+            self.parent_node_tracker)
 
 
 class DnNormal(pgm.DistributionPGM):
@@ -124,9 +166,9 @@ class DnNormal(pgm.DistributionPGM):
 
     @staticmethod
     def draw_normal(
-        n_draws: int,
-        mean_param: float,
-        sd_param: float) -> ty.Union[np.float64, np.ndarray]:
+            n_draws: int,
+            mean_param: float,
+            sd_param: float) -> ty.Union[np.float64, np.ndarray]:
         """Return sample from normal distribution
 
         Args:
@@ -166,8 +208,12 @@ class DnNormal(pgm.DistributionPGM):
 
         # makes sure these parameters are lists, or converts them into list
         # also multiplying element (when only one is provided) if necessary
-        # check_sample_size_return = self.check_sample_size(pars[2:4]) # one element per parameter
-        check_sample_size_return = self._check_sample_size([self.norm_mean_param_arg, self.norm_sd_param_arg]) # one element per parameter
+        # check_sample_size_return = self.check_sample_size(pars[2:4])
+
+        # one element per parameter
+        check_sample_size_return = \
+            self._check_sample_size([self.norm_mean_param_arg,
+                                     self.norm_sd_param_arg])
         if isinstance(check_sample_size_return, list):
             self.vectorized_params = check_sample_size_return
 
@@ -193,7 +239,7 @@ class DnNormal(pgm.DistributionPGM):
             # use single provided mean and sd for all (n_draws * n_repl) draws
             # if len(mean_params) == 1 and len(sd_params) == 1:
             if len(self.norm_mean_param_list) == 1 and \
-                len(self.norm_sd_param_list) == 1:
+                    len(self.norm_sd_param_list) == 1:
                 # so mypy won't complain
                 # if isinstance(mean_params, float) and isinstance(sd_params, float):
                 # return ty.cast(ty.List, DnNormal.draw_normal(self.n_draws * self.n_repl, mean_params[0], sd_params[0]).tolist())
@@ -202,13 +248,12 @@ class DnNormal(pgm.DistributionPGM):
                     self.norm_mean_param_list[0],
                     self.norm_sd_param_list[0]).tolist())
 
-
             # (DnNormal sould have taken care of checking dimensions)
             # otherwise, use one mean and sd for each n_repl draws for each simulation
             else:
                 # for i in range(len(mean_params)):
                 for i in range(len(self.norm_mean_param_list)):
-                    # so mypy won't complain             
+                    # so mypy won't complain
                     # for some reason, just checking type like below won't work here
                     # ... no clue why (I'm still calling isinstance() just to be safe)
                     # mypy is only satisfied if I forcefully cast into float
@@ -226,19 +271,22 @@ class DnNormal(pgm.DistributionPGM):
 
                 return sampled_values
 
-        except:
+        except Exception as e:
+            print("An error occurred: ", type(e).__name__, " - ", e)
+
             raise ec.GenerateFailError(
                 self.DN_NAME,
-                "A \'norm_mean_param\' and \'norm_sd_param\' must be specified.")
+                ("A \'norm_mean_param\' and \'norm_sd_param\' "
+                 "must be specified."))
 
     def _check_sample_size(
             self,
             param_list: ty.List[ty.Any] = []) \
-                -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
+            -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(
             param_list,
             self.DN_NAME,
-            size_to_grow = self.n_draws)
+            size_to_grow=self.n_draws)
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         return rbpar.get_normal_rev_inference_spec_info(
@@ -247,7 +295,6 @@ class DnNormal(pgm.DistributionPGM):
             self.norm_sd_param_list,
             self.parent_node_tracker)
 
-##############################################################################
 
 class DnExponential(pgm.DistributionPGM):
 
@@ -262,13 +309,18 @@ class DnExponential(pgm.DistributionPGM):
     parent_node_tracker: ty.Optional[ty.Dict[str, str]]
 
     @staticmethod
-    def draw_exp(n_draws: int, scale_or_rate_param: float, rate_parameterization: bool = True) -> ty.Union[np.float64, np.ndarray]:
+    def draw_exp(
+            n_draws: int,
+            scale_or_rate_param: float,
+            rate_parameterization: bool = True) -> ty.Union[np.float64, np.ndarray]:
         """Return sample from exponential distribution.
 
         Args:
             n_draws (int): Number of draws (sample size).
-            scale_or_rate_param (float): Scale (default) or rate of exponential distribution.
-            rate_parameterization (bool, optional): Argument of 'scale_or_rate_param' is rate instead of scale. Defaults to True.
+            scale_or_rate_param (float): Scale (default) or rate of
+                exponential distribution.
+            rate_parameterization (bool, optional): Argument of
+                'scale_or_rate_param' is rate instead of scale. Defaults to True.
 
         Returns:
             float: Sample (list) from exponential distribution.
@@ -338,7 +390,12 @@ class DnExponential(pgm.DistributionPGM):
                 # so mypy won't complain
                 # if isinstance(scale_or_rate_params[0], float) and isinstance(rate_parameterization, bool):
                 #     # return ty.cast(ty.List[float], DnExponential.draw_exp(self.n_draws * self.n_repl, scale_or_rate_params[0], rate_parameterization=rate_parameterization).tolist())
-                return ty.cast(ty.List[float], DnExponential.draw_exp(self.n_draws * self.n_repl, self.exp_scale_or_rate_param_list[0], rate_parameterization=self.exp_rate_parameterization).tolist())
+                return ty.cast(
+                    ty.List[float],
+                    DnExponential.draw_exp(
+                        self.n_draws * self.n_repl,
+                        self.exp_scale_or_rate_param_list[0],
+                        rate_parameterization=self.exp_rate_parameterization).tolist())
 
             # (DnExponential sould have taken care of checking dimensions)
             # otherwise, use one rate for each n_repl draws for each simulation
@@ -363,10 +420,13 @@ class DnExponential(pgm.DistributionPGM):
 
                 return sampled_values
 
-        except:
+        except Exception as e:
+            print("An error occurred: ", type(e).__name__, " - ", e)
+
             raise ec.GenerateFailError(
                 self.DN_NAME,
-                "A \'scale_or_rate_param\' and \'rate_parameterization\' must be specified.")
+                ("A \'scale_or_rate_param\' and \'rate_parameterization\' "
+                 "must be specified."))
 
     def _check_sample_size(self, param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
@@ -381,8 +441,6 @@ class DnExponential(pgm.DistributionPGM):
             self.exp_scale_or_rate_param_list,
             self.exp_rate_parameterization,
             self.parent_node_tracker)
-
-##############################################################################
 
 
 class DnGamma(pgm.DistributionPGM):
@@ -517,13 +575,25 @@ class DnGamma(pgm.DistributionPGM):
                     #     scale_or_rate_param = ty.cast(float, scale_or_rate_params[i])
                     #     rate_parameterization = ty.cast(bool, rate_parameterization)
                     #     # repl = ty.cast(ty.List[float], DnGamma.draw_gamma(self.n_repl, shape_param, scale_or_rate_param, rate_parameterization=rate_parameterization).tolist())
-                    repl = ty.cast(ty.List[float], DnGamma.draw_gamma(self.n_repl, self.gamma_shape_param_list[i], self.gamma_scale_or_rate_param_list[i], rate_parameterization=self.gamma_rate_parameterization).tolist())
+                    repl = ty.cast(
+                        ty.List[float],
+                        DnGamma.draw_gamma(
+                            self.n_repl,
+                            self.gamma_shape_param_list[i],
+                            self.gamma_scale_or_rate_param_list[i],
+                            rate_parameterization=self.gamma_rate_parameterization).tolist())
+
                     sampled_values += repl
 
                 return sampled_values
 
-        except:
-            raise ec.ParseMissingParameterError(self.DN_NAME, "A \'shape_param\' and \'scale_or_rate_param\' must be specified.")
+        except Exception as e:
+            print("An error occurred: ", type(e).__name__, " - ", e)
+
+            raise ec.GenerateFailError(
+                self.DN_NAME,
+                ("A \'shape_param\' and \'scale_or_rate_param\' "
+                 "must be specified."))
 
     def _check_sample_size(
         self,
@@ -541,8 +611,6 @@ class DnGamma(pgm.DistributionPGM):
             self.gamma_scale_or_rate_param_list,
             self.gamma_rate_parameterization,
             self.parent_node_tracker)
-
-##############################################################################
 
 
 class DnUnif(pgm.DistributionPGM):
@@ -577,7 +645,14 @@ class DnUnif(pgm.DistributionPGM):
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float]]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
-    def __init__(self, n_draws: int, n_repl: int, min_param: ty.List[float], max_param: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
+    def __init__(
+            self,
+            n_draws: int,
+            n_repl: int,
+            min_param: ty.List[float],
+            max_param: ty.List[float],
+            parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
+
         self.param_dict = dict()
 
         # so mypy won't complain...
@@ -603,8 +678,10 @@ class DnUnif(pgm.DistributionPGM):
         # params
         # self.param_dict["min_param"] = self.vectorized_params[0]
         # self.param_dict["max_param"] = self.vectorized_params[1]
-        self.min_param_list = ty.cast(ty.List[float], self.vectorized_params[0])
-        self.max_param_list = ty.cast(ty.List[float], self.vectorized_params[1])
+        self.min_param_list = \
+            ty.cast(ty.List[float], self.vectorized_params[0])
+        self.max_param_list = \
+            ty.cast(ty.List[float], self.vectorized_params[1])
 
         # for inference, we need to keep track of parent node names
         self.parent_node_tracker = parent_node_tracker
@@ -620,11 +697,16 @@ class DnUnif(pgm.DistributionPGM):
             # if isinstance(min_params, list) and isinstance(max_params, list):
             #     use single provided mean and sd for all (n_draws * n_repl) draws
             #     if len(min_params) == 1 and len(max_params) == 1:
-            if len(self.min_param_list) == 1 and len(self.max_param_list) == 1:
+            if len(self.min_param_list) == 1 and \
+                    len(self.max_param_list) == 1:
                 # so mypy won't complain
                 # if isinstance(min_params, float) and isinstance(max_params, float):
                 #     return ty.cast(ty.List[float], DnUnif.draw_unif(self.n_draws * self.n_repl, float(min_params[0]), float(max_params[0])).tolist())
-                return ty.cast(ty.List[float], DnUnif.draw_unif(self.n_draws * self.n_repl, self.min_param_list[0], self.max_param_list[0]).tolist())
+                return ty.cast(
+                    ty.List[float],
+                    DnUnif.draw_unif(self.n_draws * self.n_repl,
+                                     self.min_param_list[0],
+                                     self.max_param_list[0]).tolist())
 
             # (DnUniform sould have taken care of checking dimensions)
             # otherwise, use one mean and sd for each n_repl draws for each simulation
@@ -639,15 +721,24 @@ class DnUnif(pgm.DistributionPGM):
                     #     min_param = ty.cast(float, min_params[i])
                     #     max_param = ty.cast(float, max_params[i])
                     #     # repl = ty.cast(ty.List[float], DnUnif.draw_unif(self.n_repl, min_param, max_param).tolist())
-                    repl = ty.cast(ty.List[float], DnUnif.draw_unif(self.n_repl, self.min_param_list[i], self.max_param_list[i]).tolist())
+                    repl = ty.cast(
+                        ty.List[float],
+                        DnUnif.draw_unif(self.n_repl,
+                                         self.min_param_list[i],
+                                         self.max_param_list[i]).tolist())
                     sampled_values += repl
 
                 return sampled_values
 
-        # mypy doesn't understand this except is mandatory and would necessarily
-        # quit the program
-        except:
-            raise ec.ParseMissingParameterError(self.DN_NAME, "A \'min_param\' and \'max_param\' must be specified. Exiting...")
+        # mypy doesn't understand this except is mandatory
+        # and would necessarily quit the program
+        except Exception as e:
+            print("An error occurred: ", type(e).__name__, " - ", e)
+
+            raise ec.GenerateFailError(
+                self.DN_NAME,
+                ("A \'min_param\' and \'max_param\' must be specified. "
+                 "Exiting..."))
 
     def _check_sample_size(
         self,
@@ -664,8 +755,6 @@ class DnUnif(pgm.DistributionPGM):
             self.min_param_list,
             self.max_param_list,
             self.parent_node_tracker)
-
-##############################################################################
 
 
 if __name__ == "__main__":

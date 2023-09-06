@@ -245,7 +245,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer.exception),
-            ("\n\nERROR: u ~ unif(n=1, nr=1, max=1.0)\n\nThe line above "
+            ("ERROR: u ~ unif(n=1, nr=1, max=1.0)\n\nThe line above "
              "had a syntax problem and could not be tokenized. Parsing "
              "the specification of \'unif\' failed. Parameter \'min\' is "
              "missing."))
@@ -271,7 +271,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer.exception),
-            ("\n\nERROR: u ~ unif(n=1, rate=1.0)\n\nThe line above had a "
+            ("ERROR: u ~ unif(n=1, rate=1.0)\n\nThe line above had a "
              "syntax problem and could not be tokenized. Parsing the "
              "specification of \'unif\' failed. \'rate\' is not a valid "
              "parameter."))
@@ -297,11 +297,11 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer2.exception),
-            ("\n\nERROR: u ~ unif()\n\nThe line above had a syntax problem "
+            ("ERROR: u ~ unif()\n\nThe line above had a syntax problem "
              "and could not be tokenized. Something went wrong during "
-             "sampling distribution specification. Could not find both "
-             "the name of a distribution (e.g., \'normal\') and its "
-             "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+             "sampling distribution specification. Could not find either "
+             "the name of a distribution (e.g., \'normal\') or its "
+             "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
 
     def test_exp_misspec(self):
@@ -319,7 +319,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer.exception),
-            ("\n\nERROR: e ~ exponential(n=1, nr=1)\n\nThe line above had a "
+            ("ERROR: e ~ exponential(n=1, nr=1)\n\nThe line above had a "
              "syntax problem and could not be tokenized. Parsing the "
              "specification of \'exponential\' failed. Parameter \'rate\' is "
              "missing."))
@@ -345,7 +345,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer.exception),
-            ("\n\nERROR: e ~ exponential(n=1, min=-1)\n\nThe line above had a "
+            ("ERROR: e ~ exponential(n=1, min=-1)\n\nThe line above had a "
              "syntax problem and could not be tokenized. Parsing the "
              "specification of \'exponential\' failed. \'min\' is not a valid "
              "parameter."))
@@ -357,11 +357,11 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer2.exception),
-            ("\n\nERROR: e ~ exponential()\n\nThe line above had a syntax problem "
+            ("ERROR: e ~ exponential()\n\nThe line above had a syntax problem "
              "and could not be tokenized. Something went wrong during "
-             "sampling distribution specification. Could not find both "
-             "the name of a distribution (e.g., \'normal\') and its "
-             "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+             "sampling distribution specification. Could not find either "
+             "the name of a distribution (e.g., \'normal\') or its "
+             "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
 
     def test_gamma_misspec(self):
@@ -395,7 +395,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer.exception),
-            ("\n\nERROR: g ~ gamma(n=1, nr=1, rate=0.5)\n\nThe line above had a "
+            ("ERROR: g ~ gamma(n=1, nr=1, rate=0.5)\n\nThe line above had a "
              "syntax problem and could not be tokenized. Parsing the "
              "specification of \'gamma\' failed. \'rate\' is not a valid "
              "parameter."))
@@ -407,11 +407,11 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer2.exception),
-            ("\n\nERROR: g ~ gamma()\n\nThe line above had a syntax problem "
+            ("ERROR: g ~ gamma()\n\nThe line above had a syntax problem "
              "and could not be tokenized. Something went wrong during "
-             "sampling distribution specification. Could not find both "
-             "the name of a distribution (e.g., \'normal\') and its "
-             "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+             "sampling distribution specification. Could not find either "
+             "the name of a distribution (e.g., \'normal\') or its "
+             "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
 
     def test_normal_misspec(self):
@@ -442,7 +442,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
             self.assertEqual(
                 str(exc_outer.exception),
-                ("\n\nERROR: n ~ normal(n=1, rate=1.0)\n\nThe line above had a "
+                ("ERROR: n ~ normal(n=1, rate=1.0)\n\nThe line above had a "
                 "syntax problem and could not be tokenized. Parsing the "
                 "specification of \'normal\' failed. \'rate\' is not a valid "
                 "parameter."))
@@ -454,11 +454,11 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
             self.assertEqual(
                 str(exc_outer2.exception),
-                ("\n\nERROR: n ~ normal()\n\nThe line above had a syntax problem "
+                ("ERROR: n ~ normal()\n\nThe line above had a syntax problem "
                 "and could not be tokenized. Something went wrong during "
-                "sampling distribution specification. Could not find both "
-                "the name of a distribution (e.g., \'normal\') and its "
-                "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+                "sampling distribution specification. Could not find either "
+                "the name of a distribution (e.g., \'normal\') or its "
+                "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
 
     def test_ln_misspec(self):
@@ -492,7 +492,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
                 str(exc_outer.exception),
-                ("\n\nERROR: ln ~ lognormal(n=1, rate=1.0)\n\nThe line above had a "
+                ("ERROR: ln ~ lognormal(n=1, rate=1.0)\n\nThe line above had a "
                 "syntax problem and could not be tokenized. Parsing the "
                 "specification of \'lognormal\' failed. \'rate\' is not a valid "
                 "parameter."))
@@ -504,11 +504,11 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(
             str(exc_outer2.exception),
-            ("\n\nERROR: ln ~ lognormal()\n\nThe line above had a syntax problem "
+            ("ERROR: ln ~ lognormal()\n\nThe line above had a syntax problem "
             "and could not be tokenized. Something went wrong during "
-            "sampling distribution specification. Could not find both "
-            "the name of a distribution (e.g., \'normal\') and its "
-            "specification (e.g., \'(mean=0.0, sd=1.0)\')."))
+            "sampling distribution specification. Could not find either "
+            "the name of a distribution (e.g., \'normal\') or its "
+            "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
 
 if __name__ == "__main__":

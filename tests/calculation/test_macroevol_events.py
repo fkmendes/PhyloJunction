@@ -166,21 +166,35 @@ class TestMacroEvolEvent(unittest.TestCase):
         while n_draws > 0:
             i = n_events - n_draws
             n_draws -= 1
-            total_rate, state_total_rates = self.bd_event_handler.total_rate(a_time, self.bd_state_representation_dict)
+            total_rate, \
+                state_total_rates = \
+                self.bd_event_handler.total_rate(
+                    a_time,
+                    self.bd_state_representation_dict)
 
             event_outcomes.append(
-                self.bd_event_handler.sample_event_atomic_parameter(state_total_rates[0], a_time, [0])[0].event.value
+                self.bd_event_handler \
+                    .sample_event_atomic_parameter(
+                    state_total_rates[0],
+                    a_time,
+                    [0])[0].event.value
             )
 
         # first [0] indexing gets lambda parameter, second [0] gets the first item inside the vectorized value
-        expected_proportion_event_1 = self.bd_rates_t0_s0[0].value[0] / (self.bd_rates_t0_s0[0].value[0] + self.bd_rates_t0_s0[1].value[0])
-        obs_proportion_event_1 = sum(1 for v in event_outcomes if v == 0) / n_events
+        expected_proportion_event_1 = \
+            self.bd_rates_t0_s0[0].value[0] / (self.bd_rates_t0_s0[0].value[0] + self.bd_rates_t0_s0[1].value[0])
+        obs_proportion_event_1 = \
+            sum(1 for v in event_outcomes if v == 0) / n_events
 
         # let's see events if really drawn proportional to weights
         # print(expected_proportion_event_1)
         # print(obs_proportion_event_1) # pretty good!
         
-        self.assertAlmostEqual(obs_proportion_event_1, expected_proportion_event_1, msg="Proportion of event is off by more than 0.01", delta=0.01)
+        self.assertAlmostEqual(
+            obs_proportion_event_1,
+            expected_proportion_event_1,
+            msg="Proportion of event is off by more than 0.01",
+            delta=0.01)
 
 
     def test_event_sampling_bisse(self):

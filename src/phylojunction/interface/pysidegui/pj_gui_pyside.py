@@ -4,7 +4,7 @@ import re
 import typing as ty
 import numpy as np
 import pandas as pd
-from tabulate import tabulate # type: ignore
+from tabulate import tabulate  # type: ignore
 from PySide6.QtWidgets import \
     QApplication, QMainWindow, QPushButton, QFileDialog
 from PySide6.QtGui import QAction
@@ -21,6 +21,9 @@ import phylojunction.readwrite.pj_read as pjread
 import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.data.tree as pjdt
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
 
 class GUIModeling():
 
@@ -31,8 +34,11 @@ class GUIModeling():
         self.pgm_obj = ProbabilisticGraphicalModel()
         self.cmd_log_list = []
 
-
-    def parse_cmd_update_pgm(self, cmd_line_list, gui_main_window_obj, clear_cmd_log_list: bool=False):
+    def parse_cmd_update_pgm(
+            self,
+            cmd_line_list,
+            gui_main_window_obj,
+            clear_cmd_log_list: bool = False):
         # in case we read two scripts
         # consecutively, we want to clear
         # the comand line history list
@@ -41,7 +47,7 @@ class GUIModeling():
 
         valid_cmd_line = None
         print("\nReading following command lines:")
-        
+
         for line in cmd_line_list:
             # removing whitespaces from left and right
             line = line.strip()
@@ -50,16 +56,19 @@ class GUIModeling():
             # side-effect in cmdline2pgm
             try:
                 valid_cmd_line = cmdp.cmdline2pgm(self.pgm_obj, line)
-        
+
             except Exception as e:
                 gui_main_window_obj.ui.bottom_label_left.setText("Warning produced")
 
                 # if not event == "Simulate":
                 if e.__context__:
-                    # __context__ catches innermost exception 
+                    # __context__ catches innermost exception
                     # update warnings page later, with e.__context__
-                    print(e.__context__)
-                    gui_main_window_obj.ui.ui_pages.warnings_textbox.setText(str(e.__context__))
+                    # print(e.__context__)
+                    # gui_main_window_obj.ui.ui_pages.warnings_textbox.setText(str(e.__context__))
+                    print(e)
+                    gui_main_window_obj.ui.ui_pages.warnings_textbox.setText(str(e))
+
                 else:
                     print(e)  # update warnings page with e
                     gui_main_window_obj.ui.ui_pages.warnings_textbox.setText(str(e))
@@ -68,16 +77,16 @@ class GUIModeling():
                 try:
                     if self.cmd_log_list[-1].startswith("\n#"):
                         self.cmd_log_list.append("")  # adding new line
-                
-                except:
+
+                except Exception as e:
+                    print("An error occurred: ", type(e).__name__, " - ", e)
                     pass
 
                 self.cmd_log_list.append(valid_cmd_line)
-            
 
     def cmd_log(self):
         return "\n".join(self.cmd_log_list) + "\n\n"
-    
+
     def clear(self):
         self.pgm_obj = ProbabilisticGraphicalModel()
 
@@ -110,7 +119,7 @@ class GUIMainWindow(QMainWindow):
         # Members for storage #
         # and operations      #
         #######################
-        
+
         self.input_script_filepath = ""
 
         # model-related members #
@@ -122,7 +131,6 @@ class GUIMainWindow(QMainWindow):
         self.other_comparison_df = pd.DataFrame()
         self.coverage_df = pd.DataFrame()
         self.hpd_df = pd.DataFrame()
-        
 
         #########################
         # Below we specify what #
@@ -151,7 +159,6 @@ class GUIMainWindow(QMainWindow):
         # warnings page button #
         self.ui.warning_button.clicked.connect(self.show_warnings_page)
 
-
         ###################################
         # gui_pages buttons               #
         # (created by QtCreator/Designer) #
@@ -162,23 +169,29 @@ class GUIMainWindow(QMainWindow):
         ############
 
         # cmd line enter #
-        self.ui.ui_pages.cmd_prompt.returnPressed.connect(self.parse_cmd_update_gui)
+        self.ui.ui_pages.cmd_prompt.returnPressed.connect(
+            self.parse_cmd_update_gui)
 
         # node list #
         # need to use lambda b/c otherwise 'self'
         # is passed as argument for 'spin_buttons_clicked'
         # which makes it so spin buttons are not properly
         # initialized
-        self.ui.ui_pages.node_list.itemClicked.connect(lambda do_node: \
-            self.do_selected_node_pgm_page(spin_buttons_clicked=False))
+        self.ui.ui_pages.node_list.itemClicked.connect(
+            lambda do_node: self.do_selected_node_pgm_page(
+                spin_buttons_clicked=False))
 
         # radio button update #
-        self.ui.ui_pages.one_sample_radio.clicked.connect(self.one_sample_clicked)
-        self.ui.ui_pages.all_samples_radio.clicked.connect(self.all_samples_clicked)
+        self.ui.ui_pages.one_sample_radio.clicked.connect(
+            self.one_sample_clicked)
+        self.ui.ui_pages.all_samples_radio.clicked.connect(
+            self.all_samples_clicked)
 
         # spin boxes update #
-        self.ui.ui_pages.sample_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot_spin)
-        self.ui.ui_pages.repl_idx_spin.valueChanged.connect(self.refresh_selected_node_display_plot_spin)
+        self.ui.ui_pages.sample_idx_spin.valueChanged.connect(
+            self.refresh_selected_node_display_plot_spin)
+        self.ui.ui_pages.repl_idx_spin.valueChanged.connect(
+            self.refresh_selected_node_display_plot_spin)
 
         # save plot #
         self.ui.ui_pages.save_pgm_node_plot.clicked.connect(
@@ -189,8 +202,9 @@ class GUIMainWindow(QMainWindow):
         )
 
         # clear model button #
-        self.ui.ui_pages.clear_model.clicked.connect(lambda clear_model: \
-            self.clean_disable_everything(user_reset=True))
+        self.ui.ui_pages.clear_model.clicked.connect(
+            lambda clear_model:
+                self.clean_disable_everything(user_reset=True))
 
         ################
         # Compare page #
@@ -211,8 +225,8 @@ class GUIMainWindow(QMainWindow):
         #################
         self.ui.ui_pages.read_hpd_csv_button.clicked.connect(self.read_coverage_hpd_csv)
         self.ui.ui_pages.coverage_node_list.itemClicked.connect(self.do_selected_node_coverage_page)
-        
-        # side-effect: sets xticklabels in 
+
+        # side-effect: sets xticklabels in
         self.ui.ui_pages.draw_cov_button.clicked.connect(self.draw_cov)
         self.ui.ui_pages.save_cov_button.clicked.connect(
             lambda plot2fig: self.write_plot_to_file(
@@ -228,7 +242,7 @@ class GUIMainWindow(QMainWindow):
     def init_top_menus(self):
         # setup menu bar #
         menubar = self.menuBar()
-        
+
         # first item (pj menu)
         pj_menu = menubar.addMenu("PhyloJunction")
 
@@ -255,16 +269,15 @@ class GUIMainWindow(QMainWindow):
         file_menu.addAction("Save data as", self.write_data_to_dir)
         file_menu.addAction("Save model as", self.write_model_to_file)
 
-
     # verify which menu buttons are selected #
     def reset_selection(self):
         for btn in self.ui.left_menu.findChildren(QPushButton):
             try:
                 btn.set_active(False)
-            
-            except:
-                pass
 
+            except Exception as e:
+                print("An error occurred: ", type(e).__name__, " - ", e)
+                pass
 
     def toggle_button_animation(self):
         # get menu width #
@@ -283,7 +296,6 @@ class GUIMainWindow(QMainWindow):
         self.animation.setEasingCurve(QEasingCurve.InOutCirc)
         self.animation.start()
 
-
     #########################################
     # Functions for activating page buttons #
     #########################################
@@ -296,13 +308,11 @@ class GUIMainWindow(QMainWindow):
         self.ui.pgm_button.set_active(True)
         self.ui.top_label_left.setText("MODEL SPECIFICATION")
 
-
     def show_compare_page(self):
         self.reset_selection()
         self.ui.pages.setCurrentWidget(self.ui.ui_pages.compare_page)
         self.ui.compare_button.set_active(True)
         self.ui.top_label_left.setText("IMPLEMENTATION COMPARISON")
-
 
     def show_coverage_page(self):
         self.reset_selection()
@@ -310,20 +320,17 @@ class GUIMainWindow(QMainWindow):
         self.ui.compare_button.set_active(True)
         self.ui.top_label_left.setText("COVERAGE VALIDATION")
 
-
     def show_cmd_log_page(self):
         self.reset_selection()
         self.ui.pages.setCurrentWidget(self.ui.ui_pages.cmd_log_page)
         self.ui.cmd_log_button.set_active(True)
         self.ui.top_label_left.setText("COMMAND LOG")
 
-
     def show_settings_page(self):
         self.reset_selection()
         self.ui.pages.setCurrentWidget(self.ui.ui_pages.settings_page)
         self.ui.warning_button.set_active(True)
         self.ui.top_label_left.setText("SETTINGS")
-
 
     def show_warnings_page(self):
         self.reset_selection()
@@ -332,109 +339,139 @@ class GUIMainWindow(QMainWindow):
         self.ui.top_label_left.setText("WARNINGS")
         self.ui.bottom_label_left.setText("")
 
-
     ###################################
     # Various event-related functions #
     ###################################
 
     def parse_cmd_update_gui(self):
         cmd_line = self.ui.ui_pages.cmd_prompt.text()  # grab input
-        
+
         # in case the user enters many lines
         # (also ignores empty lines)
         cmd_line_list = [cl for cl in re.split("\n", cmd_line) if cl]
-        
+
         # read commands
         # (side-effect: gui_modeling stores cmd hist)
         self.gui_modeling.parse_cmd_update_pgm(cmd_line_list, self)
-        
+
         # update GUI cmd history
         self.refresh_cmd_history()
 
         self.ui.ui_pages.cmd_prompt.clear()  # clear
 
-        # updating node lists 
+        # updating node lists
         self.refresh_node_lists()
 
+    def selected_node_display(
+            self,
+            node_pgm,
+            do_all_samples,
+            sample_idx=None,
+            repl_idx=0,
+            repl_size=1):
 
-    def selected_node_display(self, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
         display_node_pgm_value_str = str()
         display_node_pgm_stat_str = str()
 
         is_tree = False
-        try:
-            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                is_tree = True
+        # try:
+        if isinstance(node_pgm.value, list) and \
+                isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+            is_tree = True
 
-        # if deterministic
-        # not subscriptable
-        except:
-            pass
+        # if deterministic, not subscriptable
+        # except Exception as e:
+            # print("merda An error occurred: ", type(e).__name__, " - ", e)
+            # pass
 
         # first we do values
         # we care about a specific sample and maybe a specific replicate
-        if not sample_idx == None and not do_all_samples:
+        if sample_idx is not None and not do_all_samples:
             start = sample_idx * repl_size
             end = start + repl_size
 
             # values
             display_node_pgm_value_str = \
-                node_pgm.get_start2end_str(start, end, \
-                    repl_idx=repl_idx, is_tree=is_tree)
-            
+                node_pgm.get_start2end_str(
+                    start,
+                    end,
+                    repl_idx=repl_idx,
+                    is_tree=is_tree)
+
             # summary stats
             display_node_pgm_stat_str = \
-                node_pgm.get_node_stats_str(start, end, repl_idx)
-        
+                node_pgm.get_node_stats_str(
+                    start,
+                    end,
+                    repl_idx)
+
         # we get all samples
         else:
             # just calling __str__
             display_node_pgm_value_str = \
-                self.gui_modeling.pgm_obj.\
-                get_display_str_by_name(node_pgm.node_name)
-            
+                self.gui_modeling.pgm_obj \
+                .get_display_str_by_name(node_pgm.node_name)
+
             # getting all values
             display_node_pgm_stat_str = \
                 node_pgm.get_node_stats_str(
-                    0, len(node_pgm.value), repl_idx) # summary stats
-        
+                    0, len(node_pgm.value), repl_idx)  # summary stats
+
         # print("Set values_content QLineEdit widget with text: " + display_node_pgm_value_str)
         # print("Set summary_content QLineEdit widget with text: " + display_node_pgm_stat_str)
         self.ui.ui_pages.values_content.setText(display_node_pgm_value_str)
         self.ui.ui_pages.summary_content.setText(display_node_pgm_stat_str)
 
-
-    def selected_node_plot(self, fig_obj, fig_axes, node_pgm, do_all_samples,
-                           sample_idx=None, repl_idx=0, repl_size=1):
+    def selected_node_plot(
+            self,
+            fig_obj,
+            fig_axes,
+            node_pgm,
+            do_all_samples,
+            sample_idx=None,
+            repl_idx=0,
+            repl_size=1):
         """
         Plot pgm node on 'node_display_fig_axes' (Axes object) scoped to 'call_gui()',
         then update canvas with new plot
         """
-        try:
+
+        # try:
+
+        # if stochastic or constant, value will be list
+        if isinstance(node_pgm.value, list):
             # if a tree
             if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                self.draw_node_pgm(fig_axes, node_pgm,
-                    sample_idx=sample_idx,
-                    repl_idx=repl_idx,
-                    repl_size=repl_size)
-            
+                self.draw_node_pgm(fig_axes,
+                                    node_pgm,
+                                    sample_idx=sample_idx,
+                                    repl_idx=repl_idx,
+                                    repl_size=repl_size)
+
             # when not a tree
             else:
-                if do_all_samples: 
-                    self.draw_node_pgm(fig_axes, node_pgm, repl_size=repl_size)
-                
+                if do_all_samples:
+                    self.draw_node_pgm(fig_axes,
+                                        node_pgm,
+                                        repl_size=repl_size)
+
                 else:
-                    self.draw_node_pgm(fig_axes, node_pgm, sample_idx=sample_idx, repl_size=repl_size)
-        
-        # when it's deterministic, you cannot
-        # index .value
-        except:
+                    self.draw_node_pgm(fig_axes,
+                                        node_pgm,
+                                        sample_idx=sample_idx,
+                                        repl_size=repl_size)
+
+        # if deterministic, not subscriptable
+        # except Exception as e:
+        #     print("An error occurred: ", type(e).__name__, " - ", e)
+
+        # deterministic node
+        else:
             self.draw_node_pgm(fig_axes, node_pgm)
 
         fig_obj.canvas.draw()
-    
 
-    def selected_node_read(self, node_name):
+    def selected_node_read(self, node_name: str):
         node_pgm = self.gui_modeling.pgm_obj.get_node_pgm_by_name(node_name)
         # this is n_sim inside sampling distribution classes
         sample_size = len(node_pgm)
@@ -442,21 +479,20 @@ class GUIMainWindow(QMainWindow):
 
         return node_pgm, sample_size, repl_size
 
-
-    def do_selected_node_pgm_page(self, spin_buttons_clicked: bool=False):
+    def do_selected_node_pgm_page(self, spin_buttons_clicked: bool = False):
         """
         Display selected node's string representation and
         plot it on canvas if possible, for pgm page
         (model specification menu)
         """
-        
+
         # first get selected node's name #
         selected_node_name: str = ""
         active_item = self.ui.ui_pages.node_list.currentItem()
         if active_item:
             selected_node_name = active_item.text()
 
-        if not selected_node_name in ("", None):
+        if selected_node_name not in ("", None):
             # reading node information #
             node_pgm, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
@@ -467,41 +503,40 @@ class GUIMainWindow(QMainWindow):
             # spin boxes must be up-to-date #
             self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
             if sample_size == 0:
-                self.ui.ui_pages.sample_idx_spin.setMaximum(0)    
-            
+                self.ui.ui_pages.sample_idx_spin.setMaximum(0)
+
             else:
                 self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
 
             # grab pgm_page's figure and axes #
             fig_obj = self.ui.ui_pages.pgm_page_matplotlib_widget.fig
             fig_axes = self.ui.ui_pages.pgm_page_matplotlib_widget.axes
-        
+
             # activate radio buttons and spin elements #
             # if spin buttons were clicked, no need
             # to updated radio and spin buttons
             if not spin_buttons_clicked:
                 self.init_and_refresh_radio_spin(node_pgm, sample_size, repl_size)
-            
+
             do_all_samples = \
                 self.ui.ui_pages.all_samples_radio.isChecked()
-        
-        
+
             #################################
             # Collect information from spin #
             #################################
-            
+
             sample_idx = self.ui.ui_pages.sample_idx_spin.value() - 1
             repl_idx = self.ui.ui_pages.repl_idx_spin.value() - 1
-
 
             ###############
             # Now do node #
             ###############
+
             self.selected_node_display(node_pgm,
-                                    do_all_samples,
-                                    sample_idx=sample_idx,
-                                    repl_idx=repl_idx,
-                                    repl_size=repl_size)
+                                       do_all_samples,
+                                       sample_idx=sample_idx,
+                                       repl_idx=repl_idx,
+                                       repl_size=repl_size)
 
             self.selected_node_plot(fig_obj,
                                     fig_axes,
@@ -509,13 +544,12 @@ class GUIMainWindow(QMainWindow):
                                     do_all_samples,
                                     sample_idx=sample_idx,
                                     repl_idx=repl_idx,
-                                    repl_size=repl_size)  
+                                    repl_size=repl_size)
 
         # no nodes to do
         else:
             print("If there are no nodes in PJ model, nothing to do")
-            pass    
-
+            pass
 
     def do_selected_node_compare_page(self):
         """
@@ -532,7 +566,7 @@ class GUIMainWindow(QMainWindow):
 
         # if there is at least one
         # sampled node with a name
-        if not selected_node_name in ("", None):
+        if selected_node_name not in ("", None):
 
             # reading node information #
             selected_node_pgm, selected_node_sample_size, selected_node_repl_size = \
@@ -542,7 +576,7 @@ class GUIMainWindow(QMainWindow):
             # makes sure that stashes are always up-to-date
             scalar_output_stash, tree_output_stash = \
                 pjwrite.prep_data_df(self.gui_modeling.pgm_obj)
-            
+
             # collecting scalars #
             _, scalar_value_df_dict, scalar_repl_summary_df = \
                 scalar_output_stash
@@ -552,22 +586,25 @@ class GUIMainWindow(QMainWindow):
                 tree_rec_ann_value_df_dict, tree_summary_df_dict, tree_repl_summary_df_dict, \
                 tree_living_nd_states_str_dict, tree_living_nd_states_str_nexus_dict, \
                 tree_internal_nd_states_str_dict = tree_output_stash
-                    
+
             # adding "program" column to
             # PJ's pandas DataFrame's stored inside dicts
             for repl_size in scalar_value_df_dict:
-                scalar_value_df_dict[selected_node_repl_size].loc[:, "program"] = "PJ"
+                scalar_value_df_dict[selected_node_repl_size] \
+                    .loc[:, "program"] = "PJ"
 
             for tr_nd_name in tree_summary_df_dict:
-                    tree_summary_df_dict[tr_nd_name].loc[:, "program"] = "PJ"
-                    
+                tree_summary_df_dict[tr_nd_name] \
+                    .loc[:, "program"] = "PJ"
+
             for tr_w_repl_nd_name in tree_repl_summary_df_dict:
-                tree_repl_summary_df_dict[tr_w_repl_nd_name].loc[:, "program"] = "PJ"
+                tree_repl_summary_df_dict[tr_w_repl_nd_name] \
+                    .loc[:, "program"] = "PJ"
 
             # scalar was selected #
             if isinstance(selected_node_pgm.value[0], (int, float, np.float64)):
                 self.ui.ui_pages.summary_stats_list.clear()
-                
+
                 if not self.is_avg_repl_check:
                     self.pj_comparison_df = scalar_value_df_dict[selected_node_repl_size]
 
@@ -576,23 +613,20 @@ class GUIMainWindow(QMainWindow):
                         ["average", "std. dev."]
                     )
                     self.pj_comparison_df = scalar_repl_summary_df
-                
 
             # tree was selected #
             elif isinstance(selected_node_pgm.value[0], pjdt.AnnotatedTree):
                 self.pj_comparison_df = tree_summary_df_dict[selected_node_name]
                 self.ui.ui_pages.summary_stats_list.clear()
                 self.ui.ui_pages.summary_stats_list.addItems(
-                    [tree_stat for tree_stat in self.pj_comparison_df.keys() \
-                        if tree_stat not in \
-                            ("program", "sample", "replicate")]
+                    [tree_stat for tree_stat in self.pj_comparison_df.keys()
+                     if tree_stat not in ("program", "sample", "replicate")]
                 )
 
         # no sampled nodes
         else:
             print("If there are no sampled nodes in PJ model, we cannot compare against PJ. Later write an Exception for this")
             pass
-
 
     def do_selected_node_coverage_page(self):
         """
@@ -609,7 +643,7 @@ class GUIMainWindow(QMainWindow):
 
         # if there is at least one
         # sampled node with a name
-        if not selected_node_name in ("", None):
+        if selected_node_name not in ("", None):
 
             # reading node information #
             selected_node_pgm, selected_node_sample_size, selected_node_repl_size = \
@@ -619,7 +653,7 @@ class GUIMainWindow(QMainWindow):
             # makes sure that stashes are always up-to-date
             scalar_output_stash, tree_output_stash = \
                 pjwrite.prep_data_df(self.gui_modeling.pgm_obj)
-            
+
             # collecting scalars #
             scalar_constant_value_df, scalar_value_df_dict, scalar_repl_summary_df = \
                 scalar_output_stash
@@ -638,7 +672,7 @@ class GUIMainWindow(QMainWindow):
                     # sampled, non-deterministic
                     if selected_node_pgm.is_sampled:
                         self.coverage_df = scalar_value_df_dict[selected_node_repl_size]
-                    
+
                     # constant, non-deterministic
                     else:
                         self.coverage_df = scalar_constant_value_df
@@ -652,18 +686,22 @@ class GUIMainWindow(QMainWindow):
         else:
             print("If there are no non-deterministic nodes in PJ model, no sensical coverage can be calculated. Later write an Exception for this")
             pass
-        
 
     ##################
     # Functions for  #
     # reading and    #
     # loading events #
     ##################
-    
+
     def read_execute_script(self):
 
         # read file path #
-        script_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Read script", dir=".", filter="*.pj")
+        script_fp, filter = \
+            QFileDialog.getOpenFileName(
+                parent=self,
+                caption="Read script",
+                dir=".",
+                filter="*.pj")
 
         if script_fp:
             # reset everything #
@@ -680,24 +718,23 @@ class GUIMainWindow(QMainWindow):
             # add node names to...
             # pgm page node list
             self.ui.ui_pages.node_list.addItems(
-                [node_name for node_name in \
-                    self.gui_modeling.pgm_obj.node_name_val_dict]
+                [node_name for node_name in
+                 self.gui_modeling.pgm_obj.node_name_val_dict]
             )
 
             # compare page node list
             self.ui.ui_pages.compare_node_list.addItems(
-                [nd.node_name for nd in \
-                    self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
-                        nd.is_sampled]
+                [nd.node_name for nd in
+                 self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+                 nd.is_sampled]
             )
 
             # coverage page node list
             self.ui.ui_pages.coverage_node_list.addItems(
-                [nd.node_name for nd in \
-                    self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
-                        not nd.is_deterministic]
+                [nd.node_name for nd in
+                 self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+                 not nd.is_deterministic]
             )
-
 
     def read_compare_csv(self):
 
@@ -706,19 +743,29 @@ class GUIMainWindow(QMainWindow):
 
         if compare_csv_fp:
             if not os.path.isfile(compare_csv_fp):
-                print("Could not find " + compare_csv_fp) # TODO: add exception here later
+                print("Could not find " + compare_csv_fp)
+                # TODO: raise specific Error later
 
             try:
-                self.other_comparison_df = pjread.read_csv_into_dataframe(compare_csv_fp)
-                other_comparison_df_str = tabulate(self.other_comparison_df, self.other_comparison_df.head(), tablefmt="plain", showindex=False).lstrip()
-                self.ui.ui_pages.compare_csv_textbox.setText(other_comparison_df_str)
-                
-            except:
-                print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
-            
-        else:
-            pass # event canceled by user
+                self.other_comparison_df = \
+                    pjread.read_csv_into_dataframe(compare_csv_fp)
 
+                other_comparison_df_str = \
+                    tabulate(
+                        self.other_comparison_df,
+                        self.other_comparison_df.head(),
+                        tablefmt="plain",
+                        showindex=False).lstrip()
+
+                self.ui.ui_pages.compare_csv_textbox.setText(other_comparison_df_str)
+
+            except Exception as e:
+                print("An error occurred: ", type(e).__name__, " - ", e)
+                print(("Could not load .csv file into pandas DataFrame. "
+                       "Later write an Exception for this"))
+
+        else:
+            pass  # event canceled by user
 
     def read_coverage_hpd_csv(self):
 
@@ -730,19 +777,29 @@ class GUIMainWindow(QMainWindow):
 
         if coverage_hpd_csv_fp:
             if not os.path.isfile(coverage_hpd_csv_fp):
-                print("Could not find " + coverage_hpd_csv_fp) # TODO: add exception here later
+                print("Could not find " + coverage_hpd_csv_fp)
+                # TODO: raise specific Error later
 
             try:
-                self.hpd_df = pjread.read_csv_into_dataframe(coverage_hpd_csv_fp)
-                coverage_df_str = tabulate(self.hpd_df, self.hpd_df.head(), tablefmt="plain", showindex=False).lstrip()
-                self.ui.ui_pages.coverage_csv_textbox.setText(coverage_df_str)
-                
-            except:
-                print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
-            
-        else:
-            pass # event canceled by user
+                self.hpd_df = \
+                    pjread.read_csv_into_dataframe(coverage_hpd_csv_fp)
 
+                coverage_df_str = \
+                    tabulate(
+                        self.hpd_df,
+                        self.hpd_df.head(),
+                        tablefmt="plain",
+                        showindex=False).lstrip()
+
+                self.ui.ui_pages.coverage_csv_textbox.setText(coverage_df_str)
+
+            except Exception as e:
+                print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
+                print("An error occurred: ", type(e).__name__)
+                pass
+
+        else:
+            pass  # event canceled by user
 
     def load_model(self):
         # read file path #
@@ -755,16 +812,16 @@ class GUIMainWindow(QMainWindow):
             self.refresh_node_lists()
             self.ui.ui_pages.cmd_log_textbox.setText(self.gui_modeling.cmd_log())
 
-
     ##################
     # Functions for  #
     # writing events #
     ##################
 
-    def write_plot_to_file(self, fig_obj, axes_obj):        
+    def write_plot_to_file(self, fig_obj, axes_obj):
         is_plot = True
+
         if len(axes_obj.get_xticklabels()) == 0 \
-            and len(axes_obj.get_yticklabels()) == 0:
+                and len(axes_obj.get_yticklabels()) == 0:
             is_plot = False
 
         if is_plot:
@@ -782,15 +839,14 @@ class GUIMainWindow(QMainWindow):
                         head + "/" + prefix + "_" + tail,
                         fig_obj
                     )
-                
+
                 else:
                     pjwrite.write_fig_to_file(
                         head + "/" + tail,
                         fig_obj
                     )
 
-
-    def write_model_to_file(self, prefix: str=""):
+    def write_model_to_file(self, prefix: str = ""):
         # get file path
         pickle_fp, filter = QFileDialog.getSaveFileName(self, "Save file", "", "")
 
@@ -804,31 +860,38 @@ class GUIMainWindow(QMainWindow):
             self.gui_modeling.cmd_log_list,
             prefix=prefix)
 
-
-    def write_data_to_dir(self, prefix: str=""):
+    def write_data_to_dir(self, prefix: str = ""):
         # get dir path
         data_out_dir = QFileDialog.getExistingDirectory(
             self, "Save in folder", "./", QFileDialog.ShowDirsOnly
         )
 
         prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
-        
-        # writing all simulated variables to 
+
+        # writing all simulated variables to
         # different files
         pjwrite.dump_pgm_data(
             data_out_dir,
             self.gui_modeling.pgm_obj,
             prefix=prefix)
 
-
     #################
     # Functions for #
     # drawing       #
     #################
 
-    def draw_node_pgm(self, axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
-        return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
-
+    def draw_node_pgm(
+            self,
+            axes,
+            node_pgm,
+            sample_idx=None,
+            repl_idx=0,
+            repl_size=1):
+        return node_pgm.plot_node(
+            axes,
+            sample_idx=sample_idx,
+            repl_idx=repl_idx,
+            repl_size=repl_size)
 
     def draw_violin(self):
         thing_to_compare: str = ""
@@ -839,26 +902,26 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.compare_page_matplotlib_widget.fig.clf()
         self.ui.ui_pages.compare_page_matplotlib_widget.initialize_axes()
         self.ui.ui_pages.compare_page_matplotlib_widget.fig.canvas.draw()
-        
+
         # first get selected node's name #
         selected_node_name: str = ""
         active_item = self.ui.ui_pages.compare_node_list.currentItem()
         if active_item:
             selected_node_name = active_item.text()
 
-        if not selected_node_name in ("", None):
+        if selected_node_name not in ("", None):
             # reading node information #
             node_pgm, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
 
             if not self.pj_comparison_df.empty and \
-                not self.other_comparison_df.empty:
+                    not self.other_comparison_df.empty:
 
                 # scalar
                 if isinstance(node_pgm.value[0], (int, float, np.float64)):
                     if not self.is_avg_repl_check:
                         thing_to_compare = selected_node_name
-                    
+
                     # averaging over replicates
                     else:
                         if not summary_stat_list_empty:
@@ -868,13 +931,13 @@ class GUIMainWindow(QMainWindow):
                             # summary stats were not picked, doing nothing
                             else:
                                 pass
-                
+
                 # custom class object (e.g., AnnotatedTree)
                 else:
                     if not summary_stat_list_empty:
                         if self.ui.ui_pages.summary_stats_list.currentItem():
                             thing_to_compare = self.ui.ui_pages.summary_stats_list.currentItem().text()
-                    
+
                         # summary stats were not picked, doing nothing
                         else:
                             pass
@@ -895,7 +958,7 @@ class GUIMainWindow(QMainWindow):
                 if joint_dataframe.empty or not node_pgm.is_sampled:
                     # node list should only contain
                     # sampled nodes already, but
-                    # just being sure...                    
+                    # just being sure...
                     print("joint_dataframe was empty or node was constant")
                     pass
 
@@ -905,12 +968,16 @@ class GUIMainWindow(QMainWindow):
                     self.ui.ui_pages.compare_page_matplotlib_widget.fig.canvas.draw()
                     fig_obj = self.ui.ui_pages.compare_page_matplotlib_widget.fig
                     fig_axes = self.ui.ui_pages.compare_page_matplotlib_widget.axes
-                    
-                    pjdraw.plot_violins(fig_obj, fig_axes,
-                        joint_dataframe, "program", thing_to_compare,
-                        xlab="Program", ylab=thing_to_compare)
 
-    
+                    pjdraw.plot_violins(
+                        fig_obj,
+                        fig_axes,
+                        joint_dataframe,
+                        "program",
+                        thing_to_compare,
+                        xlab="Program",
+                        ylab=thing_to_compare)
+
     def draw_cov(self):
         selected_node_name: str = ""
         thing_to_validate: str = ""
@@ -927,14 +994,14 @@ class GUIMainWindow(QMainWindow):
         if active_item:
             selected_node_name = active_item.text()
 
-        if not selected_node_name in ("", None):
+        if selected_node_name not in ("", None):
             # reading node information #
             node_pgm, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
 
             if not self.coverage_df.empty and \
-                not self.hpd_df.empty:
-                
+                    not self.hpd_df.empty:
+
                 # scalar
                 if isinstance(node_pgm.value[0], (str, int, float, np.float64)):
                     thing_to_validate = selected_node_name
@@ -960,11 +1027,13 @@ class GUIMainWindow(QMainWindow):
                     self.ui.ui_pages.coverage_page_matplotlib_widget.fig.canvas.draw()
                     fig_obj = self.ui.ui_pages.coverage_page_matplotlib_widget.fig
                     fig_axes = self.ui.ui_pages.coverage_page_matplotlib_widget.axes
-                    
-                    pjdraw.plot_intervals(fig_obj, fig_axes, \
-                        full_cov_df, thing_to_validate, "posterior_mean", \
-                        ylab="Posterior mean")
 
+                    pjdraw.plot_intervals(fig_obj,
+                                          fig_axes,
+                                          full_cov_df,
+                                          thing_to_validate,
+                                          "posterior_mean",
+                                          ylab="Posterior mean")
 
     #####################
     # Events related to #
@@ -994,7 +1063,7 @@ class GUIMainWindow(QMainWindow):
                 self.ui.ui_pages.all_samples_radio.setChecked(False)
                 self.ui.ui_pages.all_samples_radio.setCheckable(False)
                 self.ui.ui_pages.all_samples_radio.setDisabled(True)
-                
+
                 self.ui.ui_pages.one_sample_radio.setEnabled(True)
                 self.ui.ui_pages.one_sample_radio.setCheckable(True)
                 self.ui.ui_pages.one_sample_radio.setChecked(True)
@@ -1011,8 +1080,8 @@ class GUIMainWindow(QMainWindow):
             else:
                 # if it's the first click selecting node
                 if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
-                    not self.ui.ui_pages.one_sample_radio.isEnabled():
-                    
+                        not self.ui.ui_pages.one_sample_radio.isEnabled():
+
                     self.ui.ui_pages.all_samples_radio.setEnabled(True)
                     self.ui.ui_pages.all_samples_radio.setCheckable(True)
                     self.ui.ui_pages.one_sample_radio.setEnabled(True)
@@ -1026,7 +1095,7 @@ class GUIMainWindow(QMainWindow):
                     self.ui.ui_pages.sample_idx_spin.setMinimum(1)
                     self.ui.ui_pages.sample_idx_spin.setValue(1)
                     self.ui.ui_pages.sample_idx_spin.setEnabled(True)
-                    
+
                     self.ui.ui_pages.repl_idx_spin.setMinimum(1)
                     self.ui.ui_pages.repl_idx_spin.setValue(1)
                     self.ui.ui_pages.repl_idx_spin.setDisabled(True)
@@ -1039,7 +1108,7 @@ class GUIMainWindow(QMainWindow):
                         self.ui.ui_pages.repl_idx_spin.setMinimum(1)
                         self.ui.ui_pages.repl_idx_spin.setValue(1)
                         self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-                        
+
                         self.ui.ui_pages.sample_idx_spin.setMinimum(1)
                         self.ui.ui_pages.sample_idx_spin.setValue(1)
                         self.ui.ui_pages.sample_idx_spin.setDisabled(True)
@@ -1056,13 +1125,12 @@ class GUIMainWindow(QMainWindow):
                         self.ui.ui_pages.sample_idx_spin.setMinimum(1)
                         self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
 
-
         #################
         # Constant node #
         #################
 
         # cannot circle through replicates
-        # because no 2D-nesting when 
+        # because no 2D-nesting when
         # assigning constants (and no
         # repls in deterministic nodes)
         else:
@@ -1074,7 +1142,7 @@ class GUIMainWindow(QMainWindow):
             # radio #
             # if it's the first click selecting node
             if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
-                not self.ui.ui_pages.one_sample_radio.isEnabled():
+                    not self.ui.ui_pages.one_sample_radio.isEnabled():
                 self.ui.ui_pages.all_samples_radio.setEnabled(True)
                 self.ui.ui_pages.all_samples_radio.setCheckable(True)
                 self.ui.ui_pages.all_samples_radio.setChecked(True)
@@ -1082,7 +1150,7 @@ class GUIMainWindow(QMainWindow):
                 self.ui.ui_pages.one_sample_radio.setChecked(False)
             # self.ui.ui_pages.one_sample_radio.setCheckable(False)
             # self.ui.ui_pages.one_sample_radio.setDisabled(True)
-            
+
             # if deterministic
             # neither all nor one sample
             # is checkable
@@ -1090,7 +1158,7 @@ class GUIMainWindow(QMainWindow):
                 self.ui.ui_pages.all_samples_radio.setChecked(False)
                 self.ui.ui_pages.all_samples_radio.setCheckable(False)
                 self.ui.ui_pages.all_samples_radio.setDisabled(True)
-            
+
             # if not deterministic,
             # we can see all samples
             # at once
@@ -1111,40 +1179,39 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.sample_idx_spin.blockSignals(False)
         self.ui.ui_pages.repl_idx_spin.blockSignals(False)
 
-
     def refresh_node_lists(self):
         # pgm page node list #
-        pgm_node_list = [node_name for \
-                node_name in self.gui_modeling.pgm_obj.node_name_val_dict]
+        pgm_node_list = \
+            [node_name for node_name in
+             self.gui_modeling.pgm_obj.node_name_val_dict]
         self.ui.ui_pages.node_list.clear()  # clear first
         self.ui.ui_pages.node_list.addItems(pgm_node_list)
 
         # compare page node list
-        compare_nodes_list = [nd.node_name for nd in \
-                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
-                    nd.is_sampled]
+        compare_nodes_list = \
+            [nd.node_name for nd in
+             self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+             nd.is_sampled]
         self.ui.ui_pages.compare_node_list.clear()
         self.ui.ui_pages.compare_node_list.addItems(compare_nodes_list)
 
         # coverage page node list
-        coverage_nodes_list = [nd.node_name for nd in \
-                self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if \
-                    not nd.is_deterministic]
+        coverage_nodes_list = \
+            [nd.node_name for nd in
+             self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+             not nd.is_deterministic]
         self.ui.ui_pages.coverage_node_list.clear()
         self.ui.ui_pages.coverage_node_list.addItems(coverage_nodes_list)
 
-
     def refresh_selected_node_display_plot_radio(self):
         # if nodes have been created and selected #
-        if self.ui.ui_pages.node_list.currentItem() != None:
+        if self.ui.ui_pages.node_list.currentItem() is not None:
             self.do_selected_node_pgm_page()
-
 
     def refresh_selected_node_display_plot_spin(self):
         # if nodes have been created and selected #
-        if self.ui.ui_pages.node_list.currentItem() != None:
+        if self.ui.ui_pages.node_list.currentItem() is not None:
             self.do_selected_node_pgm_page(spin_buttons_clicked=True)
-
 
     def refresh_cmd_history(self, user_reset=False):
         if user_reset:
@@ -1153,18 +1220,24 @@ class GUIMainWindow(QMainWindow):
         cmd_hist_str = self.gui_modeling.cmd_log().lstrip()
         self.ui.ui_pages.cmd_log_textbox.setText(cmd_hist_str)
 
-
     def clean_disable_everything(self, user_reset=False):
         if user_reset:
             cmd_hist_str: str = ""
 
             try:
                 # update GUI cmd history
-                self.gui_modeling.cmd_log_list.append("\n## Model is being cleared at this point, as a result of (i) reading script, (ii) loading model, or (iii) user reset")
+                self.gui_modeling.cmd_log_list.append(
+                    ("\n## Model is being cleared at this point, as a result "
+                     "of (i) reading script, (ii) loading model, or (iii) "
+                     "user reset"))
                 cmd_hist_str = self.gui_modeling.cmd_log()
-            
-            except:
-                cmd_hist_str = "## Model is being cleared at this point, as a result of (i) reading script, (ii) loading model, or (iii) user reset"
+
+            except Exception as e:
+                print("An error occurred: ", type(e).__name__)
+                cmd_hist_str = \
+                    ("## Model is being cleared at this point, as a result "
+                     "of (i) reading script, (ii) loading model, or (iii) "
+                     "user reset")
 
             self.ui.ui_pages.cmd_log_textbox.setText(cmd_hist_str.lstrip())
 
@@ -1215,14 +1288,12 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.coverage_page_matplotlib_widget.initialize_axes()
         self.ui.ui_pages.coverage_page_matplotlib_widget.fig.canvas.draw()
 
-
     def one_sample_clicked(self):
         self.ui.ui_pages.one_sample_radio.setEnabled(True)
         self.ui.ui_pages.one_sample_radio.setChecked(True)
         self.ui.ui_pages.all_samples_radio.setEnabled(True)
         self.ui.ui_pages.all_samples_radio.setChecked(False)
         self.refresh_selected_node_display_plot_radio()
-
 
     def all_samples_clicked(self):
         self.ui.ui_pages.one_sample_radio.setEnabled(True)
@@ -1236,13 +1307,12 @@ class GUIMainWindow(QMainWindow):
 
         self.refresh_selected_node_display_plot_radio()
 
-
     # side-effect: sets is_avg_repl_check
     # member as True or False
     def avg_repl_check(self):
         chk_button = self.sender()
         self.is_avg_repl_check = chk_button.isChecked()
-        
+
         # clearing summary stats
         # (should only be there
         # if averaging over repls)
@@ -1253,10 +1323,8 @@ class GUIMainWindow(QMainWindow):
         # being compared to force user to select
         self.ui.ui_pages.compare_node_list.clearSelection()
 
-
     def quit_app_button_clicked(self):
         sys.exit()
-
 
     def print_about(self):
         self.ui.about_licensing.exec()
@@ -1273,6 +1341,6 @@ def call_gui():
     sys.exit(gui_app.exec())
 
 
-# call GUI # 
+# call GUI #
 if __name__ == "__main__":
     call_gui()

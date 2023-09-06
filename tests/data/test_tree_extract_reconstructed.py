@@ -91,7 +91,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True))
 
-        self.assertTrue(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+        self.assertTrue(ann_tr.is_extant_or_sa_on_both_sides_complete_tr_root(root_node))
 
 
     def test_obs_both_sides_root_with_origin_true_larger(self):
@@ -217,9 +217,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
             max_age=max_age,
             epsilon=1e-12)
 
-        print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True))
+        print(
+            ann_tr.tree.as_string(schema="newick",
+                                  suppress_annotations=True,
+                                  suppress_internal_taxon_labels=True))
 
-        print(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+        print(ann_tr.is_extant_or_sa_on_both_sides_complete_tr_root(root_node))
 
         # self.assertTrue(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
 
@@ -307,7 +310,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True))
 
-        self.assertFalse(ann_tr.find_if_extant_or_sa_on_both_sides_complete_tr_root(root_node))
+        self.assertFalse(ann_tr.is_extant_or_sa_on_both_sides_complete_tr_root(root_node))
 
 
     def test_extract_reconstructed_tree_two_extant_one_extinct_one_sa(self):
@@ -1201,7 +1204,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
         tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=False)
         # print(tr_rec_str2)
 
-        self.assertEqual(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_taxon_labels=True), "((sp1:0.8,(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:1.0)root:1.0)origin:0.0;\n")
+        self.assertEqual(
+            ann_tr1.tree.as_string(
+                schema="newick",
+                suppress_annotations=True,
+                suppress_internal_taxon_labels=True),
+                "((sp1:0.8,(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:1.0)root:1.0)origin:0.0;\n")
         self.assertEqual(tr_rec_str1, "(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
@@ -1224,14 +1232,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/data/test_tree_extract_reconstructed.py
+    # $ python3.9 tests/data/test_tree_extract_reconstructed.py
     # 
     # or
     #
-    # $ python3 -m tests.data.test_tree_extract_reconstructed
+    # $ python3.9 -m tests.data.test_tree_extract_reconstructed
     #
     # or 
     #
-    # $ python3 -m unittest tests.data.test_tree_extract_reconstructed.TestExtractReconstructedTree.test_extract_reconstructed_tree_one_extant_one_extinct
+    # $ python3.9 -m unittest tests.data.test_tree_extract_reconstructed.TestExtractReconstructedTree.test_extract_reconstructed_tree_one_extant_one_extinct
 
     unittest.main()

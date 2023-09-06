@@ -130,11 +130,12 @@ A couple of rules are always broken because of type hinting, and because of an a
 These are rules E701 and W391.
 Sometimes, excessive indentation (which should be avoided anyway) causes lines to be > 79 characters.
 This violates rule E501.
+Another pair of problematic rules (W503 and W504) we can ignore is is "line break after binary operator" (it pops up for no obvious reason sometimes).
 We can also ignore indentation in comments (E116) and no newline at the end of file (W292)
 We can ask pycodestyle to ignore them:
 
 ```
-pycodestyle --ignore=E116,E501,E701,W391 [path to .py]
+pycodestyle --ignore=E116,E501,W503,W504,E701,W391 [path to .py]
 ```
 
 
