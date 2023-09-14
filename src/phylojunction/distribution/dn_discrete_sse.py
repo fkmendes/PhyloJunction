@@ -1257,6 +1257,8 @@ class DnSSE(pgm.DistributionPGM):
         while (time_slice_idx < self.n_time_slices and not reached_stop_condition):
 
             # (1) Find out the overall total rate given the current targetable nodes' states
+            # print("dn_discrete_sse.py: at (1)")
+            # print("tree size = " + str(len(tr)))
             rate_for_exponential_distn, \
                 state_total_rates = \
                 self.events.total_rate(latest_t,
@@ -1266,12 +1268,17 @@ class DnSSE(pgm.DistributionPGM):
             # [1] are all states with >= 1 representation
 
             # (2) get the time to the next event
+            # print("dn_discrete_sse.py: at (2)")
             t_to_next_event = \
                 self._get_next_event_time(rate_for_exponential_distn)
             latest_t += t_to_next_event
+            # print("latest_t at (2) = " + str(latest_t))
+            if latest_t < 0.0: exit("quit at (2)")
 
             # (3) get end time of this slice (user provides it as end ages,
             # but DiscreteStateDependentParameterManager converts it to time ends)
+            # print("dn_discrete_sse.py: at (3)")
+            # print("slice_t_ends = [" + ",".join(str(i) for i in self.slice_t_ends) + "]")
             next_max_t: float
             t_end = self.slice_t_ends[time_slice_idx]
             if isinstance(t_end, float):
@@ -1282,10 +1289,14 @@ class DnSSE(pgm.DistributionPGM):
             # through the "age stop condition"
             #
             # next_max_t will be None if self.slice_t_ends is empty
+            # print("dn_discrete_sse.py: at (4)")
             excess_t = 0.0
             if self.stop == "age" and self.n_time_slices > 1 and latest_t > next_max_t:
                 excess_t = latest_t - next_max_t
                 latest_t = next_max_t
+
+                # print("latest_t at (4) = " + str(latest_t))
+                if latest_t < 0.0: exit("quit at (4)")
                 time_slice_idx += 1
 
                 # extend all lineages (could keep just the extend in the else-block
@@ -1330,10 +1341,14 @@ class DnSSE(pgm.DistributionPGM):
             # (5) new event time did not go over a time slice, all good, we will now
             # draw an event and execute it
             else:
+                # print("dn_discrete_sse.py: at (5)")
+                # print("latest_t at (5) = " + str(latest_t))
+                if latest_t < 0.0: exit("quit at (5)")
                 # check if tree grew beyond max age (need this check here because the
                 # max age check in the if-block above will not execute
                 # with a single time slice)
-                if self.stop == "age" and (latest_t > t_stop):
+                if (self.stop == "age" and (latest_t > t_stop)) or \
+                        latest_t < 0.0:
                     _extend_all_living_nodes(t_stop - (latest_t - t_to_next_event), end=True)
 
                     sa_lineage_node_labels = [nd.label for nd in living_nodes if nd.is_sa_lineage]
@@ -1370,6 +1385,7 @@ class DnSSE(pgm.DistributionPGM):
                 # (6) draw a node we'll apply the event to
                 #
                 # a lineage will be chosen in proportion to the total rate of its state
+                # print("dn_discrete_sse.py: at (5.1)")
                 lineage_weights = \
                     [state_total_rates[nd.state] for nd in living_nodes]
                 chosen_node = \
@@ -1381,6 +1397,7 @@ class DnSSE(pgm.DistributionPGM):
                           + " in state " + str(chosen_node.state) + "\n")
 
                 # (7) draw an event
+                # print("dn_discrete_sse.py: at (5.2)")
                 macroevol_event_state = chosen_node.state
                 # denominator for sampling event
                 state_conditioned_total_rate = \
@@ -1400,6 +1417,7 @@ class DnSSE(pgm.DistributionPGM):
                 # of execute_event, whenever execute_birth and execute_eath
                 # are called, so we do not need to traverse the tree and
                 # update living_nodes all the time (below, in step (9))
+                # print("dn_discrete_sse.py: at (5.3)")
                 last_chosen_node, \
                     cumulative_node_count, \
                     cumulative_sa_count = \
@@ -1424,12 +1442,14 @@ class DnSSE(pgm.DistributionPGM):
                 # TODO: at some point, make 'living_nodes' a set that is passed to all execute_birth
                 # and execute_death functions so that we don't need to traverse the tree every event
                 # to list living nodes that can be  targeted
+                # print("dn_discrete_sse.py: at (5.4)")
                 living_nodes = [nd for nd in tr if nd.alive]
                 current_node_target_count = len(living_nodes)
 
                 # (10) check for stop conditions
                 #
                 # check if all lineages went extinct, stop!
+                # print("dn_discrete_sse.py: at (5.5)")
                 if current_node_target_count == 0:
                     tree_died = True
 
@@ -1445,6 +1465,8 @@ class DnSSE(pgm.DistributionPGM):
 
                     reached_stop_condition = True
 
+                    # print("    all lineages went extinct!")
+
                     break
 
                 # [Condition is "age", but rejection sampling
@@ -1455,6 +1477,8 @@ class DnSSE(pgm.DistributionPGM):
                 if current_node_target_count == self.abort_at_obs:
                     tree_invalid = True
                     reached_stop_condition = True
+
+                    # print("\n\n\n\n    tree grew out of control, aborting!")
 
                     break
 
@@ -1508,7 +1532,11 @@ class DnSSE(pgm.DistributionPGM):
 
                     reached_stop_condition = True
 
+                    # print("    tree reached its taxon count limit!")
+
                     break
+
+        # print("    tree is still going")
 
         # (11) got out of while loop because met stop condition
         # 'at' is scoped to simulate_a_tree() function
@@ -1520,31 +1548,36 @@ class DnSSE(pgm.DistributionPGM):
         #         print(str(at))
 
         if self.stop == "age":
-            at = AnnotatedTree(tr,
-                               self.events.state_count,
-                               start_at_origin=self.with_origin,
-                               max_age=a_stop_value,
-                               slice_t_ends=self.slice_t_ends,
-                               slice_age_ends=self.events.slice_age_ends,
-                               sa_lineage_dict=sa_lineage_dict,
-                               at_dict=state_transition_dict,
-                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
-                               tree_invalid=tree_invalid,
-                               tree_died=tree_died)
+            # print("dn_discrete_sse.py: at (11)")
+            at = AnnotatedTree(
+                tr,
+                self.events.state_count,
+                start_at_origin=self.with_origin,
+                max_age=a_stop_value,
+                slice_t_ends=self.slice_t_ends,
+                slice_age_ends=self.events.slice_age_ends,
+                sa_lineage_dict=sa_lineage_dict,
+                at_dict=state_transition_dict,
+                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
+                tree_invalid=tree_invalid,
+                tree_died=tree_died)
 
         elif self.stop == "size":
-            at = AnnotatedTree(tr,
-                               self.events.state_count,
-                               start_at_origin=self.with_origin,
-                               sa_lineage_dict=sa_lineage_dict,
-                               at_dict=state_transition_dict,
-                               condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
-                               tree_invalid=tree_invalid)
+            at = AnnotatedTree(
+                tr,
+                self.events.state_count,
+                start_at_origin=self.with_origin,
+                sa_lineage_dict=sa_lineage_dict,
+                at_dict=state_transition_dict,
+                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
+                tree_invalid=tree_invalid)
 
         if self.debug:
             # print(at.tree)
             # print(at.tree.as_string(schema="nexus", suppress_annotations=True, suppress_internal_taxon_labels=True))
-            print(at.tree.as_string(schema="newick", suppress_annotations=False, suppress_internal_taxon_labels=True))
+            print(at.tree.as_string(schema="newick",
+                                    suppress_annotations=False,
+                                    suppress_internal_taxon_labels=True))
 
         return at
         # END simulation loop #
@@ -1563,6 +1596,7 @@ class DnSSE(pgm.DistributionPGM):
             bool: If tree meets stop condition value.
         """
 
+        # print("inside _is_tr_ok()")
         # print("self.tree_died inside SSE dn: " + str(ann_tr.tree_died))
 
         if self.condition_on_survival and ann_tr.tree_died:
@@ -1681,6 +1715,7 @@ class DnSSE(pgm.DistributionPGM):
             repl_size = 0
             while repl_size < self.n_repl:
                 # print("\n\nsimulation #" + str(ith_sim))
+                
                 tr = self.simulate(
                     self.start_states[ith_sim],
                     self.stop_val[ith_sim],
@@ -1693,6 +1728,7 @@ class DnSSE(pgm.DistributionPGM):
 
                 # tree not good, stay in while loop
                 else:
+                    # print("\n\ntree was not good, trying again")
                     j += 1
                     continue
 

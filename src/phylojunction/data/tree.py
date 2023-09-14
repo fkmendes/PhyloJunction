@@ -184,8 +184,8 @@ class AnnotatedTree(dp.Tree):
                     [nd for nd in origin_children if nd.label == "brosc"][0]
 
             except Exception as e:
-                print("Exception inside tree.py: ",
-                      type(e).__name__, " - ", e)
+                # print("Exception 1 inside tree.py: ",
+                #       type(e).__name__, " - ", e)
                 pass  # self.brosc_node will remain None
 
             # Case (a): no events took place, tree may or may not have gone extinct
@@ -289,7 +289,7 @@ class AnnotatedTree(dp.Tree):
 
                         # will get here if node doesn't have .alive
                         except Exception as e:
-                            print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                            # print("Exception 2 inside tree.py: ", type(e).__name__, " - ", e)
                             pass
 
                     # no way to tell, we assume tree died
@@ -355,7 +355,7 @@ class AnnotatedTree(dp.Tree):
 
                         # will get here if node doesn't have .alive
                         except Exception as e:
-                            print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                            # print("Exception 3 inside tree.py: ", type(e).__name__, " - ", e)
                             pass
 
                 # fixes root label if tree has only origin + root
@@ -410,7 +410,7 @@ class AnnotatedTree(dp.Tree):
                     return False
 
             except Exception as e:
-                print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                # print("Exception 4 inside tree.py: ", type(e).__name__, " - ", e)
                 pass
 
         # if none of the non-SA tips is alive, or if there
@@ -549,7 +549,7 @@ class AnnotatedTree(dp.Tree):
                 # or the tree might have been created by hand and no states were
                 # defined (e.g., Yule or birth-death processes)
                 except Exception as e:
-                    print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                    # print("Exception 5 inside tree.py: ", type(e).__name__, " - ", e)
                     pass
 
                 try:
@@ -565,7 +565,7 @@ class AnnotatedTree(dp.Tree):
                 # maybe tree was read as newick string, and it does have
                 # a "state" metadata, but doesn't have an "alive" annotation
                 except Exception as e:
-                    print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                    # print("Exception 6 inside tree.py: ", type(e).__name__, " - ", e)
                     pass
 
     # TODO: add to .pyi
@@ -678,7 +678,7 @@ class AnnotatedTree(dp.Tree):
                 # instead of being simulated by PJ (it doesn't
                 # have .alive and .is_sa members)
                 except Exception as e:
-                    print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                    # print("Exception 7 inside tree.py: ", type(e).__name__, " - ", e)
                     pass
 
             # debugging
@@ -1046,7 +1046,7 @@ class AnnotatedTree(dp.Tree):
                     continue
 
             except Exception as e:
-                print("Exception inside tree.py: ", type(e).__name__, " - ", e)
+                # print("Exception 8 inside tree.py: ", type(e).__name__, " - ", e)
                 pass
 
             living_node_states_dict[taxon_name] = attr_val_dict["state"]

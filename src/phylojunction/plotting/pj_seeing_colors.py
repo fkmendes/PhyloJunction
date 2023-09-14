@@ -57,8 +57,9 @@ new_cmap = truncate_colormap(cmap, minval=0.0, maxval=mv, n=n_colors)
 
 # print(color_list) # to see the hex codes
 
-fig, ax = matplotlib.pyplot.subplots(figsize=(8, 5))
-for x in range(n_colors):
-    # ax.axvline(x, color=color_list[x], linewidth=3)
-    ax.axvline(x, color=qual_color_list[x], linewidth=3)
-plt.show()
+if __name__ == "__main__":
+    fig, ax = matplotlib.pyplot.subplots(figsize=(8, 5))
+    for x in range(n_colors):
+        # ax.axvline(x, color=color_list[x], linewidth=3)
+        ax.axvline(x, color=qual_color_list[x], linewidth=3)
+    plt.show()

@@ -300,12 +300,15 @@ class TestDiscreteSSE(unittest.TestCase):
 
         # number of time slices deduced from matrix of parameters does
         # not match default number of slices (as a result of not
-        # explicitly passing a number of time slices)
+        # explicitly passing a list of epoch age ends from which the
+        # number of time slices could be deduced)
+        #
         with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc1:
             state_dep_par_manager = \
-            sseobj.DiscreteStateDependentParameterManager(
-                matrix_state_dep_probs_error1, total_n_states
-            )
+                sseobj.DiscreteStateDependentParameterManager(
+                    matrix_state_dep_probs_error1,
+                    total_n_states
+                )
 
         self.assertEqual(str(exc1.exception),
             ("Could not initialize the object of "

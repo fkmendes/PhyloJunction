@@ -194,6 +194,6 @@ if __name__ == "__main__":
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_stop_conditions_fbd.TestSSEStopConditionsFBD.test_tree_size_stop_condition_origin_fbd
+    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_stop_conditions_fbd.TestSSEStopConditionsFBD.test_tree_size_stop_condition_origin_fbd
 
     unittest.main()

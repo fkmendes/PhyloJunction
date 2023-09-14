@@ -18,7 +18,8 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-def script2pgm(script_file_path_or_model_spec: str, in_pj_file: bool = True) \
+def script2pgm(script_file_path_or_model_spec: str,
+               in_pj_file: bool = True) \
         -> pgm.ProbabilisticGraphicalModel:
     """Go through .pj lines and populate graphical model
 
@@ -631,7 +632,7 @@ if __name__ == "__main__":
     script_str1 = "a <- 1.0"
     script_str2 = "a <- [1, 2, 3]"
     script_str3 = "a <- 1\nb <- 2\nc <- [a, b, 3]"
-    script_str4 = "a ~ lognormal(n=10, mean=10.0, sd=1.0)"
+    script_str4 = "m <- [1,2,3,4,5,6,7,8,9,10]\nrv ~ lognormal(n=10, mean=m, sd=1.0)"
     script_str5 = ("l0 <- 1.0\na := sse_rate(name=\"lambda\", value=l0,"
                    " event=\"b_speciation\", states=[2, 0, 1])")
     script_str6 = ("l0rate := sse_rate(name=\"lambda\", value=1.0, "
@@ -784,7 +785,7 @@ if __name__ == "__main__":
     #
     # vectorized atomic rate parameter
     # l0rate := sse_rate(name="lambda", value=[1.0, 1.1], event="w_speciation")
-    # stash :=stash(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)
+    # stash := stash(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)
 
     # yule
     # l0 <- [0.9, 1.0, 1.1]
@@ -801,7 +802,7 @@ if __name__ == "__main__":
     # m1rate := sse_rate(name="mu1", value=0.8, states=[1,1,1], event="extinction")
     # q01rate := sse_rate(name="q01", value=0.6, states=[0,1], event="transition")
     # q10rate := sse_rate(name="q10", value=0.6, states=[1,0], event="transition")
-    # stash :=stash(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)
+    # stash := stash(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)
     # trs ~ discrete_sse(n=5, stash=stash, start_state=[0], stop="age", stop_value=2.5, origin="true", cond_spn="false", cond_surv="true")
 
     # time-het yule
@@ -838,7 +839,5 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm(script_str_error3, in_pj_file=False)
-
-    # for node_pgm in pgm_obj.get_sorted_node_pgm_list():
-    #     print(node_pgm.node_name)
+    pgm_obj = script2pgm("examples/birthdeath_timehet.pj", in_pj_file=True)
+    # pgm_pbj = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)
