@@ -149,7 +149,8 @@ Start by cloning the PhyloJunction repository, and going to its root (i.e., the 
 If you are on an Apple machine that obstrusively curtails file system access, run the following command:
 
 ```
-python3 -m pip install --user -e .
+cd PhyloJunction/
+python3.9 -m pip install --user -e .
 ```
 
 The `--user` flag is the way around said restrictions.
@@ -158,7 +159,7 @@ Remember to add this path to the PATH system variable if you want to call the ex
 Another option is to run the following command:
 
 ```
-python3 -m pip install --prefix ~/.local -e .
+python3.9 -m pip install --prefix ~/.local -e .
 ```
 
 Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.
@@ -177,7 +178,7 @@ pjgui
 ```
 
 Important notes:
-    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computer architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.13_3/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computer architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
 
     (2) On Linux machines, depending on the python version (e.g., 3.9.7), the PySimpleGUI GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
 
