@@ -28,8 +28,9 @@ def script2pgm(script_file_path_or_model_spec: str,
             file or full string specifying model directly
     """
 
-    def _execute_spec_lines(all_lines_list: ty.List[str],
-                            pgm_obj: pgm.ProbabilisticGraphicalModel) -> None:
+    def _execute_spec_lines(
+            all_lines_list: ty.List[str],
+                pgm_obj: pgm.ProbabilisticGraphicalModel) -> None:
         for line in all_lines_list:
             # clear padding whitespaces
             line = line.lstrip().rstrip()

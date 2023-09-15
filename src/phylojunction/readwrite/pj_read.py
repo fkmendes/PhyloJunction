@@ -7,6 +7,7 @@ import csv
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
+import phylojunction.utility.exception_classes as ec
 
 
 def read_text_file(fp_string: str) -> ty.List[str]:
@@ -105,3 +106,81 @@ def is_csv(fp_string: str) -> bool:
                "read CSV file, but it does not seem to be in CSV format."))
 
         return False
+
+
+def parse_cli_str_write_fig(str_write_fig: str) \
+        -> ty.Dict[str, ty.Tuple[int]]:
+    """
+    """
+
+    node_range_dict: ty.Dict[str, ty.Tuple[int]] = dict()
+
+    node_range_list = str_write_fig.split(";")
+
+    # only one node name passed, no range
+    # so we assume just the first repl of
+    # first sample
+    if len(node_range_list) == 1:
+        if node_range_list[0].isnumeric():
+            raise ec.PJCLIInvalidInput(
+                "-f",
+                ("If no range is provided, you must input a node name "
+                 "(string) whose figure to plot, instead of an integer.")
+            )
+            # raise RuntimeError
+
+        node_range_dict[node_range_list[0]] = tuple([0])
+
+    else:
+        node_names_str, node_ranges_str = node_range_list
+        node_names_list = node_names_str.split(",")
+        node_ranges_list = node_ranges_str.split(",")
+
+        if len(node_names_list) != len(node_ranges_list):
+            raise ec.PJCLIInvalidInput(
+                "-f",
+                ("If ranges are provided, the number of ranges must "
+                 "match the number of node names to plot figures for.")
+            )
+            # raise RuntimeError
+
+        for idx, node_name in enumerate(node_names_list):
+            range_str = node_ranges_list[idx]
+
+            try:
+                range_tup = tuple(int(i) for i in range_str.split("-"))
+
+            except ValueError:
+                raise ec.PJCLIInvalidInput(
+                    "-f",
+                    ("Ranges must be defined by integers."))
+                # raise RuntimeError
+
+            if node_name in node_range_dict:
+                raise ec.PJCLIInvalidInput(
+                    "-f",
+                    ("Node names appeared more than once. Nodes to plot "
+                     "figures for must be unique.")
+                )
+                # raise RuntimeError
+
+            node_range_dict[node_name] = range_tup
+
+    return node_range_dict
+
+
+if __name__ == "__main__":
+
+    # should be ok
+    print(parse_cli_str_write_fig("tr"))
+    print(parse_cli_str_write_fig("tr;0"))
+    print(parse_cli_str_write_fig("tr;0-10"))
+    print(parse_cli_str_write_fig("rv1,tr;0,0"))
+    print(parse_cli_str_write_fig("rv1,tr;0-1,0"))
+    print(parse_cli_str_write_fig("rv1,tr;0-1,0-1"))
+
+    # should raise hell (try one at a time)
+    # parse_cli_str_write_fig("0")
+    # parse_cli_str_write_fig("rv;tr")
+    # parse_cli_str_write_fig("rv,tr;0")
+    # parse_cli_str_write_fig("rv,tr;0,")

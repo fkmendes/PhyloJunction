@@ -593,3 +593,19 @@ class GenerateFailError(Exception):
 
     def __str__(self) -> str:
         return self.message
+
+
+# CLI exceptions #
+class PJCLIInvalidInput(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str, message: str) -> None:
+        self.par_name = par_name
+        self.message = "ERROR: The argument to " + par_name + " was invalid. " \
+            + message
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
