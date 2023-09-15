@@ -1,4 +1,4 @@
-from phylojunction.interface.pj_cli import call_cli
+from interface.pjcli.pj_cli import call_cli
 
 def main():
     call_cli()

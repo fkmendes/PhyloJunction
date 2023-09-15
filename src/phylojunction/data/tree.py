@@ -1311,7 +1311,8 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         segment_colors = [color]
 
         # in case it is a tree with attrs
-        if ann_tr.node_attr_dict:
+        if ann_tr.node_attr_dict and \
+            attr_of_interest is not None:
             attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
             segment_colors = [color_map[attr_idx]]  # from parent
 

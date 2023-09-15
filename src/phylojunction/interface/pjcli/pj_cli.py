@@ -1,10 +1,16 @@
 import argparse
 import os
+import typing as ty
 
 # pj imports
 import phylojunction.interface.cmdbox.cmd_parse as cmd
 import phylojunction.pgm.pgm as pgm
+import phylojunction.readwrite.pj_read as pjr
 import phylojunction.readwrite.pj_write as pjw
+import phylojunction.interface.pjcli.cli_plotting as cliplt
+
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
 
 
 def execute_pj_script(
@@ -22,13 +28,17 @@ def execute_pj_script(
     but can also be called from a .py script importing phylojunction
     """
 
-    #################
     # Reading model #
-    #################
     pgm_obj: pgm.ProbabilisticGraphicalModel = \
         pgm.ProbabilisticGraphicalModel()
 
+    print("Reading script " + model)
     pgm_obj = cmd.script2pgm(model, in_pj_file=True)
+    print("    ... done!")
+
+    n_samples = pgm_obj.sample_size
+
+    fig_obj, fig_axes = cliplt.start_fig_and_axes()
 
     # making sure the PGM has at least a note in it #
     if pgm_obj.n_nodes > 0:
@@ -36,7 +46,7 @@ def execute_pj_script(
         ########################################
         # Sorting out and creating directories #
         ########################################
-        output_dir = out_dir
+        output_dir: str = out_dir
         if not out_dir.endswith("/"):
             output_dir += "/"
 
@@ -48,34 +58,39 @@ def execute_pj_script(
         #     print("\nnode name = " + node_name)
         #     print(node_pgm.value)
 
-        ################
         # Writing data #
-        ################
         if write_data:
-            data_dir = output_dir
+            data_dir: str = output_dir
 
             if not os.path.isdir(data_dir):
                 os.mkdir(data_dir)
 
-            pjw.dump_pgm_data(data_dir, pgm_obj, prefix, write_nex_states)
+            pjw.dump_pgm_data(
+                data_dir,
+                pgm_obj,
+                prefix,
+                write_nex_states)
 
-        ###################
         # Writing figures #
-        ###################
         if write_figures:
-            
-            fig_dir = output_dir + "figures/"
+            node_range_dict: ty.Dict[str, ty.Tuple[int]] = \
+                pjr.parse_cli_str_write_fig(write_figures)
+            fig_dir: str = output_dir + "figures/"
 
             if not os.path.isdir(fig_dir):
                 os.mkdir(fig_dir)
 
+            cliplt.call_node_plot_cli(
+                fig_dir,
+                pgm_obj,
+                n_samples,
+                node_range_dict,
+                fig_obj,
+                fig_axes)
             
-
-        ###########################
         # Writing inference files #
-        ###########################
         if write_inference:
-            inference_dir = out_dir + "inference_files/"
+            inference_dir: str = out_dir + "inference_files/"
 
             if not os.path.isdir(inference_dir):
                 os.mkdir(inference_dir)
@@ -142,6 +157,7 @@ def call_cli() -> None:
         prefix=args.prefix,
         out_dir=args.out_dir,
         write_data=args.write_data,
+        write_figures=args.write_figures,
         write_inference=args.write_inference,
         write_nex_states=args.write_nex_states
     )

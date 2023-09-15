@@ -596,7 +596,7 @@ class GenerateFailError(Exception):
 
 
 # CLI exceptions #
-class PJCLIInvalidInput(Exception):
+class PJCLIInvalidInputError(Exception):
     par_name: str
     message: str
 
@@ -604,6 +604,18 @@ class PJCLIInvalidInput(Exception):
         self.par_name = par_name
         self.message = "ERROR: The argument to " + par_name + " was invalid. " \
             + message
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class PJCLISampleOutOfRangeError(Exception):
+
+    def __init__(self, range_str: str) -> None:
+        self.message = "ERROR: The range passed to -f, " \
+            + range_str + ", was invalid."
 
         super().__init__(self.message)
 

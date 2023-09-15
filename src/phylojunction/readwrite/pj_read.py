@@ -117,9 +117,8 @@ def parse_cli_str_write_fig(str_write_fig: str) \
 
     node_range_list = str_write_fig.split(";")
 
-    # only one node name passed, no range
-    # so we assume just the first repl of
-    # first sample
+    # only one node name passed, we assume all samples
+    # are needed, range tuple is empty
     if len(node_range_list) == 1:
         if node_range_list[0].isnumeric():
             raise ec.PJCLIInvalidInput(
@@ -129,7 +128,7 @@ def parse_cli_str_write_fig(str_write_fig: str) \
             )
             # raise RuntimeError
 
-        node_range_dict[node_range_list[0]] = tuple([0])
+        node_range_dict[node_range_list[0]] = tuple([])
 
     else:
         node_names_str, node_ranges_str = node_range_list
@@ -151,13 +150,13 @@ def parse_cli_str_write_fig(str_write_fig: str) \
                 range_tup = tuple(int(i) for i in range_str.split("-"))
 
             except ValueError:
-                raise ec.PJCLIInvalidInput(
+                raise ec.PJCLIInvalidInputError(
                     "-f",
-                    ("Ranges must be defined by integers."))
+                    ("Ranges must be defined by non-negative integers."))
                 # raise RuntimeError
 
             if node_name in node_range_dict:
-                raise ec.PJCLIInvalidInput(
+                raise ec.PJCLIInvalidInputError(
                     "-f",
                     ("Node names appeared more than once. Nodes to plot "
                      "figures for must be unique.")
