@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phylojunction.utility package &mdash; PhyloJunction 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> PhyloJunction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PhyloJunction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>phylojunction.utility package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/phylojunction.utility.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="phylojunction-utility-package">
+<h1>phylojunction.utility package<a class="headerlink" href="#phylojunction-utility-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.utility.exception_classes">
+<span id="phylojunction-utility-exception-classes-module"></span><h2>phylojunction.utility.exception_classes module<a class="headerlink" href="#module-phylojunction.utility.exception_classes" title="Permalink to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.AnnotatedTreeLineageMissannotation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">AnnotatedTreeLineageMissannotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.AnnotatedTreeLineageMissannotation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.AnnotatedTreeLineageMissannotation.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.AnnotatedTreeLineageMissannotation.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.AnnotatedTreeMisspec">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">AnnotatedTreeMisspec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.AnnotatedTreeMisspec" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.AnnotatedTreeMisspec.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.AnnotatedTreeMisspec.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">DimensionalityError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityError.dn_name">
+<span class="sig-name descname"><span class="pre">dn_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityError.dn_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityWarning">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">DimensionalityWarning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityWarning" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityWarning.dn_name">
+<span class="sig-name descname"><span class="pre">dn_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityWarning.dn_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityWarning.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityWarning.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.DimensionalityWarning.rv_name">
+<span class="sig-name descname"><span class="pre">rv_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.DimensionalityWarning.rv_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.FunctionArgsMismatchError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">FunctionArgsMismatchError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.FunctionArgsMismatchError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.FunctionArgsMismatchError.fn_name">
+<span class="sig-name descname"><span class="pre">fn_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.FunctionArgsMismatchError.fn_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.FunctionArgsMismatchError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.FunctionArgsMismatchError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.GenerateFailError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">GenerateFailError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.GenerateFailError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.GenerateFailError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.GenerateFailError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.IncorrectDimensionError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">IncorrectDimensionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.IncorrectDimensionError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.IncorrectDimensionError.container_name">
+<span class="sig-name descname"><span class="pre">container_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.IncorrectDimensionError.container_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.IncorrectDimensionError.exp_len">
+<span class="sig-name descname"><span class="pre">exp_len</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.IncorrectDimensionError.exp_len" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.IncorrectDimensionError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.IncorrectDimensionError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.IncorrectDimensionError.obs_len">
+<span class="sig-name descname"><span class="pre">obs_len</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.IncorrectDimensionError.obs_len" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.InexistentVariableError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">InexistentVariableError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.InexistentVariableError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.InexistentVariableError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.InexistentVariableError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.InexistentVariableError.rv_name">
+<span class="sig-name descname"><span class="pre">rv_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.InexistentVariableError.rv_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.InvalidMCMCChainLength">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">InvalidMCMCChainLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.InvalidMCMCChainLength" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.InvalidMCMCChainLength.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.InvalidMCMCChainLength.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NoPlatingAllowedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">NoPlatingAllowedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">problematic_node_pgm_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.NoPlatingAllowedError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NoPlatingAllowedError.det_name">
+<span class="sig-name descname"><span class="pre">det_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NoPlatingAllowedError.det_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NoPlatingAllowedError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NoPlatingAllowedError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NoPlatingAllowedError.node_pgm_name">
+<span class="sig-name descname"><span class="pre">node_pgm_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NoPlatingAllowedError.node_pgm_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NodeInferenceDimensionalityError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">NodeInferenceDimensionalityError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.NodeInferenceDimensionalityError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NodeInferenceDimensionalityError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NodeInferenceDimensionalityError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NodeInferenceDimensionalityError.node_name">
+<span class="sig-name descname"><span class="pre">node_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NodeInferenceDimensionalityError.node_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NodePGMNodeStatCantFloatError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">NodePGMNodeStatCantFloatError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.NodePGMNodeStatCantFloatError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NodePGMNodeStatCantFloatError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NodePGMNodeStatCantFloatError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NotBetweenZeroAndOneError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">NotBetweenZeroAndOneError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.NotBetweenZeroAndOneError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NotBetweenZeroAndOneError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NotBetweenZeroAndOneError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.NotBetweenZeroAndOneError.par_name">
+<span class="sig-name descname"><span class="pre">par_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.NotBetweenZeroAndOneError.par_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ObjInitIncorrectDimensionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.obj_name">
+<span class="sig-name descname"><span class="pre">obj_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.obj_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitInvalidArgError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ObjInitInvalidArgError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitInvalidArgError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitInvalidArgError.dn_name">
+<span class="sig-name descname"><span class="pre">dn_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitInvalidArgError.dn_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitInvalidArgError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitInvalidArgError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitMissingParameterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ObjInitMissingParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitMissingParameterError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitMissingParameterError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitMissingParameterError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitMissingParameterError.obj_name">
+<span class="sig-name descname"><span class="pre">obj_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitMissingParameterError.obj_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ObjInitMissingStateDependentParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch_missing_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric_diff_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError.symmetric_diff_str">
+<span class="sig-name descname"><span class="pre">symmetric_diff_str</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError.symmetric_diff_str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitRepeatedStateDependentParameterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ObjInitRepeatedStateDependentParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch_w_repeated_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeated_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitRepeatedStateDependentParameterError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitRepeatedStateDependentParameterError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitRepeatedStateDependentParameterError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ObjInitRequireSameParameterTypeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_diff_par</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.n_diff_par">
+<span class="sig-name descname"><span class="pre">n_diff_par</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.n_diff_par" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.obj_name">
+<span class="sig-name descname"><span class="pre">obj_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.obj_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.PJCLIInvalidInputError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">PJCLIInvalidInputError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.PJCLIInvalidInputError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.PJCLIInvalidInputError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.PJCLIInvalidInputError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.PJCLIInvalidInputError.par_name">
+<span class="sig-name descname"><span class="pre">par_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.PJCLIInvalidInputError.par_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.PJCLISampleOutOfRangeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">PJCLISampleOutOfRangeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.PJCLISampleOutOfRangeError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseDetFnInitFailError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseDetFnInitFailError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseDetFnInitFailError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseDetFnInitFailError.det_fn_name">
+<span class="sig-name descname"><span class="pre">det_fn_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseDetFnInitFailError.det_fn_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseDetFnInitFailError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseDetFnInitFailError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseDnInitFailError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseDnInitFailError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseDnInitFailError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseDnInitFailError.dn_name">
+<span class="sig-name descname"><span class="pre">dn_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseDnInitFailError.dn_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseDnInitFailError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseDnInitFailError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseFunctionArgError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseFunctionArgError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseFunctionArgError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseFunctionArgError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseFunctionArgError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseFunctionArgError.par_name">
+<span class="sig-name descname"><span class="pre">par_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseFunctionArgError.par_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingArgumentError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseMissingArgumentError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingArgumentError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingArgumentError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingArgumentError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingArgumentError.par_name">
+<span class="sig-name descname"><span class="pre">par_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingArgumentError.par_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingParameterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseMissingParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingParameterError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingParameterError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingParameterError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingParameterError.par_name">
+<span class="sig-name descname"><span class="pre">par_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingParameterError.par_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingSpecificationError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseMissingSpecificationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj2spec_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingSpecificationError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseMissingSpecificationError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseMissingSpecificationError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseNotAParameterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseNotAParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">par_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseNotAParameterError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseNotAParameterError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseNotAParameterError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseNotAParameterError.par_name">
+<span class="sig-name descname"><span class="pre">par_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseNotAParameterError.par_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireIntegerError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseRequireIntegerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireIntegerError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireIntegerError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireIntegerError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireIntegerError.obj_name">
+<span class="sig-name descname"><span class="pre">obj_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireIntegerError.obj_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireNumericError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseRequireNumericError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireNumericError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireNumericError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireNumericError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireNumericError.obj_name">
+<span class="sig-name descname"><span class="pre">obj_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireNumericError.obj_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireSingleValueError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ParseRequireSingleValueError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireSingleValueError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireSingleValueError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireSingleValueError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ParseRequireSingleValueError.obj_name">
+<span class="sig-name descname"><span class="pre">obj_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ParseRequireSingleValueError.obj_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ReplicateNumberError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ReplicateNumberError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ReplicateNumberError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ReplicateNumberError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ReplicateNumberError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ReplicateNumberError.node_name">
+<span class="sig-name descname"><span class="pre">node_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ReplicateNumberError.node_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.SSEStashMisspec">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">SSEStashMisspec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.SSEStashMisspec" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.SSEStashMisspec.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.SSEStashMisspec.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ScriptSyntaxError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">ScriptSyntaxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.ScriptSyntaxError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ScriptSyntaxError.cmd_line">
+<span class="sig-name descname"><span class="pre">cmd_line</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ScriptSyntaxError.cmd_line" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.ScriptSyntaxError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.ScriptSyntaxError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.StateDependentParameterMisspec">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">StateDependentParameterMisspec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.StateDependentParameterMisspec" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.StateDependentParameterMisspec.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.StateDependentParameterMisspec.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.VariableAssignmentError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">VariableAssignmentError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.VariableAssignmentError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.VariableAssignmentError.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.VariableAssignmentError.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.VariableAssignmentError.rv_name">
+<span class="sig-name descname"><span class="pre">rv_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.VariableAssignmentError.rv_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.VariableMisspec">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.utility.exception_classes.</span></span><span class="sig-name descname"><span class="pre">VariableMisspec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rv_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.utility.exception_classes.VariableMisspec" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.VariableMisspec.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.VariableMisspec.message" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.utility.exception_classes.VariableMisspec.rv_name">
+<span class="sig-name descname"><span class="pre">rv_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.utility.exception_classes.VariableMisspec.rv_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.utility.helper_functions">
+<span id="phylojunction-utility-helper-functions-module"></span><h2>phylojunction.utility.helper_functions module<a class="headerlink" href="#module-phylojunction.utility.helper_functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.autovivify">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">autovivify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levels=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final=&lt;class</span> <span class="pre">'dict'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DefaultDict</span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.autovivify" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.create_str_defaultdict">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">create_str_defaultdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">defaultdict</span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.create_str_defaultdict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.get_ellapsed_time_in_minutes">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">get_ellapsed_time_in_minutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.get_ellapsed_time_in_minutes" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate ellapsed time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<em>float</em>) – Start of time window</p></li>
+<li><p><strong>end</strong> (<em>float</em>) – End of time window</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Ellapsed time in minutes in time window</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.is_val_in_interval">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">is_val_in_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.is_val_in_interval" title="Permalink to this definition"></a></dt>
+<dd><p>Return True/False if numerical value is in (lower, upper]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>val</strong> (<em>ty.Union</em><em>[</em><em>int</em><em>, </em><em>float</em><em>, </em><em>np.float64</em><em>]</em><em>t</em>) – Numerical value</p></li>
+<li><p><strong>lower</strong> (<em>ty.Union</em><em>[</em><em>int</em><em>, </em><em>float</em><em>, </em><em>np.float64</em><em>]</em>) – Lower end of interval</p></li>
+<li><p><strong>upper</strong> (<em>ty.Union</em><em>[</em><em>int</em><em>, </em><em>float</em><em>, </em><em>np.float64</em><em>]</em>) – Upper end of interval</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether val is in (lower, upper]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.print_progress">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">print_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterator_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.print_progress" title="Permalink to this definition"></a></dt>
+<dd><p>Print progress bar on iteration for longer tests</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idx</strong> (<em>int</em>) – Index to keep track of where in iteration one is</p></li>
+<li><p><strong>iterator_len</strong> (<em>int</em>) – Size of the iterator whose progress is
+keeping track of</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.symmetric_difference">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">symmetric_difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.symmetric_difference" title="Permalink to this definition"></a></dt>
+<dd><p>Return symmetric difference among two sets</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.utility.helper_functions.verify_or_convert2_vector">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.utility.helper_functions.</span></span><span class="sig-name descname"><span class="pre">verify_or_convert2_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_to_grow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.utility.helper_functions.verify_or_convert2_vector" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>size_to_grow</strong> (<em>int</em>) – This will be the number of simulations
+(n_draws inside a DistributionPGM object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.utility">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.utility" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Fabio K. Mendes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

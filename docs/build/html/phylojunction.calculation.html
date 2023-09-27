@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>phylojunction.calculation package &mdash; PhyloJunction 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> PhyloJunction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PhyloJunction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>phylojunction.calculation package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/phylojunction.calculation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="phylojunction-calculation-package">
+<h1>phylojunction.calculation package<a class="headerlink" href="#phylojunction-calculation-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.calculation.discrete_sse">
+<span id="phylojunction-calculation-discrete-sse-module"></span><h2>phylojunction.calculation.discrete_sse module<a class="headerlink" href="#module-phylojunction.calculation.discrete_sse" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">DiscreteStateDependentParameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Main class for discrete state-dependent parameters</p>
+<p>Supports vectorization of values only.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.state">
+<span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">DiscreteStateDependentParameterManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix_state_dep_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><span class="pre">DiscreteStateDependentParameter</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_state_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_age_for_time_slicing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_time_slice_age_ends</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stash for discrete state-dependent parameters and time slices</p>
+<p>At the moment, this class does not care about vectorization.
+It manipulates whole instances of DiscreteStateDependentParameter,
+which then in turn contain multiple values if vectors have been passed
+by user.</p>
+<p>Later, vectorization of seed ages for time slicing and time slices themselves
+might become vectorized.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.epsilon">
+<span class="sig-name descname"><span class="pre">epsilon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.epsilon" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.matrix_state_dep_params">
+<span class="sig-name descname"><span class="pre">matrix_state_dep_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><span class="pre">DiscreteStateDependentParameter</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.matrix_state_dep_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.seed_age">
+<span class="sig-name descname"><span class="pre">seed_age</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.seed_age" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.slice_age_ends">
+<span class="sig-name descname"><span class="pre">slice_age_ends</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.slice_age_ends" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.slice_t_ends">
+<span class="sig-name descname"><span class="pre">slice_t_ends</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.slice_t_ends" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.state_dep_params_at_time">
+<span class="sig-name descname"><span class="pre">state_dep_params_at_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><span class="pre">DiscreteStateDependentParameter</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><span class="pre">DiscreteStateDependentParameter</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.state_dep_params_at_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">DiscreteStateDependentProbability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter</span></code></a></p>
+<p>Main class for discrete state-dependent probability parameters</p>
+<p>Supports vectorization of values only.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability.state_representation">
+<span class="sig-name descname"><span class="pre">state_representation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability.state_representation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">DiscreteStateDependentProbabilityHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dep_prob_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager"><span class="pre">DiscreteStateDependentParameterManager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for managing time-heterogeneous state-dependent probabilities</p>
+<p>Time slices do not have to be the same as those for state-dependent
+rates.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.n_time_slices">
+<span class="sig-name descname"><span class="pre">n_time_slices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.n_time_slices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.randomly_decide_taxon_sampling_at_time_at_state">
+<span class="sig-name descname"><span class="pre">randomly_decide_taxon_sampling_at_time_at_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_idx</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.randomly_decide_taxon_sampling_at_time_at_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.seed_age">
+<span class="sig-name descname"><span class="pre">seed_age</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.seed_age" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.slice_age_ends">
+<span class="sig-name descname"><span class="pre">slice_age_ends</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.slice_age_ends" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.slice_t_ends">
+<span class="sig-name descname"><span class="pre">slice_t_ends</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.slice_t_ends" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.state_count">
+<span class="sig-name descname"><span class="pre">state_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.state_count" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.state_dep_prob_manager">
+<span class="sig-name descname"><span class="pre">state_dep_prob_manager</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager"><span class="pre">DiscreteStateDependentParameterManager</span></a></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.state_dep_prob_manager" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.str_representation">
+<span class="sig-name descname"><span class="pre">str_representation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.str_representation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">DiscreteStateDependentRate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEvent" title="phylojunction.calculation.discrete_sse.MacroevolEvent"><span class="pre">MacroevolEvent</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter</span></code></a></p>
+<p>Main class for discrete state-dependent rate parameters</p>
+<p>Supports vectorization of values only.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.state_tuple">
+<span class="sig-name descname"><span class="pre">state_tuple</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.state_tuple" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">DiscreteStateDependentRate_old_and_working</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEvent" title="phylojunction.calculation.discrete_sse.MacroevolEvent"><span class="pre">MacroevolEvent</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Main class for discrete state-dependent rate parameters</p>
+<p>Supports vectorization of values only.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.event">
+<span class="sig-name descname"><span class="pre">event</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEvent" title="phylojunction.calculation.discrete_sse.MacroevolEvent"><span class="pre">MacroevolEvent</span></a></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.event" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.states">
+<span class="sig-name descname"><span class="pre">states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.states" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate_old_and_working.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">MacroevolEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent.ANAGENETIC_TRANSITION">
+<span class="sig-name descname"><span class="pre">ANAGENETIC_TRANSITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent.ANAGENETIC_TRANSITION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent.ANCESTOR_SAMPLING">
+<span class="sig-name descname"><span class="pre">ANCESTOR_SAMPLING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent.ANCESTOR_SAMPLING" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent.ASYM_SPECIATION">
+<span class="sig-name descname"><span class="pre">ASYM_SPECIATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent.ASYM_SPECIATION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent.BW_SPECIATION">
+<span class="sig-name descname"><span class="pre">BW_SPECIATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent.BW_SPECIATION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent.EXTINCTION">
+<span class="sig-name descname"><span class="pre">EXTINCTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent.EXTINCTION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEvent.W_SPECIATION">
+<span class="sig-name descname"><span class="pre">W_SPECIATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEvent.W_SPECIATION" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">MacroevolEventHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_dep_rate_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager"><span class="pre">DiscreteStateDependentParameterManager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for sampling of discrete-state macroevolutionary events</p>
+<p>Some of the methods in this class are vector-aware (through parameter
+value_idx), because instances of this class will be directly called by
+dn_sse.simulate() method, which in turn will try to access parameter values
+stored in a #-simulations-sized list.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.get_gcf">
+<span class="sig-name descname"><span class="pre">get_gcf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.get_gcf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.get_length">
+<span class="sig-name descname"><span class="pre">get_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.get_length" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.n_time_slices">
+<span class="sig-name descname"><span class="pre">n_time_slices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.n_time_slices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.sample_event_atomic_parameter">
+<span class="sig-name descname"><span class="pre">sample_event_atomic_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">denominator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.sample_event_atomic_parameter" title="Permalink to this definition"></a></dt>
+<dd><p>Return one-sized list with a sampled macroevolutionary event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>denominator</strong> (<em>float</em>) – Normalization term for computing weights
+of different events.</p></li>
+<li><p><strong>a_time</strong> (<em>float</em>) – When the event will take place.</p></li>
+<li><p><strong>state_indices</strong> (<em>int</em>) – Event is conditioned on departing from
+this state(s).</p></li>
+<li><p><strong>value_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – Index specifying which parameter
+value (within a vector of #-of-simulations-size) we care
+about. Defaults to 0 (first element).</p></li>
+<li><p><strong>a_seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for simulation (not
+working at the moment). Defaults to None.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag for printing debugging messages.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sampled macroevolutionary event that will take place</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEvent" title="phylojunction.calculation.discrete_sse.MacroevolEvent">MacroevolEvent</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.seed_age">
+<span class="sig-name descname"><span class="pre">seed_age</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.seed_age" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.slice_age_ends">
+<span class="sig-name descname"><span class="pre">slice_age_ends</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.slice_age_ends" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.slice_t_ends">
+<span class="sig-name descname"><span class="pre">slice_t_ends</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.slice_t_ends" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.state_count">
+<span class="sig-name descname"><span class="pre">state_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.state_count" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.state_dep_rate_manager">
+<span class="sig-name descname"><span class="pre">state_dep_rate_manager</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager"><span class="pre">DiscreteStateDependentParameterManager</span></a></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.state_dep_rate_manager" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.str_representation">
+<span class="sig-name descname"><span class="pre">str_representation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.str_representation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.MacroevolEventHandler.total_rate">
+<span class="sig-name descname"><span class="pre">total_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_representation_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">departing_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler.total_rate" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate total rate for either any event, or for events
+conditioned on a specific state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a_time</strong> (<em>float</em>) – Forward time (not age!) we want to recover
+rates with.</p></li>
+<li><p><strong>state_representation_dict</strong> (<em>dict</em>) – Dictionary with (int) states
+as keys and list of (str) node labels at that state.</p></li>
+<li><p><strong>value_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – Index specifying which parameter
+value (within a vector of #-of-simulations-size) we care about.
+Defaults to 0 (first element).</p></li>
+<li><p><strong>departing_state</strong> (<em>int</em><em>, </em><em>optional</em>) – State we can condition rates on.
+Defaults to None.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag for printing debugging messages.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>If no departing_state is provided, returns the global</dt><dd><p>rate. Otherwise, returns a state-conditioned total rate and
+a list with each state total rate.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>(float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.SSEStash">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">SSEStash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">macroevol_event_handler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="phylojunction.calculation.discrete_sse.MacroevolEventHandler"><span class="pre">MacroevolEventHandler</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_dep_prob_handler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler"><span class="pre">DiscreteStateDependentProbabilityHandler</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.SSEStash" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for stashing state-dependent rate and probability handlers</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.SSEStash.get_meh">
+<span class="sig-name descname"><span class="pre">get_meh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="phylojunction.calculation.discrete_sse.MacroevolEventHandler"><span class="pre">MacroevolEventHandler</span></a></span></span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.SSEStash.get_meh" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.SSEStash.get_prob_handler">
+<span class="sig-name descname"><span class="pre">get_prob_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler"><span class="pre">DiscreteStateDependentProbabilityHandler</span></a></span></span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.SSEStash.get_prob_handler" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.SSEStash.meh">
+<span class="sig-name descname"><span class="pre">meh</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="phylojunction.calculation.discrete_sse.MacroevolEventHandler"><span class="pre">MacroevolEventHandler</span></a></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.SSEStash.meh" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.SSEStash.prob_handler">
+<span class="sig-name descname"><span class="pre">prob_handler</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler"><span class="pre">DiscreteStateDependentProbabilityHandler</span></a></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.SSEStash.prob_handler" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.SSEStash.str_representation">
+<span class="sig-name descname"><span class="pre">str_representation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.SSEStash.str_representation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.discrete_sse.</span></span><span class="sig-name descname"><span class="pre">StateIntoPatternConverter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_characters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_states_per_char</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stash and machinery for checking and converting character
+compound-states into bit patterns, and vice-versa</p>
+<p>For example, if we are thinking about regions as characters,
+then compound-state means different ranges (e.g., “A”, “AB”),
+while “state” is the number of different values a single
+character can take. In the case of 1-character-1-region, then
+the number of states is 2, because a species is either present
+or not in a region.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter.int2set_dict">
+<span class="sig-name descname"><span class="pre">int2set_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.int2set_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_char">
+<span class="sig-name descname"><span class="pre">n_char</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_char" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_states">
+<span class="sig-name descname"><span class="pre">n_states</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_states" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_states_per_char">
+<span class="sig-name descname"><span class="pre">n_states_per_char</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_states_per_char" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter.populate_dicts">
+<span class="sig-name descname"><span class="pre">populate_dicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.populate_dicts" title="Permalink to this definition"></a></dt>
+<dd><p>Non-recursively generate all bit patterns for a given number
+of characters and states per characters</p>
+<p>Note that if we are thinking about regions as characters, then
+“compound state” means the range (e.g., “AB”), and state is the
+number of options per character (e.g., binary if present/absent
+in a region)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.StateIntoPatternConverter.set2int_dict">
+<span class="sig-name descname"><span class="pre">set2int_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.set2int_dict" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.calculation.math_utils">
+<span id="phylojunction-calculation-math-utils-module"></span><h2>phylojunction.calculation.math_utils module<a class="headerlink" href="#module-phylojunction.calculation.math_utils" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.BaseEnum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.math_utils.</span></span><span class="sig-name descname"><span class="pre">BaseEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.math_utils.BaseEnum" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.MetaEnum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.math_utils.</span></span><span class="sig-name descname"><span class="pre">MetaEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classdict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.math_utils.MetaEnum" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EnumMeta</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.ParametricDistribution">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.math_utils.</span></span><span class="sig-name descname"><span class="pre">ParametricDistribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.calculation.math_utils.ParametricDistribution" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#phylojunction.calculation.math_utils.BaseEnum" title="phylojunction.calculation.math_utils.BaseEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEnum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.ParametricDistribution.EXPONENTIAL">
+<span class="sig-name descname"><span class="pre">EXPONENTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'expn'</span></em><a class="headerlink" href="#phylojunction.calculation.math_utils.ParametricDistribution.EXPONENTIAL" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.ParametricDistribution.GAMMA">
+<span class="sig-name descname"><span class="pre">GAMMA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gamma'</span></em><a class="headerlink" href="#phylojunction.calculation.math_utils.ParametricDistribution.GAMMA" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.ParametricDistribution.LOGNORMAL">
+<span class="sig-name descname"><span class="pre">LOGNORMAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lnormal'</span></em><a class="headerlink" href="#phylojunction.calculation.math_utils.ParametricDistribution.LOGNORMAL" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.ParametricDistribution.NORMAL">
+<span class="sig-name descname"><span class="pre">NORMAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'normal'</span></em><a class="headerlink" href="#phylojunction.calculation.math_utils.ParametricDistribution.NORMAL" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.ParametricDistribution.UNIFORM">
+<span class="sig-name descname"><span class="pre">UNIFORM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uniform'</span></em><a class="headerlink" href="#phylojunction.calculation.math_utils.ParametricDistribution.UNIFORM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.exp_extant_count_bd">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.math_utils.</span></span><span class="sig-name descname"><span class="pre">exp_extant_count_bd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birth_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">death_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree_age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speciation_k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#phylojunction.calculation.math_utils.exp_extant_count_bd" title="Permalink to this definition"></a></dt>
+<dd><p>Return expected count of extant taxa in a birth-death tree</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>birth_rate</strong> (<em>float</em>) – Birth-rate (lambda) of birth-death process.</p></li>
+<li><p><strong>death_rate</strong> (<em>float</em>) – Death-rate (mu) of birth-death process.</p></li>
+<li><p><strong>tree_age</strong> (<em>float</em>) – Age of birth-death tree (starting from origin).</p></li>
+<li><p><strong>speciation_k</strong> (<em>int</em>) – Extant taxa are counted conditioning on process
+starting on k-th speciation event. Default: 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Expected count of extant taxa.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.calculation.math_utils.exp_root_height_yule_ntaxa">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.calculation.math_utils.</span></span><span class="sig-name descname"><span class="pre">exp_root_height_yule_ntaxa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birth_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_taxa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#phylojunction.calculation.math_utils.exp_root_height_yule_ntaxa" title="Permalink to this definition"></a></dt>
+<dd><p>Return expected root height of Yule tree simulated up to a specified
+number of tips</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>birth_rate</strong> (<em>float</em>) – Birth-rate (lambda) of Yule process.</p></li>
+<li><p><strong>n_taxa</strong> (<em>int</em>) – Tree is simulated until this number of tips.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Expected root height</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.calculation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.calculation" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Fabio K. Mendes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
