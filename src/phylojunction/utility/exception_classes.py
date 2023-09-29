@@ -612,10 +612,20 @@ class PJCLIInvalidInputError(Exception):
 
 
 class PJCLISampleOutOfRangeError(Exception):
-
     def __init__(self, range_str: str) -> None:
         self.message = "ERROR: The range passed to -f, " \
             + range_str + ", was invalid."
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class PJIOFileDoesNotExistError(Exception):
+    def __init__(self, fn_name: str, file_path: str) -> None:
+        self.message = "ERROR: When calling " + fn_name + ", could not " \
+            + "find file " + file_path + "."
 
         super().__init__(self.message)
 

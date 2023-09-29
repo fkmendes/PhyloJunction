@@ -1,17 +1,25 @@
+import os
 import typing as ty
 import numpy as np
 import pandas as pd  # type: ignore
 import pickle  # type: ignore
+import dendropy as dp  # type: ignore
 import string
 import csv
+import collections
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
 import phylojunction.utility.exception_classes as ec
+import phylojunction.utility.helper_functions as pjh
+from phylojunction.data.tree import AnnotatedTree
+
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
 
 
 def read_text_file(fp_string: str) -> ty.List[str]:
-    """Read and parse text file into list of strings (one per line)
+    """Read and parse text file into list of strings (one per line).
 
     Args:
         fp_string (str): String containing file path to text file being
@@ -33,7 +41,7 @@ def read_text_file(fp_string: str) -> ty.List[str]:
 
 
 def read_serialized_pgm(fp_string: str) -> pgm.ProbabilisticGraphicalModel:
-    """Read binary file storing PGM from a previous PJ session
+    """Read binary file storing PGM from a previous PJ session.
 
     Args:
         fp_string (str): String containing file path to binary file storing
@@ -53,7 +61,7 @@ def read_serialized_pgm(fp_string: str) -> pgm.ProbabilisticGraphicalModel:
 
 
 def read_csv_into_dataframe(fp_string: str) -> pd.DataFrame:
-    """Read .csv file into a pandas DataFrame
+    """Read .csv file into a pandas DataFrame.
 
     Args:
         fp_string (str): String containing file path to text file being
@@ -72,14 +80,14 @@ def read_csv_into_dataframe(fp_string: str) -> pd.DataFrame:
 
 
 def is_csv(fp_string: str) -> bool:
-    """Check if file in provided path is in CSV format
+    """Check if file in provided path is in CSV format.
 
     Args:
         fp_string (str): String containing file path to text file being
             read
 
     Returns:
-        bool: If file is in CSV format
+        bool: True if file is in CSV format, False otherwise
     """
 
     try:
@@ -110,7 +118,15 @@ def is_csv(fp_string: str) -> bool:
 
 def parse_cli_str_write_fig(str_write_fig: str) \
         -> ty.Dict[str, ty.Tuple[int]]:
-    """
+    """Parse command-line string argument for generating node plots.
+
+    Args:
+        str_write_fig (str): User-provided string as argument to command-line
+            interface -f parameter (e.g., 'tr;0-10')
+    
+    Returns:
+        Dictionary with node names as keys (str), tuple with range start
+            (int, int)
     """
 
     node_range_dict: ty.Dict[str, ty.Tuple[int]] = dict()
@@ -168,18 +184,158 @@ def parse_cli_str_write_fig(str_write_fig: str) \
     return node_range_dict
 
 
+def read_nwk_tree_str(nwk_tree_path_or_str: str,
+                      fn_name: str,
+                      in_file: bool=True,
+                      node_names_attribute: str="",
+                      epsilon: float=1e-12) \
+        -> AnnotatedTree:
+    """Read Newick tree string directly or in provided file.
+
+    Args:
+        nwk_tree_path_or_str (str): Tree Newick string, or path to file
+            containing tree Newick string
+        in_file (bool): If tree string is in a file being passed as argument
+            (True) or if Newick string is being passed directly (False).
+            Defaults to 'True'.
+        node_names_attribute (str): Defaults to empty string "".
+
+    Returns:
+        AnnotatedTree with populated attributes dictionary
+            (i.e., a dendropy.Tree that has been annotated)
+    """
+
+    tr_str: str = str()
+    node_attr_dict = collections.defaultdict(
+        pjh.create_str_defaultdict)
+    node_id_to_name: dict[str, str] = dict()
+
+    if in_file:
+        if not os.path.isfile(nwk_tree_path_or_str):
+            raise ec.PJIOFileDoesNotExistError(fn_name, nwk_tree_path_or_str)
+        
+        with open(nwk_tree_path_or_str, "r") as infile:
+            tr_str = infile.readline()
+
+    dp_tr = dp.Tree.get(data=tr_str, schema="newick")
+    # print(dp_tr.taxon_namespace)
+
+    # first we deal with having a root vs an origin
+    is_origin = (True if len(dp_tr.seed_node.child_nodes()) == 1 \
+                 else False)
+    print("is_origin = " + str(is_origin))
+    
+    root_height = dp_tr.max_distance_from_root()
+    seen_root = False
+
+    # now we annotate nodes
+    for nd in dp_tr.preorder_node_iter():
+        # (1) origin and/or root
+        if nd is dp_tr.seed_node:
+            nd.is_sa_dummy_parent = False
+            nd.is_sa = False
+            nd.alive = False
+            
+            nd_name = ("origin" if is_origin else "root")
+            nd.taxon = dp.Taxon(label=nd_name)
+            nd.label = nd_name
+
+            if nd_name == "root":
+                seen_root = True
+        
+        # (2) not origin
+        else:
+            if not nd.is_leaf():
+                # initial values
+                nd.is_sa_dummy_parent = False
+                nd.is_sa = False
+
+                # seeing if origin child is root
+                # or the dummy parent of a sampled ancestor
+                for ch_nd in nd.child_node_iter():
+                    if abs(ch_nd.edge_length) <= epsilon:
+                        nd.is_sa_dummy_parent = True
+                        nd.is_sa = False
+                        break
+
+                # root!
+                if not nd.is_sa_dummy_parent and \
+                        not seen_root:
+                    nd.taxon = dp.Taxon(label="root")
+                    nd.label = "root"
+                    seen_root = True
+
+            # annotate node as sampled ancestor or not
+            if abs(nd.edge_length) <= epsilon:
+                nd.is_sa_dummy_parent = False
+                nd.is_sa = True
+        
+            # annotate node as alive or not
+            if abs(nd.distance_from_tip()) <= epsilon:
+                nd.alive = True
+
+            else:
+                nd.alive = False
+
+            # now we deal with translating between node
+            # ids and node names
+            nd_id = nd.annotations[node_names_attribute].value
+
+            if nd.is_leaf():
+                nd.label = nd.taxon.label
+
+            # internal and no name provided
+            elif nd.taxon is None:
+                nd_name = "nd" + nd_id
+                nd.taxon = dp.Taxon(label=nd_name)
+                nd.label = nd_name
+                dp_tr.taxon_namespace.add_taxon(nd.taxon)
+
+            node_id_to_name[nd_id] = nd.label
+            node_attr_dict[nd.label][node_names_attribute] = nd_id
+
+    print(dp_tr)
+
+    # for nd in dp_tr.postorder_node_iter():
+    #     print(nd is dp_tr.seed_node)
+    #     print(nd.parent_node)
+
+    # at = AnnotatedTree(
+    #     dp_tr,
+    #     1,
+    #     start_at_origin=is_origin,
+    #     tree_died=False)
+
+    # print(dp_tr.taxon_namespace)
+    # print(node_attr_dict)
+    # print(node_id_to_name)
+
+
 if __name__ == "__main__":
 
     # should be ok
-    print(parse_cli_str_write_fig("tr"))
-    print(parse_cli_str_write_fig("tr;0"))
-    print(parse_cli_str_write_fig("tr;0-10"))
-    print(parse_cli_str_write_fig("rv1,tr;0,0"))
-    print(parse_cli_str_write_fig("rv1,tr;0-1,0"))
-    print(parse_cli_str_write_fig("rv1,tr;0-1,0-1"))
+    # print(parse_cli_str_write_fig("tr"))
+    # print(parse_cli_str_write_fig("tr;0"))
+    # print(parse_cli_str_write_fig("tr;0-10"))
+    # print(parse_cli_str_write_fig("rv1,tr;0,0"))
+    # print(parse_cli_str_write_fig("rv1,tr;0-1,0"))
+    # print(parse_cli_str_write_fig("rv1,tr;0-1,0-1"))
 
     # should raise hell (try one at a time)
     # parse_cli_str_write_fig("0")
     # parse_cli_str_write_fig("rv;tr")
     # parse_cli_str_write_fig("rv,tr;0")
     # parse_cli_str_write_fig("rv,tr;0,")
+
+    # should all work!
+    # read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
+    read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
+    # read_nwk_tree_str("examples/trees_maps_files/dummy_tree2.tre",
+    # read_nwk_tree_str("examples/trees_maps_files/dummy_tree3.tre",
+                      "read_tree",
+                      node_names_attribute="index")
+    
+    # dummy trees should be:
+    # (((sp1:1.0,sp2:1.5)nd4:1.0,sp3:1.7)root:0.5)origin:0.5
+    # ((sp1:1.0,sp2:1.5)nd4:1.0,sp3:1.7)root
+    # (((sp1:1.0,sp2:1.5)root:1.0,sp3:0.0)nd2:0.5)origin:0.5

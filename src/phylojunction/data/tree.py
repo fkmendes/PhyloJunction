@@ -118,6 +118,11 @@ class AnnotatedTree(dp.Tree):
             dict((int(s), 0) for s in range(self.state_count))
         # TODO: later deal with this
 
+        # TODO: add argument for node_attr_dict (when attrs are passed in
+        # by user when reading newick tree) -- in this case, no need to
+        # initialize the dictionary here, and also no need to populate it
+        # in other methods
+        # 
         # all attributes
         # populated on demand by populate_nd_attr_dict,
         # cannot be pickled for some reason...

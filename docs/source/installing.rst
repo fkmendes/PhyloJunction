@@ -4,9 +4,9 @@ Installing and configuring PhyloJunction
 
 On this page you will find instructions on how to:
 
-    (i) do a standard |pj| installation, so that you can use its command-line and graphical user interfaces,
+    (i) do a standard installation, so that you can use its command-line and graphical user interfaces,
 
-    (ii) do a development |pj| installation (in "editable mode") suitable for those who want to interact, customize, or expand PJ's source code, and
+    (ii) do a development installation (in "editable mode") suitable for those who want to interact, customize, or expand PJ's source code, and
 
     (iii) build |pj| using an integrated development environment (IDE), so you can navigate its code.
 
