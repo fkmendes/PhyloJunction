@@ -34,17 +34,20 @@ class TestDiscreteSSE(unittest.TestCase):
         expected_str_A = "Discrete state-dependent probability\n" \
             + "   Name:   rho0_A\n" \
             + "   Value:  0.5\n" \
-            + "   State:  0\n\n"
+            + "   State:  0\n" \
+            + "   Epoch:  1\n\n"
 
         expected_str_B = "Discrete state-dependent probability\n" \
             + "   Name:   rho0_B\n" \
             + "   Value:  0.5, 0.5\n" \
-            + "   State:  1\n\n"
+            + "   State:  1\n" \
+            + "   Epoch:  1\n\n"
 
         expected_str_C = "Discrete state-dependent probability\n" \
             + "   Name:   rho0_C\n" \
             + "   Value:  0.5, 0.5\n" \
-            + "   State:  0\n\n"
+            + "   State:  0\n" \
+            + "   Epoch:  1\n\n"
 
         self.assertEqual(str(state_dep_sampling_prob_A),
             expected_str_A)

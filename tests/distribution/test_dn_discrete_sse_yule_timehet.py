@@ -32,15 +32,15 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         # lambda = 0.25 from 0.8 -> 1.8 fwd-t.u.
         # lambda = 3.0 from 1.8 -> 2.3 fwd-t.u.
         # lambda = 0.4 from 2.3 -> 3.0 fwd-t.u
-        cls.time_slice_age_ends = [ 2.2, 1.2, 0.7 ] # if 2 slices, 1 age end; 0.0 is assumed to be the last age end
+        cls.time_slice_age_ends = [2.2, 1.2, 0.7] # if 2 slices, 1 age end; 0.0 is assumed to be the last age end
 
         # not state-dependent (just state 0, and no transition)
         total_n_states = 1
 
-        rates_t0_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t0", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
-        rates_t1_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t1", val=0.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
-        rates_t2_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t2", val=3.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
-        rates_t3_s0 = [ sseobj.DiscreteStateDependentRate(name="lambda_t3", val=0.4, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]) ]
+        rates_t0_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t0", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=1)]
+        rates_t1_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t1", val=0.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=2)]
+        rates_t2_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t2", val=3.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=3)]
+        rates_t3_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t3", val=0.4, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=4)]
 
         # original implementation
         # matrix_atomic_rate_params = [ [ rates_t0_s0 ], [ rates_t1_s0 ], [ rates_t2_s0 ], [ rates_t3_s0 ] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix

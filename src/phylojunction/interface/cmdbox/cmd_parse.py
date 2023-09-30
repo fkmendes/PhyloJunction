@@ -675,10 +675,10 @@ if __name__ == "__main__":
     script_str22 = "rv1 ~ lognormal(n=2, mean=0.0, sd=0.25)\nrv2 ~ lognormal(n=2, mean=-1.5, sd=0.25)\nrv3 ~ normal(n=2, nr=10, mean=rv1, sd=rv2, clamp=\"true\")"
 
     # time-het yule
-    script_str23 = "l0ratet1 := sse_rate(name=\"lambdat1\", value=1.0, event=\"w_speciation\")\n" + \
-        "l0ratet2 := sse_rate(name=\"lambdat2\", value=0.25, event=\"w_speciation\")\n" + \
-        "l0ratet3 := sse_rate(name=\"lambdat3\", value=3.0, event=\"w_speciation\")\n" + \
-        "l0ratet4 := sse_rate(name=\"lambdat4\", value=0.4, event=\"w_speciation\")\n" + \
+    script_str23 = "l0ratet1 := sse_rate(name=\"lambdat1\", value=1.0, event=\"w_speciation\", epoch=1)\n" + \
+        "l0ratet2 := sse_rate(name=\"lambdat2\", value=0.25, event=\"w_speciation\", epoch=2)\n" + \
+        "l0ratet3 := sse_rate(name=\"lambdat3\", value=3.0, event=\"w_speciation\", epoch=3)\n" + \
+        "l0ratet4 := sse_rate(name=\"lambdat4\", value=0.4, event=\"w_speciation\", epoch=4)\n" + \
         "stash := sse_stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])"
 
     script_str24 = script_str23 + "\ntr ~ discrete_sse(n=2, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
@@ -840,5 +840,5 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm("examples/birthdeath_timehet.pj", in_pj_file=True)
+    pgm_obj = script2pgm(script_str23, in_pj_file=False)
     # pgm_pbj = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)

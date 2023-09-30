@@ -18,8 +18,8 @@ class PJDetFnGrammar():
     #  All available deterministic functions #
     ##########################################
     det_fn_grammar_dict = {
-        "sse_prob": set(["name", "value", "state"]),
-        "sse_rate": set(["name", "value", "event", "states"]),
+        "sse_prob": set(["name", "value", "state", "epoch"]),
+        "sse_rate": set(["name", "value", "event", "states", "epoch"]),
         "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states",
                           "seed_age", "epoch_age_ends", "n_epochs"])
     }

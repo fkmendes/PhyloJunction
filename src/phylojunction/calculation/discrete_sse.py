@@ -38,6 +38,7 @@ class DiscreteStateDependentParameter():
                     ty.List[ty.Union[int, float, str]]]
     name: str
     state: int = 0  # associated state
+    epoch_idx: int = 1  # associated epoch
 
     def __init__(
             self,
@@ -46,10 +47,12 @@ class DiscreteStateDependentParameter():
                           str,
                           ty.List[ty.Union[int, float, str]]],
             name: str = "",
-            state: int = 0):
+            state: int = 0,
+            epoch_idx: int = 1):
 
         self.name = name
         self.state = state
+        self.epoch_idx = epoch_idx
         self.value = []
 
         # scalar
@@ -84,145 +87,141 @@ class DiscreteStateDependentParameter():
         else:
             return 1
 
-##############################################################################
 
+# class DiscreteStateDependentRate_old_and_working():
+#     """
+#     Main class for discrete state-dependent rate parameters
 
-class DiscreteStateDependentRate_old_and_working():
-    """
-    Main class for discrete state-dependent rate parameters
+#     Supports vectorization of values only.
+#     """
 
-    Supports vectorization of values only.
-    """
+#     value: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
+#     event: MacroevolEvent
+#     name: str
+#     states: ty.List[int]
 
-    value: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
-    event: MacroevolEvent
-    name: str
-    states: ty.List[int]
+#     def __init__(
+#             self,
+#             val: ty.Union[int,
+#                           float,
+#                           str,
+#                           ty.List[ty.Union[int, float, str]]],
+#             event: MacroevolEvent,
+#             name: str = "",
+#             states: ty.List[int] = [0, 0, 0]):
 
-    def __init__(
-            self,
-            val: ty.Union[int,
-                          float,
-                          str,
-                          ty.List[ty.Union[int, float, str]]],
-            event: MacroevolEvent,
-            name: str = "",
-            states: ty.List[int] = [0, 0, 0]):
+#         self.name = name
+#         self.value = []
 
-        self.name = name
-        self.value = []
+#         # scalar
+#         # if not type(val) in (list, np.ndarray):
+#         # if type(val) in (int, float, str):
+#         if isinstance(val, (float, int, str)):
+#             self.value = [float(val)]
+#             # vectorizing if input wasn't in list or ndarray form
+#             # if it is an instance of an object like RandomVariablePGM
 
-        # scalar
-        # if not type(val) in (list, np.ndarray):
-        # if type(val) in (int, float, str):
-        if isinstance(val, (float, int, str)):
-            self.value = [float(val)]
-            # vectorizing if input wasn't in list or ndarray form
-            # if it is an instance of an object like RandomVariablePGM
+#         # list
+#         # TODO: make sure that parametric distributions get output converted to list
+#         # inside their own classes so the line below is not necessary (and mypy passes)
+#         # or type(val) == np.ndarray:
+#         elif isinstance(val, list):
+#             # if isinstance(val, np.ndarray):
+#             #     val = val.tolist()
+#             if isinstance(val[0], (int, float, str, np.float64)):
+#                 self.value = [float(v) for v in val]
 
-        # list
-        # TODO: make sure that parametric distributions get output converted to list
-        # inside their own classes so the line below is not necessary (and mypy passes)
-        # or type(val) == np.ndarray:
-        elif isinstance(val, list):
-            # if isinstance(val, np.ndarray):
-            #     val = val.tolist()
-            if isinstance(val[0], (int, float, str, np.float64)):
-                self.value = [float(v) for v in val]
+#             else:
+#                 raise ec.StateDependentParameterMisspec(
+#                     message=("Could not recognize type of value argument, "
+#                              " for parameter " + self.name + ". Cannot "
+#                              "initialize " + name + "."))
 
-            else:
-                raise ec.StateDependentParameterMisspec(
-                    message=("Could not recognize type of value argument, "
-                             " for parameter " + self.name + ". Cannot "
-                             "initialize " + name + "."))
+#         else:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("Argument to value parameter is not either in "
+#                          "scalar or vectorized form (it is likely an "
+#                          "object). Cannot initialize. " + name))
 
-        else:
-            raise ec.StateDependentParameterMisspec(
-                message=("Argument to value parameter is not either in "
-                         "scalar or vectorized form (it is likely an "
-                         "object). Cannot initialize. " + name))
+#         self.state_tuple = tuple(int(s) for s in states)
+#         self.departing_state = self.state_tuple[0]
+#         # does not include time_slice_index 1
+#         self.arriving_states = self.state_tuple[1:]
+#         self.event = event
 
-        self.state_tuple = tuple(int(s) for s in states)
-        self.departing_state = self.state_tuple[0]
-        # does not include time_slice_index 1
-        self.arriving_states = self.state_tuple[1:]
-        self.event = event
+#         self.str_representation = \
+#             "AtomicRateParam\n" \
+#             + "   Name:                " \
+#             + self.name + "\n" \
+#             + "   Value:               " \
+#             + ", ".join(str(v) for v in self.value) + "\n" \
+#             + "   Departing state:     " \
+#             + str(self.departing_state) + "\n" \
+#             + "   Arriving state(s):   " \
+#             + ", ".join(str(v) for v in self.arriving_states) + "\n" \
+#             + "   Associated event:    " \
+#             + str(self.event) + "\n\n"
 
-        self.str_representation = \
-            "AtomicRateParam\n" \
-            + "   Name:                " \
-            + self.name + "\n" \
-            + "   Value:               " \
-            + ", ".join(str(v) for v in self.value) + "\n" \
-            + "   Departing state:     " \
-            + str(self.departing_state) + "\n" \
-            + "   Arriving state(s):   " \
-            + ", ".join(str(v) for v in self.arriving_states) + "\n" \
-            + "   Associated event:    " \
-            + str(self.event) + "\n\n"
+#         # making sure inputs are ok
+#         if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
 
-        # making sure inputs are ok
-        if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("Extinction only takes a departing state "
+#                          "(and no arriving states)."))
 
-            raise ec.StateDependentParameterMisspec(
-                message=("Extinction only takes a departing state "
-                         "(and no arriving states)."))
+#         if self.event == MacroevolEvent.W_SPECIATION and \
+#             len(set(self.arriving_states)) != 1 and \
+#                 self.departing_state not in self.arriving_states:
 
-        if self.event == MacroevolEvent.W_SPECIATION and \
-            len(set(self.arriving_states)) != 1 and \
-                self.departing_state not in self.arriving_states:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("Within-state speciation requires the "
+#                          "departing and arriving states to be "
+#                          "all the same."))
 
-            raise ec.StateDependentParameterMisspec(
-                message=("Within-state speciation requires the "
-                         "departing and arriving states to be "
-                         "all the same."))
+#         if self.event == MacroevolEvent.BW_SPECIATION and \
+#             len(set(self.arriving_states)) != 2 and \
+#                 self.departing_state in self.arriving_states:
 
-        if self.event == MacroevolEvent.BW_SPECIATION and \
-            len(set(self.arriving_states)) != 2 and \
-                self.departing_state in self.arriving_states:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("Between-state speciation requires the departing "
+#                          "and the two arriving states to be all different."))
 
-            raise ec.StateDependentParameterMisspec(
-                message=("Between-state speciation requires the departing "
-                         "and the two arriving states to be all different."))
+#         if self.event == MacroevolEvent.ASYM_SPECIATION and \
+#             len(set(self.arriving_states)) != 2 and \
+#                 self.departing_state not in self.arriving_states:
 
-        if self.event == MacroevolEvent.ASYM_SPECIATION and \
-            len(set(self.arriving_states)) != 2 and \
-                self.departing_state not in self.arriving_states:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("Asymmetric-state speciation requires the "
+#                          "departing and one of the arriving states "
+#                          "to be the same, and the other arriving "
+#                          "state to be different. Exiting..."))
 
-            raise ec.StateDependentParameterMisspec(
-                message=("Asymmetric-state speciation requires the "
-                         "departing and one of the arriving states "
-                         "to be the same, and the other arriving "
-                         "state to be different. Exiting..."))
+#         if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
+#             len(set(self.arriving_states)) != 1 and \
+#                 self.departing_state in self.arriving_states:
 
-        if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
-            len(set(self.arriving_states)) != 1 and \
-                self.departing_state in self.arriving_states:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("State transition requires the departing and "
+#                          "arriving states to be different."))
 
-            raise ec.StateDependentParameterMisspec(
-                message=("State transition requires the departing and "
-                         "arriving states to be different."))
+#         if self.event == MacroevolEvent.ANCESTOR_SAMPLING and \
+#                 self.arriving_states:
 
-        if self.event == MacroevolEvent.ANCESTOR_SAMPLING and \
-                self.arriving_states:
+#             raise ec.StateDependentParameterMisspec(
+#                 message=("Ancestor sampling only takes a departing state "
+#                          "(and no arriving states)."))
 
-            raise ec.StateDependentParameterMisspec(
-                message=("Ancestor sampling only takes a departing state "
-                         "(and no arriving states)."))
+#     def __str__(self):
+#         return self.str_representation
 
-    def __str__(self):
-        return self.str_representation
+#     def __repr__(self):
+#         return self.str_representation
 
-    def __repr__(self):
-        return self.str_representation
-
-    def __len__(self) -> int:
-        if isinstance(self.value, list):
-            return len(self.value)
-        else:
-            return 1
-
-##############################################################################
+#     def __len__(self) -> int:
+#         if isinstance(self.value, list):
+#             return len(self.value)
+#         else:
+#             return 1
 
 
 class DiscreteStateDependentRate(DiscreteStateDependentParameter):
@@ -242,9 +241,11 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
                           ty.List[ty.Union[int, float, str]]],
             event: MacroevolEvent,
             name: str = "",
-            states: ty.List[int] = []) -> None:
+            states: ty.List[int] = [],
+            epoch_idx: int = 1) -> None:
 
-        # side-effect: initializes self.value, self.name, self.state
+        # side-effect: initializes
+        # self.value, self.name, self.state, self.epoch
         self.states: ty.List[int] = []
         if len(states) == 0:
             self.states = [0, 0, 0]
@@ -253,7 +254,10 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
             self.states = states
 
         state = int(self.states[0])
-        super().__init__(val=val, name=name, state=state)
+        super().__init__(val=val,
+                         name=name,
+                         state=state,
+                         epoch_idx=epoch_idx)
 
         self.state_tuple = tuple(int(s) for s in self.states)
         self.departing_state = self.state_tuple[0]
@@ -322,7 +326,8 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
             + "   Departing state:     " + str(self.departing_state) + "\n" \
             + "   Arriving state(s):   " \
             + ", ".join(str(v) for v in self.arriving_states) + "\n" \
-            + "   Associated event:    " + str(self.event) + "\n\n"
+            + "   Associated event:    " + str(self.event) + "\n" \
+            + "   Epoch:               " + str(self.epoch_idx) + "\n\n"
 
     def __str__(self):
         return self.str_representation
@@ -350,10 +355,14 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
                           str,
                           ty.List[ty.Union[int, float, str]]],
             name: str = "",
-            state: int = 0):
+            state: int = 0,
+            epoch_idx: int = 1):
 
         # side-effect: populates self.values (list of floats)
-        super().__init__(val=val, name=name, state=state)
+        super().__init__(val=val,
+                         name=name,
+                         state=state,
+                         epoch_idx=epoch_idx)
 
         for v in self.value:
             if v < 0.0:
@@ -369,7 +378,8 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
             + "   Name:   " + self.name + "\n" \
             + "   Value:  " \
             + ", ".join(str(v) for v in self.value) + "\n" \
-            + "   State:  " + str(self.state) + "\n\n"
+            + "   State:  " + str(self.state) + "\n" \
+            + "   Epoch:  " + str(self.epoch_idx) + "\n\n"
 
     def __str__(self):
         return self.str_representation
@@ -412,7 +422,10 @@ class DiscreteStateDependentParameterManager:
                  total_state_count: int,
                  seed_age_for_time_slicing: ty.Optional[float] = None,
                  list_time_slice_age_ends: ty.Optional[ty.List[float]] = None,
+                 n_par_per_slice: ty.Optional[int] = None,
                  epsilon: float = 1e-12):
+        
+        print("running init")
 
         # 1D: time slices
         # 2D: list of atomic rate params
@@ -438,6 +451,8 @@ class DiscreteStateDependentParameterManager:
 
         # age ends (larger in the past, 0.0 in the present)
         if list_time_slice_age_ends:
+            print("in the if block")
+            print(list_time_slice_age_ends)
             # self.n_time_slices += len(list_time_slice_age_ends)
 
             # we do not want to change this object outside
@@ -473,6 +488,9 @@ class DiscreteStateDependentParameterManager:
 
         # the number of parameters in all epochs must be the same
         else:
+            print("in the else block")
+            print(list_time_slice_age_ends)
+
             min_param_count = \
                 min(len(t) for t in self.matrix_state_dep_params)
             

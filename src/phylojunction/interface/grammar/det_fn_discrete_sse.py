@@ -84,6 +84,7 @@ def make_DiscreteStateDependentRate(
     event_type = None
     value: ty.List[float] = []
     the_states: ty.List[int] = []
+    epoch_idx: int = 1
 
     ######################################
     # Checking for input correctness,    #
@@ -145,6 +146,19 @@ def make_DiscreteStateDependentRate(
             # so mypy won't complain
             the_states = ty.cast(ty.List[int], val)
 
+        elif arg == "epoch":
+            if len(val) > 1:
+                raise ec.ParseRequireSingleValueError(det_fn_name,
+                                                      arg)
+            
+            try:
+                # default is 1
+                epoch_idx = int(val[0])  # start at 1
+
+            except ValueError:
+                raise ec.ParseRequireIntegerError(det_fn_name, arg)
+
+
     ###################################
     # Instantiating parameter objects #
     ###################################
@@ -159,7 +173,8 @@ def make_DiscreteStateDependentRate(
                 name=sse_rate_name,
                 val=list(value),
                 event=event_type,
-                states=the_states)
+                states=the_states,
+                epoch_idx=epoch_idx)
 
     else:
         # TODO: deal with vectorization later
@@ -168,7 +183,8 @@ def make_DiscreteStateDependentRate(
             return sseobj.DiscreteStateDependentRate(
                 name=sse_rate_name,
                 val=list(value),
-                event=event_type)
+                event=event_type,
+                epoch_idx=epoch_idx)
 
 
 def make_DiscreteStateDependentProbability(
@@ -195,6 +211,7 @@ def make_DiscreteStateDependentProbability(
 
     value: ty.List[float] = []
     state: ty.Optional[int] = None
+    epoch_idx: int = 1
 
     ######################################
     # Checking for input correctness,    #
@@ -232,6 +249,17 @@ def make_DiscreteStateDependentProbability(
 
             state = int(val[0])
 
+        elif arg == "epoch":
+            if len(val[0]) > 1:
+                raise ec.ParseRequireSingleValueError(det_fn_name,
+                                                      arg)
+            try:
+                # default is 1
+                epoch_idx = int(val[0])  # start at 1
+
+            except ValueError:
+                raise ec.ParseRequireIntegerError(det_fn_name, arg)
+
     ##################################
     # Istantiating parameter objects #
     ##################################
@@ -248,7 +276,8 @@ def make_DiscreteStateDependentProbability(
             return sseobj.DiscreteStateDependentProbability(
                 name=state_dep_prob_name,
                 val=list(value),
-                state=state)
+                state=state,
+                epoch_idx=epoch_idx)
 
 
 def make_SSEStash(
