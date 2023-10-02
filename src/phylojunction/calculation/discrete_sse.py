@@ -24,6 +24,10 @@ class MacroevolEvent(enum.Enum):
     ANAGENETIC_TRANSITION = 4
     ANCESTOR_SAMPLING = 5
 
+class DiscreteStateDependentParameterType(enum.Enum):
+    UNDEFINED = 0
+    RATE = 1
+    PROBABILITY = 2
 
 class DiscreteStateDependentParameter():
     """
@@ -408,6 +412,7 @@ class DiscreteStateDependentParameterManager:
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
+    param_type: DiscreteStateDependentParameterType
     epsilon: float
 
     # NOTE: This class is flexible in that it allows different parameter
@@ -422,16 +427,17 @@ class DiscreteStateDependentParameterManager:
                  total_state_count: int,
                  seed_age_for_time_slicing: ty.Optional[float] = None,
                  list_time_slice_age_ends: ty.Optional[ty.List[float]] = None,
-                 n_par_per_slice: ty.Optional[int] = None,
                  epsilon: float = 1e-12):
         
-        print("running init")
+        self.epsilon = epsilon
 
         # 1D: time slices
         # 2D: list of atomic rate params
         self.matrix_state_dep_params = matrix_state_dep_params
 
-        self._check_single_parameter_type()
+        # make sure it's all rates or all probabilities
+        # and initialize self.param_type
+        self._check_single_and_init_param_type()
 
         self.state_count = total_state_count
 
@@ -442,17 +448,15 @@ class DiscreteStateDependentParameterManager:
         # default is one slice, but this gets updated below
         self.n_time_slices = 1
 
-        # default slice ends at present (age = 0.0)
+        # age ends (larger in the past, 0.0 in the present)
         self.slice_age_ends = [0.0]
 
         # default slice t's at present
         # (t = seed_age = stop_value with "age" condition)
         self.slice_t_ends = [self.seed_age]
 
-        # age ends (larger in the past, 0.0 in the present)
+        # updates self.n_time_slices below
         if list_time_slice_age_ends:
-            print("in the if block")
-            print(list_time_slice_age_ends)
             # self.n_time_slices += len(list_time_slice_age_ends)
 
             # we do not want to change this object outside
@@ -486,11 +490,13 @@ class DiscreteStateDependentParameterManager:
 
                 self.n_time_slices = len(self.slice_t_ends)
 
-        # the number of parameters in all epochs must be the same
-        else:
-            print("in the else block")
-            print(list_time_slice_age_ends)
-
+        # the number of PROBABILITIES in all epochs must be the same;
+        # this check here is necessary because at the moment we don't allow
+        # the user to specify epoch age ends for probabilities, so then we must
+        # check that we get the same number of probabilities in every epoch for
+        # things to work
+        elif self.param_type == \
+                DiscreteStateDependentParameterType.PROBABILITY:
             min_param_count = \
                 min(len(t) for t in self.matrix_state_dep_params)
             
@@ -507,8 +513,15 @@ class DiscreteStateDependentParameterManager:
             
             self.n_time_slices = len(self.matrix_state_dep_params)
 
-        if self.n_time_slices > 1:
-            self._check_all_states_in_all_time_slices()
+        if self.param_type == \
+                DiscreteStateDependentParameterType.RATE:
+            self._check_at_least_one_non_zero_rate_per_epoch()
+
+        self._check_repeated_parameter_in_epoch()
+        # DEPRECATED: not needed anymore, see comment above
+        # definition of _check_all_states_in_all_time_slices
+        # if self.n_time_slices > 1:
+        #     self._check_all_states_in_all_time_slices()
 
         # TODO: at this point, we should check that we have
         # a # of parameters that is a multiple of the number of
@@ -529,7 +542,7 @@ class DiscreteStateDependentParameterManager:
             dict((s, [[] for j in range(self.n_time_slices)])
                  for s in range(self.state_count))
 
-        # side effect: initializes self.atomic_rate_params_dict
+        # side effect: initializes self.state_dep_params_dict
         self._init_matrix_state_dep_params_dict()
         # self.state_dep_params_dict =
         # { state0:
@@ -538,16 +551,40 @@ class DiscreteStateDependentParameterManager:
         #           [ [ #slice1#; atomic_param1, atomic_param2, ...] [ #slice2#; atomic_param1, atomic_param2 ] ], ... ]
         # }
 
-        self.epsilon = epsilon
-
-    def _check_single_parameter_type(self):
-        different_par_type_set: ty.Set(DiscreteStateDependentParameter) \
-            = set()
-
+    ##################
+    # init functions #
+    ##################
+    def _init_matrix_state_dep_params_dict(self):
         # k-th time slice
-        for k, list_params in enumerate(self.matrix_state_dep_params):
+        for k, list_params in enumerate(
+                self.matrix_state_dep_params[:self.n_time_slices]):
+            for param in list_params:
+                try:
+                    self.state_dep_params_dict[param.state][k].append(param)
+
+                except Exception as e:
+                    exit("Parameter " + param.name + "'s associated "
+                         + "(possibly departing) state is " + str(param.state) +
+                         ", but this state is not represented between 0 and " +
+                         str(self.state_count) +
+                         ". Likely the total number of states was misspecified.")
+                    
+    ##########################
+    # health check functions #
+    ##########################
+    def _check_single_and_init_param_type(self):
+        """Make sure it is all rates or all probabilities."""
+
+        different_par_type_set: \
+            ty.Set(DiscreteStateDependentParameter) = set()
+
+        param_type = None
+
+        # t-th time slice
+        for t, list_params in enumerate(self.matrix_state_dep_params):
             for param in list_params:
                 this_param_type = type(param)
+                param_type = this_param_type
 
                 if this_param_type not in different_par_type_set:
                     different_par_type_set.add(this_param_type)
@@ -556,39 +593,95 @@ class DiscreteStateDependentParameterManager:
             raise ec.ObjInitRequireSameParameterTypeError(
                 "DiscreteStateDependentParameterManager",
                 len(different_par_type_set))
+        
+        if param_type is DiscreteStateDependentRate:
+            self.param_type = \
+                DiscreteStateDependentParameterType.RATE
 
-    def _check_all_states_in_all_time_slices(self):
+        elif param_type is DiscreteStateDependentProbability:
+            self.param_type = \
+                DiscreteStateDependentParameterType.PROBABILITY
+    
+    def _check_at_least_one_non_zero_rate_per_epoch(self):
+        """Make sure at least one non-zero parameter per epoch."""
+
+        # t-th time slice
+        for t in range(self.n_time_slices):
+            tth_param_list = self.matrix_state_dep_params[t]
+
+            # first we check that at least one rate was provided
+            if len(tth_param_list) < 1:
+                raise ec.ObjInitIncorrectDimensionError(
+                    "DiscreteStateDependentParameterManager",
+                    "matrix_state_dep_params[" + str(t+1) + "]",
+                    0,
+                    1,
+                    at_least=True)
+            
+            # second, we check that of the provided rates, at 
+            # least one is non-zero
+            else:
+                # each param.value will contain values for all samples
+                # of a specific type of rate, so if ANY of the values of
+                # param_vals_list is zero, it means that specific rate is 0.0
+                all_rate_types_are_zero = True
+                for param in tth_param_list:
+                    if any(v != 0.0 for v in param.value):
+                        all_rate_types_are_zero = False
+
+                if all_rate_types_are_zero:
+                    raise ec.ObjInitRequireNonZeroStateDependentParameterError(
+                            "DiscreteStateDependentParameterManager",
+                            t)    
+
+    def _check_repeated_parameter_in_epoch(self):
+        """Make sure parameters are not repeated in epoch."""
+
         states_per_epoch_dict = \
-            dict((k, set()) for k in range(self.n_time_slices))
+            dict((t, set()) for t in range(self.n_time_slices))
 
-        # k-th time slice (note that we slice matrix_state_dep_params
+        # t-th time slice (note that we slice matrix_state_dep_params
         # because we want to only use the time slices that are younger
         # than the tree seed's age)
-        for k, list_params in enumerate(
+        for t, list_params in enumerate(
                 self.matrix_state_dep_params[:self.n_time_slices]):
             for param in list_params:
+                st_event_tup = tuple()
                 sts = tuple()
 
-                # try states (if rate)
-                try:
+                if self.param_type is \
+                        DiscreteStateDependentParameterType.RATE:
                     sts = param.state_tuple
+                    st_event_tup = tuple([sts, param.event])
 
-                # if not, it's a probability, then state
-                except Exception as e:
-                    # print("Exception 1 inside discrete_sse.py: ",
-                    #       type(e).__name__, " - ", e)
+                if self.param_type is \
+                        DiscreteStateDependentParameterType.PROBABILITY:
                     sts = param.state
+                    st_event_tup = tuple([sts])                    
 
                 # if this is raising when you would not expect it to,
                 # double check that the rates are being passed
                 # by epoch first, then by type of rate, e.g.,
                 # birth0, death0, birth1, death1, etc.
-                if sts in states_per_epoch_dict[k]:
+                if st_event_tup not in states_per_epoch_dict[t]:
+                    states_per_epoch_dict[t].add(st_event_tup)
+                
+                else:
                     raise ec.ObjInitRepeatedStateDependentParameterError(
-                        k, sts
+                        t, st_event_tup
                     )
                 
-                states_per_epoch_dict[k].add(sts)
+                states_per_epoch_dict[t].add(sts)
+
+    # DEPRECATED: currently, discrete state-dep parameters
+    # are annotated with the epoch they belong to, so we allow
+    # users to have epochs with no rates or no probs, or epochs
+    # missing certain rates or probs for specific states
+    def _check_all_states_in_all_time_slices(self):
+        """Make sure all states appear in all time slices."""
+
+        states_per_epoch_dict = \
+            dict((k, set()) for k in range(self.n_time_slices))
 
         # debugging
         # print("states_per_epoch_dict after populating")
@@ -606,21 +699,9 @@ class DiscreteStateDependentParameterManager:
                         )
                     )
 
-    def _init_matrix_state_dep_params_dict(self):
-        # k-th time slice
-        for k, list_params in enumerate(
-                self.matrix_state_dep_params[:self.n_time_slices]):
-            for param in list_params:
-                try:
-                    self.state_dep_params_dict[param.state][k].append(param)
-
-                except Exception as e:
-                    exit("Parameter " + param.name + "'s associated "
-                         + "(possibly departing) state is " + str(param.state) +
-                         ", but this state is not represented between 0 and " +
-                         str(self.state_count) +
-                         ". Likely the total number of states was misspecified.")
-
+    ###########
+    # getters #
+    ###########
     def state_dep_params_at_time(
             self,
             a_time: float,
@@ -628,7 +709,7 @@ class DiscreteStateDependentParameterManager:
                 ty.List[ty.List[DiscreteStateDependentParameter]]] = None) \
             -> ty.List[DiscreteStateDependentParameter]:
         # see where a_time falls within (get time_slice_index)
-        # grab list of atomic rate params at that time_slice_index
+        # grab list of discrete state-dep params at that time_slice_index
         # print("self.n_time_slices = " + str(self.n_time_slices))
 
         time_slice_index = -1
@@ -1225,8 +1306,6 @@ class DiscreteStateDependentProbabilityHandler():
 
     def __str__(self) -> str:
         return self.str_representation
-
-##############################################################################
 
 
 class SSEStash():

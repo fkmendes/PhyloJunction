@@ -2,6 +2,10 @@ import typing as ty
 from _typeshed import Incomplete
 
 MacroevolEvent: Incomplete
+DiscreteStateDependentParameterType: Incomplete
+
+MacroevolEventValue = ty.Literal[0, 1, 2, 3, 4, 5]
+DiscreteStateDependentParameterTypeValue: ty.Literal[0, 1]
 
 class DiscreteStateDependentRate:
     value: ty.List[float]
@@ -36,9 +40,10 @@ class DiscreteStateDependentParameterManager:
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.List[ty.Optional[float]]
     state_dep_params_dict: Incomplete
+    param_type: DiscreteStateDependentParameterType
     epsilon: float
     def __init__(self, matrix_atomic_rate_params: ty.List[ty.List[DiscreteStateDependentParameter]], total_state_count: int, seed_age_for_time_slicing: ty.Optional[float] = ..., list_time_slice_age_ends: ty.Optional[ty.List[float]] = ..., epsilon: float = ...) -> None: ...
-    def _check_single_parameter_type(self) -> None: ...
+    def _check_single_and_init_param_type(self) -> None: ...
     def _check_all_states_in_all_time_slices(self) -> None: ...
     def init_matrix_state_dep_params_dict(self) -> None: ...
     def state_dep_params_at_time(self, a_time: float, params_matrix: ty.Optional[ty.List[ty.List[DiscreteStateDependentParameter]]]=None) -> ty.List[DiscreteStateDependentParameter]: ...

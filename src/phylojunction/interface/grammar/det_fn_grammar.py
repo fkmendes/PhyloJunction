@@ -50,7 +50,9 @@ class PJDetFnGrammar():
 
         except (ec.ParseMissingSpecificationError,
                 ec.ParseMissingArgumentError,
-                ec.ParseFunctionArgError) as e:
+                ec.ParseFunctionArgError,
+                ec.ParseRequireSingleValueError,
+                ec.ParseRequireIntegerError) as e:
             raise ec.ParseDetFnInitFailError("sse_rate", e.message)
 
     @classmethod
@@ -73,7 +75,8 @@ class PJDetFnGrammar():
                 det_fn_param_dict)
 
         except (ec.ParseMissingArgumentError,
-                ec.ParseRequireSingleValueError) as e:
+                ec.ParseRequireSingleValueError,
+                ec.ParseRequireIntegerError) as e:
             raise ec.ParseDetFnInitFailError("sse_prob", e.message)
 
     @classmethod
@@ -97,7 +100,8 @@ class PJDetFnGrammar():
                 ec.ParseRequireIntegerError,
                 ec.ParseRequireNumericError,
                 ec.IncorrectDimensionError,
-                ec.ParseMissingParameterError) as e:
+                ec.ParseMissingParameterError,
+                ec.ParseInvalidArgumentError) as e:
             raise ec.ParseDetFnInitFailError("sse_stash", e.message)
 
     @classmethod

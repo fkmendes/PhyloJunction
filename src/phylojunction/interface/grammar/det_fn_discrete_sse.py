@@ -257,6 +257,10 @@ def make_DiscreteStateDependentProbability(
                 # default is 1
                 epoch_idx = int(val[0])  # start at 1
 
+                if epoch_idx < 0:
+                    raise ec.ParseRequirePositiveIntegerError(det_fn_name,
+                                                              arg)
+
             except ValueError:
                 raise ec.ParseRequireIntegerError(det_fn_name, arg)
 
@@ -369,9 +373,9 @@ def make_SSEStash(
                         if isinstance(v, pgm.DeterministicNodePGM)]
 
             # total number of rates has to be divisible by number of slices
-            if len(flat_state_dep_prob_mat) % n_time_slices != 0:
-                raise ec.IncorrectDimensionError(
-                    arg, len(flat_state_dep_prob_mat))
+            # if len(flat_state_dep_prob_mat) % n_time_slices != 0:
+            #     raise ec.IncorrectDimensionError(
+            #         arg, len(flat_state_dep_prob_mat))
 
         elif arg == "flat_rate_mat":
             if det_fn_param_dict["flat_rate_mat"]:
@@ -381,9 +385,9 @@ def make_SSEStash(
                         if isinstance(v, pgm.DeterministicNodePGM)]
 
                 # total number of rates has to be divisible by number of slices
-                if len(flat_state_dep_rate_mat) % n_time_slices != 0:
-                    raise ec.IncorrectDimensionError(
-                        arg, len(flat_state_dep_rate_mat))
+                # if len(flat_state_dep_rate_mat) % n_time_slices != 0:
+                #     raise ec.IncorrectDimensionError(
+                #         arg, len(flat_state_dep_rate_mat))
 
             else:
                 raise ec.ParseMissingParameterError(arg)
@@ -393,24 +397,46 @@ def make_SSEStash(
     ##################################
 
     matrix_state_dep_rates: \
-        ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = []
-    total_n_rate = len(flat_state_dep_rate_mat)
-    n_rates_per_slice = int(total_n_rate / n_time_slices)
+        ty.List[ty.List[sseobj.DiscreteStateDependentRate]] = \
+            [[] for i in range(n_time_slices)] # []
 
+    # print("running new code for initializing matrix_state_dep_rates")
+    for state_dep_rate_det_nd in flat_state_dep_rate_mat:
+        if isinstance(state_dep_rate_det_nd.value,
+                      sseobj.DiscreteStateDependentRate):
+            if state_dep_rate_det_nd.value.epoch_idx > n_time_slices:
+                raise ec.ParseInvalidArgumentError(
+                    "epoch",
+                    "\'" + str(state_dep_rate_det_nd.value.epoch_idx) + "\'",
+                    ("One of the provided rates was placed in an "
+                     "epoch that exceeds the specified number of "
+                     "epochs."))
+
+            # -1 for offset
+            matrix_state_dep_rates[state_dep_rate_det_nd.value.epoch_idx - 1] \
+                .append(state_dep_rate_det_nd.value)
+            
+    # print(matrix_state_dep_rates)
+
+    # DEPRECATED: initial method expected user to specify the same
+    # number of rates for each and every epoch
+    #
     # populating state-dependent rate matrix #
-    for i in range(0, total_n_rate, n_rates_per_slice):
-        state_dep_rates: ty.List[sseobj.DiscreteStateDependentRate] = []
-        for state_dep_rate_det_nd in \
-                flat_state_dep_rate_mat[i:(i + n_rates_per_slice)]:
+    # total_n_rate = len(flat_state_dep_rate_mat)
+    # n_rates_per_slice = int(total_n_rate / n_time_slices)
+    # for i in range(0, total_n_rate, n_rates_per_slice):
+    #     state_dep_rates: ty.List[sseobj.DiscreteStateDependentRate] = []
+    #     for state_dep_rate_det_nd in \
+    #             flat_state_dep_rate_mat[i:(i + n_rates_per_slice)]:
 
-            # so mypy won't complain
-            if isinstance(state_dep_rate_det_nd.value,
-                          sseobj.DiscreteStateDependentRate):
-                state_dep_rates.append(state_dep_rate_det_nd.value)
+    #         # so mypy won't complain
+    #         if isinstance(state_dep_rate_det_nd.value,
+    #                       sseobj.DiscreteStateDependentRate):
+    #             state_dep_rates.append(state_dep_rate_det_nd.value)
 
-        # appending a list of DiscreteStateDependentRate
-        # 1D: time slices, 2D: state-dep rate list
-        matrix_state_dep_rates.append(state_dep_rates)
+    #     # appending a list of DiscreteStateDependentRate
+    #     # 1D: time slices, 2D: state-dep rate list
+    #     matrix_state_dep_rates.append(state_dep_rates)
 
     state_dep_rates_manager = \
         sseobj.DiscreteStateDependentParameterManager(

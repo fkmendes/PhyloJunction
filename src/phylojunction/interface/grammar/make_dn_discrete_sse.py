@@ -23,11 +23,13 @@ def make_discrete_SSE_dn(
     # all remaining args must be specified
     n_samples: int = 1
     n_repl: int = 1
-    stash: sseobj.SSEStash = sseobj.SSEStash(
-        sseobj.MacroevolEventHandler(
-            sseobj.DiscreteStateDependentParameterManager([[]], 1)
-        )
-    )
+
+    # stash: sseobj.SSEStash = sseobj.SSEStash(
+    #     sseobj.MacroevolEventHandler(
+    #         sseobj.DiscreteStateDependentParameterManager([[]], 1)
+    #     )
+    # )
+    stash: sseobj.SSEStash
     # event_handler: \
     #     sseobj.MacroevolEventHandler \
     #         = sseobj.MacroevolEventHandler(

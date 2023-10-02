@@ -101,7 +101,10 @@ class ObjInitMissingParameterError(Exception):
 class ObjInitIncorrectDimensionError(Exception):
     obj_name: str
     message: str
-    def __init__(self, obj_name: str, container_name: str, obs_len: int, exp_len: int = 0) -> None: ...
+    obs_len: int
+    exp_len: int
+    at_least: bool
+    def __init__(self, obj_name: str, container_name: str, obs_len: int, exp_len: int = 0, at_least: bool = False) -> None: ...
     def __str__(self) -> str: ...
 
 class ObjInitMissingStateDependentParameterError(Exception):
@@ -111,6 +114,12 @@ class ObjInitMissingStateDependentParameterError(Exception):
 class ObjInitRepeatedStateDependentParameterError(Exception):
     message: str
     def __init__(self, epoch_w_repeated_param: int, repeated_state: ty.Union[int, ty.Tuple[int]]) -> None: ...
+    def __str__(self) -> str: ...
+
+class ObjInitRequireNonZeroStateDependentParameterError(Exception):
+    message: str
+    obj_name: str
+    def __init__(self, obj_name: str, dimension_idx: int) -> None: ...
     def __str__(self) -> str: ...
 
 # Syntax errors: Sampling distribution, det. functions exceptions #
@@ -131,10 +140,14 @@ class ParseRequireSingleValueError(Exception):
     def __init__(self, dn_name: str, arg: str) -> None: ...
 
 class ParseRequireIntegerError(Exception):
-    dn_name: str
+    obj_name: str
     message: str
-    arg: Incomplete
-    def __init__(self, dn_name: str, arg: str) -> None: ...
+    def __init__(self, obj_name: str, arg: str) -> None: ...
+
+class ParseRequirePositiveIntegerError(Exception):
+    obj_name: str
+    message: str
+    def __init__(self, obj_name: str, arg: str) -> None: ...
 
 class ParseRequireNumericError(Exception):
     dn_name: str
@@ -152,9 +165,16 @@ class ParseMissingArgumentError(Exception):
     message: str
     def __init__(self, par_name: str) -> None: ...
 
+class ParseInvalidArgumentError(Exception):
+    par_name: str
+    message: str
+    def __init__(self, par_name: str, invalid_arg: str, message: str) -> None: ...
+    def __str__(self) -> str: ...
+
 class ParseMissingSpecificationError(Exception):
     message: str
     def __init__(self, obj2spec_name: str) -> None: ...
+    def __str__(self) -> str: ...
 
 class ParseDnInitFailError(Exception):
     dn_name: str

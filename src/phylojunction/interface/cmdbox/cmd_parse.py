@@ -675,13 +675,15 @@ if __name__ == "__main__":
     script_str22 = "rv1 ~ lognormal(n=2, mean=0.0, sd=0.25)\nrv2 ~ lognormal(n=2, mean=-1.5, sd=0.25)\nrv3 ~ normal(n=2, nr=10, mean=rv1, sd=rv2, clamp=\"true\")"
 
     # time-het yule
-    script_str23 = "l0ratet1 := sse_rate(name=\"lambdat1\", value=1.0, event=\"w_speciation\", epoch=1)\n" + \
-        "l0ratet2 := sse_rate(name=\"lambdat2\", value=0.25, event=\"w_speciation\", epoch=2)\n" + \
-        "l0ratet3 := sse_rate(name=\"lambdat3\", value=3.0, event=\"w_speciation\", epoch=3)\n" + \
-        "l0ratet4 := sse_rate(name=\"lambdat4\", value=0.4, event=\"w_speciation\", epoch=4)\n" + \
-        "stash := sse_stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])"
+    script_str23 = \
+        ("l0ratet1 := sse_rate(name=\"lambdat1\", value=1.0, event=\"w_speciation\", epoch=1)\n"
+         "l0ratet2 := sse_rate(name=\"lambdat2\", value=0.25, event=\"w_speciation\", epoch=2)\n"
+         "l0ratet3 := sse_rate(name=\"lambdat3\", value=3.0, event=\"w_speciation\", epoch=3)\n"
+         "l0ratet4 := sse_rate(name=\"lambdat4\", value=0.4, event=\"w_speciation\", epoch=5)\n"
+         "stash := sse_stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])")
+    script_str24 = script_str23 \
+        + ("\ntr ~ discrete_sse(n=2, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")")
 
-    script_str24 = script_str23 + "\ntr ~ discrete_sse(n=2, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\", cond_spn=\"false\", cond_surv=\"true\")"
     script_str25 = "a <- [1,2,3]\nb <- a"
     script_str26 = "a <- [1,2,3]\nb <- [a, 4, 5, 6]"
     script_str27 = "rv9 ~ exponential(n=5, rate=[0.8, 0.9, 1.0, 1.1, 1.2], clamp=\"true\")"
@@ -699,10 +701,10 @@ if __name__ == "__main__":
         "death_rate_t0 <- 0.25\n" + \
         "birth_rate_t1 <- 1.0\n" + \
         "death_rate_t1 <- 0.4\n" + \
-        "det_birth_rate_t0 := sse_rate(name=\"lambda_t0\", value=birth_rate_t0, states=[0,0,0], event=\"w_speciation\")\n" + \
-        "det_death_rate_t0 := sse_rate(name=\"mu_t0\", value=death_rate_t0, states=[0], event=\"extinction\")\n" + \
-        "det_birth_rate_t1 := sse_rate(name=\"lambda_t1\", value=birth_rate_t1, states=[0,0,0], event=\"w_speciation\")\n" + \
-        "det_death_rate_t1 := sse_rate(name=\"mu_t1\", value=death_rate_t1, states=[0], event=\"extinction\")\n" + \
+        "det_birth_rate_t0 := sse_rate(name=\"lambda_t0\", value=birth_rate_t0, states=[0,0,0], event=\"w_speciation\", epoch=1)\n" + \
+        "det_death_rate_t0 := sse_rate(name=\"mu_t0\", value=death_rate_t0, states=[0], event=\"extinction\", epoch=1)\n" + \
+        "det_birth_rate_t1 := sse_rate(name=\"lambda_t1\", value=birth_rate_t1, states=[0,0,0], event=\"w_speciation\", epoch=2)\n" + \
+        "det_death_rate_t1 := sse_rate(name=\"mu_t1\", value=death_rate_t1, states=[0], event=\"extinction\", epoch=2)\n" + \
         "stash := sse_stash(flat_rate_mat=[det_birth_rate_t0, det_death_rate_t0, det_birth_rate_t1, det_death_rate_t1], n_states=1, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)"
 
     script_str30 = "a ~ lognormal(n=10, mean=[0.0, 0.01], sd=[1.0, 0.9])"
@@ -713,9 +715,9 @@ if __name__ == "__main__":
 
     # time-het geosse
     script_str35 = \
-        "w_birth_rate0_t0 <- 0.5\n" + \
+        "w_birth_rate0_t0 <- 1.5\n" + \
         "death_rate0_t0 <- 0.25\n" + \
-        "trans_rate02_t0 <- 0.6\n" + \
+        "trans_rate02_t0 <- 0.0\n" + \
         "w_birth_rate1_t0 <- 1.0\n" + \
         "death_rate1_t0 <- 0.5\n" + \
         "trans_rate12_t0 <- 0.4\n" + \
@@ -724,7 +726,7 @@ if __name__ == "__main__":
         "b_birth_rate212_t0 <- 1.0\n" + \
         "trans_rate20_t0 <- 0.6\n" + \
         "trans_rate21_t0 <- 0.6\n" + \
-        "w_birth_rate0_t1 <- 0.75\n" + \
+        "w_birth_rate0_t1 <- 0.85\n" + \
         "death_rate0_t1 <- 0.5\n" + \
         "trans_rate02_t1 <- 0.8\n" + \
         "w_birth_rate1_t1 <- 1.5\n" + \
@@ -735,30 +737,30 @@ if __name__ == "__main__":
         "b_birth_rate212_t1 <- 1.25\n" + \
         "trans_rate20_t1 <- 0.75\n" + \
         "trans_rate21_t1 <- 0.75\n" + \
-        "det_w_birth_rate0_t0 := sse_rate(name=\"lambda0_t0\", value=w_birth_rate0_t0, states=[0,0,0], event=\"w_speciation\")\n" + \
-        "det_death_rate0_t0 := sse_rate(name=\"mu0_t0\", value=death_rate0_t0, states=[0], event=\"extinction\")\n" + \
-        "det_trans_rate02_t0 := sse_rate(name=\"q02_t0\", value=trans_rate02_t0, states=[0,2], event=\"transition\")\n" + \
-        "det_w_birth_rate1_t0 := sse_rate(name=\"lambda1_t0\", value=w_birth_rate1_t0, states=[1,1,1], event=\"w_speciation\")\n" + \
-        "det_death_rate1_t0 := sse_rate(name=\"mu1_t0\", value=death_rate1_t0, states=[1], event=\"extinction\")\n" + \
-        "det_trans_rate12_t0 := sse_rate(name=\"q12_t0\", value=trans_rate12_t0, states=[1,2], event=\"transition\")\n" + \
-        "det_b_birth_rate201_t0 := sse_rate(name=\"lambda201_t0\", value=b_birth_rate201_t0, states=[2,0,1], event=\"bw_speciation\")\n" + \
-        "det_b_birth_rate202_t0 := sse_rate(name=\"lambda202_t0\", value=b_birth_rate202_t0, states=[2,0,2], event=\"bw_speciation\")\n" + \
-        "det_b_birth_rate212_t0 := sse_rate(name=\"lambda212_t0\", value=b_birth_rate212_t0, states=[2,1,2], event=\"bw_speciation\")\n" + \
-        "det_trans_rate20_t0 := sse_rate(name=\"q20_t0\", value=trans_rate20_t0, states=[2,0], event=\"transition\")\n" + \
-        "det_trans_rate21_t0 := sse_rate(name=\"q21_t0\", value=trans_rate21_t0, states=[2,1], event=\"transition\")\n" + \
-        "det_w_birth_rate0_t1 := sse_rate(name=\"lambda0_t1\", value=w_birth_rate0_t1, states=[0,0,0], event=\"w_speciation\")\n" + \
-        "det_death_rate0_t1 := sse_rate(name=\"mu0_t1\", value=death_rate0_t1, states=[0], event=\"extinction\")\n" + \
-        "det_trans_rate02_t1 := sse_rate(name=\"q02_t1\", value=trans_rate02_t1, states=[0,2], event=\"transition\")\n" + \
-        "det_w_birth_rate1_t1 := sse_rate(name=\"lambda1_t1\", value=w_birth_rate1_t1, states=[1,1,1], event=\"w_speciation\")\n" + \
-        "det_death_rate1_t1 := sse_rate(name=\"mu1_t1\", value=death_rate1_t1, states=[1], event=\"extinction\")\n" + \
-        "det_trans_rate12_t1 := sse_rate(name=\"q12_t1\", value=trans_rate12_t1, states=[1,2], event=\"transition\")\n" + \
-        "det_b_birth_rate201_t1 := sse_rate(name=\"lambda201_t0\", value=b_birth_rate201_t1, states=[2,0,1], event=\"bw_speciation\")\n" + \
-        "det_b_birth_rate202_t1 := sse_rate(name=\"lambda202_t0\", value=b_birth_rate202_t1, states=[2,0,2], event=\"bw_speciation\")\n" + \
-        "det_b_birth_rate212_t1 := sse_rate(name=\"lambda212_t0\", value=b_birth_rate212_t1, states=[2,1,2], event=\"bw_speciation\")\n" + \
-        "det_trans_rate20_t1 := sse_rate(name=\"q20_t1\", value=trans_rate20_t1, states=[2,0], event=\"transition\")\n" + \
-        "det_trans_rate21_t1 := sse_rate(name=\"q21_t1\", value=trans_rate21_t1, states=[2,1], event=\"transition\")\n" + \
-        "stash := sse_stash(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate02_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate12_t0, det_b_birth_rate201_t0, det_b_birth_rate202_t0, det_b_birth_rate212_t0, det_trans_rate20_t0, det_trans_rate21_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate02_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate12_t1, det_b_birth_rate201_t1, det_b_birth_rate202_t1, det_b_birth_rate212_t1, det_trans_rate20_t1, det_trans_rate21_t1], n_states=3, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)\n" + \
-        "trs ~ discrete_sse(n=100, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
+        "det_w_birth_rate0_t0 := sse_rate(name=\"lambda0_t0\", value=w_birth_rate0_t0, states=[0,0,0], event=\"w_speciation\", epoch=1)\n" + \
+        "det_death_rate0_t0 := sse_rate(name=\"mu0_t0\", value=death_rate0_t0, states=[0], event=\"extinction\", epoch=1)\n" + \
+        "det_trans_rate02_t0 := sse_rate(name=\"q02_t0\", value=trans_rate02_t0, states=[0,2], event=\"transition\", epoch=1)\n" + \
+        "det_w_birth_rate1_t0 := sse_rate(name=\"lambda1_t0\", value=w_birth_rate1_t0, states=[1,1,1], event=\"w_speciation\", epoch=1)\n" + \
+        "det_death_rate1_t0 := sse_rate(name=\"mu1_t0\", value=death_rate1_t0, states=[1], event=\"extinction\", epoch=1)\n" + \
+        "det_trans_rate12_t0 := sse_rate(name=\"q12_t0\", value=trans_rate12_t0, states=[1,2], event=\"transition\", epoch=1)\n" + \
+        "det_b_birth_rate201_t0 := sse_rate(name=\"lambda201_t0\", value=b_birth_rate201_t0, states=[2,0,1], event=\"bw_speciation\", epoch=1)\n" + \
+        "det_b_birth_rate202_t0 := sse_rate(name=\"lambda202_t0\", value=b_birth_rate202_t0, states=[2,0,2], event=\"bw_speciation\", epoch=1)\n" + \
+        "det_b_birth_rate212_t0 := sse_rate(name=\"lambda212_t0\", value=b_birth_rate212_t0, states=[2,1,2], event=\"bw_speciation\", epoch=1)\n" + \
+        "det_trans_rate20_t0 := sse_rate(name=\"q20_t0\", value=trans_rate20_t0, states=[2,0], event=\"transition\", epoch=1)\n" + \
+        "det_trans_rate21_t0 := sse_rate(name=\"q21_t0\", value=trans_rate21_t0, states=[2,1], event=\"transition\", epoch=1)\n" + \
+        "det_w_birth_rate0_t1 := sse_rate(name=\"lambda0_t1\", value=w_birth_rate0_t1, states=[0,0,0], event=\"w_speciation\", epoch=2)\n" + \
+        "det_death_rate0_t1 := sse_rate(name=\"mu0_t1\", value=death_rate0_t1, states=[0], event=\"extinction\", epoch=2)\n" + \
+        "det_trans_rate02_t1 := sse_rate(name=\"q02_t1\", value=trans_rate02_t1, states=[0,2], event=\"transition\", epoch=2)\n" + \
+        "det_w_birth_rate1_t1 := sse_rate(name=\"lambda1_t1\", value=w_birth_rate1_t1, states=[1,1,1], event=\"w_speciation\", epoch=2)\n" + \
+        "det_death_rate1_t1 := sse_rate(name=\"mu1_t1\", value=death_rate1_t1, states=[1], event=\"extinction\", epoch=2)\n" + \
+        "det_trans_rate12_t1 := sse_rate(name=\"q12_t1\", value=trans_rate12_t1, states=[1,2], event=\"transition\", epoch=2)\n" + \
+        "det_b_birth_rate201_t1 := sse_rate(name=\"lambda201_t0\", value=b_birth_rate201_t1, states=[2,0,1], event=\"bw_speciation\", epoch=2)\n" + \
+        "det_b_birth_rate202_t1 := sse_rate(name=\"lambda202_t0\", value=b_birth_rate202_t1, states=[2,0,2], event=\"bw_speciation\", epoch=2)\n" + \
+        "det_b_birth_rate212_t1 := sse_rate(name=\"lambda212_t0\", value=b_birth_rate212_t1, states=[2,1,2], event=\"bw_speciation\", epoch=2)\n" + \
+        "det_trans_rate20_t1 := sse_rate(name=\"q20_t1\", value=trans_rate20_t1, states=[2,0], event=\"transition\", epoch=2)\n" + \
+        "det_trans_rate21_t1 := sse_rate(name=\"q21_t1\", value=trans_rate21_t1, states=[2,1], event=\"transition\", epoch=2)\n" + \
+        "stash := sse_stash(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate02_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate12_t0, det_b_birth_rate201_t0, det_b_birth_rate202_t0, det_b_birth_rate212_t0, det_trans_rate20_t0, det_trans_rate21_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate02_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate12_t1, det_b_birth_rate201_t1, det_b_birth_rate202_t1, det_b_birth_rate212_t1, det_trans_rate20_t1, det_trans_rate21_t1], n_states=3, n_epochs=2, epoch_age_ends=[1.0], seed_age=3.0)\n" + \
+        "trs ~ discrete_sse(n=2, nr=50, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
 
     script_str36 = "a ~ lognormal(n=2, nr=10, mean=10.0, sd=1.0)"
 
@@ -792,7 +794,7 @@ if __name__ == "__main__":
     # l0 <- [0.9, 1.0, 1.1]
     # l0 ~ unif(n=3, min=0.9, max=1.1)
     # l0rate := sse_rate(name="lambda", value=l0, event="w_speciation")
-    # stash :=stash(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)
+    # stash := sse_stash(flat_rate_mat=[l0rate], n_states=1, n_epochs=1)
     # trs ~ discrete_sse(n=3, stash=stash, start_state=[0], stop="age", stop_value=2.0, origin="true", cond_spn="false", cond_surv="true")
     # trs ~ discrete_sse(n=3, nr=2, stash=stash, start_state=[0], stop="age", stop_value=2.0, origin="true", cond_spn="false", cond_surv="true")
 
@@ -803,7 +805,7 @@ if __name__ == "__main__":
     # m1rate := sse_rate(name="mu1", value=0.8, states=[1,1,1], event="extinction")
     # q01rate := sse_rate(name="q01", value=0.6, states=[0,1], event="transition")
     # q10rate := sse_rate(name="q10", value=0.6, states=[1,0], event="transition")
-    # stash := stash(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)
+    # stash := sse_stash(flat_rate_mat=[l0rate, l1rate, m0rate, m1rate, q01rate, q10rate], n_states=2, n_epochs=1)
     # trs ~ discrete_sse(n=5, stash=stash, start_state=[0], stop="age", stop_value=2.5, origin="true", cond_spn="false", cond_surv="true")
 
     # time-het yule
@@ -811,7 +813,7 @@ if __name__ == "__main__":
     # l0ratet2 := sse_rate(name="lambdat2", value=0.25, event="w_speciation")
     # l0ratet3 := sse_rate(name="lambdat3", value=3.0, event="w_speciation")
     # l0ratet4 := sse_rate(name="lambdat4", value=0.4, event="w_speciation")
-    # stash :=stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])
+    # stash := sse_stash(flat_rate_mat=[l0ratet1, l0ratet2, l0ratet3, l0ratet4], n_states=1, n_epochs=4, seed_age=3.0, epoch_age_ends=[2.2, 1.2, 0.7])
     # tr ~ discrete_sse(n=10, stash=stash, start_state=[0], stop="age", stop_value=3.0, origin="true", cond_spn="false", cond_surv="true")
 
     # simple hierarchical
@@ -840,5 +842,5 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm(script_str23, in_pj_file=False)
+    pgm_obj = script2pgm(script_str35, in_pj_file=False)
     # pgm_pbj = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)

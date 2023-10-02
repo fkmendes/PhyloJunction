@@ -1,13 +1,19 @@
 # constant-node variable ('birth_rate_t0') assignment
-birth_rate_t0 <- 0.5
+# first epoch (old)
+birth_rate_t0 <- 0.0
+death_rate_t0 <- 1.0
+
+# second epoch (young)
 birth_rate_t1 <- 1.0
-death_rate_t0 <- 0.25
-death_rate_t1 <- 0.4
+death_rate_t1 <- 0.75
 
 # deterministic-node variable ('det_birth_rate_t0') assignment
+# first epoch (old)
 det_birth_rate_t0 := sse_rate(name="lambda_t0", value=birth_rate_t0, states=[0,0,0], event="w_speciation", epoch=1)
-det_birth_rate_t1 := sse_rate(name="lambda_t1", value=birth_rate_t1, states=[0,0,0], event="w_speciation", epoch=2)
 det_death_rate_t0 := sse_rate(name="mu_t0", value=death_rate_t0, states=[0], event="extinction", epoch=1)
+
+# second epoch (young)
+det_birth_rate_t1 := sse_rate(name="lambda_t1", value=birth_rate_t1, states=[0,0,0], event="w_speciation", epoch=2)
 det_death_rate_t1 := sse_rate(name="mu_t1", value=death_rate_t1, states=[0], event="extinction", epoch=2)
 
 # deterministic-node variable ('sse_stash') assignment

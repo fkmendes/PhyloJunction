@@ -1268,17 +1268,12 @@ class DnSSE(pgm.DistributionPGM):
             # [1] are all states with >= 1 representation
 
             # (2) get the time to the next event
-            # print("dn_discrete_sse.py: at (2)")
             t_to_next_event = \
                 self._get_next_event_time(rate_for_exponential_distn)
             latest_t += t_to_next_event
-            # print("latest_t at (2) = " + str(latest_t))
-            if latest_t < 0.0: exit("quit at (2)")
 
             # (3) get end time of this slice (user provides it as end ages,
             # but DiscreteStateDependentParameterManager converts it to time ends)
-            # print("dn_discrete_sse.py: at (3)")
-            # print("slice_t_ends = [" + ",".join(str(i) for i in self.slice_t_ends) + "]")
             next_max_t: float
             t_end = self.slice_t_ends[time_slice_idx]
             if isinstance(t_end, float):
@@ -1397,8 +1392,13 @@ class DnSSE(pgm.DistributionPGM):
                           + " in state " + str(chosen_node.state) + "\n")
 
                 # (7) draw an event
-                # print("dn_discrete_sse.py: at (5.2)")
                 macroevol_event_state = chosen_node.state
+                
+                # examples/geosse_timehet.pj: if it prints, we have forbidden events
+                # happening in the oldest epoch!
+                # if latest_t < 1.0 and macroevol_event_state != 0:
+                #     print("t = " + str(latest_t) + ", state of node = " + str(macroevol_event_state))
+                
                 # denominator for sampling event
                 state_conditioned_total_rate = \
                     state_total_rates[macroevol_event_state]

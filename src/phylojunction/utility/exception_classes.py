@@ -1,4 +1,5 @@
 import typing as ty
+import enum
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -281,12 +282,16 @@ class ObjInitMissingParameterError(Exception):
 class ObjInitIncorrectDimensionError(Exception):
     obj_name: str
     message: str
+    obs_len: int
+    exp_len: int
+    at_least: bool
 
     def __init__(self,
                  obj_name: str,
                  container_name: str,
                  obs_len: int,
-                 exp_len: int = 0) -> None:
+                 exp_len: int = 0,
+                 at_least: bool = False) -> None:
         self.obj_name = obj_name
         self.obs_len = obs_len
         self.exp_len = exp_len
@@ -295,8 +300,13 @@ class ObjInitIncorrectDimensionError(Exception):
             + "\', which was of size " + str(obs_len) + ". "
 
         if exp_len != 0:
-            self.message += "The expected dimension was " + str(exp_len) \
-                + "."
+            if at_least:
+                self.message += "The expected dimension was at least " + str(exp_len) \
+                    + "."
+
+            else:
+                self.message += "The expected dimension was " + str(exp_len) \
+                    + "."
 
         super().__init__(self.message)
 
@@ -365,16 +375,17 @@ class ObjInitRepeatedStateDependentParameterError(Exception):
 
     def __init__(self,
                  epoch_w_repeated_param: int,
-                 repeated_state: ty.Union[int, ty.Tuple[int]]) -> None:
+                 repeated_param: \
+                    ty.Tuple[ty.Tuple[int], enum.Enum]) -> None:
         repeated_state_str = ""
 
-        if isinstance(repeated_state, int):
-            repeated_state_str = str(repeated_state)
+        if isinstance(repeated_param[0], int):
+            repeated_state_str = str(repeated_param[0])
 
-        elif isinstance(repeated_state, tuple):
+        elif isinstance(repeated_param[0], tuple):
             repeated_state_str = "("
 
-            for i in repeated_state:
+            for i in repeated_param[0]:
                 ith_str = str(i)
 
                 if repeated_state_str == "(":
@@ -385,15 +396,39 @@ class ObjInitRepeatedStateDependentParameterError(Exception):
 
             repeated_state_str += ")"
 
-        self.message = "State-dependent parameter defined by states " \
-            + repeated_state_str + " were repeated in epoch " \
-            + str(epoch_w_repeated_param) + "."
+        self.message = "State-dependent parameter defined by states "
+
+        if len(repeated_param) == 1:
+            self.message += repeated_state_str + " were repeated in epoch " \
+                + str(epoch_w_repeated_param) + "."
+            
+        else:
+            self.message += "(event: " + str(repeated_param[1]) \
+                .replace("MacroevolEvent.", "") + ") " \
+                + repeated_state_str + " were repeated in epoch " \
+                + str(epoch_w_repeated_param) + "."
 
         super().__init__(self.message)
 
     def __str__(self) -> str:
         return self.message
 
+
+class ObjInitRequireNonZeroStateDependentParameterError(Exception):
+    message: str
+    obj_name: str
+
+    def __init__(self, obj_name: str, dimension_idx: int) -> None:
+        self.obj_name = obj_name
+        self.message = "When specifying object " + self.obj_name \
+            + ", one of its dimensions (" + str(dimension_idx) + (") "
+            "had zero-valued state-dependent parameters. At least one "
+            "non-zero parameter must be provided.")
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
 
 # Syntax errors: sampling distribution, det. function exceptions #
 class ParseFunctionArgError(Exception):
@@ -447,11 +482,26 @@ class ParseRequireIntegerError(Exception):
 
     def __init__(self, obj_name: str, arg: str) -> None:
         self.obj_name = obj_name
-        self.arg = arg
         self.message = \
             "When specifying object " + obj_name + "'s parameter \'" \
-            + self.arg + ("\', something other than an integer was "
+            + arg + ("\', something other than an integer was "
                           "provided. An integer is required.")
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ParseRequirePositiveIntegerError(Exception):
+    obj_name: str
+    message: str
+
+    def __init__(self, obj_name: str, arg: str) -> None:
+        self.obj_name = obj_name
+        self.message = \
+            "When specifying object " + obj_name + "'s parameter \'" \
+            + arg + ("\', something other than a positive integer was "
+                          "provided. A positive integer is required.")
         super().__init__(self.message)
 
     def __str__(self) -> str:
@@ -501,6 +551,21 @@ class ParseMissingArgumentError(Exception):
 
         self.message += "for \'" + par_name + "\' is missing."
 
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ParseInvalidArgumentError(Exception):
+    par_name: str
+    message: str
+
+    def __init__(self, par_name: str, invalid_arg: str, message: str) -> None:
+        self.par_name = par_name
+        self.message = "Argument " + invalid_arg +  " is invalid " \
+            + "for parameter \'" + self.par_name + "\'. " + message
+        
         super().__init__(self.message)
 
     def __str__(self) -> str:
