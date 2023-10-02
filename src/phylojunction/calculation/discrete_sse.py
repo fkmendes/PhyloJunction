@@ -1333,27 +1333,25 @@ class SSEStash():
         self._init_str_representation()
 
     # side-effect: creates and populates self.prob_handler if user did
-    # not provide it
+    # not provide it (one probability per state, per epoch)
+    #
+    # TODO: if user provides a single state-dep probability, need to
+    # then implement health checks and or default probs = 1 for all
+    # missing state-dep probs
     def _initialize_missing_prob_handler(self) -> None:
-        expected_n_prob \
-            = self.meh.state_count \
-            * self.meh.state_dep_rate_manager.n_time_slices
-            # have to use the rate manager number of slices, as that
-            # does not reflect that last 0.0
-        n_prob_per_slice = int(expected_n_prob / self.meh.n_time_slices)
-
         matrix_state_dep_probs: \
             ty.List[ty.List[DiscreteStateDependentProbability]] = []
 
         # TODO: this code is wrong, fix it!
-        for i in range(0, expected_n_prob, n_prob_per_slice):
-
+        for t in range(0,
+                       self.meh.state_dep_rate_manager.n_time_slices):
             state_dep_probs: \
                 ty.List[DiscreteStateDependentProbability] = []
-            for j in range(self.meh.state_count):
-                st = j % n_prob_per_slice
+
+            for st in range(self.meh.state_count):
+                # st = j % n_prob_per_slice
                 state_dep_prob = DiscreteStateDependentProbability(
-                    name="rho" + str(st) + "_t" + str(j // n_prob_per_slice),
+                    name="rho" + str(st) + "_t" + str(t),
                     val=1.0, state=st)
 
                 # so mypy won't complain
