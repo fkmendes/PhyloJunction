@@ -217,19 +217,28 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
         with open(nwk_tree_path_or_str, "r") as infile:
             tr_str = infile.readline()
 
-    dp_tr = dp.Tree.get(data=tr_str, schema="newick")
+        dp_tr = dp.Tree.get(data=tr_str, schema="newick")
+
+    else:
+        dp_tr = dp.Tree.get(data=nwk_tree_path_or_str, schema="newick")
     # print(dp_tr.taxon_namespace)
 
     # first we deal with having a root vs an origin
     is_origin = (True if len(dp_tr.seed_node.child_nodes()) == 1 \
                  else False)
-    print("is_origin = " + str(is_origin))
     
     root_height = dp_tr.max_distance_from_root()
     seen_root = False
 
+    # debugging
+    print("root height = " + str(root_height))
+    print("is_origin = " + str(is_origin))
+
     # now we annotate nodes
     for nd in dp_tr.preorder_node_iter():
+        nd.is_sa_lineage = False
+        nd.is_sa_dummy_parent = False
+
         # (1) origin and/or root
         if nd is dp_tr.seed_node:
             nd.is_sa_dummy_parent = False
@@ -239,7 +248,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             nd_name = ("origin" if is_origin else "root")
             nd.taxon = dp.Taxon(label=nd_name)
             nd.label = nd_name
-
+            
             if nd_name == "root":
                 seen_root = True
         
@@ -249,6 +258,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                 # initial values
                 nd.is_sa_dummy_parent = False
                 nd.is_sa = False
+                nd.alive = False
 
                 # seeing if origin child is root
                 # or the dummy parent of a sampled ancestor
@@ -269,42 +279,56 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             if abs(nd.edge_length) <= epsilon:
                 nd.is_sa_dummy_parent = False
                 nd.is_sa = True
+
+            else:
+                nd.is_sa = False
         
             # annotate node as alive or not
-            if abs(nd.distance_from_tip()) <= epsilon:
+            if abs(nd.distance_from_root() - root_height) <= epsilon:
                 nd.alive = True
 
             else:
                 nd.alive = False
 
+            # annotate as sa_lineage
+            if nd.parent_node.is_sa_dummy_parent:
+                nd.is_sa_lineage = True
+
             # now we deal with translating between node
             # ids and node names
             nd_id = nd.annotations[node_names_attribute].value
+            nd_name = "nd" + nd_id
 
             if nd.is_leaf():
                 nd.label = nd.taxon.label
 
             # internal and no name provided
-            elif nd.taxon is None:
-                nd_name = "nd" + nd_id
-                nd.taxon = dp.Taxon(label=nd_name)
-                nd.label = nd_name
+            elif nd.taxon is None:                
+                if nd.label == "None":
+                    nd.label = nd_name
+                    nd.taxon = dp.Taxon(label=nd_name)
+
+                else:
+                    nd.taxon = dp.Taxon(label=nd.label)
+
                 dp_tr.taxon_namespace.add_taxon(nd.taxon)
 
             node_id_to_name[nd_id] = nd.label
             node_attr_dict[nd.label][node_names_attribute] = nd_id
 
-    print(dp_tr)
+    # debugging
+    # print(dp_tr.taxon_namespace)
 
     # for nd in dp_tr.postorder_node_iter():
     #     print(nd is dp_tr.seed_node)
     #     print(nd.parent_node)
 
-    # at = AnnotatedTree(
-    #     dp_tr,
-    #     1,
-    #     start_at_origin=is_origin,
-    #     tree_died=False)
+    return AnnotatedTree(
+            dp_tr,
+            3,
+            start_at_origin=is_origin,
+            tree_died=False,
+            read_as_newick_string=True)
 
     # print(dp_tr.taxon_namespace)
     # print(node_attr_dict)

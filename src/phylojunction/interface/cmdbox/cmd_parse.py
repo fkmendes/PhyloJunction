@@ -760,7 +760,7 @@ if __name__ == "__main__":
         "det_trans_rate20_t1 := sse_rate(name=\"q20_t1\", value=trans_rate20_t1, states=[2,0], event=\"transition\", epoch=2)\n" + \
         "det_trans_rate21_t1 := sse_rate(name=\"q21_t1\", value=trans_rate21_t1, states=[2,1], event=\"transition\", epoch=2)\n" + \
         "stash := sse_stash(flat_rate_mat=[det_w_birth_rate0_t0, det_death_rate0_t0, det_trans_rate02_t0, det_w_birth_rate1_t0, det_death_rate1_t0, det_trans_rate12_t0, det_b_birth_rate201_t0, det_b_birth_rate202_t0, det_b_birth_rate212_t0, det_trans_rate20_t0, det_trans_rate21_t0, det_w_birth_rate0_t1, det_death_rate0_t1, det_trans_rate02_t1, det_w_birth_rate1_t1, det_death_rate1_t1, det_trans_rate12_t1, det_b_birth_rate201_t1, det_b_birth_rate202_t1, det_b_birth_rate212_t1, det_trans_rate20_t1, det_trans_rate21_t1], n_states=3, n_epochs=2, epoch_age_ends=[1.0], seed_age=3.0)\n" + \
-        "trs ~ discrete_sse(n=2, nr=50, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
+        "trs ~ discrete_sse(n=2, stash=stash, start_state=[0], stop=\"age\", stop_value=3.0, origin=\"true\")\n"
 
     script_str36 = "a ~ lognormal(n=2, nr=10, mean=10.0, sd=1.0)"
 

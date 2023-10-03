@@ -90,12 +90,13 @@ class AnnotatedTree(dp.Tree):
                 ty.Dict[str, ty.List[pjat.AttributeTransition]]] = None,
             tree_died: ty.Optional[bool] = None,
             tree_invalid: ty.Optional[bool] = None,
+            read_as_newick_string: bool = False,
             epsilon: float = 1e-12):
 
         self.origin_node = None
         self.root_node = None
         self.brosc_node = None
-        self.tree_read_as_newick_by_dendropy = False
+        self.tree_read_as_newick_by_dendropy = read_as_newick_string
         self.no_event = True
 
         # some initial tree specs
@@ -152,6 +153,12 @@ class AnnotatedTree(dp.Tree):
         # for plotting
         self.sa_lineage_dict = sa_lineage_dict
         self.at_dict = at_dict
+        
+        # debugging
+        # will print info about events and their timing
+        # if self.at_dict is not None:
+        #     for nd, at_list in self.at_dict.items():
+        #         print(nd + "\n    " + "\n".join(str(at) for at in at_list))
 
         # other
         self.epsilon = epsilon
@@ -487,6 +494,11 @@ class AnnotatedTree(dp.Tree):
 
                 # if not sampled ancestor
                 if not (nd.edge_length < self.epsilon):
+                    # debugging
+                    # print("nd = " + nd.taxon.label)
+                    # print("abs(self.seed_age - nd.distance_from_root()) = ")
+                    # print(abs(self.seed_age - nd.distance_from_root()))
+
                     # nd.distance_from_root() returns distance to seed
                     if abs(self.seed_age - nd.distance_from_root()) \
                             <= self.epsilon:
@@ -979,15 +991,23 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates self.node_attr_dict { node label (str): { attribute (str): val (Any)... }, ... }
-    def populate_nd_attr_dict(self, attrs_of_interest_list) -> None:
+    def populate_nd_attr_dict(self, attrs_of_interest_list, read_as_newick_str: bool=False) -> None:
         for nd in self.tree:
             if not nd.label:
                 exit(("Must name all nodes before populating nd_attr_dict. "
                       "Exiting"))
 
             for att, att_val in nd.__dict__.items():
-                if att in attrs_of_interest_list:
-                    self.node_attr_dict[nd.label][att] = att_val
+                if not read_as_newick_str:
+                    if att in attrs_of_interest_list:
+                        self.node_attr_dict[nd.label][att] = att_val
+                
+                else:
+                    if att == "_annotations":
+                        for att_str, att_v in att_val.values_as_dict().items():
+                            if att_str in attrs_of_interest_list:
+                                self.node_attr_dict[nd.label][att_str] = int(att_v)
+
 
         # self.node_attr_dict
 
@@ -1331,10 +1351,22 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             if nd_name in ann_tr.at_dict:
                 attr_trs = ann_tr.at_dict[nd_name]
 
+                # for idx, at in reversed(list(enumerate(attr_trs))):
                 for idx, at in enumerate(attr_trs):
                     x_starts.append(at.global_time)
                     x_heres.append(at.global_time)
-                    segment_colors.insert(0, color_map[at.from_state])
+
+                    # x_starts.append(attr_trs[-(idx+1)].global_time)
+                    # x_heres.append(attr_trs[-(idx+1)].global_time)
+                    
+                    # the initial entry of the colors is the youngest state,
+                    # so we need to insert the older states at the top of the
+                    # list, but in chronological order (this latter requirement
+                    # is why we reverse the indexing and add 1)
+                    segment_colors.insert(0, color_map[attr_trs[-(idx+1)].from_state])
+
+                    # segment_colors.insert(0, color_map[at.from_state])
+                    # segment_colors.append(color_map[at.to_state])
 
             else:
                 segment_colors.append(color)
@@ -1623,7 +1655,7 @@ def get_color_map(n_states: int) -> ty.Dict[int, str]:
 
         return new_cmap
 
-    color_map: ty.Dict[int, str] = {}
+    color_map: ty.Dict[int, str] = dict()
 
     if n_states <= 20:
         qual_cmap = matplotlib.cm.get_cmap('tab20')
@@ -1763,14 +1795,16 @@ if __name__ == "__main__":
 
     max_age = 2.0
 
-    ann_tr_sa_with_root_survives_max_age = AnnotatedTree(
-        tr_sa_with_root_survives,
-        total_state_count,
-        start_at_origin=True,
-        max_age=max_age,
-        sa_lineage_dict=sa_lineage_dict,
-        at_dict=at_dict,
-        epsilon=1e-12)
+    ann_tr_sa_with_root_survives_max_age = \
+        AnnotatedTree(
+            tr_sa_with_root_survives,
+            total_state_count,
+            start_at_origin=True,
+            max_age=max_age,
+            sa_lineage_dict=sa_lineage_dict,
+            at_dict=at_dict,
+            epsilon=1e-12
+        )
 
     print(ann_tr_sa_with_root_survives_max_age.tree.as_string(schema="newick"))
     print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_str(nexus=True))
