@@ -150,10 +150,15 @@ def make_DiscreteStateDependentRate(
             if len(val) > 1:
                 raise ec.ParseRequireSingleValueError(det_fn_name,
                                                       arg)
-            
+
             try:
                 # default is 1
                 epoch_idx = int(val[0])  # start at 1
+                print("epoch_idx = " + str(epoch_idx))
+
+                if epoch_idx < 1:
+                    raise ec.ParseRequirePositiveIntegerError(det_fn_name,
+                                                              arg)
 
             except ValueError:
                 raise ec.ParseRequireIntegerError(det_fn_name, arg)
@@ -257,7 +262,7 @@ def make_DiscreteStateDependentProbability(
                 # default is 1
                 epoch_idx = int(val[0])  # start at 1
 
-                if epoch_idx < 0:
+                if epoch_idx < 1:
                     raise ec.ParseRequirePositiveIntegerError(det_fn_name,
                                                               arg)
 

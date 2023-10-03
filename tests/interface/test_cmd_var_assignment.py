@@ -9,12 +9,14 @@ import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
+
 class TestVarAssignment(unittest.TestCase):
     def test_var_assignment(self):
         """
         Test if a series of different variable assignments are correctly evaluated
         and result in the right probabilistic graphical model
         """
+
         pgm_obj = pgm.ProbabilisticGraphicalModel()
         
         cmd_line1 = "a <- 1"

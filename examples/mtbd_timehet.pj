@@ -20,7 +20,7 @@ trans_rate2_1_t0 <- 0.9
 # state 0
 w_birth_rate0_t1 <- 0.75
 death_rate0_t1 <- 0.5
-trans_rate0_2_t1 <- 0.8
+trans_rate0_2_t1 <- 0.0
 
 # state 1
 w_birth_rate1_t1 <- 1.5

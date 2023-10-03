@@ -303,7 +303,8 @@ class TestDiscreteSSE(unittest.TestCase):
         # 2D: all rates from all states in i-th time slice
         matrix_state_dep_probs_error1 = [ probs_t0, probs_t1 ]
         matrix_state_dep_probs_error2 = [ probs_t0, prob_rate_t1 ]
-        matrix_state_dep_probs_error3 = [ probs_t0, probs_t1_2 ]
+        # DEPRECATED: not an error anymore
+        # matrix_state_dep_probs_error3 = [ probs_t0, probs_t1_2 ]
         matrix_state_dep_probs_error4 = [ probs_t0, probs_t1_3 ]
                     
         matrix_state_dep_rates_error1 = [ rates_t0, rates_t1_2 ]
