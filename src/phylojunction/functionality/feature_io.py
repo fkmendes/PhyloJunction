@@ -48,9 +48,11 @@ class GeoFeature():
         self.n_regions = None
 
         if feat_type == GeoFeatureRelationship.BETWEEN:
-            self.ndim = 2
+            self.n_dim = 2
         
         if self.value is not None:
+            # initialized here or when self.value is 
+            # set by setter
             self._initialize_n_regions()
 
         self._initialize_str_representation()
@@ -97,8 +99,12 @@ class GeoFeature():
         self._initialize_str_representation()
 
     # getters
-    def _get_val_from_to(from_idx: int, to_idx: int) -> float:
-        pass
+    def get_val_from_to(self, from_idx: int, to_idx: int) -> float:
+        if not self.n_regions:
+            exit("ERROR: Feature " + self.name + " is not aware of " \
+                 + "how many regions the feature is scored for. Exiting.")
+        
+        return self.value[from_idx * self.n_regions + to_idx]
 
     # health
     def _initialize_n_regions(self) -> None:
@@ -113,7 +119,7 @@ class GeoFeature():
         return self.str_representation
 
 
-class FeatureCollection():
+class GeoFeatureCollection():
 
     geofeat_list: ty.List[GeoFeature] = list()
 
@@ -180,16 +186,18 @@ class FeatureCollection():
 
                 # feat_unique_names.add(feat_name)
 
+                print("Initializing " + feat_name)
                 geofeat = GeoFeature(
                     int(time_idx),
                     int(feat_idx),
                     (GeoFeatureRelationship.WITHIN \
-                    if feat_rel == "within" \
+                    if feat_rel == GeoFeatureRelationship.WITHIN.value \
                     else GeoFeatureRelationship.BETWEEN),
                     (GeoFeatureType.CATEGORICAL \
-                    if feat_rel == "categorical" \
+                    if feat_type == GeoFeatureType.CATEGORICAL.value \
                     else GeoFeatureType.QUANTITATIVE),
                     feat_name = feat_name)
+                print(geofeat)
                 
                 self._check_filepaths(feat_fp)
                 
@@ -245,11 +253,40 @@ class FeatureCollection():
             exit("Could not find " + feat_summary_fp + ". Exiting.")
 
     # getters
-    def get_feat_by_name(self, feat_name: str, time_idx: ty.Optional[int] = None) \
+    def get_feat_by_name(self,
+                         feat_name: str,
+                         time_idx: ty.Optional[int] = None) \
             -> ty.Tuple[float, ty.List[float]]:
 
         feat_dict_all_epochs = self.feat_name_epochs_dict[feat_name]
 
+        if time_idx:
+            return feat_dict_all_epochs[time_idx]
+
+        else:
+            return [v for k, v in feat_dict_all_epochs.items()]
+    
+    def get_feat_by_type_rel_id(self,
+                                feat_type: GeoFeatureType,
+                                feat_rel: GeoFeatureRelationship,
+                                feat_id: int,
+                                time_idx: ty.Optional[int] = None) \
+            -> ty.Tuple[float, ty.List[float]]:
+
+        # digging into the 4-nested dictionary
+        feat_rel_dict_all_epochs = \
+            self.feat_type_rel_featid_epochs_dict[feat_type]
+        feat_id_dict_all_epochs = \
+            feat_rel_dict_all_epochs[feat_rel]
+        feat_dict_all_epochs = \
+            feat_id_dict_all_epochs[feat_id]
+        
+        # print(self.feat_type_rel_featid_epochs_dict.keys())
+        # print(feat_rel_dict_all_epochs.keys())
+        # print(feat_id_dict_all_epochs.keys())
+        # print(feat_dict_all_epochs.keys())
+        # print(feat_dict_all_epochs[1])
+        
         if time_idx:
             return feat_dict_all_epochs[time_idx]
 
@@ -274,11 +311,12 @@ class FeatureCollection():
 
 # callable type for type hinting requirement functions
 class MyCallableType(ty.Protocol):
-    def __call__(self, feat_col: FeatureCollection) -> None:
+    def __call__(self, feat_col: GeoFeatureCollection) -> None:
         ...
 
+
 class FeatureQuery():
-    feat_coll: FeatureCollection
+    feat_coll: GeoFeatureCollection
 
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
@@ -286,7 +324,7 @@ class FeatureQuery():
     # requirement function 1
     @classmethod
     def cw_features_are_one(cls,
-                            feat_col: FeatureCollection,
+                            feat_col: GeoFeatureCollection,
                             feat_name: ty.List[str] = [],
                             feat_id: ty.List[int] = []) -> ty.List[float]:
     
@@ -306,7 +344,7 @@ class FeatureQuery():
     # # requirement function 2
     @classmethod
     def qw_features_threshold(cls,
-                            feat_col: FeatureCollection,
+                            feat_col: GeoFeatureCollection,
                             threshold: float,
                             feat_name: ty.List[str] = [],
                             feat_id: ty.List[int] = []) -> ty.List[float]:
@@ -346,52 +384,73 @@ class FeatureQuery():
 if __name__ == "__main__":
     # sys.argv[1]: feature summary file path
 
-    fc = FeatureCollection(sys.argv[1])
+    fc = GeoFeatureCollection(sys.argv[1])
 
-    # testing
-    # print(fc.get_feat_by_name("qb_1", time_idx=1))
-    # feat_list = fc.get_feat_by_name("qb_1")
-    # for feat in feat_list:
-    #     print(feat)
-
-    fq = FeatureQuery(fc)
-    
-    requirement_fn1 = \
-        FeatureQuery.cw_features_are_one(fc, "cw1")
-    
-    res1 = fq.when_has_it_happened("barrier", requirement_fn1)
-    print(res1)
-
-    thresh = 0.5
-    requirement_fn2 = \
-        FeatureQuery.qw_features_threshold(fc, "qw1", thresh)
-    
-    res2 = fq.when_has_it_happened("barrier", requirement_fn2)
-    print(res2)
-
-    # let's say we want some weird function that is not
-    # defined inside FeatureQuery...
-    #
-    # we want, say, that a categorical between feature == 1
-    # and then that a quantitative between feature is < threshold
-    def custom_requirement_fn(feature_collection,
-                              cb_feat_name,
-                              qb_feat_name,
-                              threshold):
+    test_basic_stuff = True
+    if test_basic_stuff:
+        # (1) can do it like this
+        # print(fc.get_feat_by_name("qb_1", time_idx=1))
+        # feat_list = fc.get_feat_by_name("qb_1")
+        # for feat in feat_list:
+        #     print(feat)
         
-        if not (cb_feat_name and qb_feat_name):
-            exit(("ERROR: Function \'qw_features_threshold\' needs either one "
-                    "or more categorical-within feature names or feature ids."
-                    ". Exiting."))
+        # (2) or like this
+        print(fc.get_feat_by_type_rel_id(
+            GeoFeatureType.QUANTITATIVE,
+            GeoFeatureRelationship.BETWEEN,
+            1,
+            time_idx=1))
+        feat_list = fc.get_feat_by_type_rel_id(
+            GeoFeatureType.QUANTITATIVE,
+            GeoFeatureRelationship.BETWEEN,
+            1)
+        for feat in feat_list:
+            print(feat)
+        
+        # checking getter
+        print(feat_list[0].get_val_from_to(1, 2))
+    
+    # testing querying
+    test_querying = False
+    if test_querying:
+        fq = FeatureQuery(fc)
+        
+        requirement_fn1 = \
+            FeatureQuery.cw_features_are_one(fc, "cw1")
+        
+        res1 = fq.when_has_it_happened("barrier", requirement_fn1)
+        print(res1)
 
-        else:
-            pass
+        thresh = 0.5
+        requirement_fn2 = \
+            FeatureQuery.qw_features_threshold(fc, "qw1", thresh)
+        
+        res2 = fq.when_has_it_happened("barrier", requirement_fn2)
+        print(res2)
+
+        # let's say we want some weird function that is not
+        # defined inside FeatureQuery...
+        #
+        # we want, say, that a categorical between feature == 1
+        # and then that a quantitative between feature is < threshold
+        def custom_requirement_fn(feature_collection,
+                                cb_feat_name,
+                                qb_feat_name,
+                                threshold):
             
-        return [3.0]
+            if not (cb_feat_name and qb_feat_name):
+                exit(("ERROR: Function \'qw_features_threshold\' needs either one "
+                        "or more categorical-within feature names or feature ids."
+                        ". Exiting."))
 
-    requirement_fn3 = custom_requirement_fn(fc,
-                                            "cb1",
-                                            "qb1",
-                                            thresh)
-    res3 = fq.when_has_it_happened("barrier", requirement_fn3)
-    print(res3)
+            else:
+                pass
+                
+            return [3.0]
+
+        requirement_fn3 = custom_requirement_fn(fc,
+                                                "cb1",
+                                                "qb1",
+                                                thresh)
+        res3 = fq.when_has_it_happened("barrier", requirement_fn3)
+        print(res3)
