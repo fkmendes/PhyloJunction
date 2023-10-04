@@ -51,6 +51,7 @@ def selected_node_plot_cli(
         fig_obj: Figure,
         fig_axes: Axes,
         node_pgm: NodePGM,
+        prefix: str = "",
         sample_idx: int = 0,
         repl_idx: int = 0,
         repl_size: int = 1) -> None:
@@ -60,9 +61,15 @@ def selected_node_plot_cli(
     then update canvas with new plot
     """
 
-    outfile_path = \
-        fig_dir + node_pgm.node_name \
-        + str(sample_idx + 1) + "_" + str(repl_idx + 1)
+    outfile_path = fig_dir
+
+    if prefix:
+        outfile_path += prefix + "_"
+
+    outfile_path += node_pgm.node_name + str(sample_idx + 1) \
+        + "_" + str(repl_idx + 1)
+    
+    print("outfile_path = " + outfile_path)
     
     # if stochastic or constant, value will be list
     if isinstance(node_pgm.value, list):
@@ -98,7 +105,8 @@ def call_node_plot_cli(
         n_samples: int,
         node_range_dict: ty.Dict[str, ty.Tuple[int]],
         fig_obj: Figure,
-        fig_axes: Axes) -> None:
+        fig_axes: Axes,
+        prefix: str = "") -> None:
     """
     """
  
@@ -133,6 +141,7 @@ def call_node_plot_cli(
                             fig_obj,
                             fig_axes,
                             node_pgm,
+                            prefix=prefix,
                             sample_idx=sample_idx,
                             repl_idx=repl_idx,
                             repl_size=repl_size

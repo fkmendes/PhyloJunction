@@ -154,7 +154,6 @@ def make_DiscreteStateDependentRate(
             try:
                 # default is 1
                 epoch_idx = int(val[0])  # start at 1
-                print("epoch_idx = " + str(epoch_idx))
 
                 if epoch_idx < 1:
                     raise ec.ParseRequirePositiveIntegerError(det_fn_name,

@@ -86,7 +86,8 @@ def execute_pj_script(
                 n_samples,
                 node_range_dict,
                 fig_obj,
-                fig_axes)
+                fig_axes,
+                prefix=prefix)
             
         # Writing inference files #
         if write_inference:

@@ -1253,12 +1253,17 @@ class DnSSE(pgm.DistributionPGM):
         # END initializing values pre-simulation #
 
         # START simulation loop #
+        # size_set = set([])
         time_slice_idx = 0
         while (time_slice_idx < self.n_time_slices and not reached_stop_condition):
 
             # (1) Find out the overall total rate given the current targetable nodes' states
-            # print("dn_discrete_sse.py: at (1)")
-            # print("tree size = " + str(len(tr)))
+            # checking tree size
+            # tr_size = len(tr)
+            # if tr_size % 100 == 0 and tr_size not in size_set:
+            #     size_set.add(tr_size)
+            #     print("tree size = " + str(len(tr)))
+
             rate_for_exponential_distn, \
                 state_total_rates = \
                 self.events.total_rate(latest_t,
