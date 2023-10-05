@@ -122,16 +122,20 @@ class GeoFeature():
 class GeoFeatureCollection():
 
     geofeat_list: ty.List[GeoFeature] = list()
+    epoch_age_end_list_young2old: ty.List[float] = [0.0]  # present epoch ends at 0.0
+    epoch_mid_age_list_young2old: ty.List[float] = [-math.inf]  # oldest epoch midpoint 
+    is_timehet: bool = False
 
     # ways in which to store (for later grabbing) features
     #
     # (1) by name (assumes name cannot be repeated across feature
-    # types and/or relationships)
+    # types and/or relationships); final dict is k: time_idx, v: feat
     #
     # TODO: add check here!!!!
     feat_name_epochs_dict: ty.Dict[str, ty.Dict[int, GeoFeature]] \
         = pjh.autovivify(2)
-    # (2) by feature type, relationship and feature number (index)
+    # (2) by feature type, relationship and feature number (index);
+    # final dict is k: time_idx, v: feat
     feat_type_rel_featid_epochs_dict: \
         ty.Dict[GeoFeatureType, 
                 ty.Dict[GeoFeatureRelationship,
@@ -143,10 +147,18 @@ class GeoFeatureCollection():
     region_name_idx_dict: ty.Dict[str, int] = dict()
     region_idx_name_dict: ty.Dict[int, str] = dict()
 
-    def __init__(self, feat_summary_fp: str) -> None:
+    def __init__(self,
+                 feat_summary_fp: str,
+                 age_summary_fp: str = "") -> None:
+        
         self._check_filepaths(feat_summary_fp)
 
+        # if only one epoch, age_summary not necessary
+        if age_summary_fp:
+            self._check_filepaths(age_summary_fp)
+
         # initializes:
+        #     is_timehet
         #     region_name_idx_dict
         #     region_idx_name_dict
         self._read_feat_summary_init_feats(feat_summary_fp)
@@ -159,6 +171,11 @@ class GeoFeatureCollection():
 
         # debugging
         # self._debug_print_dicts()
+
+        # initializes
+        #     self.epoch_age_end_list
+        #     self.epoch_mid_age_list
+        self._read_age_summary(age_summary_fp)
 
     # init methods
     def _read_feat_summary_init_feats(
@@ -184,9 +201,9 @@ class GeoFeatureCollection():
                 time_idx, feat_idx, feat_rel, feat_type, feat_fp, feat_name \
                     = line.split(",")
 
-                # feat_unique_names.add(feat_name)
+                if int(time_idx) > 1:
+                    self.is_timehet = True
 
-                print("Initializing " + feat_name)
                 geofeat = GeoFeature(
                     int(time_idx),
                     int(feat_idx),
@@ -197,7 +214,6 @@ class GeoFeatureCollection():
                     if feat_type == GeoFeatureType.CATEGORICAL.value \
                     else GeoFeatureType.QUANTITATIVE),
                     feat_name = feat_name)
-                print(geofeat)
                 
                 self._check_filepaths(feat_fp)
                 
@@ -212,7 +228,10 @@ class GeoFeatureCollection():
                     vals_list = list()
                     for line in infile2:
                         line = line.rstrip().split(",")
-                        vals_list.extend(float(v) for v in line)
+                        vals_list.extend(int(v) \
+                                         if feat_type == GeoFeatureType.CATEGORICAL.value \
+                                         else float(v) \
+                                         for v in line)
                     
                     vals_array = np.array(vals_list)
                 
@@ -229,6 +248,58 @@ class GeoFeatureCollection():
             #     exit("ERROR: Detected " + str(len(feat_unique_names)) \
             #          + " unique feature names, but summary file had " \
             #          + str(linecount) + " lines minus the header. Exiting.")
+
+    def _read_age_summary(
+            self,
+            age_summary_fp):
+        """Populate epoch age end list
+        
+        Open, read and parse age summary .csv file, and populate
+        class member list of epoch age ends
+        """
+
+        with open(age_summary_fp, "r") as infile:
+            header = infile.readline()
+            
+            if header != ("index,age_end\n"):
+                exit(("ERROR: Expecting header:\nindex,age_end\n"))
+
+            content = infile.readlines()
+            n_epochs_minus_one = len(content)
+            epoch_age_ends_from_file = \
+                [-1.0 for i in range(n_epochs_minus_one)]
+
+            for line in content:
+                idx, age_end = line.rstrip().split(",")
+                # note the offset!
+                epoch_age_ends_from_file[int(idx)-1] = float(age_end)
+
+        # actual initialization
+        self.epoch_age_end_list_young2old += epoch_age_ends_from_file
+
+        # debugging
+        # print(self.epoch_age_end_list_young2old)
+
+        n_epochs = len(self.epoch_age_end_list_young2old)
+        mid_ages_minus_last_epoch = list()
+        for idx in range(len(self.epoch_age_end_list_young2old)):
+            if idx < n_epochs-1:
+                younger_age = self.epoch_age_end_list_young2old[idx]
+                older_age = self.epoch_age_end_list_young2old[idx+1]
+                mid_age = (younger_age + older_age) / 2.0
+
+                mid_ages_minus_last_epoch.append(mid_age)
+
+                # debugging
+                # print(younger_age, older_age, mid_age)
+
+        # actual initialization
+        self.epoch_mid_age_list_young2old \
+            = mid_ages_minus_last_epoch \
+            + self.epoch_mid_age_list_young2old
+        
+        # debugging
+        # print(self.epoch_mid_age_list_young2old)
 
     def _init_feat_name_epochs_dict(self):
         for geofeat in self.geofeat_list:
@@ -323,23 +394,46 @@ class FeatureQuery():
 
     # requirement function 1
     @classmethod
-    def cw_features_are_one(cls,
+    def cw_feature_equals_value(cls,
                             feat_col: GeoFeatureCollection,
-                            feat_name: ty.List[str] = [],
-                            feat_id: ty.List[int] = []) -> ty.List[float]:
+                            val2match: int,
+                            feat_name: str = "",
+                            feat_id: int = None) \
+            -> ty.List[float]:
     
+        ft_all_epochs_list: ty.List[GeoFeature] = list()
+        
         if feat_name:
-            pass
-
+            ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
+    
         elif feat_id:
-            pass
+            ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
+                GeoFeatureType.CATEGORICAL,
+                GeoFeatureRelationship.WITHIN,
+                feat_id
+            )
 
         else:
             exit(("ERROR: Function \'cw_features_are_one\' needs either one "
                     "or more categorical-within feature names or feature ids."
                     ". Exiting."))
+
+        n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
+        mid_ages = feat_col.epoch_mid_age_list_young2old
+        
+        mid_ages_match = list()
+
+        for region_idx in range(n_regions):
+            mid_ages_match_this_region = list()
             
-        return [1.0]
+            for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                if ft_this_epoch.value[region_idx] == val2match:
+                    mid_ages_match_this_region.append(
+                        mid_ages[ft_this_epoch.time_idx-1])
+
+            mid_ages_match.append(mid_ages_match_this_region)
+
+        return mid_ages_match
     
     # # requirement function 2
     @classmethod
@@ -383,10 +477,12 @@ class FeatureQuery():
 
 if __name__ == "__main__":
     # sys.argv[1]: feature summary file path
+    # sys.argv[2]: age summary file path
 
-    fc = GeoFeatureCollection(sys.argv[1])
+    fc = GeoFeatureCollection(sys.argv[1],
+                              age_summary_fp=sys.argv[2])
 
-    test_basic_stuff = True
+    test_basic_stuff = False
     if test_basic_stuff:
         # (1) can do it like this
         # print(fc.get_feat_by_name("qb_1", time_idx=1))
@@ -408,22 +504,30 @@ if __name__ == "__main__":
             print(feat)
         
         # checking getter
-        print(feat_list[0].get_val_from_to(1, 2))
+        # print(feat_list[0].get_val_from_to(1, 2))
     
     # testing querying
-    test_querying = False
+    test_querying = True
     if test_querying:
         fq = FeatureQuery(fc)
         
         requirement_fn1 = \
-            FeatureQuery.cw_features_are_one(fc, "cw1")
+            FeatureQuery.cw_feature_equals_value(fc, 1, feat_name="cw_1")
         
-        res1 = fq.when_has_it_happened("barrier", requirement_fn1)
+        res1 = fq.when_has_it_happened("ancient_sea", requirement_fn1)
         print(res1)
+        # [[5.0], [5.0], [-inf], [-inf]]
+
+        requirement_fn1_1 = \
+            FeatureQuery.cw_feature_equals_value(fc, 1, feat_id=2)
+        
+        res1_1 = fq.when_has_it_happened("ancient_sea", requirement_fn1_1)
+        print(res1_1)
+        # [[-inf], [5.0], [5.0], [-inf]]
 
         thresh = 0.5
         requirement_fn2 = \
-            FeatureQuery.qw_features_threshold(fc, "qw1", thresh)
+            FeatureQuery.qw_features_threshold(fc, "qw_1", thresh)
         
         res2 = fq.when_has_it_happened("barrier", requirement_fn2)
         print(res2)
@@ -434,9 +538,9 @@ if __name__ == "__main__":
         # we want, say, that a categorical between feature == 1
         # and then that a quantitative between feature is < threshold
         def custom_requirement_fn(feature_collection,
-                                cb_feat_name,
-                                qb_feat_name,
-                                threshold):
+                                  cb_feat_name,
+                                  qb_feat_name,
+                                  threshold):
             
             if not (cb_feat_name and qb_feat_name):
                 exit(("ERROR: Function \'qw_features_threshold\' needs either one "
