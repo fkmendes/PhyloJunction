@@ -386,11 +386,16 @@ class MyCallableType(ty.Protocol):
         ...
 
 
-class FeatureQuery():
+class GeoFeatureQuery():
     feat_coll: GeoFeatureCollection
+    event_dict: ty.Dict[str,
+                        ty.Tuple[ty.List[ty.List[float]],
+                                 ty.List[ty.List[ty.List[float]]
+                                         ]]]
 
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
+        self.event_dict = dict()
 
     # requirement function 1
     @classmethod
@@ -399,7 +404,7 @@ class FeatureQuery():
                             val2match: int,
                             feat_name: str = "",
                             feat_id: int = None) \
-            -> ty.List[float]:
+            -> ty.List[ty.List[float]]:
     
         ft_all_epochs_list: ty.List[GeoFeature] = list()
         
@@ -414,14 +419,14 @@ class FeatureQuery():
             )
 
         else:
-            exit(("ERROR: Function \'cw_features_are_one\' needs either one "
-                    "or more categorical-within feature names or feature ids."
+            exit(("ERROR: Function \'cw_feature_equals_value\' needs a "
+                    "categorical-within feature name or feature id."
                     ". Exiting."))
 
         n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
         mid_ages = feat_col.epoch_mid_age_list_young2old
         
-        mid_ages_match = list()
+        mid_ages_match_list = list()
 
         for region_idx in range(n_regions):
             mid_ages_match_this_region = list()
@@ -431,48 +436,181 @@ class FeatureQuery():
                     mid_ages_match_this_region.append(
                         mid_ages[ft_this_epoch.time_idx-1])
 
-            mid_ages_match.append(mid_ages_match_this_region)
+            mid_ages_match_list.append(mid_ages_match_this_region)
 
-        return mid_ages_match
+        return mid_ages_match_list
     
-    # # requirement function 2
+    # requirement function 2
     @classmethod
-    def qw_features_threshold(cls,
+    def qw_feature_threshold(cls,
                             feat_col: GeoFeatureCollection,
                             threshold: float,
-                            feat_name: ty.List[str] = [],
-                            feat_id: ty.List[int] = []) -> ty.List[float]:
+                            above: bool,
+                            feat_name: str = "",
+                            feat_id: int = None) \
+            -> ty.List[ty.List[float]]:
     
+        ft_all_epochs_list: ty.List[GeoFeature] = list()
+
         if feat_name:
-            pass
+            ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
 
         elif feat_id:
-            pass
+            ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
+                GeoFeatureType.QUANTITATIVE,
+                GeoFeatureRelationship.WITHIN,
+                feat_id
+            )
 
         else:
-            exit(("ERROR: Function \'qw_features_threshold\' needs either one "
-                    "or more categorical-within feature names or feature ids."
+            exit(("ERROR: Function \'qw_feature_threshold\' needs a "
+                    "quantitative-within feature name or feature id."
                     ". Exiting."))
             
-        return [2.0]
+        n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
+        mid_ages = feat_col.epoch_mid_age_list_young2old
         
-    def when_has_it_happened(self,
+        mid_ages_match_list = list()
+
+        for region_idx in range(n_regions):
+            mid_ages_match_this_region = list()
+            
+            for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                if above and ft_this_epoch.value[region_idx] > threshold:
+                    mid_ages_match_this_region.append(
+                        mid_ages[ft_this_epoch.time_idx-1])
+                    
+                elif not above and ft_this_epoch.value[region_idx] < threshold:
+                    mid_ages_match_this_region.append(
+                        mid_ages[ft_this_epoch.time_idx-1])
+
+            mid_ages_match_list.append(mid_ages_match_this_region)
+
+        return mid_ages_match_list
+        
+    # requirement function 3
+    @classmethod
+    def cb_feature_equals_value(cls,
+                                feat_col: GeoFeatureCollection,
+                                val2match: int,
+                                feat_name: str = "",
+                                feat_id: int = None
+                                ) \
+            -> ty.List[ty.List[float]]:
+        
+        ft_all_epochs_list: ty.List[GeoFeature] = list()
+
+        if feat_name:
+            ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
+
+        elif feat_id:
+            ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
+                GeoFeatureType.CATEGORICAL,
+                GeoFeatureRelationship.BETWEEN,
+                feat_id
+            )
+
+        else:
+            exit(("ERROR: Function \'qw_feature_threshold\' needs a "
+                    "quantitative-within feature name or feature id."
+                    ". Exiting."))
+            
+        n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
+        mid_ages = feat_col.epoch_mid_age_list_young2old
+
+        mid_ages_match_2d_list = list()
+
+        for region_idx1 in range(n_regions):
+            mid_ages_match_from_region = list()
+            
+            for region_idx2 in range(n_regions):
+                mid_ages_match_to_region = list()        
+
+                for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                    if ft_this_epoch \
+                        .get_val_from_to(region_idx1, region_idx2) \
+                            == val2match:
+                        mid_ages_match_to_region.append(
+                            mid_ages[ft_this_epoch.time_idx-1])
+
+                mid_ages_match_from_region.append(mid_ages_match_to_region)
+
+            mid_ages_match_2d_list.append(mid_ages_match_from_region)
+
+        return mid_ages_match_2d_list
+        
+    # requirement function 4
+    @classmethod
+    def qb_feature_threshold(cls,
+                             feat_col: GeoFeatureCollection,
+                             threshold: float,
+                             above: bool,
+                             feat_name: str = "",
+                             feat_id: int = None
+                             ) \
+            -> ty.List[ty.List[float]]:
+        
+        ft_all_epochs_list: ty.List[GeoFeature] = list()
+
+        if feat_name:
+            ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
+
+        elif feat_id:
+            ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
+                GeoFeatureType.QUANTITATIVE,
+                GeoFeatureRelationship.BETWEEN,
+                feat_id
+            )
+
+        else:
+            exit(("ERROR: Function \'qw_feature_threshold\' needs a "
+                    "quantitative-within feature name or feature id."
+                    ". Exiting."))
+            
+        n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
+        mid_ages = feat_col.epoch_mid_age_list_young2old
+
+        mid_ages_match_2d_list = list()
+
+        for region_idx1 in range(n_regions):
+            mid_ages_match_from_region = list()
+            
+            for region_idx2 in range(n_regions):
+                mid_ages_match_to_region = list()        
+
+                for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                    if above and ft_this_epoch \
+                        .get_val_from_to(region_idx1, region_idx2) \
+                            > threshold:
+                        mid_ages_match_to_region.append(
+                            mid_ages[ft_this_epoch.time_idx-1])
+                        
+                    elif not above and ft_this_epoch \
+                        .get_val_from_to(region_idx1, region_idx2) \
+                            < threshold:
+                        mid_ages_match_to_region.append(
+                            mid_ages[ft_this_epoch.time_idx-1])
+
+                mid_ages_match_from_region.append(mid_ages_match_to_region)
+
+            mid_ages_match_2d_list.append(mid_ages_match_from_region)
+
+        return mid_ages_match_2d_list
+                          
+    def feed_event_dict_with(self,
                              geo_event_name: str,
                              requirement_fn: MyCallableType) \
-            -> ty.List[float]:
-        """Return list of times when events happened
+            -> None:
+        """Populate event dictionary with new event
         
         Args:
             geo_event_name (str): the name one is giving the event
             requirement_fn (function): this function receives a feature
                 collection and a list of integers defining the involved
                 regions, and returns a list of times
-
-        Returns:
-            list (float): time(s) the event took place
         """
 
-        return requirement_fn
+        self.event_dict[geo_event_name] = requirement_fn
 
 
 if __name__ == "__main__":
@@ -509,52 +647,60 @@ if __name__ == "__main__":
     # testing querying
     test_querying = True
     if test_querying:
-        fq = FeatureQuery(fc)
+        fq = GeoFeatureQuery(fc)
         
         requirement_fn1 = \
-            FeatureQuery.cw_feature_equals_value(fc, 1, feat_name="cw_1")
+            GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_name="cw_1")
         
-        res1 = fq.when_has_it_happened("ancient_sea", requirement_fn1)
-        print(res1)
+        # for all regions, gives all times when it happened
+        fq.feed_event_dict_with("ancient_sea", requirement_fn1)
+        print(fq.event_dict["ancient_sea"])
         # [[5.0], [5.0], [-inf], [-inf]]
 
         requirement_fn1_1 = \
-            FeatureQuery.cw_feature_equals_value(fc, 1, feat_id=2)
+            GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_id=1)
         
-        res1_1 = fq.when_has_it_happened("ancient_sea", requirement_fn1_1)
-        print(res1_1)
+        # for all regions, gives all times when it happened
+        fq.feed_event_dict_with("ancient_sea", requirement_fn1_1)
+        print(fq.event_dict["ancient_sea"])
         # [[-inf], [5.0], [5.0], [-inf]]
 
-        thresh = 0.5
+        # for all regions, gives all times when it happened
+        thresh = 25.0
         requirement_fn2 = \
-            FeatureQuery.qw_features_threshold(fc, "qw_1", thresh)
+            GeoFeatureQuery.qw_feature_threshold(fc, thresh, True, feat_name="qw_1")
         
-        res2 = fq.when_has_it_happened("barrier", requirement_fn2)
-        print(res2)
+        fq.feed_event_dict_with("altitude", requirement_fn2)
+        print(fq.event_dict["altitude"])
 
-        # let's say we want some weird function that is not
-        # defined inside FeatureQuery...
-        #
-        # we want, say, that a categorical between feature == 1
-        # and then that a quantitative between feature is < threshold
-        def custom_requirement_fn(feature_collection,
-                                  cb_feat_name,
-                                  qb_feat_name,
-                                  threshold):
-            
-            if not (cb_feat_name and qb_feat_name):
-                exit(("ERROR: Function \'qw_features_threshold\' needs either one "
-                        "or more categorical-within feature names or feature ids."
-                        ". Exiting."))
+        # for all pairs of regions, gives all times when it happened
+        requirement_fn3 = \
+            GeoFeatureQuery.cb_feature_equals_value(fc, 1, feat_name="cb_1")
+        
+        fq.feed_event_dict_with("land_bridge", requirement_fn3)
+        print(fq.event_dict["altitude"])
+        # [[[], [5.0, -inf], [5.0], []], [[5.0, -inf], [], [5.0], []], [[], [5.0], [], [5.0]], [[], [], [5.0], []]]
 
-            else:
-                pass
-                
-            return [3.0]
+        # for all pairs of regions, gives all times when it happened
+        requirement_fn3_1 = \
+            GeoFeatureQuery.cb_feature_equals_value(fc, 1, feat_id=1)
+        
+        fq.feed_event_dict_with("land_bridge", requirement_fn3_1)
+        print(fq.event_dict["land_bridge"])
+        # [[[], [5.0, -inf], [5.0], []], [[5.0, -inf], [], [5.0], []], [[], [5.0], [], [5.0]], [[], [], [5.0], []]]
 
-        requirement_fn3 = custom_requirement_fn(fc,
-                                                "cb1",
-                                                "qb1",
-                                                thresh)
-        res3 = fq.when_has_it_happened("barrier", requirement_fn3)
-        print(res3)
+        # for all pairs of regions, gives all times when it happened
+        thresh = 15.0
+        requirement_fn4 = \
+            GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_name="qb_1")
+        
+        fq.feed_event_dict_with("distance", requirement_fn4)
+        print(fq.event_dict["distance"])
+        # [[[], [-inf], [5.0], [5.0, -inf]], [[-inf], [], [5.0], []], [[5.0], [5.0], [], [5.0]], [[], [], [5.0], []]]
+         
+        requirement_fn4_1 = \
+            GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_id=2)
+        
+        fq.feed_event_dict_with("distance", requirement_fn4_1)
+        print(fq.event_dict["distance"])
+        # [[[], [5.0], [-inf], [5.0, -inf]], [[5.0], [], [-inf], []], [[-inf], [-inf], [], [-inf]], [[], [], [-inf], []]]

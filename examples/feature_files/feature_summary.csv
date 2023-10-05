@@ -1,0 +1,17 @@
+time_index,feature_index,feature_relationship,feature_type,feature_path,name
+1,1,within,quantitative,examples/feature_files/age1/qw1_1.csv,qw_1
+1,2,within,quantitative,examples/feature_files/age1/qw1_2.csv,qw_2
+1,1,between,quantitative,examples/feature_files/age1/qb1_1.csv,qb_1
+1,2,between,quantitative,examples/feature_files/age1/qb1_2.csv,qb_2
+1,1,within,categorical,examples/feature_files/age1/cw1_1.csv,cw_1
+1,2,within,categorical,examples/feature_files/age1/cw1_2.csv,cw_2
+1,1,between,categorical,examples/feature_files/age1/cb1_1.csv,cb_1
+1,2,between,categorical,examples/feature_files/age1/cb1_2.csv,cb_2
+2,1,within,quantitative,examples/feature_files/age2/qw2_1.csv,qw_1
+2,2,within,quantitative,examples/feature_files/age2/qw2_2.csv,qw_2
+2,1,between,quantitative,examples/feature_files/age2/qb2_1.csv,qb_1
+2,2,between,quantitative,examples/feature_files/age2/qb2_2.csv,qb_2
+2,1,within,categorical,examples/feature_files/age2/cw2_1.csv,cw_1
+2,2,within,categorical,examples/feature_files/age2/cw2_2.csv,cw_2
+2,1,between,categorical,examples/feature_files/age2/cb2_1.csv,cb_1
+2,2,between,categorical,examples/feature_files/age2/cb2_2.csv,cb_2
