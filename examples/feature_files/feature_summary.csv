@@ -15,3 +15,11 @@ time_index,feature_index,feature_relationship,feature_type,feature_path,name
 2,2,within,categorical,examples/feature_files/age2/cw2_2.csv,cw_2
 2,1,between,categorical,examples/feature_files/age2/cb2_1.csv,cb_1
 2,2,between,categorical,examples/feature_files/age2/cb2_2.csv,cb_2
+3,1,within,quantitative,examples/feature_files/age3/qw3_1.csv,qw_1
+3,2,within,quantitative,examples/feature_files/age3/qw3_2.csv,qw_2
+3,1,between,quantitative,examples/feature_files/age3/qb3_1.csv,qb_1
+3,2,between,quantitative,examples/feature_files/age3/qb3_2.csv,qb_2
+3,1,within,categorical,examples/feature_files/age3/cw3_1.csv,cw_1
+3,2,within,categorical,examples/feature_files/age3/cw3_2.csv,cw_2
+3,1,between,categorical,examples/feature_files/age3/cb3_1.csv,cb_1
+3,2,between,categorical,examples/feature_files/age3/cb3_2.csv,cb_2

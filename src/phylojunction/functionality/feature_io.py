@@ -173,8 +173,10 @@ class GeoFeatureCollection():
         # self._debug_print_dicts()
 
         # initializes
-        #     self.epoch_age_end_list
-        #     self.epoch_mid_age_list
+        #     self.epoch_age_end_list_young2old
+        #     self.epoch_mid_age_list_young2old
+        #     self.epoch_age_end_list_old2young
+        #     self.epoch_mid_age_list_old2young
         self._read_age_summary(age_summary_fp)
 
     # init methods
@@ -276,6 +278,8 @@ class GeoFeatureCollection():
 
         # actual initialization
         self.epoch_age_end_list_young2old += epoch_age_ends_from_file
+        self.epoch_age_end_list_old2young \
+            = self.epoch_age_end_list_young2old[::-1]
 
         # debugging
         # print(self.epoch_age_end_list_young2old)
@@ -297,6 +301,9 @@ class GeoFeatureCollection():
         self.epoch_mid_age_list_young2old \
             = mid_ages_minus_last_epoch \
             + self.epoch_mid_age_list_young2old
+        
+        self.epoch_mid_age_list_old2young \
+            = self.epoch_mid_age_list_young2old[::-1]
         
         # debugging
         # print(self.epoch_mid_age_list_young2old)
@@ -388,14 +395,18 @@ class MyCallableType(ty.Protocol):
 
 class GeoFeatureQuery():
     feat_coll: GeoFeatureCollection
-    event_dict: ty.Dict[str,
-                        ty.Tuple[ty.List[ty.List[float]],
-                                 ty.List[ty.List[ty.List[float]]
-                                         ]]]
+    # bit patterns are in old -> young epochs
+    geo_cond_bit_dict: ty.Dict[str,
+                        ty.Tuple[ty.List[ty.List[str]],
+                                 ty.List[str]]]
+    geo_cond_change_times_dict: ty.Dict[str,
+                                        ty.Tuple[ty.List[ty.List[float]],
+                                                 ty.List[ty.List[ty.List[float]]]]]
 
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
-        self.event_dict = dict()
+        self.geo_cond_bit_dict = dict()
+        self.geo_cond_change_times_dict = dict()
 
     # requirement function 1
     @classmethod
@@ -404,14 +415,16 @@ class GeoFeatureQuery():
                             val2match: int,
                             feat_name: str = "",
                             feat_id: int = None) \
-            -> ty.List[ty.List[float]]:
+            -> ty.List[str]:
     
         ft_all_epochs_list: ty.List[GeoFeature] = list()
         
         if feat_name:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
     
         elif feat_id:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
                 GeoFeatureType.CATEGORICAL,
                 GeoFeatureRelationship.WITHIN,
@@ -424,21 +437,31 @@ class GeoFeatureQuery():
                     ". Exiting."))
 
         n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
-        mid_ages = feat_col.epoch_mid_age_list_young2old
+        # mid_ages = feat_col.epoch_mid_age_list_young2old
         
-        mid_ages_match_list = list()
+        # mid_ages_match_list = list()
+        bits_match_list = list()
 
         for region_idx in range(n_regions):
-            mid_ages_match_this_region = list()
+            # mid_ages_match_this_region = list()
+            bits_match_this_region_str = str()
             
-            for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+            # young to old
+            # for epoch_idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+            for ft_this_epoch in ft_all_epochs_list:
                 if ft_this_epoch.value[region_idx] == val2match:
-                    mid_ages_match_this_region.append(
-                        mid_ages[ft_this_epoch.time_idx-1])
+                    # mid_ages_match_this_region.append(
+                    #     (epoch_idx, mid_ages[ft_this_epoch.time_idx-1]))
+                    bits_match_this_region_str += "1"
 
-            mid_ages_match_list.append(mid_ages_match_this_region)
+                else:
+                    bits_match_this_region_str += "0"
 
-        return mid_ages_match_list
+            # mid_ages_match_list.append(mid_ages_match_this_region)
+            bits_match_list.append(bits_match_this_region_str)
+
+        # return mid_ages_match_list
+        return bits_match_list
     
     # requirement function 2
     @classmethod
@@ -453,9 +476,11 @@ class GeoFeatureQuery():
         ft_all_epochs_list: ty.List[GeoFeature] = list()
 
         if feat_name:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
 
         elif feat_id:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
                 GeoFeatureType.QUANTITATIVE,
                 GeoFeatureRelationship.WITHIN,
@@ -468,25 +493,40 @@ class GeoFeatureQuery():
                     ". Exiting."))
             
         n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
-        mid_ages = feat_col.epoch_mid_age_list_young2old
+        # mid_ages = feat_col.epoch_mid_age_list_young2old
         
-        mid_ages_match_list = list()
+        # mid_ages_match_list = list()
+        bits_match_list = list()
 
         for region_idx in range(n_regions):
-            mid_ages_match_this_region = list()
-            
-            for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
-                if above and ft_this_epoch.value[region_idx] > threshold:
-                    mid_ages_match_this_region.append(
-                        mid_ages[ft_this_epoch.time_idx-1])
-                    
-                elif not above and ft_this_epoch.value[region_idx] < threshold:
-                    mid_ages_match_this_region.append(
-                        mid_ages[ft_this_epoch.time_idx-1])
+            # mid_ages_match_this_region = list()
+            bits_match_this_region_str = str()
 
-            mid_ages_match_list.append(mid_ages_match_this_region)
+            # for epoch_idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+            for ft_this_epoch in ft_all_epochs_list:
+                if above:
+                    if ft_this_epoch.value[region_idx] > threshold:
+                        # mid_ages_match_this_region.append(
+                        #     (epoch_idx, mid_ages[ft_this_epoch.time_idx-1]))
+                        bits_match_this_region_str += "1"
 
-        return mid_ages_match_list
+                    else:
+                        bits_match_this_region_str += "0"
+
+                else:
+                    if ft_this_epoch.value[region_idx] < threshold:
+                        # mid_ages_match_this_region.append(
+                        #     (epoch_idx, mid_ages[ft_this_epoch.time_idx-1]))
+                        bits_match_this_region_str += "1"
+
+                    else:
+                        bits_match_this_region_str += "0"
+
+            # mid_ages_match_list.append(mid_ages_match_this_region)
+            bits_match_list.append(bits_match_this_region_str)
+
+        return bits_match_list
+        # return mid_ages_match_list
         
     # requirement function 3
     @classmethod
@@ -496,14 +536,17 @@ class GeoFeatureQuery():
                                 feat_name: str = "",
                                 feat_id: int = None
                                 ) \
-            -> ty.List[ty.List[float]]:
+            -> ty.List[ty.List[str]]:
+            # -> ty.List[ty.List[float]]:
         
         ft_all_epochs_list: ty.List[GeoFeature] = list()
 
         if feat_name:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
 
         elif feat_id:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
                 GeoFeatureType.CATEGORICAL,
                 GeoFeatureRelationship.BETWEEN,
@@ -516,28 +559,39 @@ class GeoFeatureQuery():
                     ". Exiting."))
             
         n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
-        mid_ages = feat_col.epoch_mid_age_list_young2old
+        # mid_ages = feat_col.epoch_mid_age_list_young2old
 
-        mid_ages_match_2d_list = list()
+        # mid_ages_match_2d_list = list()
+        bits_match_2d_list = list()
 
         for region_idx1 in range(n_regions):
-            mid_ages_match_from_region = list()
+            # mid_ages_match_from_region = list()
+            bits_match_from_region = list()
             
             for region_idx2 in range(n_regions):
-                mid_ages_match_to_region = list()        
+                # mid_ages_match_to_region = list()     
+                bits_match_to_region_str = str()   
 
-                for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                # for epoch_idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                for ft_this_epoch in ft_all_epochs_list:
                     if ft_this_epoch \
                         .get_val_from_to(region_idx1, region_idx2) \
                             == val2match:
-                        mid_ages_match_to_region.append(
-                            mid_ages[ft_this_epoch.time_idx-1])
+                        # mid_ages_match_to_region.append(
+                        #     (epoch_idx, mid_ages[ft_this_epoch.time_idx-1]))
+                        bits_match_to_region_str += "1"
 
-                mid_ages_match_from_region.append(mid_ages_match_to_region)
+                    else:
+                        bits_match_to_region_str += "0"
 
-            mid_ages_match_2d_list.append(mid_ages_match_from_region)
+                # mid_ages_match_from_region.append(mid_ages_match_to_region)
+                bits_match_from_region.append(bits_match_to_region_str)
 
-        return mid_ages_match_2d_list
+            # mid_ages_match_2d_list.append(mid_ages_match_from_region)
+            bits_match_2d_list.append(bits_match_from_region)
+
+        # return mid_ages_match_2d_list
+        return bits_match_2d_list
         
     # requirement function 4
     @classmethod
@@ -548,14 +602,17 @@ class GeoFeatureQuery():
                              feat_name: str = "",
                              feat_id: int = None
                              ) \
-            -> ty.List[ty.List[float]]:
+            -> ty.List[ty.List[str]]:
+            # -> ty.List[ty.List[float]]:
         
         ft_all_epochs_list: ty.List[GeoFeature] = list()
 
         if feat_name:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
 
         elif feat_id:
+            # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_type_rel_id(
                 GeoFeatureType.QUANTITATIVE,
                 GeoFeatureRelationship.BETWEEN,
@@ -568,49 +625,133 @@ class GeoFeatureQuery():
                     ". Exiting."))
             
         n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
-        mid_ages = feat_col.epoch_mid_age_list_young2old
+        # mid_ages = feat_col.epoch_mid_age_list_young2old
 
-        mid_ages_match_2d_list = list()
+        # mid_ages_match_2d_list = list()
+        bits_match_2d_list = list()
 
         for region_idx1 in range(n_regions):
-            mid_ages_match_from_region = list()
+            # mid_ages_match_from_region = list()
+            bits_match_from_region = list()
             
             for region_idx2 in range(n_regions):
-                mid_ages_match_to_region = list()        
+                # mid_ages_match_to_region = list()
+                bits_match_to_region_str = str()
 
-                for idx, ft_this_epoch in enumerate(ft_all_epochs_list):
-                    if above and ft_this_epoch \
-                        .get_val_from_to(region_idx1, region_idx2) \
-                            > threshold:
-                        mid_ages_match_to_region.append(
-                            mid_ages[ft_this_epoch.time_idx-1])
-                        
-                    elif not above and ft_this_epoch \
-                        .get_val_from_to(region_idx1, region_idx2) \
-                            < threshold:
-                        mid_ages_match_to_region.append(
-                            mid_ages[ft_this_epoch.time_idx-1])
+                # for epoch_idx, ft_this_epoch in enumerate(ft_all_epochs_list):
+                for ft_this_epoch in ft_all_epochs_list:
+                    if above:
+                        if ft_this_epoch .get_val_from_to(region_idx1, region_idx2) \
+                                > threshold:
+                            # second element is a True/False bit (1 = True, 0 = False)
+                            # mid_ages_match_to_region.append(
+                            #     (epoch_idx, 1, mid_ages[ft_this_epoch.time_idx-1]))
+                            bits_match_to_region_str += "1"
 
-                mid_ages_match_from_region.append(mid_ages_match_to_region)
+                        else:
+                            # mid_ages_match_to_region.append(
+                            #     (epoch_idx, 0, None))
+                            bits_match_to_region_str += "0"
 
-            mid_ages_match_2d_list.append(mid_ages_match_from_region)
+                    else: 
+                        if ft_this_epoch.get_val_from_to(region_idx1, region_idx2) \
+                                < threshold:
+                            # second element is a True/False bit (1 = True, 0 = False)
+                            # mid_ages_match_to_region.append(
+                            #     (epoch_idx, 1, mid_ages[ft_this_epoch.time_idx-1]))
+                            bits_match_to_region_str += "1"
 
-        return mid_ages_match_2d_list
+                        else:
+                            # mid_ages_match_to_region.append(
+                            #     (epoch_idx, 0, None))
+                            bits_match_to_region_str += "0"
+
+                # mid_ages_match_from_region.append(mid_ages_match_to_region)
+                # reverse so it's old to young
+                bits_match_from_region.append(bits_match_to_region_str[::-1])
+
+            # mid_ages_match_2d_list.append(mid_ages_match_from_region)
+            bits_match_2d_list.append(bits_match_from_region)
+
+        # return mid_ages_match_2d_list
+        return bits_match_2d_list
                           
-    def feed_event_dict_with(self,
-                             geo_event_name: str,
-                             requirement_fn: MyCallableType) \
-            -> None:
-        """Populate event dictionary with new event
+    def populate_geo_cond_bit_dict(
+            self,
+            geo_cond_name: str,
+            requirement_fn: MyCallableType) \
+                -> None:
+        """Populate geographic condition bit dictionary
+
+        e.g., for 2 regions, 3 epochs {"altitude": ["010", "010"]}
+        the 0's represent a geographic condition that was NOT met,
+        while the 1's represent those that were met (depending on
+        the requirement function provided by the user)
         
         Args:
-            geo_event_name (str): the name one is giving the event
+            geo_cond_name (str): the name one is giving the geographic
+                condition (e.g., \"altitude\", \"distance\", \"ancient
+                sea\")
             requirement_fn (function): this function receives a feature
                 collection and a list of integers defining the involved
-                regions, and returns a list of times
+                regions, and returns a nested (1 or 2 dimensions) list
+                of strings representing bit patterns
         """
 
-        self.event_dict[geo_event_name] = requirement_fn
+        self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
+
+        self._populate_geo_cond_change_times_dict(geo_cond_name)
+
+    # internal
+    def _populate_geo_cond_change_times_dict(
+            self,
+            geo_cond_name):
+        
+        mid_ages_old2young = self.feat_coll.epoch_mid_age_list_old2young
+        self.geo_cond_change_times_dict[geo_cond_name] = list()
+
+        # either 1d or 2d list, depending on
+        # if within or between feature condition
+        geo_cond_bits_list = self.geo_cond_bit_dict[geo_cond_name]
+
+        for region1_str_or_list in geo_cond_bits_list:
+            region1_times_list = list()
+
+            # between
+            if type(region1_str_or_list) == list:
+                # old to young bit
+                for region2_str in region1_str_or_list:                    
+                    region2_times_list = \
+                        [mid_ages_old2young[idx+1] for idx, (i, j) \
+                           in enumerate(zip(region2_str,
+                                            region2_str[1:])) \
+                                                if (i, j) == ('0', '1')]
+                    
+                    region1_times_list.append(region2_times_list)
+
+                self.geo_cond_change_times_dict[geo_cond_name].append(region1_times_list)
+
+            # within
+            else:
+                # old to young bit
+                region1_times_list.append(
+                    [mid_ages_old2young[idx+1] for idx, (i, j) \
+                     in enumerate(zip(region1_str_or_list,
+                                      region1_str_or_list[1:])) \
+                                        if (i, j) == ('0', '1')]
+                )
+
+                self.geo_cond_change_times_dict[geo_cond_name].append(region1_times_list)
+
+    # getters
+    def get_geo_condition_change_times(
+            self,
+            geo_cond_name):
+
+        if not self.geo_cond_change_dict[geo_cond_name]:
+            self._populate_geo_cond_change_times_dict(geo_cond_name)
+
+        return self.geo_cond_change_dict[geo_cond_name]
 
 
 if __name__ == "__main__":
@@ -653,54 +794,133 @@ if __name__ == "__main__":
             GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_name="cw_1")
         
         # for all regions, gives all times when it happened
-        fq.feed_event_dict_with("ancient_sea", requirement_fn1)
-        print(fq.event_dict["ancient_sea"])
-        # [[5.0], [5.0], [-inf], [-inf]]
+        fq.populate_geo_cond_bit_dict("ancient_sea", requirement_fn1)
+        print("\nancient_sea 1:")
+        print(" ".join(fq.geo_cond_bit_dict["ancient_sea"]))
+        # ancient_sea 1:
+        # 101 101 010 010
+
+        print("\nancient_sea times 1:")
+        for k in fq.geo_cond_change_times_dict["ancient_sea"]:
+            print(*k)
 
         requirement_fn1_1 = \
             GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_id=1)
         
         # for all regions, gives all times when it happened
-        fq.feed_event_dict_with("ancient_sea", requirement_fn1_1)
-        print(fq.event_dict["ancient_sea"])
-        # [[-inf], [5.0], [5.0], [-inf]]
+        fq.populate_geo_cond_bit_dict("ancient_sea", requirement_fn1_1)
+        print("\nancient_sea 2:")
+        print(" ".join(fq.geo_cond_bit_dict["ancient_sea"]))
+        # ancient_sea 2:
+        # 101 101 010 010
+
+        print("\nancient_sea times 2:")
+        for k in fq.geo_cond_change_times_dict["ancient_sea"]:
+            print(*k)
 
         # for all regions, gives all times when it happened
         thresh = 25.0
         requirement_fn2 = \
             GeoFeatureQuery.qw_feature_threshold(fc, thresh, True, feat_name="qw_1")
         
-        fq.feed_event_dict_with("altitude", requirement_fn2)
-        print(fq.event_dict["altitude"])
+        fq.populate_geo_cond_bit_dict("altitude", requirement_fn2)
+        print("\naltitude:")
+        print(" ".join(fq.geo_cond_bit_dict["altitude"]))
+        # altitude:
+        # 010 010 101 101
+
+        print("\naltitude times:")
+        for k in fq.geo_cond_change_times_dict["altitude"]:
+            print(*k)
 
         # for all pairs of regions, gives all times when it happened
         requirement_fn3 = \
-            GeoFeatureQuery.cb_feature_equals_value(fc, 1, feat_name="cb_1")
+            GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_name="cb_1")
         
-        fq.feed_event_dict_with("land_bridge", requirement_fn3)
-        print(fq.event_dict["altitude"])
-        # [[[], [5.0, -inf], [5.0], []], [[5.0, -inf], [], [5.0], []], [[], [5.0], [], [5.0]], [[], [], [5.0], []]]
+        fq.populate_geo_cond_bit_dict("land_bridge", requirement_fn3)
+        print("\nland_bridge 1:")
+        for k in fq.geo_cond_bit_dict["land_bridge"]:
+            print(*k)
+        # land_bridge 1:
+        # 111 000 010 111
+        # 000 111 010 111
+        # 111 010 111 010
+        # 111 111 010 111
+
+        print("\nland_bridge times 1:")
+        for k in fq.geo_cond_change_times_dict["land_bridge"]:
+            print(*k)
+        # land_bridge times 1:
+        # [] [] [15.0] []
+        # [] [] [15.0] []
+        # [] [15.0] [] [15.0]
+        # [] [] [15.0] []
 
         # for all pairs of regions, gives all times when it happened
         requirement_fn3_1 = \
-            GeoFeatureQuery.cb_feature_equals_value(fc, 1, feat_id=1)
+            GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_id=1)
         
-        fq.feed_event_dict_with("land_bridge", requirement_fn3_1)
-        print(fq.event_dict["land_bridge"])
-        # [[[], [5.0, -inf], [5.0], []], [[5.0, -inf], [], [5.0], []], [[], [5.0], [], [5.0]], [[], [], [5.0], []]]
+        fq.populate_geo_cond_bit_dict("land_bridge", requirement_fn3_1)
+        print("\nland_bridge 2:")
+        for k in fq.geo_cond_bit_dict["land_bridge"]:
+            print(*k)
+        # land_bridge 2:
+        # 111 000 010 111
+        # 000 111 010 111
+        # 111 010 111 010
+        # 111 111 010 111
+
+        print("\nland_bridge times 2:")
+        for k in fq.geo_cond_change_times_dict["land_bridge"]:
+            print(*k)
+        # land_bridge times 2
+        # [] [] [15.0] []
+        # [] [] [15.0] []
+        # [] [15.0] [] [15.0]
+        # [] [] [15.0] []
 
         # for all pairs of regions, gives all times when it happened
         thresh = 15.0
         requirement_fn4 = \
             GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_name="qb_1")
         
-        fq.feed_event_dict_with("distance", requirement_fn4)
-        print(fq.event_dict["distance"])
-        # [[[], [-inf], [5.0], [5.0, -inf]], [[-inf], [], [5.0], []], [[5.0], [5.0], [], [5.0]], [[], [], [5.0], []]]
+        fq.populate_geo_cond_bit_dict("distance", requirement_fn4)
+        print("\ndistance 1:")
+        for k in fq.geo_cond_bit_dict["distance"]:
+            print(*k)
+        # distance 1:
+        # 000 010 101 111
+        # 010 000 101 000
+        # 101 101 000 101
+        # 000 000 101 000
+
+        print("\ndistance barriers times 1:")
+        for k in fq.geo_cond_change_times_dict["distance"]:
+            print(*k)
+        # distance barriers times 1:
+        # [] [15.0] [5.0] []
+        # [15.0] [] [5.0] []
+        # [5.0] [5.0] [] [5.0]
+        # [] [] [5.0] []
          
         requirement_fn4_1 = \
             GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_id=2)
         
-        fq.feed_event_dict_with("distance", requirement_fn4_1)
-        print(fq.event_dict["distance"])
-        # [[[], [5.0], [-inf], [5.0, -inf]], [[5.0], [], [-inf], []], [[-inf], [-inf], [], [-inf]], [[], [], [-inf], []]]
+        fq.populate_geo_cond_bit_dict("distance", requirement_fn4_1)
+        print("\ndistance 2:")
+        for k in fq.geo_cond_bit_dict["distance"]:
+            print(*k)
+        # distance 2:
+        # 000 101 010 110
+        # 101 000 010 000
+        # 010 010 000 010
+        # 000 000 010 000
+        
+        print("\ndistance barriers times 2:")
+        for k in fq.geo_cond_change_times_dict["distance"]:
+            print(*k)
+        # distance barriers times 2:
+        # [] [5.0] [15.0] [15.0]
+        # [5.0] [] [15.0] []
+        # [15.0] [15.0] [] [15.0]
+        # [] [] [15.0] []
