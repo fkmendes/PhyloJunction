@@ -396,16 +396,34 @@ class MyCallableType(ty.Protocol):
 class GeoFeatureQuery():
     feat_coll: GeoFeatureCollection
     # bit patterns are in old -> young epochs
+    #
+    # the value is either a list or a nested list depending on
+    # whether the feature was between or within
     geo_cond_bit_dict: ty.Dict[str,
                         ty.Tuple[ty.List[ty.List[str]],
                                  ty.List[str]]]
+
+    # the value is a 2-D or 3-D list of floats, with all ages
+    # of geographic condition change, as indicated by a bit in the
+    # bit pattern flipping (if not flips no changes)
     geo_cond_change_times_dict: ty.Dict[str,
                                         ty.Tuple[ty.List[ty.List[float]],
                                                  ty.List[ty.List[ty.List[float]]]]]
 
+    # this member below helps us tell if geographic conditions were
+    # always met, e.g., maybe a barrier never "appears" during the
+    # considered epochs, but that's because it existed a long time ago
+    # and we will want to know that it did; if it's a "component" barrier
+    # of the "full" barrier between complex ranges, we need to know if it's
+    # already there so we can say the "full" barrier is observed
+    geo_oldest_cond_bit_dict: ty.Dict[str,
+                                  ty.Tuple[ty.List[ty.List[str]],
+                                           ty.List[str]]]
+
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
         self.geo_cond_bit_dict = dict()
+        self.geo_oldest_cond_bit_dict = dict()
         self.geo_cond_change_times_dict = dict()
 
     # requirement function 1
@@ -676,12 +694,12 @@ class GeoFeatureQuery():
         # return mid_ages_match_2d_list
         return bits_match_2d_list
                           
-    def populate_geo_cond_bit_dict(
+    def populate_geo_cond_bit_dicts(
             self,
             geo_cond_name: str,
             requirement_fn: MyCallableType) \
                 -> None:
-        """Populate geographic condition bit dictionary
+        """Populate geographic condition bit dictionaries
 
         e.g., for 2 regions, 3 epochs {"altitude": ["010", "010"]}
         the 0's represent a geographic condition that was NOT met,
@@ -699,6 +717,8 @@ class GeoFeatureQuery():
         """
 
         self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
+
+        self._populate_oldest_geo_cond_bit_dict(geo_cond_name)
 
         self._populate_geo_cond_change_times_dict(geo_cond_name)
 
@@ -743,15 +763,51 @@ class GeoFeatureQuery():
 
                 self.geo_cond_change_times_dict[geo_cond_name].append(region1_times_list)
 
+    def _populate_oldest_geo_cond_bit_dict(self, geo_cond_name):
+
+        self.geo_oldest_cond_bit_dict[geo_cond_name] = list()
+
+        # either 1d or 2d list, depending on
+        # if within or between feature condition
+        geo_cond_bits_list = self.geo_cond_bit_dict[geo_cond_name]
+
+        for region1_str_or_list in geo_cond_bits_list:
+            region1_oldest_bit_list = list()
+
+            # between
+            if type(region1_str_or_list) == list:
+                for region2_str in region1_str_or_list:                    
+                    region2_oldest_bit = region2_str[0]
+
+                    region1_oldest_bit_list.append(region2_oldest_bit)
+
+                self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
+
+            # within
+            else:
+                # old to young bit
+                region1_oldest_bit_list = region1_str_or_list[0]
+
+                self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
+
     # getters
     def get_geo_condition_change_times(
             self,
             geo_cond_name):
 
-        if not self.geo_cond_change_dict[geo_cond_name]:
+        if not self.geo_cond_change_times_dict[geo_cond_name]:
             self._populate_geo_cond_change_times_dict(geo_cond_name)
 
-        return self.geo_cond_change_dict[geo_cond_name]
+        return self.geo_cond_change_times_dict[geo_cond_name]
+    
+    def get_geo_oldest_condition_bit(
+            self,
+            geo_cond_name):
+
+        if not self.geo_oldest_cond_bit_dict[geo_cond_name]:
+            self._populate_oldest_geo_cond_bit_dict(geo_cond_name)
+
+        return self.geo_oldest_cond_bit_dict[geo_cond_name]
 
 
 if __name__ == "__main__":
@@ -794,7 +850,7 @@ if __name__ == "__main__":
             GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_name="cw_1")
         
         # for all regions, gives all times when it happened
-        fq.populate_geo_cond_bit_dict("ancient_sea", requirement_fn1)
+        fq.populate_geo_cond_bit_dicts("ancient_sea", requirement_fn1)
         print("\nancient_sea 1:")
         print(" ".join(fq.geo_cond_bit_dict["ancient_sea"]))
         # ancient_sea 1:
@@ -803,12 +859,22 @@ if __name__ == "__main__":
         print("\nancient_sea times 1:")
         for k in fq.geo_cond_change_times_dict["ancient_sea"]:
             print(*k)
+        # ancient_sea times 1:
+        # [5.0]
+        # [5.0]
+        # [15.0]
+        # [15.0]
+
+        print("\nancient_sea oldest bit 1:")
+        print(" ".join(fq.geo_oldest_cond_bit_dict["ancient_sea"]))
+        # ancient_sea oldest bit 1:
+        # 1 1 0 0
 
         requirement_fn1_1 = \
             GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_id=1)
         
         # for all regions, gives all times when it happened
-        fq.populate_geo_cond_bit_dict("ancient_sea", requirement_fn1_1)
+        fq.populate_geo_cond_bit_dicts("ancient_sea", requirement_fn1_1)
         print("\nancient_sea 2:")
         print(" ".join(fq.geo_cond_bit_dict["ancient_sea"]))
         # ancient_sea 2:
@@ -818,12 +884,17 @@ if __name__ == "__main__":
         for k in fq.geo_cond_change_times_dict["ancient_sea"]:
             print(*k)
 
+        print("\nancient_sea oldest bit 2:")
+        print(" ".join(fq.geo_oldest_cond_bit_dict["ancient_sea"]))
+        # ancient_sea oldest bit 2:
+        # 1 1 0 0
+
         # for all regions, gives all times when it happened
         thresh = 25.0
         requirement_fn2 = \
             GeoFeatureQuery.qw_feature_threshold(fc, thresh, True, feat_name="qw_1")
         
-        fq.populate_geo_cond_bit_dict("altitude", requirement_fn2)
+        fq.populate_geo_cond_bit_dicts("altitude", requirement_fn2)
         print("\naltitude:")
         print(" ".join(fq.geo_cond_bit_dict["altitude"]))
         # altitude:
@@ -833,11 +904,16 @@ if __name__ == "__main__":
         for k in fq.geo_cond_change_times_dict["altitude"]:
             print(*k)
 
+        print("\naltitude oldest bit:")
+        print(" ".join(fq.geo_oldest_cond_bit_dict["altitude"]))
+        # altitude oldest bit:
+        # 0 0 1 1
+
         # for all pairs of regions, gives all times when it happened
         requirement_fn3 = \
             GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_name="cb_1")
         
-        fq.populate_geo_cond_bit_dict("land_bridge", requirement_fn3)
+        fq.populate_geo_cond_bit_dicts("land_bridge", requirement_fn3)
         print("\nland_bridge 1:")
         for k in fq.geo_cond_bit_dict["land_bridge"]:
             print(*k)
@@ -856,11 +932,20 @@ if __name__ == "__main__":
         # [] [15.0] [] [15.0]
         # [] [] [15.0] []
 
+        print("\nland_bridge oldest bit 1:")
+        for k in fq.geo_oldest_cond_bit_dict["land_bridge"]:
+            print(*k)
+        # land_bridge oldest bit 1:
+        # 1 0 0 1
+        # 0 1 0 1
+        # 1 0 1 0
+        # 1 1 0 1
+
         # for all pairs of regions, gives all times when it happened
         requirement_fn3_1 = \
             GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_id=1)
         
-        fq.populate_geo_cond_bit_dict("land_bridge", requirement_fn3_1)
+        fq.populate_geo_cond_bit_dicts("land_bridge", requirement_fn3_1)
         print("\nland_bridge 2:")
         for k in fq.geo_cond_bit_dict["land_bridge"]:
             print(*k)
@@ -879,12 +964,21 @@ if __name__ == "__main__":
         # [] [15.0] [] [15.0]
         # [] [] [15.0] []
 
+        print("\nland_bridge oldest bit 2:")
+        for k in fq.geo_oldest_cond_bit_dict["land_bridge"]:
+            print(*k)
+        # land_bridge oldest bit 2:
+        # 1 0 0 1
+        # 0 1 0 1
+        # 1 0 1 0
+        # 1 1 0 1
+
         # for all pairs of regions, gives all times when it happened
         thresh = 15.0
         requirement_fn4 = \
             GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_name="qb_1")
         
-        fq.populate_geo_cond_bit_dict("distance", requirement_fn4)
+        fq.populate_geo_cond_bit_dicts("distance", requirement_fn4)
         print("\ndistance 1:")
         for k in fq.geo_cond_bit_dict["distance"]:
             print(*k)
@@ -902,11 +996,20 @@ if __name__ == "__main__":
         # [15.0] [] [5.0] []
         # [5.0] [5.0] [] [5.0]
         # [] [] [5.0] []
+
+        print("\ndistance oldest bit 1:")
+        for k in fq.geo_oldest_cond_bit_dict["distance"]:
+            print(*k)
+        # distance oldest bit 1:
+        # 0 0 1 1
+        # 0 0 1 0
+        # 1 1 0 1
+        # 0 0 1 0
          
         requirement_fn4_1 = \
             GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_id=2)
         
-        fq.populate_geo_cond_bit_dict("distance", requirement_fn4_1)
+        fq.populate_geo_cond_bit_dicts("distance", requirement_fn4_1)
         print("\ndistance 2:")
         for k in fq.geo_cond_bit_dict["distance"]:
             print(*k)
@@ -924,3 +1027,12 @@ if __name__ == "__main__":
         # [5.0] [] [15.0] []
         # [15.0] [15.0] [] [15.0]
         # [] [] [15.0] []
+
+        print("\ndistance oldest bit 2:")
+        for k in fq.geo_oldest_cond_bit_dict["distance"]:
+            print(*k)
+        # distance oldest bit 2:
+        # 0 1 0 0
+        # 1 0 0 0
+        # 0 0 0 0
+        # 0 0 0 0
