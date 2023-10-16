@@ -30,6 +30,7 @@ class GeoFeature():
     feat_type: GeoFeatureType
     value: np.array
     name: str
+    str_representation: str
 
     def __init__(self,
                  time_idx: int,
@@ -400,14 +401,14 @@ class GeoFeatureQuery():
     # the value is either a list or a nested list depending on
     # whether the feature was between or within
     geo_cond_bit_dict: ty.Dict[str,
-                        ty.Tuple[ty.List[ty.List[str]],
+                        ty.Union[ty.List[ty.List[str]],
                                  ty.List[str]]]
 
     # the value is a 2-D or 3-D list of floats, with all ages
     # of geographic condition change, as indicated by a bit in the
     # bit pattern flipping (if not flips no changes)
     geo_cond_change_times_dict: ty.Dict[str,
-                                        ty.Tuple[ty.List[ty.List[float]],
+                                        ty.Union[ty.List[ty.List[float]],
                                                  ty.List[ty.List[ty.List[float]]]]]
 
     # this member below helps us tell if geographic conditions were
@@ -417,7 +418,7 @@ class GeoFeatureQuery():
     # of the "full" barrier between complex ranges, we need to know if it's
     # already there so we can say the "full" barrier is observed
     geo_oldest_cond_bit_dict: ty.Dict[str,
-                                  ty.Tuple[ty.List[ty.List[str]],
+                                  ty.Union[ty.List[ty.List[str]],
                                            ty.List[str]]]
 
     def __init__(self, feat_coll) -> None:

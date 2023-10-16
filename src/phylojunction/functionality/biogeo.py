@@ -105,6 +105,7 @@ class State2BitLookup:
 
     # getters
     def get_bit(self, state: int) -> str:
+        print(self.int2bit_dict)
         return self.int2bit_dict[state]
     
     def get_bit_patts(self) -> ty.List[str]:

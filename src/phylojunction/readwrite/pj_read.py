@@ -352,10 +352,10 @@ if __name__ == "__main__":
     # parse_cli_str_write_fig("rv,tr;0,")
 
     # should all work!
-    # read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
-    read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
-    # read_nwk_tree_str("examples/trees_maps_files/dummy_tree2.tre",
-    # read_nwk_tree_str("examples/trees_maps_files/dummy_tree3.tre",
+    # tr = read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
+    tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
+    # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree2.tre",
+    # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree3.tre",
                       "read_tree",
                       node_names_attribute="index")
     
