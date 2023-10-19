@@ -45,16 +45,24 @@ class State2BitLookup:
     int2bit_dict: ty.Dict[str, str] = dict()
     bit2int_dict: ty.Dict[str, str] = dict()
 
-    def __init__(self, n_characters: int, n_states_per_char: int) -> None:
+    def __init__(self,
+                 n_characters: int,
+                 n_states_per_char: int,
+                 geosse: bool = True) -> None:
+        
         self.n_char = n_characters
         self.n_states_per_char = n_states_per_char
         self.n_states = int(n_states_per_char ** n_characters)
 
         # side-effect
-        self._populate_dicts()
+        self._populate_dicts(geosse)
+
+        if geosse:
+            self.n_states -= 1  # add back null range
+
 
     # internal
-    def _populate_dicts(self) -> None:
+    def _populate_dicts(self, geosse: bool = True) -> None:
         """
         Non-recursively generate all bit patterns for a given number
         of characters and states per characters
@@ -87,6 +95,11 @@ class State2BitLookup:
 
             bit_pattern_str = "".join(str(b) for b in bit_pattern)
             n_bits_on = sum(bit_pattern)
+
+            # we do not want null range
+            if geosse and n_bits_on == 0:
+                continue
+
             list_for_sorting[n_bits_on].append(bit_pattern_str)
 
         # will store all bit patterns after sorting first by number of bits
@@ -104,8 +117,7 @@ class State2BitLookup:
             self.bit2int_dict[v] = k
 
     # getters
-    def get_bit(self, state: int) -> str:
-        print(self.int2bit_dict)
+    def get_bit(self, state: int, geosse: bool = True) -> str:
         return self.int2bit_dict[state]
     
     def get_bit_patts(self) -> ty.List[str]:
