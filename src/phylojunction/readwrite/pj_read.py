@@ -186,9 +186,9 @@ def parse_cli_str_write_fig(str_write_fig: str) \
 
 def read_nwk_tree_str(nwk_tree_path_or_str: str,
                       fn_name: str,
-                      in_file: bool=True,
-                      node_names_attribute: str="",
-                      epsilon: float=1e-12) \
+                      in_file: bool = True,
+                      node_names_attribute: str = "",
+                      epsilon: float = 1e-12) \
         -> AnnotatedTree:
     """Read Newick tree string directly or in provided file.
 
@@ -210,6 +210,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
         pjh.create_str_defaultdict)
     node_id_to_name: dict[str, str] = dict()
 
+    # if tree provided in separate file
     if in_file:
         if not os.path.isfile(nwk_tree_path_or_str):
             raise ec.PJIOFileDoesNotExistError(fn_name, nwk_tree_path_or_str)
@@ -219,9 +220,9 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
         dp_tr = dp.Tree.get(data=tr_str, schema="newick")
 
+    # if tree is provided as newick string
     else:
         dp_tr = dp.Tree.get(data=nwk_tree_path_or_str, schema="newick")
-    # print(dp_tr.taxon_namespace)
 
     # first we deal with having a root vs an origin
     is_origin = (True if len(dp_tr.seed_node.child_nodes()) == 1 \
@@ -352,8 +353,8 @@ if __name__ == "__main__":
     # parse_cli_str_write_fig("rv,tr;0,")
 
     # should all work!
-    # tr = read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
-    tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
+    tr = read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
+    # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
     # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree2.tre",
     # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree3.tre",
                       "read_tree",

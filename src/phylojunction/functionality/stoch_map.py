@@ -164,9 +164,9 @@ class RangeSplit(StochMap):
 class StochMapsOnTree():
 
     # class members
-    anagenetic_stoch_maps_on_tree_dict: \
+    anagenetic_stoch_maps_dict: \
         ty.Dict[str, ty.List[StochMap]]  # node name as key
-    cladogenetic_stoch_maps_on_tree_dict: \
+    cladogenetic_stoch_maps_dict: \
         ty.Dict[str, StochMap]  # node name as key
     iteration_idx: int
     str_representation: str
@@ -186,6 +186,9 @@ class StochMapsOnTree():
     pctg_forbidden_higher_order_anagenetic_maps: float
     n_different_clado_maps: int
     n_identical_clado_maps: int
+
+    # iteration
+    index: int
     
     def __init__(self,
                  iteration_idx: int,
@@ -196,8 +199,9 @@ class StochMapsOnTree():
         self.state2bit_lookup = state2bit_lookup
         self.n_regions = self.state2bit_lookup.n_char
 
-        self.anagenetic_stoch_maps_on_tree_dict = dict()
-        self.cladogenetic_stoch_maps_on_tree_dict = dict()
+        self.anagenetic_stoch_maps_dict = dict()
+        self.cladogenetic_stoch_maps_dict = dict()
+        self.identical_cladogenetic_stoch_maps_dict = dict()
         
         # summary / counts
         self.maps_counts_dict = dict()
@@ -321,14 +325,14 @@ class StochMapsOnTree():
                     self.n_range_cont_maps += 1
                         
                 # TODO: later, replace idx with node name
-                if nd_idx not in self.anagenetic_stoch_maps_on_tree_dict:
-                    self.anagenetic_stoch_maps_on_tree_dict[nd_idx] = [stoch_map]
+                if nd_idx not in self.anagenetic_stoch_maps_dict:
+                    self.anagenetic_stoch_maps_dict[nd_idx] = [stoch_map]
 
                 else:
-                    self.anagenetic_stoch_maps_on_tree_dict[nd_idx].append(stoch_map)
+                    self.anagenetic_stoch_maps_dict[nd_idx].append(stoch_map)
 
         elif event_type == "cladogenetic":
-            if nd_idx not in self.cladogenetic_stoch_maps_on_tree_dict:
+            if nd_idx not in self.cladogenetic_stoch_maps_dict:
                 self.n_total_maps += 1
                 self.n_different_clado_maps += 1
 
@@ -342,28 +346,50 @@ class StochMapsOnTree():
                                        ch1_idx,
                                        ch2_idx)
                 
-                self.cladogenetic_stoch_maps_on_tree_dict[nd_idx] = stoch_map
+                self.cladogenetic_stoch_maps_dict[nd_idx] = stoch_map
 
             else:
                 # just counting here
-                if self.cladogenetic_stoch_maps_on_tree_dict[nd_idx].from_state \
+                if self.cladogenetic_stoch_maps_dict[nd_idx].from_state \
                     == int(from_state) and \
-                    self.cladogenetic_stoch_maps_on_tree_dict[nd_idx].to_state \
+                    self.cladogenetic_stoch_maps_dict[nd_idx].to_state \
                         == int(to_state):
+                    
+                    if self.iteration_idx \
+                            not in self.identical_cladogenetic_stoch_maps_dict:
+                        self.identical_cladogenetic_stoch_maps_dict \
+                            [self.iteration_idx] = [nd_idx]
+                    
+                    else:
+                        self.identical_cladogenetic_stoch_maps_dict \
+                            [self.iteration_idx].append(nd_idx)
+                    
                     self.n_identical_clado_maps += 1
                     self.n_different_clado_maps -= 1
 
                 # updating the cladogenetic map with info from the second child
-                else:
-                    self.cladogenetic_stoch_maps_on_tree_dict[nd_idx] \
-                        .to_state2 = to_state
-                    self.cladogenetic_stoch_maps_on_tree_dict[nd_idx] \
-                        .to_state2_bit_patt = to_state_bit_patt
+                # else:
+                self.cladogenetic_stoch_maps_dict[nd_idx] \
+                    .to_state2 = int(to_state)
+                self.cladogenetic_stoch_maps_dict[nd_idx] \
+                    .to_state2_bit_patt = to_state_bit_patt
+                    
+                    # debugging
+                    # range_split = self.cladogenetic_stoch_maps_on_tree_dict[nd_idx]
+                    # if range_split.from_state == 2 and range_split.to_state == 0 and range_split.to_state2 == 0:
+                    #     exit("found weird cladogenetic event")
+                    # if range_split.from_state == 2 and range_split.to_state == 1 and range_split.to_state2 == 1:
+                    #     exit("found weird cladogenetic event")
+                    # if range_split.from_state == 2 and range_split.to_state == 0 and range_split.to_state2 == 1:
+                    #     print("found good cladogenetic event")
+                    # if range_split.from_state == 2 and range_split.to_state == 1 and range_split.to_state2 == 0:
+                    #     print("found good cladogenetic event")
+
 
     def get_clado_distribution(self) -> ty.Dict[int, int]:
         widespread_range_sizes_dict = dict()
         for nd_name, clado_stoch_map \
-                in self.cladogenetic_stoch_maps_on_tree_dict.items():
+                in self.cladogenetic_stoch_maps_dict.items():
             
             # print(clado_stoch_map.from_state, clado_stoch_map.from_state_bit_patt)
             
@@ -429,7 +455,6 @@ class StochMapsOnTree():
         return self.str_representation
 
 
-
 class StochMapCollection():
 
     stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree] = dict()
@@ -443,7 +468,8 @@ class StochMapCollection():
         self._read_stoch_maps_file(stoch_maps_file_path,
                                    ann_tr,
                                    state2bit_lookup)
-
+        
+        self._init_clado_map_issue_str()
 
     # internal
     def _read_stoch_maps_file(self,
@@ -473,6 +499,81 @@ class StochMapCollection():
                     .add_map(stoch_map_on_tree_str_list[1:])
                 
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
+
+    def _init_clado_map_issue_str(self) -> None:
+        clado_issue_str = str()
+        single_entry_cladogenetic_maps = 0
+        single_entry_cladogenetic_maps_dict = dict()
+        identical_cladogenetic_maps_dict = dict()
+        nonwidespread_cladogenetic_maps_dict = dict()
+        
+        for it_idx, stoch_maps_on_tree \
+                in self.stoch_maps_tree_dict.items():
+            for nd_name, range_split_map \
+                in stoch_maps_on_tree \
+                    .cladogenetic_stoch_maps_dict.items():
+                
+                # did not find a second line for cladogenetic map
+                # so the information from child 2 is missing!
+                if range_split_map.to_state2 == None:
+                    single_entry_cladogenetic_maps += 1
+
+                    if it_idx not in single_entry_cladogenetic_maps_dict:
+                        single_entry_cladogenetic_maps_dict[it_idx] = [nd_name]
+
+                    else:
+                        single_entry_cladogenetic_maps_dict[it_idx].append(nd_name)
+
+                # range that splits is not widespread!
+                if sum(int(i) for i in \
+                       range_split_map.from_state_bit_patt) <= 1:
+                    if it_idx not in nonwidespread_cladogenetic_maps_dict:
+                        nonwidespread_cladogenetic_maps_dict[it_idx] = [nd_name]
+
+                    else:
+                        nonwidespread_cladogenetic_maps_dict[it_idx].append(nd_name)
+
+            # now we interrogate the StochMapsOnTree instance
+            # for (repeated) identical RangeSplit maps
+            if it_idx in stoch_maps_on_tree.identical_cladogenetic_stoch_maps_dict:
+                nd_idx_list = stoch_maps_on_tree \
+                    .identical_cladogenetic_stoch_maps_dict[it_idx]
+                identical_cladogenetic_maps_dict[it_idx] = nd_idx_list
+ 
+        if len(single_entry_cladogenetic_maps_dict) > 0 \
+            or len(identical_cladogenetic_maps_dict) > 0:
+                clado_issue_str = ("\nThere were issues with the "
+                                   "cladogenetic stochastic maps\n\n"
+                                   "Iterations with single entries "
+                                   "(and the affected nodes)\n")
+                
+                for it_idx, nd_list \
+                        in single_entry_cladogenetic_maps_dict.items():
+                    clado_issue_str += str(it_idx) \
+                        + "\t" + ", ".join(i for i in nd_list) + "\n"
+                
+                clado_issue_str += ("\nIterations with repeated entries"
+                                    " (and the affected nodes)\n")
+                
+                for it_idx, nd_list \
+                        in identical_cladogenetic_maps_dict.items():
+                    clado_issue_str += str(it_idx) \
+                        + "\t" + ", ".join(i for i in nd_list) + "\n"
+                    
+                clado_issue_str += ("\nIterations with non-widespread parent ranges"
+                                    " (and the affected nodes)\n")
+                
+                for it_idx, nd_list \
+                        in nonwidespread_cladogenetic_maps_dict.items():
+                    clado_issue_str += str(it_idx) \
+                        + "\t" + ", ".join(i for i in nd_list) + "\n"
+        
+        print(clado_issue_str)
+
+            
+
+
+
 
 
 if __name__ == "__main__":
@@ -511,26 +612,21 @@ if __name__ == "__main__":
     #     print(k, v)
 
     state2bit_lookup = pjbio.State2BitLookup(8, 2, geosse=True)
-    first = False
-    for i, (k, v) in enumerate(state2bit_lookup.int2bit_dict.items()):
-        print(k, v)
+    # first = False
+    # for i, (k, v) in enumerate(state2bit_lookup.int2bit_dict.items()):
+    #     print(k, v)
     
     
     stoch_mapcoll = \
         StochMapCollection("examples/trees_maps_files/turtle_maps.tsv",
+        # StochMapCollection("examples/trees_maps_files/geosse_maps.tsv",
                            tr,
                            state2bit_lookup)
 
-    # stoch_map_on_tree = stoch_mapcoll.stoch_maps_tree_dict[200]
+    # for smot in stoch_mapcoll.stoch_maps_tree_dict.values():
+    #     print(smot)
+    #     widespread_range_size_dict = smot.get_clado_distribution()
 
-    for smot in stoch_mapcoll.stoch_maps_tree_dict.values():
-        print(smot)
-        widespread_range_size_dict = smot.get_clado_distribution()
-
-        print("    Size of range being split, count:")
-        for k, v in widespread_range_size_dict.items():
-            print("    ", k, ", ", v, sep="")
-        
-
-    # print(stoch_map_on_tree.n_anagenetic_maps)
-    # print(stoch_map_on_tree.n_forbidden_higher_order_anagenetic_maps)
+    #     print("    Size of range being split, count:")
+    #     for k, v in widespread_range_size_dict.items():
+    #         print("    ", k, ", ", v, sep="")
