@@ -6,7 +6,8 @@
 #     Time: 1.6028010851528143
 #     Subtending node: nd3
 #     Departing state: 0
-#     Arriving state: 2, Attribute ('state') transition:
+#     Arriving state: 2,
+#        Attribute ('state') transition:
 #     Time: 1.6714902163855656
 #     Subtending node: nd3
 #     Departing state: 2

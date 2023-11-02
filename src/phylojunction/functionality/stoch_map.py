@@ -17,7 +17,7 @@ __email__ = "f.mendes@wustl.edu"
 class StochMap():
     """Parent class for stochastic map"""
 
-    n_regions: int = 0
+    n_regions: int
     age: float
     time: float
     from_state: int
@@ -26,6 +26,7 @@ class StochMap():
     to_state_bit_patt: str
     to_state2: int
     to_state2_bit_patt: str
+    focal_node_name: str
     parent_node_name: str
     child_node_name: str
     child2_node_name: str
@@ -37,6 +38,7 @@ class StochMap():
                  from_state_bit_patt: str,
                  to_state: int,
                  to_state_bit_patt: str,
+                 focal_node_name: str,
                  parent_node_name: str,
                  child_node_name: str,
                  time: ty.Optional[int] = None,
@@ -49,7 +51,8 @@ class StochMap():
         self.from_state = from_state
         self.from_state_bit_patt = from_state_bit_patt
         self.to_state = to_state
-        self.to_state2_bit_patt = to_state_bit_patt
+        self.to_state_bit_patt = to_state_bit_patt
+        self.focal_node_name = focal_node_name
         self.parent_node_name = parent_node_name
         self.child_node_name = child_node_name
         self.n_regions = n_regions
@@ -57,15 +60,19 @@ class StochMap():
         # if cladogenetic range split
         self.child2_node_name = child2_node_name
         self.to_state2 = to_state2
-        self.to_state_bit2 = to_state2_bit_patt
+        self.to_state2_bit_patt = to_state2_bit_patt
 
 
 class RangeExpansion(StochMap):
-    """Stochastic map class for dispersal"""
+    """Stochastic map class for dispersal
+    
+    Range of lineage is incremented by one (region)
+    """
 
-    region_gained_idx: int = 0
-    ancestral_over_barrier: bool = False
-    range_expansion_erased_by_extinction: bool = False
+    str_representation: str
+    region_gained_idx: int
+    ancestral_over_barrier: bool
+    range_expansion_erased_by_extinction: bool
 
     def __init__(self,
                  region_gained_idx: int,
@@ -75,6 +82,7 @@ class RangeExpansion(StochMap):
                  from_state_bit_patt: str,
                  to_state: int,
                  to_state_bit_patt: str,
+                 focal_node_name: str,
                  parent_node_name: str,
                  child_node_name: str,
                  time: ty.Optional[int] = None):
@@ -85,6 +93,7 @@ class RangeExpansion(StochMap):
                          from_state_bit_patt,
                          to_state,
                          to_state_bit_patt,
+                         focal_node_name,
                          parent_node_name,
                          child_node_name,
                          time=time)
@@ -101,9 +110,13 @@ class RangeExpansion(StochMap):
 
 
 class RangeContraction(StochMap):
-    """Stochastic map class for local extinction"""
+    """Stochastic map class for local extinction
+    
+    Range of lineage contracts by one (region)
+    """
 
-    region_lost_idx: int = 0
+    str_representation: str
+    region_lost_idx: int
 
     def __init__(self,
                  region_lost_idx: int,
@@ -113,6 +126,7 @@ class RangeContraction(StochMap):
                  from_state_bit_patt: str,
                  to_state: int,
                  to_state_bit_patt: str,
+                 focal_node_name: str,
                  parent_node_name: str,
                  child_node_name: str,
                  time: int = None) -> None:
@@ -123,15 +137,49 @@ class RangeContraction(StochMap):
                          from_state_bit_patt,
                          to_state,
                          to_state_bit_patt,
+                         focal_node_name,
                          parent_node_name,
                          child_node_name,
                          time=time)
 
         self.region_lost_idx = region_lost_idx
 
+        self._init_str_representation()
 
-class RangeSplit(StochMap):
-    """Stochastic class for cladogenetic event with range split"""
+    def _init_str_representation(self) -> None:
+        self.str_representation = \
+            "Range contraction (at age = " + str(self.age) + ")" \
+            + "\n  Node subtending range contraction: " + self.focal_node_name \
+            + " (state " + str(self.from_state) + ", bits \'" \
+            + self.from_state_bit_patt + "\', " \
+            + "range size " + str(self.size_of_splitting_node_range) + ")" \
+            + "\n  Child 1 node: " + self.child_node_name \
+            + " (state " + str(self.to_state) + ", bits \'" \
+            + self.to_state_bit_patt + "\', " \
+            + "range size " + str(self.size_of_child1_range) + ")"
+
+
+class RangeSplitOrBirth(StochMap):
+    """Stochastic class for cladogenetic event
+    
+    Range either splits between children, e.g., ABC -> AB, C 
+    (upon b/w-region speciation)
+    
+    or
+
+    One-sized Range is born and inherited by one child, e.g., ABC -> ABC, A
+    (upon within-region speciation)
+    """
+
+    str_representation: str
+    
+    # this is when, under GeoSSE, at an internal node
+    # we have speciation within a region, e.g., AB -> AB,A
+    range_split: bool  # used for printing only
+    
+    size_of_splitting_node_range: int
+    size_of_child1_range: int
+    size_of_child2_range: int
 
     def __init__(self,
                  n_regions: int,
@@ -140,25 +188,73 @@ class RangeSplit(StochMap):
                  from_state_bit_patt: str,
                  to_state: int,
                  to_state_bit_patt: str,
+                 focal_node_name: str,
                  parent_node_name: str,
                  child_node_name: str,
-                 child2_node_name: str = None,
-                 to_state2: int = None,
-                 to_state2_bit_patt: str = None,
-                 time: int = None) -> None:
-        
+                 child2_node_name: str,
+                 to_state2: ty.Optional[int] = None,
+                 to_state2_bit_patt: ty.Optional[str] = None,
+                 time: ty.Optional[int] = None) -> None:
+
         super().__init__(n_regions,
                          age,
                          from_state,
                          from_state_bit_patt,
                          to_state,
                          to_state_bit_patt,
+                         focal_node_name,
                          parent_node_name,
                          child_node_name,
                          child2_node_name=child2_node_name,
                          to_state2=to_state2,
                          to_state2_bit_patt=to_state2_bit_patt,
                          time=time)
+        
+        self.size_of_splitting_node_range = \
+            sum(int(i) for i in from_state_bit_patt)
+        self.size_of_child1_range = \
+            sum(int(i) for i in to_state_bit_patt)
+        self.range_split = False
+        
+        self._init_str_representation()
+
+    def add_child2_info(self,
+                        to_state2: int,
+                        to_state2_bit_patt: str) -> None:
+
+        self.to_state2 = to_state2
+        self.to_state2_bit_patt = to_state2_bit_patt
+        self.size_of_child2_range = \
+            sum(int(i) for i in to_state2_bit_patt)
+        self._update_str_representation()
+        self.range_split = True
+
+    def _init_str_representation(self) -> None:
+        self.str_representation = \
+            "Range split (at age = " + str(self.age) + ")" \
+            + "\n  Splitting node: " + self.focal_node_name \
+            + " (state " + str(self.from_state) + ", bits \'" \
+            + self.from_state_bit_patt + "\', " \
+            + "range size " + str(self.size_of_splitting_node_range) + ")" \
+            + "\n  Child 1 node: " + self.child_node_name \
+            + " (state " + str(self.to_state) + ", bits \'" \
+            + self.to_state_bit_patt + "\', " \
+            + "range size " + str(self.size_of_child1_range) + ")"
+    
+    def _update_str_representation(self) -> None:
+        self.str_representation += \
+            "\n  Child 2 node: " + self.child2_node_name \
+            + " (state " + str(self.to_state2) + ", bits \'" \
+            + self.to_state2_bit_patt + "\', " \
+            + "range size " + str(self.size_of_child2_range) + ")"
+        
+    def __str__(self) -> str:
+        if self.range_split:
+            return self.str_representation
+        
+        else:
+            return self.str_representation \
+                + "\n  Child 2 node: same as parent"
 
 
 class StochMapsOnTree():
@@ -305,8 +401,10 @@ class StochMapsOnTree():
                                                 b_from,
                                                 int(to_state),
                                                 b_to,
+                                                nd_idx,
                                                 parent_idx,
-                                                ch1_idx)
+                                                ch1_idx,
+                                                ch2_idx)
                     
                     self.n_range_exp_maps += 1
 
@@ -318,6 +416,7 @@ class StochMapsOnTree():
                                                 b_from,
                                                 int(to_state),
                                                 b_to,
+                                                nd_idx,
                                                 parent_idx,
                                                 ch1_idx,
                                                 ch2_idx)
@@ -332,22 +431,25 @@ class StochMapsOnTree():
                     self.anagenetic_stoch_maps_dict[nd_idx].append(stoch_map)
 
         elif event_type == "cladogenetic":
+            # first time we add cladogenetic map
             if nd_idx not in self.cladogenetic_stoch_maps_dict:
                 self.n_total_maps += 1
                 self.n_different_clado_maps += 1
 
-                stoch_map = RangeSplit(self.n_regions,
+                stoch_map = RangeSplitOrBirth(self.n_regions,
                                        event_age,
                                        int(from_state),
                                        from_state_bit_patt,
                                        int(to_state),
                                        to_state_bit_patt,
+                                       nd_idx,
                                        parent_idx,
                                        ch1_idx,
                                        ch2_idx)
                 
                 self.cladogenetic_stoch_maps_dict[nd_idx] = stoch_map
 
+            # second cladogenetic map entry (child 2!)
             else:
                 # just counting here
                 if self.cladogenetic_stoch_maps_dict[nd_idx].from_state \
@@ -368,23 +470,12 @@ class StochMapsOnTree():
                     self.n_different_clado_maps -= 1
 
                 # updating the cladogenetic map with info from the second child
-                # else:
                 self.cladogenetic_stoch_maps_dict[nd_idx] \
-                    .to_state2 = int(to_state)
-                self.cladogenetic_stoch_maps_dict[nd_idx] \
-                    .to_state2_bit_patt = to_state_bit_patt
-                    
-                    # debugging
-                    # range_split = self.cladogenetic_stoch_maps_on_tree_dict[nd_idx]
-                    # if range_split.from_state == 2 and range_split.to_state == 0 and range_split.to_state2 == 0:
-                    #     exit("found weird cladogenetic event")
-                    # if range_split.from_state == 2 and range_split.to_state == 1 and range_split.to_state2 == 1:
-                    #     exit("found weird cladogenetic event")
-                    # if range_split.from_state == 2 and range_split.to_state == 0 and range_split.to_state2 == 1:
-                    #     print("found good cladogenetic event")
-                    # if range_split.from_state == 2 and range_split.to_state == 1 and range_split.to_state2 == 0:
-                    #     print("found good cladogenetic event")
-
+                    .add_child2_info(int(to_state), to_state_bit_patt)
+                
+            # debugging
+            # for nd_name, rsom in self.cladogenetic_stoch_maps_dict.items():
+            #     print("Iteration ", str(self.iteration_idx) + ",", "node", nd_name, "\n", rsom)
 
     def get_clado_distribution(self) -> ty.Dict[int, int]:
         widespread_range_sizes_dict = dict()
@@ -457,19 +548,25 @@ class StochMapsOnTree():
 
 class StochMapCollection():
 
-    stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree] = dict()
+    stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree]
+    str_representation: str
 
     def __init__(self,
                  stoch_maps_file_path: str,
                  ann_tr: AnnotatedTree,
                  state2bit_lookup: pjbio.State2BitLookup) -> None:
 
+        self.stoch_maps_tree_dict = dict()
+
         # initializes stoch_maps_tree_list
         self._read_stoch_maps_file(stoch_maps_file_path,
                                    ann_tr,
                                    state2bit_lookup)
         
-        self._init_clado_map_issue_str()
+        # looks for errors with cladogenetic maps
+        self._report_clado_map_issue_str()
+
+        self._init_str_representation()
 
     # internal
     def _read_stoch_maps_file(self,
@@ -500,10 +597,8 @@ class StochMapCollection():
                 
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
 
-    def _init_clado_map_issue_str(self) -> None:
+    def _report_clado_map_issue_str(self) -> None:
         clado_issue_str = str()
-        single_entry_cladogenetic_maps = 0
-        single_entry_cladogenetic_maps_dict = dict()
         identical_cladogenetic_maps_dict = dict()
         nonwidespread_cladogenetic_maps_dict = dict()
         
@@ -512,19 +607,11 @@ class StochMapCollection():
             for nd_name, range_split_map \
                 in stoch_maps_on_tree \
                     .cladogenetic_stoch_maps_dict.items():
-                
-                # did not find a second line for cladogenetic map
-                # so the information from child 2 is missing!
-                if range_split_map.to_state2 == None:
-                    single_entry_cladogenetic_maps += 1
-
-                    if it_idx not in single_entry_cladogenetic_maps_dict:
-                        single_entry_cladogenetic_maps_dict[it_idx] = [nd_name]
-
-                    else:
-                        single_entry_cladogenetic_maps_dict[it_idx].append(nd_name)
 
                 # range that splits is not widespread!
+                # (we look at a bit pattern and if the sum of '1's is
+                # <= 1, that means the range is an atomic region, i.e.,
+                # not widespread)
                 if sum(int(i) for i in \
                        range_split_map.from_state_bit_patt) <= 1:
                     if it_idx not in nonwidespread_cladogenetic_maps_dict:
@@ -540,17 +627,10 @@ class StochMapCollection():
                     .identical_cladogenetic_stoch_maps_dict[it_idx]
                 identical_cladogenetic_maps_dict[it_idx] = nd_idx_list
  
-        if len(single_entry_cladogenetic_maps_dict) > 0 \
+        if len(nonwidespread_cladogenetic_maps_dict) > 0 \
             or len(identical_cladogenetic_maps_dict) > 0:
-                clado_issue_str = ("\nThere were issues with the "
-                                   "cladogenetic stochastic maps\n\n"
-                                   "Iterations with single entries "
-                                   "(and the affected nodes)\n")
-                
-                for it_idx, nd_list \
-                        in single_entry_cladogenetic_maps_dict.items():
-                    clado_issue_str += str(it_idx) \
-                        + "\t" + ", ".join(i for i in nd_list) + "\n"
+                clado_issue_str = ("\nWARNING: Cladogenetic stochastic maps "
+                                   "had issues:\n\n")
                 
                 clado_issue_str += ("\nIterations with repeated entries"
                                     " (and the affected nodes)\n")
@@ -568,9 +648,94 @@ class StochMapCollection():
                     clado_issue_str += str(it_idx) \
                         + "\t" + ", ".join(i for i in nd_list) + "\n"
         
-        print(clado_issue_str)
+        if clado_issue_str != "":
+            print(clado_issue_str)
 
+    def _init_str_representation(self) -> None:
+        self.str_representation = "Stochastic mapping collection"
+
+        for it_idx, smot in self.stoch_maps_tree_dict.items():
+            anag_node_names_str = ", ".join(
+                smot.anagenetic_stoch_maps_dict.keys())
+            clado_node_names_str = ", ".join(
+                smot.cladogenetic_stoch_maps_dict.keys())
             
+            self.str_representation += "\n  Iteration " + str(it_idx) \
+                + "\n    Nodes with anagenetic maps: " \
+                    + anag_node_names_str \
+
+            # preparing string for anagenetic events
+            if len(smot.anagenetic_stoch_maps_dict) > 0:
+                range_expansion_count = 0
+                range_contraction_count = 0
+
+                for node_name, sm_list in \
+                        smot.anagenetic_stoch_maps_dict.items():
+                    for sm in sm_list:
+                        if isinstance(sm, RangeExpansion):
+                            range_expansion_count += 1
+
+                        if isinstance(sm, RangeContraction):
+                            range_contraction_count += 1
+                
+                range_expansion_str = \
+                    "\n      Number of range expansion (dispersal) events: " \
+                    + str(range_expansion_count)
+                    
+                range_contraction_str = \
+                    "\n      Number of range contraction (extinction) events: " \
+                    + str(range_contraction_count)
+                
+                self.str_representation += \
+                    range_expansion_str + range_contraction_str
+
+            self.str_representation += "\n    Nodes with cladogenetic maps: " \
+                + clado_node_names_str
+            
+            # preparing string for cladogenetic events
+            if len(smot.cladogenetic_stoch_maps_dict) > 0:
+                self.str_representation += \
+                        "\n      Range size (of nodes above): "
+                range_split_str = ""
+                range_birth_str = ""
+                first_element = True
+
+                for splitting_node_name, rsb in \
+                        smot.cladogenetic_stoch_maps_dict.items():
+                    
+                    # getting node names for nodes with cladogenetic maps
+                    if first_element:
+                        self.str_representation += \
+                            str(rsb.size_of_splitting_node_range)
+
+                        first_element = False
+
+                    else:
+                        self.str_representation += ", " + \
+                            str(rsb.size_of_splitting_node_range)
+
+                    # getting node names for b/w or within-speciation
+                    if range_split_str == "" and rsb.range_split:
+                        range_split_str = \
+                            "\n      Between-region speciation nodes: " \
+                            + splitting_node_name
+                    
+                    elif range_split_str != "" and rsb.range_split:
+                        range_split_str += ", " + splitting_node_name
+
+                    elif range_birth_str == "" and not rsb.range_split:
+                        range_birth_str = \
+                            "\n      Within-region speciation nodes: " \
+                            + splitting_node_name
+                    
+                    elif range_birth_str != "" and not rsb.range_split:
+                        range_birth_str += ", " + splitting_node_name
+
+                self.str_representation += \
+                    range_split_str + range_birth_str
+
+    def __str__(self) -> str:
+        return self.str_representation
 
 
 
@@ -611,19 +776,23 @@ if __name__ == "__main__":
     # for k, v in unique_dict.items():
     #     print(k, v)
 
-    state2bit_lookup = pjbio.State2BitLookup(8, 2, geosse=True)
+    # state2bit_lookup = pjbio.State2BitLookup(8, 2, geosse=True)
+    state2bit_lookup = pjbio.State2BitLookup(2, 2, geosse=True)
     # first = False
     # for i, (k, v) in enumerate(state2bit_lookup.int2bit_dict.items()):
     #     print(k, v)
     
     
     stoch_mapcoll = \
-        StochMapCollection("examples/trees_maps_files/turtle_maps.tsv",
-        # StochMapCollection("examples/trees_maps_files/geosse_maps.tsv",
+        StochMapCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
                            tr,
                            state2bit_lookup)
+        # StochMapCollection("examples/trees_maps_files/turtle_maps.tsv",
 
-    # for smot in stoch_mapcoll.stoch_maps_tree_dict.values():
+    print(stoch_mapcoll)
+
+    # for it_idx, smot in stoch_mapcoll.stoch_maps_tree_dict.items():
+    #     print(smot)
     #     print(smot)
     #     widespread_range_size_dict = smot.get_clado_distribution()
 
