@@ -3,7 +3,7 @@ import typing as ty
 # pj imports
 import phylojunction.calculation.discrete_sse as sseobj
 import phylojunction.utility.exception_classes as ec
-import phylojunction.interface.grammar.det_fn_discrete_sse as detsse
+import phylojunction.interface.grammar.det_fn_discrete_sse_makers as detsse
 import phylojunction.pgm.pgm as pgm
 
 __author__ = "Fabio K. Mendes"
@@ -14,9 +14,9 @@ class PJDetFnGrammar():
 
     det_fn_grammar_dict: ty.Dict[str, ty.Set[str]]
 
-    ##########################################
-    #  All available deterministic functions #
-    ##########################################
+    #########################################
+    # All available deterministic functions #
+    #########################################
     det_fn_grammar_dict = {
         "sse_prob": set(["name", "value", "state", "epoch"]),
         "sse_rate": set(["name", "value", "event", "states", "epoch"]),
@@ -119,7 +119,7 @@ class PJDetFnGrammar():
         Build and return deterministic function object.
 
         Args:
-            det_fn_id (str): Name of deterministic function to create
+            det_fn_id (str): Name of deterministic function being called
             det_fn_param_dict (dict): Dictionary containing deterministic
                 function parameter names (str) as keys and lists (of either
                 strings or NodePGMs) as values

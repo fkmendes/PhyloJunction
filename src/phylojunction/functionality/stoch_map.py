@@ -70,6 +70,8 @@ class RangeExpansion(StochMap):
     """
 
     str_representation: str
+    size_of_expanding_range: int
+    size_of_final_range: int
     region_gained_idx: int
     ancestral_over_barrier: bool
     range_expansion_erased_by_extinction: bool
@@ -99,7 +101,23 @@ class RangeExpansion(StochMap):
                          time=time)
 
         self.region_gained_idx = region_gained_idx
+        self.size_of_expanding_range = \
+            sum(int(i) for i in from_state_bit_patt)
+        self.size_of_final_range = \
+            sum(int(i) for i in to_state_bit_patt)
 
+        self._init_str_representation()
+
+    def _init_str_representation(self) -> None:
+        self.str_representation = \
+            "Range expansion / Dispersal (at age = " + str(self.age) + ")" \
+            + "\n  Node subtending range expansion: " + self.focal_node_name \
+            + "\n    From state " + str(self.from_state) + ", bits \'" \
+            + self.from_state_bit_patt + "\', " \
+            + "range size " + str(self.size_of_expanding_range) \
+            + "\n    To state " + str(self.to_state) + ", bits \'" \
+            + self.to_state_bit_patt + "\', " \
+            + "range size " + str(self.size_of_final_range)
 
     # setter
     def gained_region_is_lost_in_future(self):
@@ -107,6 +125,9 @@ class RangeExpansion(StochMap):
 
     def dispersal_is_over_barrier(self):
         self.ancestral_over_barrier = True
+
+    def __str__(self) -> str:
+        return self.str_representation
 
 
 class RangeContraction(StochMap):
@@ -116,12 +137,14 @@ class RangeContraction(StochMap):
     """
 
     str_representation: str
+    size_of_contracting_range: int
+    size_of_final_range: int
     region_lost_idx: int
 
     def __init__(self,
                  region_lost_idx: int,
                  n_regions: int,
-                 age: int,
+                 age: float,
                  from_state: int,
                  from_state_bit_patt: str,
                  to_state: int,
@@ -143,20 +166,26 @@ class RangeContraction(StochMap):
                          time=time)
 
         self.region_lost_idx = region_lost_idx
+        self.size_of_contracting_range = \
+            sum(int(i) for i in from_state_bit_patt)
+        self.size_of_final_range = \
+            sum(int(i) for i in to_state_bit_patt)
 
         self._init_str_representation()
 
     def _init_str_representation(self) -> None:
         self.str_representation = \
-            "Range contraction (at age = " + str(self.age) + ")" \
+            "Range contraction / Local extinction (at age = " + str(self.age) + ")" \
             + "\n  Node subtending range contraction: " + self.focal_node_name \
-            + " (state " + str(self.from_state) + ", bits \'" \
+            + "\n    From state " + str(self.from_state) + ", bits \'" \
             + self.from_state_bit_patt + "\', " \
-            + "range size " + str(self.size_of_splitting_node_range) + ")" \
-            + "\n  Child 1 node: " + self.child_node_name \
-            + " (state " + str(self.to_state) + ", bits \'" \
+            + "range size " + str(self.size_of_contracting_range) \
+            + "\n    To state " + str(self.to_state) + ", bits \'" \
             + self.to_state_bit_patt + "\', " \
-            + "range size " + str(self.size_of_child1_range) + ")"
+            + "range size " + str(self.size_of_final_range)
+
+    def __str__(self) -> str:
+        return self.str_representation
 
 
 class RangeSplitOrBirth(StochMap):
@@ -395,31 +424,32 @@ class StochMapsOnTree():
                 if is_expansion:
                     # TODO: later replace idx with node name
                     stoch_map = RangeExpansion(idx,
-                                                self.n_regions,
-                                                event_age,
-                                                int(from_state),
-                                                b_from,
-                                                int(to_state),
-                                                b_to,
-                                                nd_idx,
-                                                parent_idx,
-                                                ch1_idx,
-                                                ch2_idx)
+                                               self.n_regions,
+                                               event_age,
+                                               int(from_state),
+                                               from_state_bit_patt,
+                                               int(to_state),
+                                               to_state_bit_patt,
+                                               nd_idx,
+                                               parent_idx,
+                                               ch1_idx,
+                                               ch2_idx)
                     
                     self.n_range_exp_maps += 1
 
                 else:
                     # TODO: later replace idx with node name
-                    stoch_map = RangeContraction(self.n_regions,
-                                                event_age,
-                                                int(from_state),
-                                                b_from,
-                                                int(to_state),
-                                                b_to,
-                                                nd_idx,
-                                                parent_idx,
-                                                ch1_idx,
-                                                ch2_idx)
+                    stoch_map = RangeContraction(idx,
+                                                 self.n_regions,
+                                                 event_age,
+                                                 int(from_state),
+                                                 from_state_bit_patt,
+                                                 int(to_state),
+                                                 to_state_bit_patt,
+                                                 nd_idx,
+                                                 parent_idx,
+                                                 ch1_idx,
+                                                 ch2_idx)
                     
                     self.n_range_cont_maps += 1
                         
@@ -437,15 +467,15 @@ class StochMapsOnTree():
                 self.n_different_clado_maps += 1
 
                 stoch_map = RangeSplitOrBirth(self.n_regions,
-                                       event_age,
-                                       int(from_state),
-                                       from_state_bit_patt,
-                                       int(to_state),
-                                       to_state_bit_patt,
-                                       nd_idx,
-                                       parent_idx,
-                                       ch1_idx,
-                                       ch2_idx)
+                                              event_age,
+                                              int(from_state),
+                                              from_state_bit_patt,
+                                              int(to_state),
+                                              to_state_bit_patt,
+                                              nd_idx,
+                                              parent_idx,
+                                              ch1_idx,
+                                              ch2_idx)
                 
                 self.cladogenetic_stoch_maps_dict[nd_idx] = stoch_map
 
@@ -781,8 +811,7 @@ if __name__ == "__main__":
     # first = False
     # for i, (k, v) in enumerate(state2bit_lookup.int2bit_dict.items()):
     #     print(k, v)
-    
-    
+
     stoch_mapcoll = \
         StochMapCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
                            tr,

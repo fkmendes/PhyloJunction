@@ -185,7 +185,7 @@ def parse_cli_str_write_fig(str_write_fig: str) \
 
 
 def read_nwk_tree_str(nwk_tree_path_or_str: str,
-                      fn_name: str,
+                      fn_name: str = "read_tree",
                       in_file: bool = True,
                       node_names_attribute: str = "",
                       epsilon: float = 1e-12) \
@@ -213,7 +213,8 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     # if tree provided in separate file
     if in_file:
         if not os.path.isfile(nwk_tree_path_or_str):
-            raise ec.PJIOFileDoesNotExistError(fn_name, nwk_tree_path_or_str)
+            raise ec.PJIOFileDoesNotExistError(fn_name,
+                                               nwk_tree_path_or_str)
         
         with open(nwk_tree_path_or_str, "r") as infile:
             tr_str = infile.readline()
@@ -357,7 +358,6 @@ if __name__ == "__main__":
     # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
     # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree2.tre",
     # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree3.tre",
-                      "read_tree",
                       node_names_attribute="index")
     
     # dummy trees should be:

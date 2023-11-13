@@ -10,6 +10,7 @@ import phylojunction.data.tree as pjtr
 # import user_interface.phylojunction_inference as pjinf
 # import user_interface.phylojunction_io as pjio
 import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
+import phylojunction.interface.grammar.constant_fn_grammar as ctgrammar
 import phylojunction.interface.grammar.dn_grammar as dngrammar
 import phylojunction.interface.grammar.det_fn_grammar as detgrammar
 import phylojunction.utility.exception_classes as ec
@@ -312,12 +313,18 @@ def parse_variable_assignment(
     # arguments of dn/det parameters will come out as lists
     values_list = list()
 
-    # if argument is a list
+    # if argument is a vector of values
     if re.match(cmdu.vector_value_regex, stoch_node_spec):
         values_list = cmdu.parse_val_vector(stoch_node_spec)
 
     # if scalar variable
-    else:
+    elif re.match(cmdu.int_or_float_regex, stoch_node_spec):
+        if len(re.findall(cmdu.int_or_float_regex, stoch_node_spec)) > 1:
+            raise ec.ScriptSyntaxError(
+                stoch_node_spec,
+                ("Something went wrong during variable assignment. If a value, "
+                 "it must be a single integer or float."))
+
         if len(re.findall(r"\.", stoch_node_spec)) > 1:
             raise ec.ScriptSyntaxError(
                 stoch_node_spec,
@@ -325,35 +332,43 @@ def parse_variable_assignment(
                  "like there were two dots \".\" when only one is allowed."))
 
         values_list.append(stoch_node_spec)
+    
+    # if the value is the return of a function (e.g., read_tree())
+    elif re.search(cmdu.sampling_dn_spec_regex, stoch_node_spec) is not None:
+        constant_fn_name, constant_fn_spec = \
+            re.search(cmdu.sampling_dn_spec_regex, stoch_node_spec).groups()
+
+        ####################################################
+        # Create the sampling distribution object          #
+        #                                                  #
+        # Inside create_dn_obj, we check that distribution #
+        # are ok                                           #
+        ####################################################
+        try:
+            # exists outside try!
+            ct_obj = \
+                ctgrammar.PJCtFnGrammar.create_ct_fn_obj(
+                    constant_fn_name,
+                    constant_fn_spec)
+
+        except (ec.ParseNotAParameterError,
+                ec.ParseRequireSingleValueError,
+                ec.ParseRequireIntegerError,
+                ec.ParseRequireNumericError,
+                ec.ParseMissingParameterError) as e:
+            raise ec.ParseCtFnInitFailError(constant_fn_name, e.message)
+        
+    else:
+        raise ec.ScriptSyntaxError(
+            stoch_node_spec,
+            ("Something went wrong during variable assignment "
+             "Could not find both the name of a function "
+             "(e.g., \'read_tree\') and its specification (e.g., "
+             "\'(file=\"examples/geosse_dummy_tree1\", node_name_attr=\"index\")\')."))
 
     val_obj_list = cmdu.val_or_obj(pgm_obj, values_list)
-
-    # if rv_spec is scalar
-    # if re.match(int_or_float_regex, rv_spec) and
-    #    len(re.findall(int_or_float_regex, rv_spec)) > 1:
-    #     raise ScriptSyntaxError(
-    #         rv_spec,
-    #         "Something went wrong during variable assignment. " +
-    #         "If not a vector, the assigned value must consist of " +
-    #         "a single integer or float. Exiting...")
-
-    # # ok!
-    # else:
-    #     scalar_values = rv_spec
-
-    # # if rv_spec is vector
-    # if re.match(vector_value_regex, rv_spec):
-    #     scalar_values = parse_val_vector(rv_spec)
-
-    # if not re.match(int_or_float_regex, rv_spec) and not \
-    #        re.match(vector_value_regex, rv_spec):
-    #     raise ScriptSyntaxError(
-    #         rv_spec,
-    #         "Something went wrong during variable assignment. The " +
-    #         "value assigned to a variable must be a numeric scalar " +
-    #         "or a vector (not a character).")
-
     n_samples = len(val_obj_list)
+    
     create_add_stoch_node_pgm(stoch_node_name, n_samples, val_obj_list)
 
 
@@ -620,10 +635,10 @@ def parse_deterministic_function_assignment(
                     ec.ParseMissingParameterError) as e:
                 raise ec.ParseDetFnInitFailError(det_fn_name, e.message)
 
-            except ec.ParseDetFnInitFailError as e:
-                # re-raises the DetFnInitFailError exception from
-                # within .create_det_fn_obj()
-                raise
+            # except ec.ParseDetFnInitFailError as e:
+            #     # re-raises the DetFnInitFailError exception from
+            #     # within .create_det_fn_obj()
+            #     raise
 
             create_add_det_nd_pgm(det_nd_name, det_fn_obj, parent_pgm_nodes)
 

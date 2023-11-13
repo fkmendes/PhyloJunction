@@ -584,6 +584,56 @@ class ParseMissingSpecificationError(Exception):
         return self.message
 
 
+class ParseMutuallyExclusiveParametersError(Exception):
+    message: str
+    par_name: str
+    mutually_exclusive_par_name: str
+
+    def __init__(self,
+                 par_name: str,
+                 mutually_exclusive_par_name: str,
+                 message: str) -> None:
+        self.par_name = par_name
+        self.mutually_exclusive_par_name = mutually_exclusive_par_name
+        self.message = "Argument " + self.par_name \
+            + " cannot be specified at the same time as \'" \
+            + self.mutually_exclusive_par_name + "\'. " + message
+        
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class ParsePathDoesNotExistError(Exception):
+    message: str
+    par_name: str
+    path_str: str
+
+    def __init__(self, par_name: str, path_str: str, message: str) -> None:
+        self.par_name = par_name
+        self.path_str = path_str
+        self.message = "Path provided to argument \'" + self.par_name \
+            + "\' does not seem to store a file. " + message
+        
+    def __str__(self) -> str:
+        return self.message
+
+
+class ParseCtFnInitFailError(Exception):
+    ct_fn_name: str
+    message: str
+
+    def __init__(self, ct_fn_name: str, message: str) -> None:
+        self.ct_fn_name = ct_fn_name
+        self.message = "Constant output from \'" + self.ct_fn_name \
+            + "\' could not be instantiated. " + message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
 class ParseDnInitFailError(Exception):
     dn_name: str
     message: str
