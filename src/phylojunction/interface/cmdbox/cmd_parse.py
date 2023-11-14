@@ -10,7 +10,7 @@ import phylojunction.data.tree as pjtr
 # import user_interface.phylojunction_inference as pjinf
 # import user_interface.phylojunction_io as pjio
 import phylojunction.interface.cmdbox.cmd_parse_utils as cmdu
-import phylojunction.interface.grammar.constant_fn_grammar as ctgrammar
+import phylojunction.interface.grammar.ct_fn_grammar as ctgrammar
 import phylojunction.interface.grammar.dn_grammar as dngrammar
 import phylojunction.interface.grammar.det_fn_grammar as detgrammar
 import phylojunction.utility.exception_classes as ec
@@ -332,6 +332,16 @@ def parse_variable_assignment(
                  "like there were two dots \".\" when only one is allowed."))
 
         values_list.append(stoch_node_spec)
+
+    elif re.match(cmdu.character_value_regex, stoch_node_spec):
+        if len(re.findall(cmdu.character_value_regex, stoch_node_spec)) > 1:
+            raise ec.ScriptSyntaxError(
+                stoch_node_spec,
+                ("Something went wrong during variable assignment. If being "
+                 "assigned the value of another variable, it must be a single "
+                 "one."))
+        
+        values_list.append(stoch_node_spec)
     
     # if the value is the return of a function (e.g., read_tree())
     elif re.search(cmdu.sampling_dn_spec_regex, stoch_node_spec) is not None:
@@ -357,7 +367,7 @@ def parse_variable_assignment(
                 ec.ParseRequireNumericError,
                 ec.ParseMissingParameterError) as e:
             raise ec.ParseCtFnInitFailError(constant_fn_name, e.message)
-        
+
     else:
         raise ec.ScriptSyntaxError(
             stoch_node_spec,
@@ -368,7 +378,7 @@ def parse_variable_assignment(
 
     val_obj_list = cmdu.val_or_obj(pgm_obj, values_list)
     n_samples = len(val_obj_list)
-    
+
     create_add_stoch_node_pgm(stoch_node_name, n_samples, val_obj_list)
 
 

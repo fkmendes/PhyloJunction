@@ -65,8 +65,8 @@ def make_DiscreteStateDependentRate(
         ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
         -> sseobj.DiscreteStateDependentRate:
     """
-    Create and return DiscreteStateDependentRate as prompted by deterministic
-    function call.
+    Create and return DiscreteStateDependentRate as prompted by
+    deterministic function call.
 
     Args:
         det_fn_name (str): Name of the function being called

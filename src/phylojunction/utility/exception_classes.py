@@ -430,7 +430,10 @@ class ObjInitRequireNonZeroStateDependentParameterError(Exception):
     def __str__(self) -> str:
         return self.message
 
-# Syntax errors: sampling distribution, det. function exceptions #
+
+# Syntax errors: constant functions,
+# sampling distribution,
+# det. function exceptions
 class ParseFunctionArgError(Exception):
     par_name: str
     message: str
@@ -616,6 +619,22 @@ class ParsePathDoesNotExistError(Exception):
         self.message = "Path provided to argument \'" + self.par_name \
             + "\' does not seem to store a file. " + message
         
+    def __str__(self) -> str:
+        return self.message
+
+
+class ParseInvalidNewickStringError(Exception):
+    message: str
+    par_name: str
+
+    def __init__(self,
+                 par_name: str,
+                 message: str = "") -> None:
+        self.par_name = par_name
+        self.message = "Newick string(s) provided in \'" + par_name \
+            + "\' were invalid. " + message
+        super().__init__(self.message)
+
     def __str__(self) -> str:
         return self.message
 

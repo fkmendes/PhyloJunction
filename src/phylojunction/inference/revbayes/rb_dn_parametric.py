@@ -9,7 +9,7 @@ import phylojunction.pgm.pgm as pgm
 def get_rev_str_from_dn_parametric_obj(dn_obj: pgm.DistributionPGM) -> ty.Tuple[int, int, ty.List[str]]:
     
     rev_str_list: ty.List[str]
-    n_sim: int = dn_obj.n_draws
+    n_sim: int = dn_obj.n_samples
     n_repl: int = dn_obj.n_repl
     
     rev_str_list = dn_obj.get_rev_inference_spec_info()
@@ -21,7 +21,7 @@ def get_rev_str_from_dn_parametric_obj(dn_obj: pgm.DistributionPGM) -> ty.Tuple[
 # distribution PJ call into .Rev syntax #
 #########################################
 
-def get_unif_rev_inference_spec_info(n_draws: int, min_param_list: ty.List[float], max_param_list: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
+def get_unif_rev_inference_spec_info(n_samples: int, min_param_list: ty.List[float], max_param_list: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
     
     rev_str_list: ty.List[str] = [] # return
 
@@ -30,13 +30,13 @@ def get_unif_rev_inference_spec_info(n_draws: int, min_param_list: ty.List[float
 
     # so mypy won't complain
     if isinstance(parent_node_tracker, dict):
-        for ith_sim in range(n_draws):
+        for ith_sim in range(n_samples):
             rev_str_list.append("dnUniform(lower=" + str(min_list[ith_sim]) + ", upper=" + str(max_list[ith_sim]) + ")")
 
     return rev_str_list
 
 
-def get_exponential_rev_inference_spec_info(n_draws: int, exp_scale_or_rate_list: ty.List[float], exp_rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
+def get_exponential_rev_inference_spec_info(n_samples: int, exp_scale_or_rate_list: ty.List[float], exp_rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
     
     rev_str_list: ty.List[str] = [] # return
 
@@ -51,7 +51,7 @@ def get_exponential_rev_inference_spec_info(n_draws: int, exp_scale_or_rate_list
         if not rate_parameterization:
             scale_or_rate_list = [ 1.0/float(v) for v in scale_or_rate_list ]
 
-        for ith_sim in range(n_draws):
+        for ith_sim in range(n_samples):
             ith_sim_str = "dnExponential(lambda="
 
             # if we can find a node that holds the value of the rate, we use it
@@ -66,7 +66,7 @@ def get_exponential_rev_inference_spec_info(n_draws: int, exp_scale_or_rate_list
     return rev_str_list
 
 
-def get_gamma_rev_inference_spec_info(n_draws: int, gamma_shape_param_list: ty.List[float], gamma_scale_or_rate_param_list: ty.List[float], gamma_rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
+def get_gamma_rev_inference_spec_info(n_samples: int, gamma_shape_param_list: ty.List[float], gamma_scale_or_rate_param_list: ty.List[float], gamma_rate_parameterization: bool, parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
     
     rev_str_list: ty.List[str] = [] # return
 
@@ -81,7 +81,7 @@ def get_gamma_rev_inference_spec_info(n_draws: int, gamma_shape_param_list: ty.L
         if not rate_parameterization:
             scale_or_rate_list = [ 1.0/float(v) for v in scale_or_rate_list ]
 
-        for ith_sim in range(n_draws):
+        for ith_sim in range(n_samples):
             ith_sim_str = "dnGamma("
 
             # if we can find a node that holds the value of the shape parameter, we use it
@@ -103,7 +103,7 @@ def get_gamma_rev_inference_spec_info(n_draws: int, gamma_shape_param_list: ty.L
 
     return rev_str_list
 
-def get_normal_rev_inference_spec_info(n_draws: int, norm_mean_param_list: ty.List[float], norm_sd_param_list: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
+def get_normal_rev_inference_spec_info(n_samples: int, norm_mean_param_list: ty.List[float], norm_sd_param_list: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
     
     rev_str_list: ty.List[str] = [] # return
 
@@ -112,7 +112,7 @@ def get_normal_rev_inference_spec_info(n_draws: int, norm_mean_param_list: ty.Li
 
     # so mypy won't complain
     if isinstance(parent_node_tracker, dict):
-        for ith_sim in range(n_draws):
+        for ith_sim in range(n_samples):
             ith_sim_str = "dnNormal(mean="
 
             # if we can find a node that holds the value of the mean, we use it
@@ -135,7 +135,7 @@ def get_normal_rev_inference_spec_info(n_draws: int, norm_mean_param_list: ty.Li
     return rev_str_list
 
 
-def get_ln_rev_inference_spec_info(n_draws: int, ln_mean_list: ty.List[float], ln_sd_list: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
+def get_ln_rev_inference_spec_info(n_samples: int, ln_mean_list: ty.List[float], ln_sd_list: ty.List[float], parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> ty.List[str]:
     
     rev_str_list: ty.List[str] = [] # return
     
@@ -148,7 +148,7 @@ def get_ln_rev_inference_spec_info(n_draws: int, ln_mean_list: ty.List[float], l
         real_sd_list = [ math.exp(float(i)) for i in real_sd_list ]
         
         # real_mean_list and real_sd_list will have n_sim values inside, even if they are all the same
-        for ith_sim in range(n_draws):
+        for ith_sim in range(n_samples):
             ith_sim_str = "dnLognormal(mean="
 
             # if we can find a node that holds the value of the mean, we use it

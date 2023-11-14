@@ -19,7 +19,7 @@ class DnLogNormal(pgm.DistributionPGM):
 
     DN_NAME = "Log-normal"
 
-    n_draws: int
+    n_samples: int
     n_repl: int
     ln_mean_list: ty.List[float]
     ln_sd_list: ty.List[float]
@@ -30,7 +30,7 @@ class DnLogNormal(pgm.DistributionPGM):
 
     @staticmethod
     def draw_ln(
-            n_draws: int,
+            n_samples: int,
             mean_param: float,
             sd_param: float,
             scale: float = 1.0,
@@ -38,7 +38,7 @@ class DnLogNormal(pgm.DistributionPGM):
         """Return sample from log-normal distribution.
 
         Args:
-            n_draws (int): Number of draws (sample size).
+            n_samples (int): Number of draws (sample size).
             mean_param (float): Mean (location) of log-normal in log-space.
             sd_param (float): Std. deviation (shape) of log-normal
                 distribution in log-space.
@@ -56,18 +56,18 @@ class DnLogNormal(pgm.DistributionPGM):
             # print("log-normal in natural space: mean = " + str(mean_param) + " sd = " + str(sd_param))
 
             # have to use scale if in natural space
-            return lognorm.rvs(s=sd_param, scale=math.exp(mean_param), size=n_draws)
+            return lognorm.rvs(s=sd_param, scale=math.exp(mean_param), size=n_samples)
 
         # debugging
         # print("log-normal in log-space: mean = " + str(mean_param) + " sd = " + str(sd_param))
 
         # have to use loc if in log-space
-        return lognorm.rvs(s=math.exp(sd_param), loc=math.exp(mean_param), scale=1.0, size=n_draws)
+        return lognorm.rvs(s=math.exp(sd_param), loc=math.exp(mean_param), scale=1.0, size=n_samples)
 
     # validation of pars happens in phylojunction_grammar
     def __init__(
             self,
-            n_draws: int,
+            n_samples: int,
             n_repl: int,
             ln_mean: ty.List[float],
             ln_sd: ty.List[float],
@@ -75,7 +75,7 @@ class DnLogNormal(pgm.DistributionPGM):
             parent_node_tracker: ty.Optional[ty.Dict[str, str]]) -> None:
 
         self.param_dict = dict()
-        self.n_draws = n_draws
+        self.n_samples = n_samples
         self.n_repl = n_repl
         self.ln_mean_arg = ln_mean
         self.ln_sd_arg = ln_sd
@@ -110,7 +110,7 @@ class DnLogNormal(pgm.DistributionPGM):
                 return ty.cast(
                     ty.List[float],
                     DnLogNormal.draw_ln(
-                        self.n_draws * self.n_repl,
+                        self.n_samples * self.n_repl,
                         self.ln_mean_list[0],
                         self.ln_sd_list[0],
                         log_space=self.ln_log_space).tolist())
@@ -142,11 +142,11 @@ class DnLogNormal(pgm.DistributionPGM):
             self,
             param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
-        return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_draws)
+        return pjh.verify_or_convert2_vector(param_list, self.DN_NAME, size_to_grow=self.n_samples)
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         return rbpar.get_ln_rev_inference_spec_info(
-            self.n_draws,
+            self.n_samples,
             self.ln_mean_list,
             self.ln_sd_list,
             self.parent_node_tracker)
@@ -156,7 +156,7 @@ class DnNormal(pgm.DistributionPGM):
 
     DN_NAME = "Normal"
 
-    n_draws: int
+    n_samples: int
     n_repl: int
     norm_mean_param_list: ty.List[float]
     norm_sd_param_list: ty.List[float]
@@ -166,13 +166,13 @@ class DnNormal(pgm.DistributionPGM):
 
     @staticmethod
     def draw_normal(
-            n_draws: int,
+            n_samples: int,
             mean_param: float,
             sd_param: float) -> ty.Union[np.float64, np.ndarray]:
         """Return sample from normal distribution
 
         Args:
-            n_draws (int): Number of draws (sample size)
+            n_samples (int): Number of draws (sample size)
             mean_param (float): Mean (location) of normal distribution
             sd_param (float): Std. deviation (scale) of normal distribution
 
@@ -183,13 +183,13 @@ class DnNormal(pgm.DistributionPGM):
         # debugging
         # print("normal: mean = " + str(mean_param) + " sd = " + str(sd_param))
 
-        return norm.rvs(scale=sd_param, loc=mean_param, size=n_draws)
+        return norm.rvs(scale=sd_param, loc=mean_param, size=n_samples)
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float]]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
     def __init__(
             self,
-            n_draws: int,
+            n_samples: int,
             n_repl: int,
             norm_mean_param: ty.List[float],
             norm_sd_param: ty.List[float],
@@ -199,9 +199,9 @@ class DnNormal(pgm.DistributionPGM):
 
         # so mypy won't complain...
         # if isinstance(pars[0], int) and isinstance(pars[1], int):
-        #     self.n_draws = pars[0]
+        #     self.n_samples = pars[0]
         #     self.n_repl = pars[1]
-        self.n_draws = n_draws
+        self.n_samples = n_samples
         self.n_repl = n_repl
         self.norm_mean_param_arg = norm_mean_param
         self.norm_sd_param_arg = norm_sd_param
@@ -236,15 +236,15 @@ class DnNormal(pgm.DistributionPGM):
             # so mypy won't complain
             # if isinstance(mean_params, list) and isinstance(sd_params, list):
 
-            # use single provided mean and sd for all (n_draws * n_repl) draws
+            # use single provided mean and sd for all (n_samples * n_repl) draws
             # if len(mean_params) == 1 and len(sd_params) == 1:
             if len(self.norm_mean_param_list) == 1 and \
                     len(self.norm_sd_param_list) == 1:
                 # so mypy won't complain
                 # if isinstance(mean_params, float) and isinstance(sd_params, float):
-                # return ty.cast(ty.List, DnNormal.draw_normal(self.n_draws * self.n_repl, mean_params[0], sd_params[0]).tolist())
+                # return ty.cast(ty.List, DnNormal.draw_normal(self.n_samples * self.n_repl, mean_params[0], sd_params[0]).tolist())
                 return ty.cast(ty.List, DnNormal.draw_normal(
-                    self.n_draws * self.n_repl,
+                    self.n_samples * self.n_repl,
                     self.norm_mean_param_list[0],
                     self.norm_sd_param_list[0]).tolist())
 
@@ -286,11 +286,11 @@ class DnNormal(pgm.DistributionPGM):
         return pjh.verify_or_convert2_vector(
             param_list,
             self.DN_NAME,
-            size_to_grow=self.n_draws)
+            size_to_grow=self.n_samples)
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         return rbpar.get_normal_rev_inference_spec_info(
-            self.n_draws,
+            self.n_samples,
             self.norm_mean_param_list,
             self.norm_sd_param_list,
             self.parent_node_tracker)
@@ -300,7 +300,7 @@ class DnExponential(pgm.DistributionPGM):
 
     DN_NAME = "Exponential"
 
-    n_draws: int
+    n_samples: int
     n_repl: int
     exp_scale_or_rate_list: ty.List[float]
     exp_rate_parameterization: bool = True
@@ -310,13 +310,13 @@ class DnExponential(pgm.DistributionPGM):
 
     @staticmethod
     def draw_exp(
-            n_draws: int,
+            n_samples: int,
             scale_or_rate_param: float,
             rate_parameterization: bool = True) -> ty.Union[np.float64, np.ndarray]:
         """Return sample from exponential distribution.
 
         Args:
-            n_draws (int): Number of draws (sample size).
+            n_samples (int): Number of draws (sample size).
             scale_or_rate_param (float): Scale (default) or rate of
                 exponential distribution.
             rate_parameterization (bool, optional): Argument of
@@ -329,13 +329,13 @@ class DnExponential(pgm.DistributionPGM):
         if rate_parameterization:
             scale_or_rate_param = 1.0 / scale_or_rate_param
 
-        return expon.rvs(loc=0.0, scale=scale_or_rate_param, size=n_draws)
+        return expon.rvs(loc=0.0, scale=scale_or_rate_param, size=n_samples)
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float], bool]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
     def __init__(
             self,
-            n_draws: int,
+            n_samples: int,
             n_repl: int,
             scale_or_rate_param: ty.List[float],
             rate_parameterization: bool,
@@ -345,11 +345,11 @@ class DnExponential(pgm.DistributionPGM):
 
         # so mypy won't complain...
         # if isinstance(pars[0], int) and isinstance(pars[1], int) and isinstance(pars[3], bool):
-        #     self.n_draws = pars[0]
+        #     self.n_samples = pars[0]
         #     self.n_repl = pars[1]
         #     self.param_dict["rate_parameterization"] = pars[3] # True is the default
 
-        self.n_draws = n_draws
+        self.n_samples = n_samples
         self.n_repl = n_repl
         self.exp_scale_or_rate_param_arg = scale_or_rate_param
         self.exp_rate_parameterization = rate_parameterization
@@ -384,16 +384,16 @@ class DnExponential(pgm.DistributionPGM):
             # so mypy won't complain
             # if isinstance(scale_or_rate_params, list):
 
-            # use single provided scale_or_rate_params for all (n_draws * n_repl) draws
+            # use single provided scale_or_rate_params for all (n_samples * n_repl) draws
             # if len(scale_or_rate_params) == 1:
             if len(self.exp_scale_or_rate_param_list) == 1:
                 # so mypy won't complain
                 # if isinstance(scale_or_rate_params[0], float) and isinstance(rate_parameterization, bool):
-                #     # return ty.cast(ty.List[float], DnExponential.draw_exp(self.n_draws * self.n_repl, scale_or_rate_params[0], rate_parameterization=rate_parameterization).tolist())
+                #     # return ty.cast(ty.List[float], DnExponential.draw_exp(self.n_samples * self.n_repl, scale_or_rate_params[0], rate_parameterization=rate_parameterization).tolist())
                 return ty.cast(
                     ty.List[float],
                     DnExponential.draw_exp(
-                        self.n_draws * self.n_repl,
+                        self.n_samples * self.n_repl,
                         self.exp_scale_or_rate_param_list[0],
                         rate_parameterization=self.exp_rate_parameterization).tolist())
 
@@ -433,11 +433,11 @@ class DnExponential(pgm.DistributionPGM):
         return pjh.verify_or_convert2_vector(
             param_list,
             self.DN_NAME,
-            size_to_grow=self.n_draws)
+            size_to_grow=self.n_samples)
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         return rbpar.get_exponential_rev_inference_spec_info(
-            self.n_draws,
+            self.n_samples,
             self.exp_scale_or_rate_param_list,
             self.exp_rate_parameterization,
             self.parent_node_tracker)
@@ -447,7 +447,7 @@ class DnGamma(pgm.DistributionPGM):
 
     DN_NAME = "Gamma"
 
-    n_draws: int
+    n_samples: int
     n_repl: int
     gamma_shape_param_list: ty.List[float]
     gamma_scale_or_rate_param_list: ty.List[float]
@@ -458,7 +458,7 @@ class DnGamma(pgm.DistributionPGM):
 
     @staticmethod
     def draw_gamma(
-        n_draws: int,
+        n_samples: int,
         shape_param: float,
         scale_or_rate_param: float,
         rate_parameterization: bool = False) \
@@ -466,7 +466,7 @@ class DnGamma(pgm.DistributionPGM):
         """Return sample from gamma distribution
 
         Args:
-            n_draws (int): Number of draws (sample size)
+            n_samples (int): Number of draws (sample size)
             shape_param (float): Gamma distribution shape parameter
                 (represented by alpha or kappa sometimes).
             scale_or_rate_param (float): Gamma distribution scale or
@@ -485,13 +485,13 @@ class DnGamma(pgm.DistributionPGM):
         return gamma.rvs(
             a=shape_param,
             scale=scale_or_rate_param,
-            size=n_draws)
+            size=n_samples)
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float], bool]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
     def __init__(
             self,
-            n_draws: int,
+            n_samples: int,
             n_repl: int,
             shape_param: ty.List[float],
             scale_or_rate_param: ty.List[float],
@@ -502,10 +502,10 @@ class DnGamma(pgm.DistributionPGM):
 
         # so mypy won't complain...
         # if isinstance(pars[0], int) and isinstance(pars[1], int):
-        #     self.n_draws = pars[0]
+        #     self.n_samples = pars[0]
         #     self.n_repl = pars[1]
 
-        self.n_draws = n_draws
+        self.n_samples = n_samples
         self.n_repl = n_repl
         self.gamma_rate_parameterization = rate_parameterization
         self.gamma_shape_param_arg = shape_param
@@ -545,18 +545,18 @@ class DnGamma(pgm.DistributionPGM):
 
             # so mypy won't complain
             # if isinstance(shape_params, list) and isinstance(scale_or_rate_params, list):
-            #     use single provided mean and sd for all (n_draws * n_repl) draws
+            #     use single provided mean and sd for all (n_samples * n_repl) draws
             #     if len(shape_params) == 1 and len(scale_or_rate_params) == 1:
             if len(self.gamma_shape_param_list) == 1 and \
                     len(self.gamma_scale_or_rate_param_list) == 1:
 
                 # so mypy won't complain
                 # if isinstance(shape_params[0], float) and isinstance(scale_or_rate_params[0], float) and isinstance(rate_parameterization, bool):
-                #    return ty.cast(ty.List[float], DnGamma.draw_gamma(self.n_draws * self.n_repl, shape_params[0], scale_or_rate_params[0], rate_parameterization=rate_parameterization).tolist())
+                #    return ty.cast(ty.List[float], DnGamma.draw_gamma(self.n_samples * self.n_repl, shape_params[0], scale_or_rate_params[0], rate_parameterization=rate_parameterization).tolist())
                 return ty.cast(
                     ty.List[float],
                     DnGamma.draw_gamma(
-                        self.n_draws * self.n_repl,
+                        self.n_samples * self.n_repl,
                         self.gamma_shape_param_list[0],
                         self.gamma_scale_or_rate_param_list[0],
                         rate_parameterization=self.gamma_rate_parameterization).tolist())
@@ -602,11 +602,11 @@ class DnGamma(pgm.DistributionPGM):
         return pjh.verify_or_convert2_vector(
             param_list,
             self.DN_NAME,
-            size_to_grow=self.n_draws)
+            size_to_grow=self.n_samples)
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         return rbpar.get_gamma_rev_inference_spec_info(
-            self.n_draws,
+            self.n_samples,
             self.gamma_shape_param_list,
             self.gamma_scale_or_rate_param_list,
             self.gamma_rate_parameterization,
@@ -617,7 +617,7 @@ class DnUnif(pgm.DistributionPGM):
 
     DN_NAME = "Uniform"
 
-    n_draws: int
+    n_samples: int
     n_repl: int
     min_param_list: ty.List[float]
     max_param_list: ty.List[float]
@@ -626,11 +626,11 @@ class DnUnif(pgm.DistributionPGM):
     parent_node_tracker: ty.Optional[ty.Dict[str, str]]
 
     @staticmethod
-    def draw_unif(n_draws: int, min_param: float, max_param: float) -> ty.Union[np.float64, np.ndarray]:
+    def draw_unif(n_samples: int, min_param: float, max_param: float) -> ty.Union[np.float64, np.ndarray]:
         """Return sample from log-normal distribution
 
         Args:
-            n_draws (int): Number of draws (sample size)
+            n_samples (int): Number of draws (sample size)
             min_param (float): Minimum value
             max_param (float): Maximum value
 
@@ -641,13 +641,13 @@ class DnUnif(pgm.DistributionPGM):
         # see definition of uniform from scipy (need to subtract min_param)
         # if we want the "usual" behavior of a uniform distribution, where
         # scale behaves as a maximum
-        return uniform.rvs(loc=min_param, scale=max_param - min_param, size=n_draws)
+        return uniform.rvs(loc=min_param, scale=max_param - min_param, size=n_samples)
 
     # validation of pars happens in phylojunction_grammar
     # def __init__(self, pars: ty.List[ty.Union[int, ty.List[float]]], parent_node_tracker: ty.Optional[ty.Dict[str, str]]=None) -> None:
     def __init__(
             self,
-            n_draws: int,
+            n_samples: int,
             n_repl: int,
             min_param: ty.List[float],
             max_param: ty.List[float],
@@ -657,9 +657,9 @@ class DnUnif(pgm.DistributionPGM):
 
         # so mypy won't complain...
         # if isinstance(pars[0], int) and isinstance(pars[1], int):
-        #     self.n_draws = pars[0]
+        #     self.n_samples = pars[0]
         #     self.n_repl = pars[1]
-        self.n_draws = n_draws
+        self.n_samples = n_samples
         self.n_repl = n_repl
         self.min_param_arg = min_param
         self.max_param_arg = max_param
@@ -695,16 +695,16 @@ class DnUnif(pgm.DistributionPGM):
 
             # so mypy won't complain
             # if isinstance(min_params, list) and isinstance(max_params, list):
-            #     use single provided mean and sd for all (n_draws * n_repl) draws
+            #     use single provided mean and sd for all (n_samples * n_repl) draws
             #     if len(min_params) == 1 and len(max_params) == 1:
             if len(self.min_param_list) == 1 and \
                     len(self.max_param_list) == 1:
                 # so mypy won't complain
                 # if isinstance(min_params, float) and isinstance(max_params, float):
-                #     return ty.cast(ty.List[float], DnUnif.draw_unif(self.n_draws * self.n_repl, float(min_params[0]), float(max_params[0])).tolist())
+                #     return ty.cast(ty.List[float], DnUnif.draw_unif(self.n_samples * self.n_repl, float(min_params[0]), float(max_params[0])).tolist())
                 return ty.cast(
                     ty.List[float],
-                    DnUnif.draw_unif(self.n_draws * self.n_repl,
+                    DnUnif.draw_unif(self.n_samples * self.n_repl,
                                      self.min_param_list[0],
                                      self.max_param_list[0]).tolist())
 
@@ -747,11 +747,11 @@ class DnUnif(pgm.DistributionPGM):
         return pjh.verify_or_convert2_vector(
             param_list,
             self.DN_NAME,
-            size_to_grow=self.n_draws)
+            size_to_grow=self.n_samples)
 
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         return rbpar.get_unif_rev_inference_spec_info(
-            self.n_draws,
+            self.n_samples,
             self.min_param_list,
             self.max_param_list,
             self.parent_node_tracker)
@@ -769,14 +769,14 @@ if __name__ == "__main__":
     # can also be called from VS Code, if open folder is phylojuction/
 
     # ln1 = DnLogNormal([1, [10,9,8], [7,6,5], True]) # should throw exception
-    n_draws = 3
+    n_samples = 3
     n_repl = 1
 
     dummy_parent_node_tracker: ty.Dict[str, str] = dict()
 
-    ln2 = DnLogNormal(n_draws, n_repl, [-2, -2.1, -2.2], [0.1, 0.2, 0.15], True, dummy_parent_node_tracker)
-    ln3 = DnLogNormal(n_draws, n_repl, [-2], [0.1], True, dummy_parent_node_tracker)
-    ln4 = DnLogNormal(n_draws, n_repl, [-2], [0.1], True, dummy_parent_node_tracker)
+    ln2 = DnLogNormal(n_samples, n_repl, [-2, -2.1, -2.2], [0.1, 0.2, 0.15], True, dummy_parent_node_tracker)
+    ln3 = DnLogNormal(n_samples, n_repl, [-2], [0.1], True, dummy_parent_node_tracker)
+    ln4 = DnLogNormal(n_samples, n_repl, [-2], [0.1], True, dummy_parent_node_tracker)
 
     print(ln2.generate())
     print(ln3.generate())

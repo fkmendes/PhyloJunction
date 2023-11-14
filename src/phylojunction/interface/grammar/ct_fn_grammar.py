@@ -1,12 +1,9 @@
-import os
 import typing as ty
 
 # pj imports
-# import phylojunction.calculation.discrete_sse as sseobj
 import phylojunction.utility.exception_classes as ec
 import phylojunction.pgm.pgm as pgm
-import phylojunction.readwrite.pj_read as pjr
-from phylojunction.data.tree import AnnotatedTree
+import interface.grammar.ct_fn_treereader_makers as make_tree
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -34,41 +31,16 @@ class PJCtFnGrammar():
         cls,
         ct_fn_param_dict:
             ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
-            -> AnnotatedTree:
-
-        tree_fp = ""
-        tree_str = ""
-
+            -> pgm.ConstantFn:
+        
         if not ct_fn_param_dict:
             raise ec.ParseMissingSpecificationError("read_tree")
-
-        for arg, val in ct_fn_param_dict.items():
+        
+        for arg in ct_fn_param_dict:
             if not cls.grammar_check("read_tree", arg):
                 raise ec.ParseNotAParameterError(arg)
 
-            if arg == "file_path":
-                if "string" in ct_fn_param_dict:
-                    raise ec.ParseMutuallyExclusiveParametersError(arg, "string")
-
-                if not os.path.isfile(val):
-                    raise ec.ParsePathDoesNotExistError(arg, val)
-                
-                tree_fp = val
-
-            if arg == "string":
-                if "file_path" in ct_fn_param_dict:
-                    raise ec.ParseMutuallyExclusiveParametersError(arg, "file_path")
-
-                tree_str = val
-
-            try:
-                # TODO: call pjr.read_nwk_tree_str()
-                pass
-
-            except:
-                # TODO: capture dendropy's error messages and return custom ec.Exception...
-                raise RuntimeError
-            
+        return make_tree.make_tree_reader("read_tree", ct_fn_param_dict)
         
     @classmethod
     def create_ct_fn_obj(
@@ -77,7 +49,7 @@ class PJCtFnGrammar():
         ct_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
             -> ty.Optional[
                 # ty.Union[
-                    AnnotatedTree
+                    pgm.ConstantFn
                 # ]
                 ]:
         """

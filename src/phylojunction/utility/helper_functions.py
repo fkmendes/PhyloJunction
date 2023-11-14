@@ -43,7 +43,7 @@ def verify_or_convert2_vector(
 
     Args:
         size_to_grow (int): This will be the number of simulations
-            (n_draws inside a DistributionPGM object)
+            (n_samples inside a DistributionPGM object)
     """
 
     # using numpy array as a hack to get nested-ness of param_list

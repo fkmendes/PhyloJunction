@@ -28,21 +28,13 @@ class ProbabilisticGraphicalModel:
     def get_display_str_by_name(self, node_name, sample_idx: Incomplete | None = ..., repl_size: int = ...): ...
     def get_sorted_node_pgm_list(self) -> ty.List[NodePGM]: ...
 
-class DistributionPGM(ABC, metaclass=abc.ABCMeta):
-
-    @property
-    @abstractmethod
-    def DN_NAME(self):
-        pass
-
+class ValueGenerator(ABC, metaclass=abc.ABCMeta):
     @abstract_attribute
-    def n_draws(self):
+    def n_samples(self):
         pass
-
     @abstract_attribute
     def n_repl(self):
         pass
-
     @abstractmethod
     def __init__(self): ...
     @abstractmethod
@@ -51,6 +43,18 @@ class DistributionPGM(ABC, metaclass=abc.ABCMeta):
     def _check_sample_size(self, param_list: ty.List[ty.Any]=[]) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     @abstractmethod
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...
+
+class DistributionPGM(ValueGenerator):
+    @property
+    @abstractmethod
+    def DN_NAME(self):
+        pass
+
+class ConstantFn(ValueGenerator):
+    @property
+    @abstractmethod
+    def CT_FN_NAME(self):
+        pass
 
 class NodePGM(ABC, metaclass=abc.ABCMeta):
     node_name: str

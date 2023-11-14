@@ -133,15 +133,10 @@ class ProbabilisticGraphicalModel():
 ##############################################################################
 
 
-class DistributionPGM(ABC):
-
-    @property
-    @abstractmethod
-    def DN_NAME(self):
-        pass
+class ValueGenerator(ABC):
 
     @abstract_attribute
-    def n_draws(self):
+    def n_samples(self):
         pass
 
     @abstract_attribute
@@ -169,6 +164,20 @@ class DistributionPGM(ABC):
 
     @abstractmethod
     def get_rev_inference_spec_info(self) -> ty.List[str]:
+        pass
+
+
+class DistributionPGM(ValueGenerator):
+    @property
+    @abstractmethod
+    def DN_NAME(self):
+        pass
+
+
+class ConstantFn(ValueGenerator):
+    @property
+    @abstractmethod
+    def CT_FN_NAME(self):
         pass
 
 ##############################################################################
@@ -467,6 +476,7 @@ class StochasticNodePGM(NodePGM):
                  node_name: str,
                  sample_size: int,
                  sampled_from: ty.Optional[DistributionPGM] = None,
+                 returned_from: ty.Optional[ConstantFn] = None,
                  value: ty.Optional[ty.List[ty.Any]] = None,
                  replicate_size: int = 1,
                  call_order_idx: ty.Optional[int] = None,
@@ -486,10 +496,11 @@ class StochasticNodePGM(NodePGM):
 
         self.is_sampled = False
         self.sampling_dn = sampled_from  # dn object
+        self.constant_fn = returned_from  # constant fn object
         # used for MCMC #move/operator setup during inference
         self.operator_weight = 0.0
         if not value:
-            self.sample()
+            self.get_value()
 
         self.populate_operator_weight()
 
@@ -497,9 +508,12 @@ class StochasticNodePGM(NodePGM):
         if self.sampling_dn:
             self.is_sampled = True  # r.v. value is sampled
 
-    def sample(self):
+    def get_value(self):
         if self.sampling_dn:
             self.value = self.sampling_dn.generate()
+        
+        elif self.constant_fn:
+            self.value = self.constant_fn.generate()
 
         else:
             raise RuntimeError("exiting...")

@@ -194,7 +194,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
     Args:
         nwk_tree_path_or_str (str): Tree Newick string, or path to file
-            containing tree Newick string
+            containing single tree Newick string
         in_file (bool): If tree string is in a file being passed as argument
             (True) or if Newick string is being passed directly (False).
             Defaults to 'True'.

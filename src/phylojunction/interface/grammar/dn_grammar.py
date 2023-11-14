@@ -83,7 +83,7 @@ class PJDnGrammar():
             #############################
             # IMPORTANT: Default values #
             #############################
-            ln_n_draws: int = 1
+            ln_n_samples: int = 1
             ln_n_repl: int = 1
             ln_mean: ty.List[float] = []
             ln_sd: ty.List[float] = []
@@ -114,7 +114,7 @@ class PJDnGrammar():
 
                         # only one element always
                         try:
-                            ln_n_draws = int(extracted_val[0])
+                            ln_n_samples = int(extracted_val[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -165,7 +165,7 @@ class PJDnGrammar():
 
             # return dnpar.DnLogNormal(pars, parent_node_tracker)
             return dnpar.DnLogNormal(
-                ln_n_draws,
+                ln_n_samples,
                 ln_n_repl,
                 ln_mean,
                 ln_sd,
@@ -176,7 +176,7 @@ class PJDnGrammar():
             #############################
             # IMPORTANT: Default values #
             #############################
-            norm_n_draws: int = 1
+            norm_n_samples: int = 1
             norm_n_repl: int = 1
             norm_mean: ty.List[float] = []
             norm_sd: ty.List[float] = []
@@ -202,7 +202,7 @@ class PJDnGrammar():
                                 dnpar.DnNormal.DN_NAME, arg)
 
                         try:
-                            norm_n_draws = int(extracted_val[0])
+                            norm_n_samples = int(extracted_val[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -243,7 +243,7 @@ class PJDnGrammar():
 
             # return dnpar.DnNormal(pars, parent_node_tracker)
             return dnpar.DnNormal(
-                norm_n_draws,
+                norm_n_samples,
                 norm_n_repl,
                 norm_mean,
                 norm_sd,
@@ -253,7 +253,7 @@ class PJDnGrammar():
             #############################
             # IMPORTANT: Default values #
             #############################
-            exp_n_draws: int = 1
+            exp_n_samples: int = 1
             exp_n_repl: int = 1
             exp_scale_or_rate: ty.List[float] = []
             exp_rate_parameterization: bool = True
@@ -278,7 +278,7 @@ class PJDnGrammar():
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnExponential.DN_NAME, arg)
                         # pars[0] = int(_extracted_val[0])
-                        exp_n_draws = int(extracted_val[0])
+                        exp_n_samples = int(extracted_val[0])
 
                     elif arg == "nr":
                         if len(extracted_val) > 1:
@@ -306,7 +306,7 @@ class PJDnGrammar():
 
             # return dnpar.DnExponential(pars, parent_node_tracker)
             return dnpar.DnExponential(
-                exp_n_draws,
+                exp_n_samples,
                 exp_n_repl,
                 exp_scale_or_rate,
                 exp_rate_parameterization,
@@ -316,7 +316,7 @@ class PJDnGrammar():
             #############################
             # IMPORTANT: Default values #
             #############################
-            gamma_n_draws: int = 1
+            gamma_n_samples: int = 1
             gamma_n_repl: int = 1
             gamma_shape: ty.List[float] = []
             gamma_scale_or_rate: ty.List[float] = []
@@ -343,7 +343,7 @@ class PJDnGrammar():
                                 dnpar.DnGamma.DN_NAME, arg)
 
                         try:
-                            gamma_n_draws = int(extracted_val[0])
+                            gamma_n_samples = int(extracted_val[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -395,7 +395,7 @@ class PJDnGrammar():
 
             # return dnpar.DnGamma(pars, parent_node_tracker)
             return dnpar.DnGamma(
-                gamma_n_draws,
+                gamma_n_samples,
                 gamma_n_repl,
                 gamma_shape,
                 gamma_scale_or_rate,
@@ -406,7 +406,7 @@ class PJDnGrammar():
             #############################
             # IMPORTANT: Default values #
             #############################
-            unif_n_draws: int = 1
+            unif_n_samples: int = 1
             unif_n_repl: int = 1
             unif_min: ty.List[float] = []
             unif_max: ty.List[float] = []
@@ -431,7 +431,7 @@ class PJDnGrammar():
                                 dnpar.DnUnif.DN_NAME, arg)
 
                         try:
-                            unif_n_draws = int(extracted_val[0])
+                            unif_n_samples = int(extracted_val[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -473,7 +473,7 @@ class PJDnGrammar():
 
             # return dnpar.DnUnif(pars, parent_node_tracker)
             return dnpar.DnUnif(
-                unif_n_draws,
+                unif_n_samples,
                 unif_n_repl,
                 unif_min,
                 unif_max,

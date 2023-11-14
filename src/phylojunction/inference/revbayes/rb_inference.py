@@ -154,7 +154,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
                     # Important #
                     #############
                     # in PJ, we assume that if a node has the same number of (clamped) assigned values
-                    # as the the sample size (n_draws) of stochastic nodes (or if there are no stochastic
+                    # as the the sample size (n_samples) of stochastic nodes (or if there are no stochastic
                     # nodes added to the PGM at all yet, see above code), then we take each of its
                     # values and split them among the sample-sized-rev scripts, e.g., if we do:
                     #

@@ -40,9 +40,18 @@ import matplotlib.pyplot as plt  # type: ignore
 if __name__ == "__main__":
     # tr_str = "(((nd10:0.05585634266420793[&state=1],(nd12:0.01444225652017525[&state=0],nd13:0.01444225652017525[&state=2])nd11:0.04141408614403268[&state=2])nd2:1.225238932333245[&state=2],((nd6:0.15152443528855317[&state=1],nd7:0.15152443528855317[&state=1])nd4:0.16841576897032884[&state=1],(nd8:0.11388809491478649[&state=1],nd9:0.0982030908340934[&state=1])nd5:0.2060521093440955[&state=1])nd3:0.9611550707385709[&state=1])root:0.7189047250025469[&state=0])origin:0.0[&state=0];"
     tr_str = "(((nd10[&state=1]:0.05585634266420793,(nd12[&state=0]:0.01444225652017525,nd13[&state=2]:0.01444225652017525)nd11[&state=2]:0.04141408614403268)nd2[&state=2]:1.225238932333245,((nd6[&state=1]:0.15152443528855317,nd7[&state=1]:0.15152443528855317)nd4[&state=1]:0.16841576897032884,(nd8[&state=1]:0.11388809491478649,nd9[&state=1]:0.0982030908340934)nd5[&state=1]:0.2060521093440955)nd3[&state=1]:0.9611550707385709)root[&state=0]:0.7189047250025469)origin[&state=0]:0.0;"
+    tr_str_invalid = "((A:1.0,B:1.0):1.0,C:2.0);"
 
-    ann_tr = pjr.read_nwk_tree_str(tr_str,
-                                   in_file=False)
+    try:
+        ann_tr = pjr.read_nwk_tree_str(tr_str,
+                                       in_file=False)
+    except (TypeError,
+            AttributeError,
+            dp.dataio.tokenizer.Tokenizer.UnexpectedEndOfStreamError,
+            dp.dataio.newickreader.NewickReader.NewickReaderMalformedStatementError,
+            dp.dataio.newickreader.NewickReader.NewickReaderDuplicateTaxonError) as e:
+        print(e)
+
     
     at_dict = \
         {"nd3":
