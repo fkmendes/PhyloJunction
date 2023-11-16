@@ -74,13 +74,13 @@ class GUIModeling():
                     gui_main_window_obj.ui.ui_pages.warnings_textbox.setText(str(e))
 
             if valid_cmd_line:
-                try:
-                    if self.cmd_log_list[-1].startswith("\n#"):
-                        self.cmd_log_list.append("")  # adding new line
+                # try:
+                if len(self.cmd_log_list) >= 1 and self.cmd_log_list[-1] in ("\n#"):
+                    self.cmd_log_list.append("")  # adding new line
 
-                except Exception as e:
-                    print("An error occurred: ", type(e).__name__, " - ", e)
-                    pass
+                # except Exception as e:
+                #     print("PhyloJunction's GUI: An error occurred: ", type(e).__name__, " - ", e)
+                #     pass
 
                 self.cmd_log_list.append(valid_cmd_line)
 

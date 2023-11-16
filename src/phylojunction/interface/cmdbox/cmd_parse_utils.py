@@ -95,6 +95,10 @@ def parse_spec(
             ty.List[pgm.NodePGM]]:
 
     spec_dict: ty.Dict[str, str] = tokenize_fn_spec(fn_spec_str, cmd_line)
+    
+    # debugging
+    # print("spec_dict = ", spec_dict)
+    
     spec_dict_return: \
         ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
 
@@ -176,12 +180,13 @@ def tokenize_fn_spec(fn_spec_str: str, cmd_line: str) -> ty.Dict[str, str]:
             keys, argument strings as values (e.g., {"mean": "0.0"}).
     """
 
-    stop_token_capture_chs = tuple(["]", "="])
+    stop_token_capture_chs = tuple([']', '='])
 
     spec_dict = dict()
     token, last_key_token = str(), str()
-    first_ch = True
-    reading_vector = False
+    first_ch: bool = True
+    reading_vector: bool = False
+    reading_string: bool = False
 
     for ch in fn_spec_str:
         if first_ch and re.match(cannot_start_with_this_regex, ch):
@@ -196,22 +201,38 @@ def tokenize_fn_spec(fn_spec_str: str, cmd_line: str) -> ty.Dict[str, str]:
         elif ch in stop_token_capture_chs:
             # token was parameter, we make it a key
             if ch == "=":
-                spec_dict[token] = ""
-                last_key_token = token
+                if not reading_string:
+                    spec_dict[token] = ""
+                    last_key_token = token
+                    reading_string = False
+                    token = str()
+                
+                else:
+                    token += ch
+                    continue
 
             # character closed a vector, we make it a value
             elif ch == "]":
-                token += ch
-                spec_dict[last_key_token] = token
-                reading_vector = False  # matters only when ch == "]"
+                if not reading_string:
+                    token += ch
+                    spec_dict[last_key_token] = token
+                    reading_vector = False  # matters only when ch == "]"
+                    token = str()
+                
+                else:
+                    token += ch
+                    continue
 
-            token = str()
+            # elif ch == '"' and reading_string:
+            #     token += ch
+            #     spec_dict[last_key_token] = token
+            #     reading_string = False
 
         # if not stopping, keep adding
         else:
             if ch == ",":
                 # finished reading a parameter=argument pair
-                if not reading_vector and token:
+                if not reading_vector and not reading_string and token:
                     spec_dict[last_key_token] = token
                     token = str()
                     continue
@@ -221,10 +242,23 @@ def tokenize_fn_spec(fn_spec_str: str, cmd_line: str) -> ty.Dict[str, str]:
                     token += ch
                     continue
 
+                # reading string (e.g., newick), we care about the comma
+                if reading_string:
+                    token += ch
+                    continue
+
             # keep adding as long as it's not a comma
             else:
-                if ch == "[":
+                if ch == "[" and not reading_string:
                     reading_vector = True
+
+                if ch == '"':
+                    if not reading_string:
+                        reading_string = True
+
+                    else:
+                        reading_string = False
+
 
                 token += ch
 

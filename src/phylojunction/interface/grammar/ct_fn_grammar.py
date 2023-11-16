@@ -3,7 +3,7 @@ import typing as ty
 # pj imports
 import phylojunction.utility.exception_classes as ec
 import phylojunction.pgm.pgm as pgm
-import interface.grammar.ct_fn_treereader_makers as make_tree
+import phylojunction.interface.grammar.ct_fn_treereader_makers as make_tree
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -17,7 +17,7 @@ class PJCtFnGrammar():
     # All available deterministic functions #
     #########################################
     ct_fn_grammar_dict = {
-        "read_tree": set(["file_path", "string", "node_name_attr"])
+        "read_tree": set(["n", "nr", "file_path", "string", "node_name_attr"])
     }
 
     @classmethod
@@ -39,6 +39,9 @@ class PJCtFnGrammar():
         for arg in ct_fn_param_dict:
             if not cls.grammar_check("read_tree", arg):
                 raise ec.ParseNotAParameterError(arg)
+
+        # debugging    
+        # print(ct_fn_param_dict)
 
         return make_tree.make_tree_reader("read_tree", ct_fn_param_dict)
         

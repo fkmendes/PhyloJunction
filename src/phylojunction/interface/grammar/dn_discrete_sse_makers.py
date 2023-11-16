@@ -226,12 +226,12 @@ def make_discrete_SSE_dn(
 
 if __name__ == "__main__":
     # can be called from interface/grammar/
-    # $ python3 make_dn_discrete_sse.py
+    # $ python3.9 make_dn_discrete_sse.py
     #
     # can also be called from phylojunction/
-    # $ python3 interface/grammar/make_dn_discrete_sse.py
+    # $ python3.9 interface/grammar/make_dn_discrete_sse.py
     # or
-    # $ python3 -m interface.grammar.make_dn_discrete_sse
+    # $ python3.9 -m interface.grammar.make_dn_discrete_sse
     #
     # can also be called from VS Code, if open folder is phylojuction/
 

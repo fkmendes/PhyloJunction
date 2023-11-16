@@ -295,14 +295,16 @@ def parse_variable_assignment(
         None
     """
 
-    def create_add_stoch_node_pgm(a_stoch_node_name,
-                                  sample_size,
-                                  a_val_obj_list):
+    def create_add_stoch_node_pgm(a_stoch_node_name: str,
+                                  sample_size: int,
+                                  a_val_obj_list: ty.List[ty.Any],
+                                  a_ct_fn_obj: pgm.ConstantFn):
 
         stoch_node = pgm.StochasticNodePGM(
             a_stoch_node_name,
             sample_size=sample_size,
             value=a_val_obj_list,
+            returned_from=a_ct_fn_obj,
             clamped=True)
 
         pgm_obj.add_node(stoch_node)
@@ -311,7 +313,8 @@ def parse_variable_assignment(
     # IMPORTANT #
     #############
     # arguments of dn/det parameters will come out as lists
-    values_list = list()
+    values_list: ty.List[ty.Any] = list()
+    ct_fn_obj: pgm.ConstantFn = None
 
     # if argument is a vector of values
     if re.match(cmdu.vector_value_regex, stoch_node_spec):
@@ -332,21 +335,15 @@ def parse_variable_assignment(
                  "like there were two dots \".\" when only one is allowed."))
 
         values_list.append(stoch_node_spec)
-
-    elif re.match(cmdu.character_value_regex, stoch_node_spec):
-        if len(re.findall(cmdu.character_value_regex, stoch_node_spec)) > 1:
-            raise ec.ScriptSyntaxError(
-                stoch_node_spec,
-                ("Something went wrong during variable assignment. If being "
-                 "assigned the value of another variable, it must be a single "
-                 "one."))
-        
-        values_list.append(stoch_node_spec)
     
     # if the value is the return of a function (e.g., read_tree())
     elif re.search(cmdu.sampling_dn_spec_regex, stoch_node_spec) is not None:
         constant_fn_name, constant_fn_spec = \
             re.search(cmdu.sampling_dn_spec_regex, stoch_node_spec).groups()
+
+        # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
+        spec_dict, parent_pgm_nodes = \
+            cmdu.parse_spec(pgm_obj, constant_fn_spec, cmd_line)
 
         ####################################################
         # Create the sampling distribution object          #
@@ -356,10 +353,10 @@ def parse_variable_assignment(
         ####################################################
         try:
             # exists outside try!
-            ct_obj = \
+            ct_fn_obj = \
                 ctgrammar.PJCtFnGrammar.create_ct_fn_obj(
                     constant_fn_name,
-                    constant_fn_spec)
+                    spec_dict)
 
         except (ec.ParseNotAParameterError,
                 ec.ParseRequireSingleValueError,
@@ -367,6 +364,16 @@ def parse_variable_assignment(
                 ec.ParseRequireNumericError,
                 ec.ParseMissingParameterError) as e:
             raise ec.ParseCtFnInitFailError(constant_fn_name, e.message)
+        
+    elif re.match(cmdu.character_value_regex, stoch_node_spec):
+        if len(re.findall(cmdu.character_value_regex, stoch_node_spec)) > 1:
+            raise ec.ScriptSyntaxError(
+                stoch_node_spec,
+                ("Something went wrong during variable assignment. If being "
+                 "assigned the value of another variable, it must be a single "
+                 "one."))
+        
+        values_list.append(stoch_node_spec)
 
     else:
         raise ec.ScriptSyntaxError(
@@ -379,7 +386,10 @@ def parse_variable_assignment(
     val_obj_list = cmdu.val_or_obj(pgm_obj, values_list)
     n_samples = len(val_obj_list)
 
-    create_add_stoch_node_pgm(stoch_node_name, n_samples, val_obj_list)
+    create_add_stoch_node_pgm(stoch_node_name,
+                              n_samples,
+                              val_obj_list,
+                              ct_fn_obj)
 
 
 # function called by (2. sampling distribution assignment)
@@ -808,7 +818,17 @@ if __name__ == "__main__":
         + "det_sampling_rate := sse_prob(name=\"rho\", value=sampling_rate, state=[0])\n" \
         + "stash := sse_stash(flat_rate_mat=[det_birth_rate], flat_prob_mat=[det_sampling_rate], n_states=1, n_epochs=1)\n" \
         + "trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=stash, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
+    
+    script_str39 = \
+        "tr <- read_tree(string=\"((sp1[&index=1]:1.0,sp2[&index=2]:1.0)[&index=4]:1.0,sp3[&index=3]:2.0)[&index=5];\", node_name_attr=\"index\")"
 
+    script_str40 = \
+        "tr <- read_tree(file_path=\"examples/trees_maps_files/tree_to_read.tre\", node_name_attr=\"index\")"
+    
+    script_str41 = \
+        "tr <- read_tree(file_path=\"examples/trees_maps_files/trees_to_read.tre\", node_name_attr=\"index\")"
+        # tr <- read_tree(file_path="examples/trees_maps_files/trees_to_read.tre", node_name_attr="index")
+    
     # for copying and pasting in GUI:
     #
     # vectorized atomic rate parameter
@@ -867,5 +887,5 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm(script_str24, in_pj_file=False)
+    pgm_obj = script2pgm(script_str41, in_pj_file=False)
     # pgm_pbj = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)

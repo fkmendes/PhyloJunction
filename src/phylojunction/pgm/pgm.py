@@ -399,12 +399,13 @@ class NodePGM(ABC):
                         for st, stat_v in obj_stat_dict.items():
                             float_stat_v: float = 0.0
 
-                            try:
-                                float_stat_v = float(stat_v)
+                            if stat_v != "None":
+                                try:
+                                    float_stat_v = float(stat_v)
 
-                            except ValueError:
-                                raise ec.NodePGMNodeStatCantFloatError(
-                                    self.node_name)
+                                except ValueError:
+                                    raise ec.NodePGMNodeStatCantFloatError(
+                                        self.node_name)
 
                             try:
                                 repl_all_stats_dict[st].append(float_stat_v)
@@ -472,6 +473,8 @@ class NodePGM(ABC):
 
 class StochasticNodePGM(NodePGM):
 
+    random_value: ty.List[ty.Any]
+
     def __init__(self,
                  node_name: str,
                  sample_size: int,
@@ -484,23 +487,27 @@ class StochasticNodePGM(NodePGM):
                  clamped: bool = False,
                  parent_nodes: ty.Optional[ty.List[ty.Any]] = None):
 
-        super().__init__(
-            node_name,
-            sample_size=sample_size,
-            value=value,
-            replicate_size=replicate_size,
-            call_order_idx=call_order_idx,
-            deterministic=deterministic,
-            clamped=clamped,
-            parent_nodes=parent_nodes)
-
         self.is_sampled = False
         self.sampling_dn = sampled_from  # dn object
         self.constant_fn = returned_from  # constant fn object
-        # used for MCMC #move/operator setup during inference
-        self.operator_weight = 0.0
+
         if not value:
-            self.get_value()
+            self.random_value = self.get_value()
+        
+        else:
+            self.random_value = value
+
+        super().__init__(node_name,
+                         sample_size=sample_size,
+                         value=self.random_value,
+                         replicate_size=replicate_size,
+                         call_order_idx=call_order_idx,
+                         deterministic=deterministic,
+                         clamped=clamped,
+                         parent_nodes=parent_nodes)
+
+        # used for MCMC #move/operator setup during inference
+        self.operator_weight = 0.0            
 
         self.populate_operator_weight()
 
@@ -508,12 +515,12 @@ class StochasticNodePGM(NodePGM):
         if self.sampling_dn:
             self.is_sampled = True  # r.v. value is sampled
 
-    def get_value(self):
+    def get_value(self) -> ty.List[ty.Any]:
         if self.sampling_dn:
-            self.value = self.sampling_dn.generate()
+            return self.sampling_dn.generate()
         
         elif self.constant_fn:
-            self.value = self.constant_fn.generate()
+            return self.constant_fn.generate()
 
         else:
             raise RuntimeError("exiting...")

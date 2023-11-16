@@ -210,6 +210,9 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
         pjh.create_str_defaultdict)
     node_id_to_name: dict[str, str] = dict()
 
+    # debugging
+    # print("node_names_attribute =", node_names_attribute)
+
     # if tree provided in separate file
     if in_file:
         if not os.path.isfile(nwk_tree_path_or_str):
@@ -241,26 +244,31 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
         nd.is_sa_lineage = False
         nd.is_sa_dummy_parent = False
 
-        # (1) origin and/or root
+        # (1) seed node (origin and/or root)
         if nd is dp_tr.seed_node:
             nd.is_sa_dummy_parent = False
             nd.is_sa = False
             nd.alive = False
+            nd.state = 0
             
             nd_name = ("origin" if is_origin else "root")
-            nd.taxon = dp.Taxon(label=nd_name)
-            nd.label = nd_name
-            
             if nd_name == "root":
                 seen_root = True
-        
-        # (2) not origin
+
+            if nd.taxon is None:
+                nd.taxon = dp.Taxon(label=nd_name)
+                nd.label = nd_name
+                dp_tr.taxon_namespace.add_taxon(nd.taxon)
+
+        # (2) not seed node
         else:
+            # internal node
             if not nd.is_leaf():
                 # initial values
                 nd.is_sa_dummy_parent = False
                 nd.is_sa = False
                 nd.alive = False
+                nd.state = 0
 
                 # seeing if origin child is root
                 # or the dummy parent of a sampled ancestor
@@ -301,12 +309,9 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             nd_id = nd.annotations[node_names_attribute].value
             nd_name = "nd" + nd_id
 
-            if nd.is_leaf():
-                nd.label = nd.taxon.label
-
             # internal and no name provided
-            elif nd.taxon is None:                
-                if nd.label == "None":
+            if nd.taxon is None:
+                if nd.label is None:
                     nd.label = nd_name
                     nd.taxon = dp.Taxon(label=nd_name)
 
@@ -314,6 +319,23 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                     nd.taxon = dp.Taxon(label=nd.label)
 
                 dp_tr.taxon_namespace.add_taxon(nd.taxon)
+
+            if nd.is_leaf():
+                nd.label = nd.taxon.label
+                nd.state = 0
+
+            # # internal and no name provided
+            # elif nd.taxon is None:                
+            #     if nd.label == "None":
+            #         nd.label = nd_name
+            #         nd.taxon = dp.Taxon(label=nd_name)
+
+            #     else:
+            #         nd.taxon = dp.Taxon(label=nd.label)
+
+            #     print(dp_tr.taxon_namespace)
+            #     dp_tr.taxon_namespace.add_taxon(nd.taxon)
+            #     print(dp_tr.taxon_namespace)
 
             node_id_to_name[nd_id] = nd.label
             node_attr_dict[nd.label][node_names_attribute] = nd_id

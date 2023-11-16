@@ -20,11 +20,12 @@ class TestCommandParseUtils(unittest.TestCase):
         fn_spec2 = "name=\"lambda0\", states=[0, 0, 0], value=1.0, event=\"w_speciation\""
         fn_spec3 = "states=[0, 0, 0], name=\"lambda0\", value=1.0, event=\"w_speciation\""
         
-        cmd_line1 = "a <- sse_rate(" + fn_spec1 + ")"    
-        cmd_line2 = "a <- sse_rate(" + fn_spec2 + ")" 
-        cmd_line3 = "a <- sse_rate(" + fn_spec3 + ")"     
+        cmd_line1 = "a := sse_rate(" + fn_spec1 + ")"    
+        cmd_line2 = "a := sse_rate(" + fn_spec2 + ")" 
+        cmd_line3 = "a := sse_rate(" + fn_spec3 + ")"     
         
         token_dict1 = cmdu.tokenize_fn_spec(fn_spec1, cmd_line1)
+        print("token_dict1 = ", token_dict1)
         token_dict2 = cmdu.tokenize_fn_spec(fn_spec2, cmd_line2)
         token_dict3 = cmdu.tokenize_fn_spec(fn_spec3, cmd_line3)
 
@@ -63,6 +64,6 @@ if __name__ == "__main__":
     #
     # or 
     #
-    # $ python3 -m unittest tests.interface.test_cmd_parse_utils.TestCommandParseUtils.test_tokenizer
+    # $ python3.9 -m unittest tests.interface.test_cmd_parse_utils.TestCommandParseUtils.test_tokenizer
 
     unittest.main()
