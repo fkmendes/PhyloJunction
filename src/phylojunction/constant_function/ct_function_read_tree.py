@@ -63,11 +63,15 @@ class CtFnTreeReader(pgm.ConstantFn):
     def _check_sample_size(self) -> None:
         """Check provided tree strings and count members match"""
 
+        arg: str = "string" 
+        if self.in_file:
+            arg = "file_path"
+
         if (self.n_samples != 1 or self.n_repl != 1) and \
             (self.n_samples * self.n_repl) != self.total_tr_count:
                 raise ec.ObjInitIncorrectDimensionError(
                         "CtFnTreeReader",
-                        "file_path",
+                        arg,
                         self.total_tr_count,
                         exp_len=self.n_samples * self.n_repl
                     )

@@ -300,9 +300,14 @@ def parse_variable_assignment(
                                   a_val_obj_list: ty.List[ty.Any],
                                   a_ct_fn_obj: pgm.ConstantFn):
 
+        replicate_size: int = 1
+        if a_ct_fn_obj is not None:
+            replicate_size = a_ct_fn_obj.n_repl
+        
         stoch_node = pgm.StochasticNodePGM(
             a_stoch_node_name,
             sample_size=sample_size,
+            replicate_size=replicate_size,
             value=a_val_obj_list,
             returned_from=a_ct_fn_obj,
             clamped=True)
@@ -820,13 +825,16 @@ if __name__ == "__main__":
         + "trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=stash, start_state=[0,0], stop=\"age\", stop_value=1.0, origin=\"true\")"
     
     script_str39 = \
-        "tr <- read_tree(string=\"((sp1[&index=1]:1.0,sp2[&index=2]:1.0)[&index=4]:1.0,sp3[&index=3]:2.0)[&index=5];\", node_name_attr=\"index\")"
-
-    script_str40 = \
-        "tr <- read_tree(file_path=\"examples/trees_maps_files/tree_to_read.tre\", node_name_attr=\"index\")"
+        'tr <- read_tree(string="((sp1[&index=1]:1.0,sp2[&index=2]:1.0)[&index=4]:1.0,sp3[&index=3]:2.0)[&index=5];", node_name_attr="index")'
     
+    script_str40 = \
+        'tr <- read_tree(string="((sp1:1.0,sp2:1.0):1.0,sp3:2.0);")'
+
     script_str41 = \
-        "tr <- read_tree(file_path=\"examples/trees_maps_files/trees_to_read.tre\", node_name_attr=\"index\")"
+        'tr <- read_tree(file_path="examples/trees_maps_files/tree_to_read.tre", node_name_attr="index")'
+    
+    script_str42 = \
+        'tr <- read_tree(file_path="examples/trees_maps_files/trees_to_read.tre", node_name_attr="index")'
         # tr <- read_tree(file_path="examples/trees_maps_files/trees_to_read.tre", node_name_attr="index")
     
     # for copying and pasting in GUI:
@@ -887,5 +895,5 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm(script_str41, in_pj_file=False)
+    pgm_obj = script2pgm(script_str40, in_pj_file=False)
     # pgm_pbj = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)

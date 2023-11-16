@@ -497,9 +497,6 @@ class GUIMainWindow(QMainWindow):
             node_pgm, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
 
-            # print("sample_size=" + str(sample_size))
-            # print("repl_size=" + str(repl_size))
-
             # spin boxes must be up-to-date #
             self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
             if sample_size == 0:
@@ -1138,42 +1135,64 @@ class GUIMainWindow(QMainWindow):
             # and uncheck so that the radio
             # button is totally reset and
             # turned off
-
-            # radio #
-            # if it's the first click selecting node
-            if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
-                    not self.ui.ui_pages.one_sample_radio.isEnabled():
-                self.ui.ui_pages.all_samples_radio.setEnabled(True)
-                self.ui.ui_pages.all_samples_radio.setCheckable(True)
-                self.ui.ui_pages.all_samples_radio.setChecked(True)
-                self.ui.ui_pages.one_sample_radio.setEnabled(True)
-                self.ui.ui_pages.one_sample_radio.setChecked(False)
-            # self.ui.ui_pages.one_sample_radio.setCheckable(False)
-            # self.ui.ui_pages.one_sample_radio.setDisabled(True)
-
-            # if deterministic
-            # neither all nor one sample
-            # is checkable
-            if sample_size == 0:
+            
+            # tree #
+            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+                # radio #
+                # we always look one tree at a time
                 self.ui.ui_pages.all_samples_radio.setChecked(False)
                 self.ui.ui_pages.all_samples_radio.setCheckable(False)
                 self.ui.ui_pages.all_samples_radio.setDisabled(True)
 
-            # if not deterministic,
-            # we can see all samples
-            # at once
-            else:
-                self.ui.ui_pages.all_samples_radio.setEnabled(True)
-                self.ui.ui_pages.all_samples_radio.setCheckable(True)
-                self.ui.ui_pages.all_samples_radio.setChecked(True)
+                self.ui.ui_pages.one_sample_radio.setEnabled(True)
+                self.ui.ui_pages.one_sample_radio.setCheckable(True)
+                self.ui.ui_pages.one_sample_radio.setChecked(True)
 
-            # spin #
-            self.ui.ui_pages.sample_idx_spin.setMinimum(1)
-            self.ui.ui_pages.sample_idx_spin.setValue(1)
-            self.ui.ui_pages.sample_idx_spin.setDisabled(True)
-            self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-            self.ui.ui_pages.repl_idx_spin.setValue(1)
-            self.ui.ui_pages.repl_idx_spin.setDisabled(True)
+                # spin #
+                self.ui.ui_pages.sample_idx_spin.setEnabled(True)
+                self.ui.ui_pages.sample_idx_spin.setMinimum(1)
+                self.ui.ui_pages.sample_idx_spin.setValue(1)
+                self.ui.ui_pages.repl_idx_spin.setEnabled(True)
+                self.ui.ui_pages.repl_idx_spin.setMinimum(1)
+                self.ui.ui_pages.repl_idx_spin.setValue(1)
+
+            # non-tree
+            else:
+                # radio #
+                # if it's the first click selecting node
+                if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
+                        not self.ui.ui_pages.one_sample_radio.isEnabled():
+                    self.ui.ui_pages.all_samples_radio.setEnabled(True)
+                    self.ui.ui_pages.all_samples_radio.setCheckable(True)
+                    self.ui.ui_pages.all_samples_radio.setChecked(True)
+                    self.ui.ui_pages.one_sample_radio.setEnabled(True)
+                    self.ui.ui_pages.one_sample_radio.setChecked(False)
+                # self.ui.ui_pages.one_sample_radio.setCheckable(False)
+                # self.ui.ui_pages.one_sample_radio.setDisabled(True)
+
+                # if deterministic
+                # neither all nor one sample
+                # is checkable
+                if sample_size == 0:
+                    self.ui.ui_pages.all_samples_radio.setChecked(False)
+                    self.ui.ui_pages.all_samples_radio.setCheckable(False)
+                    self.ui.ui_pages.all_samples_radio.setDisabled(True)
+
+                # if not deterministic,
+                # we can see all samples
+                # at once
+                else:
+                    self.ui.ui_pages.all_samples_radio.setEnabled(True)
+                    self.ui.ui_pages.all_samples_radio.setCheckable(True)
+                    self.ui.ui_pages.all_samples_radio.setChecked(True)
+
+                # spin #
+                self.ui.ui_pages.sample_idx_spin.setMinimum(1)
+                self.ui.ui_pages.sample_idx_spin.setValue(1)
+                self.ui.ui_pages.sample_idx_spin.setDisabled(True)
+                self.ui.ui_pages.repl_idx_spin.setMinimum(1)
+                self.ui.ui_pages.repl_idx_spin.setValue(1)
+                self.ui.ui_pages.repl_idx_spin.setDisabled(True)
 
         # need to unblock signals from here on
         self.ui.ui_pages.sample_idx_spin.blockSignals(False)

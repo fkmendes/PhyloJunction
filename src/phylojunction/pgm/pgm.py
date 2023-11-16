@@ -254,7 +254,7 @@ class NodePGM(ABC):
                           start: int,
                           end: int,
                           repl_idx: int = 0,
-                          is_tree: bool = False) -> str:
+                          is_tree: bool = False) -> str:        
         if isinstance(self.value, np.ndarray):
             self.value = \
                 ", ".join(str(v) for v in self.value.tolist()[start:end])

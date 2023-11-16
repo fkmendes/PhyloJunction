@@ -236,8 +236,10 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     seen_root = False
 
     # debugging
-    print("root height = " + str(root_height))
-    print("is_origin = " + str(is_origin))
+    # print("root height = " + str(root_height))
+    # print("is_origin = " + str(is_origin))
+
+    nd_count: int = 1
 
     # now we annotate nodes
     for nd in dp_tr.preorder_node_iter():
@@ -262,6 +264,8 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
         # (2) not seed node
         else:
+            nd_count += 1
+
             # internal node
             if not nd.is_leaf():
                 # initial values
@@ -306,7 +310,18 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
             # now we deal with translating between node
             # ids and node names
-            nd_id = nd.annotations[node_names_attribute].value
+            
+            nd_id: str = str(nd_count)
+            if node_names_attribute != "":
+                if nd.annotations[node_names_attribute].value == "":
+                    raise ec.ObjInitInvalidArgError(
+                        fn_name,
+                        "'node_name_attribute'",
+                        message=("The attribute for node names "
+                                 "was not in the newick strings."))
+
+                nd_id = nd.annotations[node_names_attribute].value
+            
             nd_name = "nd" + nd_id
 
             # internal and no name provided

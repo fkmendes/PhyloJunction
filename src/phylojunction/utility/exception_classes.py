@@ -595,7 +595,7 @@ class ParseMutuallyExclusiveParametersError(Exception):
     def __init__(self,
                  par_name: str,
                  mutually_exclusive_par_name: str,
-                 message: str) -> None:
+                 message: str = "") -> None:
         self.par_name = par_name
         self.mutually_exclusive_par_name = mutually_exclusive_par_name
         self.message = "Argument " + self.par_name \
@@ -736,8 +736,8 @@ class PJCLIInvalidInputError(Exception):
 
     def __init__(self, par_name: str, message: str) -> None:
         self.par_name = par_name
-        self.message = "ERROR: The argument to " + par_name + " was invalid. " \
-            + message
+        self.message = "ERROR: The argument to " + par_name + \
+            + " was invalid. " + message
 
         super().__init__(self.message)
 
