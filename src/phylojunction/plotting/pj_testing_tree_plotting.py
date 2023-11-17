@@ -39,11 +39,10 @@ import matplotlib.pyplot as plt  # type: ignore
 
 if __name__ == "__main__":
     # tr_str = "(((nd10:0.05585634266420793[&state=1],(nd12:0.01444225652017525[&state=0],nd13:0.01444225652017525[&state=2])nd11:0.04141408614403268[&state=2])nd2:1.225238932333245[&state=2],((nd6:0.15152443528855317[&state=1],nd7:0.15152443528855317[&state=1])nd4:0.16841576897032884[&state=1],(nd8:0.11388809491478649[&state=1],nd9:0.0982030908340934[&state=1])nd5:0.2060521093440955[&state=1])nd3:0.9611550707385709[&state=1])root:0.7189047250025469[&state=0])origin:0.0[&state=0];"
-    tr_str = "(((nd10[&state=1]:0.05585634266420793,(nd12[&state=0]:0.01444225652017525,nd13[&state=2]:0.01444225652017525)nd11[&state=2]:0.04141408614403268)nd2[&state=2]:1.225238932333245,((nd6[&state=1]:0.15152443528855317,nd7[&state=1]:0.15152443528855317)nd4[&state=1]:0.16841576897032884,(nd8[&state=1]:0.11388809491478649,nd9[&state=1]:0.0982030908340934)nd5[&state=1]:0.2060521093440955)nd3[&state=1]:0.9611550707385709)root[&state=0]:0.7189047250025469)origin[&state=0]:0.0;"
-    tr_str_invalid = "((A:1.0,B:1.0):1.0,C:2.0);"
+    tr_str1 = "(((nd10[&state=1]:0.05585634266420793,(nd12[&state=0]:0.01444225652017525,nd13[&state=2]:0.01444225652017525)nd11[&state=2]:0.04141408614403268)nd2[&state=2]:1.225238932333245,((nd6[&state=1]:0.15152443528855317,nd7[&state=1]:0.15152443528855317)nd4[&state=1]:0.16841576897032884,(nd8[&state=1]:0.11388809491478649,nd9[&state=1]:0.0982030908340934)nd5[&state=1]:0.2060521093440955)nd3[&state=1]:0.9611550707385709)root[&state=0]:0.7189047250025469)origin[&state=0]:0.0;"
 
     try:
-        ann_tr = pjr.read_nwk_tree_str(tr_str,
+        ann_tr1 = pjr.read_nwk_tree_str(tr_str1,
                                        in_file=False)
     except (TypeError,
             AttributeError,
@@ -51,8 +50,9 @@ if __name__ == "__main__":
             dp.dataio.newickreader.NewickReader.NewickReaderMalformedStatementError,
             dp.dataio.newickreader.NewickReader.NewickReaderDuplicateTaxonError) as e:
         print(e)
-
     
+    # we will overwrite ann_tr1 current at_dict, which
+    # is an empty dictionary at the moment
     at_dict = \
         {"nd3":
         [
@@ -74,8 +74,8 @@ if __name__ == "__main__":
         "nd12": [pjat.AttributeTransition("state", "nd12", 1.9855577434798246, 2, 0)]
         }
 
-    ann_tr.at_dict = at_dict
-    ann_tr.populate_nd_attr_dict(["state"], read_as_newick_str=True)
+    ann_tr1.at_dict = at_dict
+    ann_tr1.populate_nd_attr_dict(["state"], read_as_newick_str=True)
     
     fig = matplotlib.pyplot.figure()
 
@@ -88,13 +88,47 @@ if __name__ == "__main__":
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
+    # pjt.plot_ann_tree(
+    #     ann_tr1,
+    #     ax,
+    #     use_age=False,
+    #     start_at_origin=True,
+    #     sa_along_branches=False,
+    #     attr_of_interest="state")
+    
+    # plt.show()
+
+
+
+
+    # tr_str2 = "((A:1.0,B:1.0):1.0,C:2.0);"
+    tr_str2 = "examples/trees_maps_files/geosse_dummy_tree1.tre"
+
+    try:
+        # ann_tr2.at_dict is an empty dictionary
+        ann_tr2 = pjr.read_nwk_tree_str(tr_str2,
+                                        in_file=True)
+    except (TypeError,
+            AttributeError,
+            dp.dataio.tokenizer.Tokenizer.UnexpectedEndOfStreamError,
+            dp.dataio.newickreader.NewickReader.NewickReaderMalformedStatementError,
+            dp.dataio.newickreader.NewickReader.NewickReaderDuplicateTaxonError) as e:
+        print(e)
+
+    pjr.read_node_attr_update_tree(
+        "examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
+        "state",
+        ann_tr2)
+    
+    # for nd in ann_tr2.tree.nodes():
+    #     print(nd.state)
+
     pjt.plot_ann_tree(
-        ann_tr,
+        ann_tr2,
         ax,
         use_age=False,
-        start_at_origin=True,
+        start_at_origin=False,
         sa_along_branches=False,
         attr_of_interest="state")
-    # sa_along_branches=False
 
     plt.show()

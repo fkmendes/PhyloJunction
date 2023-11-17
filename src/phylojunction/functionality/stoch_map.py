@@ -9,6 +9,7 @@ import typing as ty
 from phylojunction.data.tree import AnnotatedTree
 import phylojunction.readwrite.pj_read as pjr
 import phylojunction.functionality.biogeo as pjbio
+import phylojunction.utility.exception_classes as ec
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -525,6 +526,22 @@ class StochMapsOnTree():
 
         return widespread_range_sizes_dict
 
+    def update_tree_attributes(self, attr_name: str) -> None:
+        """Go through stochastic maps and annotate tree
+
+        This function is called outside of StochMapsOnTree.
+        It goes through the two stochastic maps dictionaries,
+        and updates the AnnotatedTree member with respect to
+        its (i) node's attributes, (ii) node_attr_dict member
+
+        Args:
+            attr_name (str):
+
+        Returns:
+            None, this function has a side-effect
+        """
+        pass
+
     # internal
     def _preorder_traverse_tree_annotating_maps(self, ann_tr):
         pass
@@ -578,30 +595,34 @@ class StochMapsOnTree():
 
 class StochMapCollection():
 
+    n_stoch_map_iterations: int
     stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree]
     str_representation: str
 
     def __init__(self,
                  stoch_maps_file_path: str,
-                 ann_tr: AnnotatedTree,
+                 ann_trs: ty.List[AnnotatedTree],
                  state2bit_lookup: pjbio.State2BitLookup) -> None:
 
         self.stoch_maps_tree_dict = dict()
 
-        # initializes stoch_maps_tree_list
+        # initializesL
+        # (i) stoch_maps_tree_list
+        # (ii) n_stoch_map_iterations
         self._read_stoch_maps_file(stoch_maps_file_path,
-                                   ann_tr,
+                                   ann_trs,
                                    state2bit_lookup)
         
         # looks for errors with cladogenetic maps
         self._report_clado_map_issue_str()
 
+        # self.str_representation = ""
         self._init_str_representation()
 
     # internal
     def _read_stoch_maps_file(self,
                               stoch_maps_file_path: str,
-                              ann_tr: AnnotatedTree,
+                              ann_trs: ty.List[AnnotatedTree],
                               state2bit_lookup: pjbio.State2BitLookup) -> None:
 
         if not os.path.isfile(stoch_maps_file_path):
@@ -609,21 +630,49 @@ class StochMapCollection():
         
         with open(stoch_maps_file_path, "r") as infile:
             infile.readline() # skip header
+            # load all maps in memory
+            stoch_map_on_tree_str_list = infile.read().splitlines()
 
-            # iterating over MCMC iterations logging stochastic maps
-            for line in infile:
-                stoch_map_on_tree_str_list = line.rstrip().split("\t")
-                iteration_idx = int(stoch_map_on_tree_str_list[0])
+        # how many MCMC iterations we have maps for
+        self.n_stoch_map_iterations = \
+            len(set(line.split("\t")[0] \
+                    for line in stoch_map_on_tree_str_list))
+            
+        # either we have a single tree (n_samples = 1)
+        # and multiple maps (stochastic maps from
+        # a single analysis at different MCMC generations)
+        #
+        # or we have multiple trees (n_samples > 1 and/or
+        # n_repl > 1) and the number of MCMC stochastic maps
+        # must match the number of trees
+        n_trees: int = len(ann_trs)
+        if n_trees > 1 and n_trees != self.n_stoch_map_iterations:
+            raise ec.ObjInitIncorrectDimensionError(
+                StochMapCollection,
+                "ann_trs",
+                n_trees,
+                self.n_stoch_map_iterations)
 
-                if iteration_idx not in self.stoch_maps_tree_dict: 
-                    self.stoch_maps_tree_dict[iteration_idx] \
-                        = StochMapsOnTree(iteration_idx,
-                                          ann_tr,
-                                          state2bit_lookup)      
+        # debugging
+        # print("n_iterations", self.n_stoch_map_iterations)
 
-                # we add this map to it
+        # iterating over MCMC iterations logging stochastic maps
+        n_different_iterations: int = 0
+        for line in stoch_map_on_tree_str_list:
+            stoch_map_on_tree_str_list = line.split("\t")
+            iteration_idx = int(stoch_map_on_tree_str_list[0])
+
+            if iteration_idx not in self.stoch_maps_tree_dict: 
                 self.stoch_maps_tree_dict[iteration_idx] \
-                    .add_map(stoch_map_on_tree_str_list[1:])
+                    = StochMapsOnTree(iteration_idx,
+                                      ann_trs[n_different_iterations],
+                                      state2bit_lookup)
+                if n_trees > 1:
+                    n_different_iterations += 1
+
+            # we add this map to it
+            self.stoch_maps_tree_dict[iteration_idx] \
+                .add_map(stoch_map_on_tree_str_list[1:])
                 
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
 
@@ -773,10 +822,9 @@ class StochMapCollection():
 
 if __name__ == "__main__":
     
-    tr = pjr.read_nwk_tree_str(
-        "examples/trees_maps_files/turtle.tre",
-        "read_tree",
-        node_names_attribute="index")
+    tr = [pjr.read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
+                                "read_tree",
+                                node_names_attribute="index")]
     
     # bit_patts = list()
     # with open("examples/trees_maps_files/kadua_range_label.csv", "r") as infile:

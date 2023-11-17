@@ -152,7 +152,7 @@ def parse_cli_str_write_fig(str_write_fig: str) \
         node_ranges_list = node_ranges_str.split(",")
 
         if len(node_names_list) != len(node_ranges_list):
-            raise ec.PJCLIInvalidInput(
+            raise ec.PJCLIInvalidInputError(
                 "-f",
                 ("If ranges are provided, the number of ranges must "
                  "match the number of node names to plot figures for.")
@@ -243,6 +243,24 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
     # now we annotate nodes
     for nd in dp_tr.preorder_node_iter():
+        # if node ids (e.g. index) are provided
+        # as node_names_attribute, we will use
+        # them to name every single node in the tree
+        with_attribute: bool = False
+        nd_name: str = "nd" + str(nd_count)
+        node_names_attribute_val: str = ""
+        if node_names_attribute != "":
+            if nd.annotations[node_names_attribute].value == "":
+                raise ec.ObjInitInvalidArgError(
+                    fn_name,
+                    "'node_name_attribute'",
+                    message=("The attribute for node names "
+                                "was not in the newick strings."))
+
+            node_names_attribute_val = nd.annotations[node_names_attribute].value
+            nd_name = "nd" + node_names_attribute_val
+            with_attribute = True
+
         nd.is_sa_lineage = False
         nd.is_sa_dummy_parent = False
 
@@ -253,7 +271,9 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             nd.alive = False
             nd.state = 0
             
-            nd_name = ("origin" if is_origin else "root")
+            if not with_attribute:
+                nd_name = ("origin" if is_origin else "root")
+
             if nd_name == "root":
                 seen_root = True
 
@@ -284,7 +304,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
                 # root!
                 if not nd.is_sa_dummy_parent and \
-                        not seen_root:
+                        not seen_root and not with_attribute:
                     nd.taxon = dp.Taxon(label="root")
                     nd.label = "root"
                     seen_root = True
@@ -308,22 +328,6 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             if nd.parent_node.is_sa_dummy_parent:
                 nd.is_sa_lineage = True
 
-            # now we deal with translating between node
-            # ids and node names
-            
-            nd_id: str = str(nd_count)
-            if node_names_attribute != "":
-                if nd.annotations[node_names_attribute].value == "":
-                    raise ec.ObjInitInvalidArgError(
-                        fn_name,
-                        "'node_name_attribute'",
-                        message=("The attribute for node names "
-                                 "was not in the newick strings."))
-
-                nd_id = nd.annotations[node_names_attribute].value
-            
-            nd_name = "nd" + nd_id
-
             # internal and no name provided
             if nd.taxon is None:
                 if nd.label is None:
@@ -336,7 +340,15 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                 dp_tr.taxon_namespace.add_taxon(nd.taxon)
 
             if nd.is_leaf():
-                nd.label = nd.taxon.label
+                # if node_names_attribute is passed,
+                # we rename all taxa, including leaves
+                if with_attribute:
+                    nd.label = nd_name
+                    nd.taxon.label = nd_name
+                
+                else:
+                    nd.label = nd.taxon.label
+                
                 nd.state = 0
 
             # # internal and no name provided
@@ -352,8 +364,9 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             #     dp_tr.taxon_namespace.add_taxon(nd.taxon)
             #     print(dp_tr.taxon_namespace)
 
-            node_id_to_name[nd_id] = nd.label
-            node_attr_dict[nd.label][node_names_attribute] = nd_id
+            # node_id_to_name[nd_id] = nd.label
+            node_attr_dict[nd.label][node_names_attribute] = \
+                node_names_attribute_val
 
     # debugging
     # print(dp_tr.taxon_namespace)
@@ -362,17 +375,46 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     #     print(nd is dp_tr.seed_node)
     #     print(nd.parent_node)
 
-    return AnnotatedTree(
-            dp_tr,
-            3,
-            start_at_origin=is_origin,
-            tree_died=False,
-            read_as_newick_string=True)
+    ann_tr = AnnotatedTree(dp_tr,
+                           1,
+                           start_at_origin=is_origin,
+                           tree_died=False,
+                           read_as_newick_string=True)
+    
+    ann_tr.node_attr_dict = node_attr_dict
+    ann_tr.at_dict = dict()
+
+    return ann_tr
 
     # print(dp_tr.taxon_namespace)
     # print(node_attr_dict)
     # print(node_id_to_name)
 
+
+def read_node_attr_update_tree(attr_tsv_fp: str,
+                               attr_name: str,
+                               ann_tr: AnnotatedTree) -> None:
+    
+    node_name_attr_str_list = read_text_file(attr_tsv_fp)
+    ann_tr_nd_names = \
+        set([nd.label for nd in ann_tr.tree.taxon_namespace])
+    
+    for line in node_name_attr_str_list:
+        nd_name, nd_attr_val = line.split("\t")
+
+        # if node name is not in tree, something must be wrong
+        if nd_name not in ann_tr_nd_names:
+            exit("test")
+
+        nd = ann_tr.tree.find_node_with_label(nd_name)
+        # set the attribute value
+        nd.__setattr__(attr_name, int(nd_attr_val))
+
+    ann_tr.populate_nd_attr_dict(["state"],
+                                 read_as_newick_str = False)
+        
+        
+    
 
 if __name__ == "__main__":
 

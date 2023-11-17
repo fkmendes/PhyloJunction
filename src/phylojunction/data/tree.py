@@ -991,7 +991,9 @@ class AnnotatedTree(dp.Tree):
 
     # side-effect:
     # populates self.node_attr_dict { node label (str): { attribute (str): val (Any)... }, ... }
-    def populate_nd_attr_dict(self, attrs_of_interest_list, read_as_newick_str: bool=False) -> None:
+    def populate_nd_attr_dict(self,
+                              attrs_of_interest_list,
+                              read_as_newick_str: bool = False) -> None:
         for nd in self.tree:
             if not nd.label:
                 exit(("Must name all nodes before populating nd_attr_dict. "
@@ -1232,7 +1234,10 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                   sa_along_branches: bool = True) -> None:
 
     color_map: ty.Dict[int, str]
-    color_map = get_color_map(ann_tr.state_count)
+    if attr_of_interest not in ann_tr.node_attr_dict:
+        color_map = get_color_map(1)
+    else:
+        color_map = get_color_map(ann_tr.state_count)
 
     ####################################################
     # Setting up flags and checking tree content is OK #
@@ -1337,9 +1342,10 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
         # in case it is a tree with attrs
         if ann_tr.node_attr_dict and \
-            attr_of_interest is not None:
-            attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
-            segment_colors = [color_map[attr_idx]]  # from parent
+            attr_of_interest is not None and \
+                attr_of_interest in ann_tr.node_attr_dict[nd_name]:
+                    attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
+                    segment_colors = [color_map[attr_idx]]  # from parent
 
         x_starts = [x_start]
         x_heres = []
@@ -1556,7 +1562,9 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     # call #
     ########
     color = "black"
-    if attr_of_interest:
+    if attr_of_interest and \
+        attr_of_interest in \
+            ann_tr.node_attr_dict[ann_tr.tree.seed_node.label]:
         attr_idx = ann_tr.node_attr_dict[ann_tr.tree.seed_node.label][attr_of_interest]
         color = color_map[attr_idx]
 

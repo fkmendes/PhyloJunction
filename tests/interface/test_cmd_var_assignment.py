@@ -103,8 +103,8 @@ class TestVarAssignment(unittest.TestCase):
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
-                         ('((sp1:1.0[&index=1],sp2:1.0[&index=2])nd4:1.0'
-                          '[&index=4],sp3:2.0[&index=3])root[&index=5];'))
+                         ('((nd1:1.0[&index=1],nd2:1.0[&index=2])nd4:1.0'
+                          '[&index=4],nd3:2.0[&index=3])nd5[&index=5];'))
         
         cmd_line2 = 'tr <- read_tree(string="((sp1:1.0,sp2:1.0):1.0,sp3:2.0);")'
 
@@ -118,7 +118,7 @@ class TestVarAssignment(unittest.TestCase):
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
-                         ('((sp1:1.0,sp2:1.0)nd2:1.0,sp3:2.0)root;'))
+                         ('((sp1:1.0,sp2:1.0)nd1:1.0,sp3:2.0)root;'))
         
     def test_var_assignment_read_tree_from_file(self):
         """
@@ -140,8 +140,8 @@ class TestVarAssignment(unittest.TestCase):
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
-                         ('((sp1:1.0[&index=1],sp2:1.0[&index=2])nd4:1.0'
-                          '[&index=4],sp3:2.0[&index=3])root[&index=5];'))
+                         ('((nd1:1.0[&index=1],nd2:1.0[&index=2])nd4:1.0'
+                          '[&index=4],nd3:2.0[&index=3])nd5[&index=5];'))
         
         cmd_line2 = ('tr <- read_tree(file_path="examples/trees_maps_files'
                      '/trees_to_read.tre", node_name_attr="index")')
@@ -154,8 +154,8 @@ class TestVarAssignment(unittest.TestCase):
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 2)
         self.assertEqual(a_node_pgm.value[1].__str__().rstrip(),
-                         ('((sp1:0.1[&index=1],sp2:0.1[&index=2])nd4:1.9'
-                          '[&index=4],sp3:2.0[&index=3])root[&index=5];'))
+                         ('((nd1:0.1[&index=1],nd2:0.1[&index=2])nd4:1.9'
+                          '[&index=4],nd3:2.0[&index=3])nd5[&index=5];'))
 
     def test_var_assignment_read_tree_string_exceptions(self):
         """
