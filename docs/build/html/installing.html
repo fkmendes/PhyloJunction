@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installing and configuring PhyloJunction &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -19,6 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Documentation" href="pjdoc/index.html" />
     <link rel="prev" title="PhyloJunction" href="index.html" /> 
 </head>
 
@@ -53,6 +53,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
 </ul>
 
         </div>
@@ -79,37 +80,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installing-and-configuring-phylojunction">
+  <div class="section" id="installing-and-configuring-phylojunction">
 <h1>Installing and configuring PhyloJunction<a class="headerlink" href="#installing-and-configuring-phylojunction" title="Permalink to this heading"></a></h1>
 <p>On this page you will find instructions on how to:</p>
 <blockquote>
 <div><ol class="lowerroman simple">
-<li><p>do a standard PhyloJunction installation, so that you can use its command-line and graphical user interfaces,</p></li>
-<li><p>do a development PhyloJunction installation (in “editable mode”) suitable for those who want to interact, customize, or expand PJ’s source code, and</p></li>
-<li><p>build PhyloJunction using an integrated development environment (IDE), so you can navigate its code.</p></li>
+<li>do a standard installation, so that you can use its command-line and graphical user interfaces,</li>
+<li>do a development installation (in “editable mode”) suitable for those who want to interact, customize, or expand PJ’s source code, and</li>
+<li>build PhyloJunction using an integrated development environment (IDE), so you can navigate its code.</li>
 </ol>
 </div></blockquote>
-<p>We will use the <a class="reference external" href="https://code.visualstudio.com/">Visual Studio Code</a> and <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a> IDEs.</p>
-<section id="requirements-and-dependencies">
+<div class="section" id="requirements-and-dependencies">
 <h2>Requirements and dependencies<a class="headerlink" href="#requirements-and-dependencies" title="Permalink to this heading"></a></h2>
 <p>For the most part, PhyloJunction has been developed and tested on an M1-chip Apple machine (running macOS Big Sur), though it is periodically tested on Linux (Ubuntu).
 There is no support for Microsoft Windows.</p>
 <p>PhyloJunction currently runs under Python 3.9 (support for 3.1X will be added soon) and has various Python library dependencies.
-Fortunately those are automatically managed by the <a class="reference external" href="https://pypi.python.org/pypi/pip">pip</a> package manager, as shown below.</p>
-</section>
-<section id="typical-user-installation">
+Fortunately those are automatically managed by the <a class="reference external" href="https://pypi.python.org/pypi/pip" rel="noopener noreferrer" target="_blank">pip</a> package manager, as shown below.</p>
+</div>
+<div class="section" id="typical-user-installation">
 <h2>Typical user installation<a class="headerlink" href="#typical-user-installation" title="Permalink to this heading"></a></h2>
 <p>To be written.</p>
-</section>
-<section id="development-installation">
+</div>
+<div class="section" id="development-installation">
 <h2>Development installation<a class="headerlink" href="#development-installation" title="Permalink to this heading"></a></h2>
-<p>On both macOS and Linux, we will start by cloning the PhyloJunction <a class="reference external" href="https://github.com/fkmendes/PhyloJunction">GitHub repository</a>.
+<p>On both macOS and Linux, we will start by cloning the PhyloJunction <a class="reference external" href="https://github.com/fkmendes/PhyloJunction" rel="noopener noreferrer" target="_blank">GitHub repository</a>.
 Open your Terminal (macOS) or shell (Linux), go to a directory of choice, and do:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/fkmendes/PhyloJunction.git
 </pre></div>
 </div>
 <p>You will see that <code class="docutils literal notranslate"><span class="pre">git</span></code> will have created the PhyloJunction root folder, <code class="docutils literal notranslate"><span class="pre">PhyloJunction/</span></code>, inside the directory you chose.</p>
-<section id="installation-in-editable-mode">
+<div class="section" id="installation-in-editable-mode">
 <h3>Installation in editable mode<a class="headerlink" href="#installation-in-editable-mode" title="Permalink to this heading"></a></h3>
 <p>In this section you will find instructions on how to install PhyloJunction in <strong>editable mode</strong> (some might know this as setuptools’ “develop mode”), on both macOS and Linux.</p>
 <p>When a library being installed is being locally developed, this type of installation is convenient for a few reasons.
@@ -117,14 +117,14 @@ First, an editable install will not copy all of the library’s source files and
 Instead, it will only install dependencies and write metadata and wrapper files for library entry points (<code class="docutils literal notranslate"><span class="pre">pjcli</span></code> and <code class="docutils literal notranslate"><span class="pre">pjgui</span></code> in PhyloJunction’s case’).</p>
 <p>Second, without the need for re-installation, changes to the library’s source files are effective immediately when the library is next imported, or when entry points are called.
 This is because <code class="docutils literal notranslate"><span class="pre">pip</span></code> adds the library modules’ file paths to <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>, making those files discoverable (see below).</p>
-<section id="apple-operating-systems">
+<div class="section" id="apple-operating-systems">
 <h4>Apple operating systems<a class="headerlink" href="#apple-operating-systems" title="Permalink to this heading"></a></h4>
 <p>The editable install is carried out from PhyloJunction’s root folder, <code class="docutils literal notranslate"><span class="pre">PhyloJunction/</span></code>, like so:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3.9 -m pip install -e .
 </pre></div>
 </div>
 <p>With this command, <code class="docutils literal notranslate"><span class="pre">pip</span></code> will place PhyloJunction’s entry-point executables (<code class="docutils literal notranslate"><span class="pre">pjcli</span></code> and <code class="docutils literal notranslate"><span class="pre">pjgui</span></code>) into the <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory of wherever you Python 3.9 lives.
-If Python 3.9 was installed with <a class="reference external" href="https://brew.sh/">Homebrew</a>, for example, that could be <code class="docutils literal notranslate"><span class="pre">/opt/homebrew/opt/python&#64;3.9/Frameworks/Python.framework/Versions/3.9/bin</span></code>.</p>
+If Python 3.9 was installed with <a class="reference external" href="https://brew.sh/" rel="noopener noreferrer" target="_blank">Homebrew</a>, for example, that could be <code class="docutils literal notranslate"><span class="pre">/opt/homebrew/opt/python&#64;3.9/Frameworks/Python.framework/Versions/3.9/bin</span></code>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag tells <code class="docutils literal notranslate"><span class="pre">pip</span></code> to do an editable install, which further writes the path to PhyloJunction modules to <code class="docutils literal notranslate"><span class="pre">/opt/homebrew/opt/python&#64;3.9/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/__editable__.phylojunction-0.0.1.pth</span></code>.</p>
 <p>The last argument <code class="docutils literal notranslate"><span class="pre">.</span></code> tells <code class="docutils literal notranslate"><span class="pre">pip</span></code> where the local project directory is (where it can find file <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>).</p>
 <p>If file system access is denied, you can add the <code class="docutils literal notranslate"><span class="pre">--user</span></code> flag to the installation command, like so:</p>
@@ -142,7 +142,7 @@ Paths to PhyloJunction’s modules will be written to <code class="docutils lite
 This command will create <code class="docutils literal notranslate"><span class="pre">bin/</span></code> inside <code class="docutils literal notranslate"><span class="pre">~/.local</span></code> if it does not exist, and place PhyloJunction’s executables in there.
 Lastly, paths to PhyloJunction’s modules will be written to <code class="docutils literal notranslate"><span class="pre">~/.local/lib/python3.9/site-packages/__editable__.phylojunction-0.0.1.pth</span></code></p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
+<p class="first admonition-title">Note</p>
 <p>After running these commands, do not forget to tell your operating system where to look for PhyloJunction’s executables, <code class="docutils literal notranslate"><span class="pre">pjcli</span></code> and <code class="docutils literal notranslate"><span class="pre">pjgui</span></code>.
 For example, assuming you installed PhyloJunction with the <code class="docutils literal notranslate"><span class="pre">--user</span></code> flag, you can then add path <code class="docutils literal notranslate"><span class="pre">/Users/user_name/Library/Python/3.9/bin/</span></code> to your environment <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable.
 This variable is normally defined in a hidden file in your root directory that gets executed by the Terminal app.
@@ -152,29 +152,30 @@ On macOS, that file is <code class="docutils literal notranslate"><span class="p
 <span class="nb">export</span> PATH
 </pre></div>
 </div>
-<p>Should you still want to use your current, active Terminal session, you must source <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code> after saving it.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> ~/.bash_profile
+<p>Should you still want to use your current, active Terminal session, you must source <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code> after saving and closing that file.</p>
+<div class="last highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> ~/.bash_profile
 </pre></div>
 </div>
 </div>
-</section>
-<section id="linux">
+</div>
+<div class="section" id="linux">
 <h4>Linux<a class="headerlink" href="#linux" title="Permalink to this heading"></a></h4>
 <p>TODO</p>
-</section>
-</section>
-<section id="building-pj-on-an-ide">
+</div>
+</div>
+<div class="section" id="building-pj-on-an-ide">
 <h3>Building PJ on an IDE<a class="headerlink" href="#building-pj-on-an-ide" title="Permalink to this heading"></a></h3>
 <p>TODO</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="PhyloJunction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pjdoc/index.html" class="btn btn-neutral float-right" title="Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -4,8 +4,11 @@ import enum
 import math
 import numpy as np
 import typing as ty
+import matplotlib
+import matplotlib.pyplot as plt  # type: ignore
 
 # pj imports
+import phylojunction.data.tree as pjt
 from phylojunction.data.tree import AnnotatedTree
 import phylojunction.readwrite.pj_read as pjr
 import phylojunction.functionality.biogeo as pjbio
@@ -290,6 +293,7 @@ class RangeSplitOrBirth(StochMap):
 class StochMapsOnTree():
 
     # class members
+    ann_tr: AnnotatedTree
     anagenetic_stoch_maps_dict: \
         ty.Dict[str, ty.List[StochMap]]  # node name as key
     cladogenetic_stoch_maps_dict: \
@@ -314,13 +318,16 @@ class StochMapsOnTree():
     n_identical_clado_maps: int
 
     # iteration
-    index: int
+    iteration_idx: int
     
     def __init__(self,
                  iteration_idx: int,
                  ann_tr: AnnotatedTree,
-                 state2bit_lookup: pjbio.State2BitLookup) -> None:
+                 state2bit_lookup: pjbio.State2BitLookup,
+                 node_attr_file_path: str,
+                 stoch_map_attr_name: str) -> None:
         
+        self.ann_tr = ann_tr
         self.iteration_idx = iteration_idx
         self.state2bit_lookup = state2bit_lookup
         self.n_regions = self.state2bit_lookup.n_char
@@ -344,10 +351,33 @@ class StochMapsOnTree():
         self.n_identical_clado_maps = 0
         self.pctg_ident_clado_maps = 0.0
 
+        if node_attr_file_path and stoch_map_attr_name:
+            pjr.read_node_attr_update_tree(node_attr_file_path,
+                                           stoch_map_attr_name,
+                                           self.ann_tr)
+
         # self._init_str_representation()
 
-        # sets critical properties in stoch maps
-        # self._preorder_traverse_tree_annotating_maps(ann_tr)
+        # fig = matplotlib.pyplot.figure()
+
+        # ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+        # ax.patch.set_alpha(0.0)
+        # ax.xaxis.set_ticks([])
+        # ax.yaxis.set_ticks([])
+        # ax.spines['left'].set_visible(False)
+        # ax.spines['bottom'].set_visible(False)
+        # ax.spines['right'].set_visible(False)
+        # ax.spines['top'].set_visible(False)
+
+        # pjt.plot_ann_tree(
+        #     ann_tr,
+        #     ax,
+        #     use_age=False,
+        #     start_at_origin=False,
+        #     sa_along_branches=False,
+        #     attr_of_interest="state")
+
+        # plt.show()
 
     # updates
     #     self.n_total_maps
@@ -356,7 +386,7 @@ class StochMapsOnTree():
     #     self.n_anagenetic_maps
     #     self.forbidden_higher_order_maps_counts_dict
     #     self.n_forbidden_higher_order_anagenetic_maps
-    def add_map(self, stoch_map_str_list) -> None:
+    def add_map(self, stoch_map_str_list: ty.List[str]) -> None:
         def _which_region_changed(from_state: int, to_state: int) \
                 -> ty.Tuple[bool, int]:
             pass
@@ -526,21 +556,28 @@ class StochMapsOnTree():
 
         return widespread_range_sizes_dict
 
-    def update_tree_attributes(self, attr_name: str) -> None:
+    def update_tree_attributes(self,
+                               stoch_map_attr_name: str) -> None:
         """Go through stochastic maps and annotate tree
 
         This function is called outside of StochMapsOnTree.
         It goes through the two stochastic maps dictionaries,
         and updates the AnnotatedTree member with respect to
-        its (i) node's attributes, (ii) node_attr_dict member
+        its (i) node's attributes, and (ii) node_attr_dict member
 
         Args:
-            attr_name (str):
+            stoch_map_attr_name (str): Name of the node attribute
+                the stochastic maps carry a value for (e.g., 'state')
 
         Returns:
             None, this function has a side-effect
         """
-        pass
+        
+        print(self.cladogenetic_stoch_maps_dict)
+        # for nd in ann_tr.tree.postorder_node_iter():
+        #     print(nd.label, nd.label in self.cladogenetic_stoch_maps_dict)
+        #     print(nd.label, nd.label in self.anagenetic_stoch_maps_dict)
+            
 
     # internal
     def _preorder_traverse_tree_annotating_maps(self, ann_tr):
@@ -596,20 +633,27 @@ class StochMapsOnTree():
 class StochMapCollection():
 
     n_stoch_map_iterations: int
-    stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree]
+    sorted_iteration_idxs: ty.List[int]
+    stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree]  # key: iteration idx
     str_representation: str
 
     def __init__(self,
                  stoch_maps_file_path: str,
                  ann_trs: ty.List[AnnotatedTree],
-                 state2bit_lookup: pjbio.State2BitLookup) -> None:
+                 state2bit_lookup: pjbio.State2BitLookup,
+                 stoch_map_attr_name: str = "",
+                 node_states_file_path: str = "") -> None:
 
         self.stoch_maps_tree_dict = dict()
+        self.sorted_iteration_idxs = list()
 
-        # initializesL
+        # initializes
         # (i) stoch_maps_tree_list
-        # (ii) n_stoch_map_iterations
+        # (ii) sorted_iteration_idxs (also sorts it)
+        # (iii) n_stoch_map_iterations
         self._read_stoch_maps_file(stoch_maps_file_path,
+                                   node_states_file_path,
+                                   stoch_map_attr_name,
                                    ann_trs,
                                    state2bit_lookup)
         
@@ -619,9 +663,12 @@ class StochMapCollection():
         # self.str_representation = ""
         self._init_str_representation()
 
+
     # internal
     def _read_stoch_maps_file(self,
                               stoch_maps_file_path: str,
+                              node_states_file_path: str,
+                              stoch_map_attr_name: str,
                               ann_trs: ty.List[AnnotatedTree],
                               state2bit_lookup: pjbio.State2BitLookup) -> None:
 
@@ -648,7 +695,7 @@ class StochMapCollection():
         n_trees: int = len(ann_trs)
         if n_trees > 1 and n_trees != self.n_stoch_map_iterations:
             raise ec.ObjInitIncorrectDimensionError(
-                StochMapCollection,
+                "StochMapCollection",
                 "ann_trs",
                 n_trees,
                 self.n_stoch_map_iterations)
@@ -662,19 +709,31 @@ class StochMapCollection():
             stoch_map_on_tree_str_list = line.split("\t")
             iteration_idx = int(stoch_map_on_tree_str_list[0])
 
+            if iteration_idx not in self.sorted_iteration_idxs:
+                self.sorted_iteration_idxs.append(iteration_idx)
+
             if iteration_idx not in self.stoch_maps_tree_dict: 
                 self.stoch_maps_tree_dict[iteration_idx] \
                     = StochMapsOnTree(iteration_idx,
                                       ann_trs[n_different_iterations],
-                                      state2bit_lookup)
+                                      state2bit_lookup,
+                                      node_states_file_path,
+                                      stoch_map_attr_name)
                 if n_trees > 1:
                     n_different_iterations += 1
 
-            # we add this map to it
+            # we append this map to the members of the
+            # already initialized smot
             self.stoch_maps_tree_dict[iteration_idx] \
                 .add_map(stoch_map_on_tree_str_list[1:])
                 
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
+        
+        sorted(self.sorted_iteration_idxs)
+
+        for iteration_idx, smot in self.stoch_maps_tree_dict.items():
+            # sets critical properties in stoch maps
+            smot.update_tree_attributes(stoch_map_attr_name)
 
     def _report_clado_map_issue_str(self) -> None:
         clado_issue_str = str()
@@ -815,6 +874,10 @@ class StochMapCollection():
 
     def __str__(self) -> str:
         return self.str_representation
+    
+    def iter_mcmc_generations(self) -> ty.Iterator[StochMapsOnTree]:
+        for idx in self.sorted_iteration_idxs:
+            yield self.stoch_maps_tree_dict[idx]
 
 
 
@@ -822,9 +885,10 @@ class StochMapCollection():
 
 if __name__ == "__main__":
     
-    tr = [pjr.read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
+    # "examples/trees_maps_files/turtle.tre",
+    tr = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree1.tre",
                                 "read_tree",
-                                node_names_attribute="index")]
+                                in_file=True)]
     
     # bit_patts = list()
     # with open("examples/trees_maps_files/kadua_range_label.csv", "r") as infile:
@@ -863,10 +927,21 @@ if __name__ == "__main__":
     stoch_mapcoll = \
         StochMapCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
                            tr,
-                           state2bit_lookup)
+                           state2bit_lookup,
+                           node_states_file_path="examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
+                           stoch_map_attr_name="state")
         # StochMapCollection("examples/trees_maps_files/turtle_maps.tsv",
 
-    print(stoch_mapcoll)
+    # choose one:
+    # print(stoch_mapcoll)
+    #
+    # or
+    #
+    # for smot in stoch_mapcoll.iter_mcmc_generations():
+    #     print(smot)
+        # k: node index, v: stoch map
+        # print(smot.anagenetic_stoch_maps_dict)
+        # print(smot.cladogenetic_stoch_maps_dict)
 
     # for it_idx, smot in stoch_mapcoll.stoch_maps_tree_dict.items():
     #     print(smot)

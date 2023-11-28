@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>phylojunction.plotting package &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -39,6 +38,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
 </ul>
 
         </div>
@@ -65,120 +65,136 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="phylojunction-plotting-package">
+  <div class="section" id="phylojunction-plotting-package">
 <h1>phylojunction.plotting package<a class="headerlink" href="#phylojunction-plotting-package" title="Permalink to this heading"></a></h1>
-<section id="submodules">
+<div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</section>
-<section id="module-phylojunction.plotting.pj_draw">
+</div>
+<div class="section" id="module-phylojunction.plotting.pj_draw">
 <span id="phylojunction-plotting-pj-draw-module"></span><h2>phylojunction.plotting.pj_draw module<a class="headerlink" href="#module-phylojunction.plotting.pj_draw" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.plotting.pj_draw.plot_intervals">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_draw.</span></span><span class="sig-name descname"><span class="pre">plot_intervals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axes_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Posterior</span> <span class="pre">mean'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_draw.plot_intervals" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_draw.</span></code><code class="sig-name descname"><span class="pre">plot_intervals</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fig_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em><span class="n"><span class="pre">axes_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">xlab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">ylab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Posterior</span> <span class="pre">mean'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_draw.plot_intervals" title="Permalink to this definition"></a></dt>
 <dd><p>Draw coverage plot on provided plt.Figure instance</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fig_obj</strong> (<em>matplotlib.Figure</em>) – Figure object</p></li>
-<li><p><strong>axes_obj</strong> (<em>plt.Axes</em>) – Axes object</p></li>
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – pandas dataframe holding interval
-information</p></li>
-<li><p><strong>x</strong> (<em>str</em>) – Label for x-axis on pandas dataframe.</p></li>
-<li><p><strong>y</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for y-axis on pandas dataframe.
-Defaults to “posterior_mean”.</p></li>
-<li><p><strong>xlab</strong> (<em>ty.Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – User-provided overriding
-label for x-axis. Defaults to None.</p></li>
-<li><p><strong>ylab</strong> (<em>ty.Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – User-provided overriding</p></li>
-<li><p><strong>None.</strong> (<em>label for y-axis. Defaults to</em>) – </p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fig_obj</strong> (<em>matplotlib.Figure</em>) – Figure object</li>
+<li><strong>axes_obj</strong> (<em>plt.Axes</em>) – Axes object</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – pandas dataframe holding interval
+information</li>
+<li><strong>x</strong> (<em>str</em>) – Label for x-axis on pandas dataframe.</li>
+<li><strong>y</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for y-axis on pandas dataframe.
+Defaults to “posterior_mean”.</li>
+<li><strong>xlab</strong> (<em>ty.Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – User-provided overriding
+label for x-axis. Defaults to None.</li>
+<li><strong>ylab</strong> (<em>ty.Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – User-provided overriding</li>
+<li><strong>None.</strong> (<em>label for y-axis. Defaults to</em>) – </li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.plotting.pj_draw.plot_violins">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_draw.</span></span><span class="sig-name descname"><span class="pre">plot_violins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_draw.plot_violins" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_draw.</span></code><code class="sig-name descname"><span class="pre">plot_violins</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em>, <em><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">xlab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">ylab</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_draw.plot_violins" title="Permalink to this definition"></a></dt>
 <dd><p>Draw violin plots, one variable and 2+ factors</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fig</strong> (<em>matplotlib.Figure</em>) – Figure object</p></li>
-<li><p><strong>ax</strong> (<em>plt.Axes</em>) – Axes object</p></li>
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – pandas DataFrame with values for a variable
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fig</strong> (<em>matplotlib.Figure</em>) – Figure object</li>
+<li><strong>ax</strong> (<em>plt.Axes</em>) – Axes object</li>
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – pandas DataFrame with values for a variable
 (column 1) in two or more scenarios (column 2), i.e., two
-or more factors (e.g., different simulators)</p></li>
-<li><p><strong>xlab</strong> (<em>str</em>) – x-axis label. Defaults to None.</p></li>
-<li><p><strong>ylab</strong> (<em>str</em>) – y-axis label. Defaults to None.</p></li>
+or more factors (e.g., different simulators)</li>
+<li><strong>xlab</strong> (<em>str</em>) – x-axis label. Defaults to None.</li>
+<li><strong>ylab</strong> (<em>str</em>) – y-axis label. Defaults to None.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-</section>
-<section id="module-phylojunction.plotting.pj_organize">
+</div>
+<div class="section" id="module-phylojunction.plotting.pj_organize">
 <span id="phylojunction-plotting-pj-organize-module"></span><h2>phylojunction.plotting.pj_organize module<a class="headerlink" href="#module-phylojunction.plotting.pj_organize" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.plotting.pj_organize.add_within_hpd_col">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_organize.</span></span><span class="sig-name descname"><span class="pre">add_within_hpd_col</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_col_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_organize.add_within_hpd_col" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_organize.</span></code><code class="sig-name descname"><span class="pre">add_within_hpd_col</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em><span class="n"><span class="pre">val_col_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_organize.add_within_hpd_col" title="Permalink to this definition"></a></dt>
 <dd><p>Add column (1 or 0) if in or out of HPD</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – DataFrame</p></li>
-<li><p><strong>val_col_name</strong> (<em>str</em>) – Name of column containing value</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>pd.DataFrame</em>) – DataFrame</li>
+<li><strong>val_col_name</strong> (<em>str</em>) – Name of column containing value</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Input dataframe with new column</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Input dataframe with new column</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.plotting.pj_organize.join_dataframes">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_organize.</span></span><span class="sig-name descname"><span class="pre">join_dataframes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pj_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare_to_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thing_to_compare</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summaries_avg_over_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_organize.join_dataframes" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_organize.</span></code><code class="sig-name descname"><span class="pre">join_dataframes</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pj_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em><span class="n"><span class="pre">compare_to_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em><span class="n"><span class="pre">thing_to_compare</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">summaries_avg_over_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.plotting.pj_organize.join_dataframes" title="Permalink to this definition"></a></dt>
 <dd><p>_summary_</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pj_df</strong> (<em>pd.DataFrame</em>) – _description_</p></li>
-<li><p><strong>compare_to_df</strong> (<em>pd.DataFrame</em>) – _description_</p></li>
-<li><p><strong>value_to_compare</strong> (<em>str</em>) – _description_</p></li>
-<li><p><strong>summaries_avg_over_repl</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_.
-Defaults to False.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pj_df</strong> (<em>pd.DataFrame</em>) – _description_</li>
+<li><strong>compare_to_df</strong> (<em>pd.DataFrame</em>) – _description_</li>
+<li><strong>value_to_compare</strong> (<em>str</em>) – _description_</li>
+<li><strong>summaries_avg_over_repl</strong> (<em>bool</em><em>, </em><em>optional</em>) – _description_.
+Defaults to False.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>_description_</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">_description_</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-</section>
-<section id="module-phylojunction.plotting.pj_seeing_colors">
+</div>
+<div class="section" id="module-phylojunction.plotting.pj_seeing_colors">
 <span id="phylojunction-plotting-pj-seeing-colors-module"></span><h2>phylojunction.plotting.pj_seeing_colors module<a class="headerlink" href="#module-phylojunction.plotting.pj_seeing_colors" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.plotting.pj_seeing_colors.truncate_colormap">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_seeing_colors.</span></span><span class="sig-name descname"><span class="pre">truncate_colormap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.plotting.pj_seeing_colors.truncate_colormap" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.plotting.pj_seeing_colors.</span></code><code class="sig-name descname"><span class="pre">truncate_colormap</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">cmap</span></span></em>, <em><span class="n"><span class="pre">minval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em><span class="n"><span class="pre">maxval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.plotting.pj_seeing_colors.truncate_colormap" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-phylojunction.plotting">
+</div>
+<div class="section" id="module-phylojunction.plotting">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.plotting" title="Permalink to this heading"></a></h2>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

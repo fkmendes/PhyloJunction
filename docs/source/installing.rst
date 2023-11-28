@@ -10,7 +10,7 @@ On this page you will find instructions on how to:
 
     (iii) build |pj| using an integrated development environment (IDE), so you can navigate its code.
 
-We will use the `Visual Studio Code <https://code.visualstudio.com/>`_ and PyCharm_ IDEs.
+.. We will use the `Visual Studio Code <https://code.visualstudio.com/>`_ and PyCharm_ IDEs.
 
 -----------------------------
 Requirements and dependencies

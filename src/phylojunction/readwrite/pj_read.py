@@ -404,13 +404,15 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
 
         # if node name is not in tree, something must be wrong
         if nd_name not in ann_tr_nd_names:
+            print("nd_name", nd_name)
+            print(ann_tr_nd_names)
             exit("test")
 
         nd = ann_tr.tree.find_node_with_label(nd_name)
         # set the attribute value
         nd.__setattr__(attr_name, int(nd_attr_val))
 
-    ann_tr.populate_nd_attr_dict(["state"],
+    ann_tr.populate_nd_attr_dict([attr_name],
                                  read_as_newick_str = False)
         
         
