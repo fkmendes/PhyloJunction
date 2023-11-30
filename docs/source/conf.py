@@ -21,6 +21,11 @@ release = '0.0.1'
 extensions = ["sphinx.ext.napoleon", "sphinx_new_tab_link"]
 # "sphinx_new_tab_link" makes new links be opened in separate tabs; it needs module sphinx-new-tab-link
 
+# necessary to load this custom css, which 
+# (i) places equation numbers to their right, as opposed to the top
+#     of the equations (the default of sphinx)
+def setup(app):
+    app.add_stylesheet('css/pj_custom.css')
 
 templates_path = ['_templates']
 exclude_patterns = []
