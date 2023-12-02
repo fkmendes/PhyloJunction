@@ -216,7 +216,12 @@ class NodePGMNodeStatCantFloatError(Exception):
     message: str
     def __init__(self, node_name: str) -> None: ...
     def __str__(self) -> str: ...
-    
+
+class DAGCannotAddNodeError(Exception):
+    message: str
+    def __init__(self, node_name: str, message: str) -> None: ...
+    def __str__(self) -> str: ...
+
 # Tree exceptions #
 class AnnotatedTreeMisspec(Exception):
     message: str

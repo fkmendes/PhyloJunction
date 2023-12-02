@@ -16,7 +16,7 @@ class ScriptSyntaxError(Exception):
             + ("\n\nThe line above had a syntax problem and could not "
                "be tokenized. ") \
             + message
-        super().__init__(self.message)
+        # super().__init__(self.message)
 
     def __str__(self) -> str:
         return self.message
@@ -688,6 +688,17 @@ class NodePGMNodeStatCantFloatError(Exception):
     def __init__(self, node_name: str) -> None:
         self.message = "ERROR: When summarizing " + node_name \
             + " into string, a node statistic could not be float-ified"
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class DAGCannotAddNodeError(Exception):
+    message: str
+
+    def __init__(self, node_name: str, message: str) -> None:
+        self.message = "Could not add \'" + node_name + "\' to DAG. " \
+            + message
 
     def __str__(self) -> str:
         return self.message

@@ -441,6 +441,7 @@ def parse_samp_dn_assignment(
 
         pgm_obj.add_node(stoch_node_pgm)
 
+
     if re.search(cmdu.sampling_dn_spec_regex, stoch_node_dn_spec) is None:
         raise ec.ScriptSyntaxError(
             cmd_line,
@@ -568,13 +569,17 @@ def parse_samp_dn_assignment(
                 #          "storing a scalar constant. Distribution "
                 #          "discrete_sse() could not be initialized."))
 
-        create_add_rv_pgm(
-            stoch_node_name,
-            sample_size,
-            repl_size,
-            dn_obj,
-            parent_pgm_nodes,
-            clamped)
+        try:
+            create_add_rv_pgm(
+                stoch_node_name,
+                sample_size,
+                repl_size,
+                dn_obj,
+                parent_pgm_nodes,
+                clamped)
+
+        except ec.DAGCannotAddNodeError as e:
+            raise ec.ParseDnInitFailError(dn_name, e.message)
 
 
 # function called by (3. deterministic function assignment)

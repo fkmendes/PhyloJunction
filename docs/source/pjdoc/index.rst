@@ -10,13 +10,30 @@ Documentation
 Overview
 --------
 
-What is PhyloJunction
-=====================
+PhyloJunction: what is it?
+==========================
 
+|pj| is first and foremost an open-source (pure-)Python **evolutionary model simulator**.
+More specifically, and as of its current release, a simulator for a very general state-dependent speciation and extinction (`SSE <https://academic.oup.com/sysbio/article/56/5/701/1694265>`_) model.
 
+But |pj| is more than that.
 
-Users may find it useful to read the original manuscript introducing |pj| (Mendes and Landis, Journal, 2024).
-That paper summarizes the main features of |pj| while providing an account on the motivations underlying its design and development. 
+...
+
+.. note::
+    Users may find it useful to read the original manuscript introducing |pj| (Mendes and Landis, Journal, 2024).
+
+Origins and design
+==================
+
+The |pj| project was born from our need to simulate arbitrarily complex SSE processes -- and, later, potentially not-yet-invented models -- but not being able to do so with existing applications.
+A series of related diversification models had been implemented in excellent computational methods, but each of those tools made unique modeling assumptions that we wanted to relax.
+
+Instead of reverse-engineering and modifying code written by others, however, it seemed like the path of least resistance was to write our own simulator.
+We also figured our task would bear fruits faster if we used a programming language that was (i) cross-platform, and (ii) easy to prototype and debug model code in, (iii) supported object-oriented programming, and for which (iv) biology and data-science libraries were available.
+Python was our preferred choice.
+
+When getting |pj| off the ground, we soon realized that |pj| could turn out to be useful in more than one project 
 
 Graphical models
 =============================
@@ -38,7 +55,7 @@ A Bayesian network representing a very simple model can be seen in figure 1a:
 
     **Figure 1.** A simple probabilistic model represented by (a) a Bayesian network, and (b) a factor graph.
     From the notation in the main text, :math:`\theta=\{sd, m\}`.
-    The dashed box is called a "plate", and for each node it envelops it denotes multiple (in this case, precisely five) i.i.d. draws.
+    The dashed box is called a "plate", and for each node it envelops it denotes multiple (in this case, precisely five) i.i.d. random variables.
     White and gray nodes denote random variables whose values we do (i.e., data) and do not know (i.e., parameters), respectively.
 
 If we were to pen down what this Bayesian network represents in probability terms, we would arrive at a joint density (assuming continuous variables) given by expression:
@@ -51,13 +68,13 @@ If we were to pen down what this Bayesian network represents in probability term
 where :math:`\theta=\{sd, m\}`.
 
 By comparing the Bayesian network graph and the expression above, the attentive reader will notice that functions are not represented in the graph.
-We do not know exactly how random variables are related, other than :math:`\boldsymbol{d}` depending somehow on :math:`sd` and :math:`m`.
+We do not know exactly how random variables are related, other than :math:`d_1` through :math:`d_5` depending somehow on :math:`sd` and :math:`m`.
 This is why it can be helpful to adopt a more general graphical representation: a factor graph (Fig. 1b).
 
 The model underlying the factor graph in figure 1b is the same as that shown by the Bayesian network, the main difference being the additional factor nodes (the filled squares).
 Factor nodes can make the relationships between two or more random variables more explicit, especially if their (factor) functions are annotated.
 
-In the example above we can see a factor whose function :math:`f_{D|\Theta}(d|\Theta=\theta)` gives us the probability of random variable :math:`\boldsymbol{d} = \{d_i: 1 \leq i \leq n\}` given :math:`\theta`.
+In the example above we can see a factor whose function :math:`f_{D|\Theta}(d|\Theta=\theta)` gives us the probability of :math:`\boldsymbol{d} = \{d_i: 1 \leq i \leq n\}` given :math:`\theta`.
 It is annotated as "Normal", so we in fact know a close-form expression for this factor function; it is the probability density function of a normal distribution.
 Random variables :math:`sd` and :math:`m` stand for the standard deviation and the mean of that normal distribution.
 (For those curious to see just how complicated factor graphs can be, an example can be found in Zhang et al., 2023; see their Supplementary Fig. X.)
@@ -84,12 +101,15 @@ and solve for :math:`f_{\Theta|D}(\theta|D=d)`, the posterior density function:
 
 This expression is known as Bayes theorem.
 What programs like RevBayes, BEAST and BEAST 2 do is evaluate the posterior density function at several values of :math:`\theta`, and output the resulting (posterior) distribution.
- 
-|pj|, however, is among other things a collection of **simulation** (rather than estimation) engines.
-Borrowing the jargon used above, we are now primarily interested in generating values for random variables, some of which are parameters, some data.
-Here, it makes sense to think of factors as the distributions from which values will be sampled (though as we will see below, factors can also represent deterministic functions).
 
+----
+
+|pj|, however, is among other things a collection of **simulation** (rather than estimation) engines.
+Borrowing the jargon used above, we are primarily interested in generating values for random variables, some of which are parameters, some data.
+
+Here, it makes sense to think of factors as the distributions from which values will be sampled (though as we will see below, factors can also represent deterministic functions).
 As opposed to estimation, simulation starts at the top (or "outer") layers of the DAG, from parameters whose values we do know, and flows in the direction pointed to by arrows (normally downwards; Fig. 1b).
+
 In figure 1b, for example, we start from known values for the parameters of the distributions at the top.
 The exponential distribution from which we sample (i.e., simulate) :math:`sd` has a rate of 1.0; the standard normal distribution (:math:`Z`) from which we sample :math:`m`, by definition, has a mean of 0.0 and a standard deviation of 1.0.
 We then define a normal distribution from the sampled values of :math:`sd` and :math:`m`, and in turn sample five times from that normal distribution, obtaining our data values in :math:`\boldsymbol{d}`.
@@ -105,7 +125,7 @@ Commands in *phylojunction* can be read as mathematical statements, and are natu
 Here is what a series of those commands would look like if written as a *phylojunction* script:
 
 .. code-block:: 
-    :caption: **Example script 1.** Script written in *phylojunction* specifying a time-homogenous birth-death model
+    :caption: **Example script 1.** Script written in *phylojunction* specifying a time-homogenous birth-death model.
 
     # hyperprior
     m <- 0.0 # mean of log-normal below
@@ -143,7 +163,7 @@ And this is the DAG such script instantiates:
     :scale: 40%
     :align: center
 
-    **Figure 2.** Factor graph representing the model specified in example script 1.
+    **Figure 2.** Factor graph representing the time-homogenous birth-death model specified in example script 1.
 
 Note how this DAG has a factor node characterized by a different type of function: deterministic function ``sse_rate``.
 Such functions are denoted by filled diamonds instead of filled squares (those represent distributions), and will have their output enclosed in a hollow diamond.
@@ -151,11 +171,43 @@ Such functions are denoted by filled diamonds instead of filled squares (those r
 Multiple samples and replicates
 -------------------------------
 
-.. code-block:: 
+Unlike other probabilistic programming languages, in *phylojunction* the output of every function is immutable and depends exclusively on that function's input.
+Initialized variables cannot be altered by mutator methods or side-effects.
 
-    sd ~ exponential(rate=1)
-    m ~ normal(mean=0.0, sd=1.0)
-    d ~ normal(n=100, nr=5, mean=m, sd=sd)
+An important consequence of variable immutability is that it precludes loop control structures (e.g., *for* and *while* loops).
+A reasonable question is then: *How does one have the model be sampled (i.e., simulated) multiple times?*
+
+Let us look at the simple model shown in figure 1.
+Ten independent samples of that model can be obtained with following *phylojunction* script:
+
+.. code-block::
+    :caption: **Example script 2.** Script written in *phylojunction* specifying the simple model in figure 1 and sampling (i.e., simulating) it ten times.
+
+    sd ~ exponential(rate=1) # this value will be vectorized
+    m ~ normal(mean=0.0, sd=1.0) # ... and so will this!
+    d ~ normal(n=10, nr=5, mean=m, sd=sd)
+
+As can be seen from the last line in script 2, all it took was providing argument ``n=10`` to the function call of a distribution.
+But note how the first and second lines in script 2 do not set ``n=10``.
+There is just a single value being drawn from exponential and standard normal distributions; implicitly, those commands are setting ``n=1``.
+
+|pj| deals with this discrepancy in the requested number of samples by **vectorizing** the single values stored in :math:`sd` and :math:`m`.
+For example, if the sampled value of :math:`m` is 0.1, under the hood |pj| converts :math:`m=1.0` into :math:`\boldsymbol{m}=\{0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1\}`.
+In such case, all ten samples requested by command ``d ~ normal(n=10, nr=5, mean=m, sd=sd)`` would thus come from normal distributions with the same mean of 0.1.
+
+.. warning::
+    |pj| will raise an error if the number of samples ``n`` specified in two commands are both different and greater than 1.
+    In other words, vectorization can only be applied on variables holding a single value.
+    (This type of behavior should be familiar to R users.)
+
+----
+
+In addition to simulating an entire model multiple times as explained above, it is also possible to specify a model with multiple i.i.d. random variables, alternatively referred to as **replicates**.
+Multiple replicates can be specified by providing an additional argument ``nr`` to distribution calls, e.g., ``nr=5`` as in the last line of script 2.
+
+In a DAG, i.i.d. random variables can be collectively represented by a single plated node (Fig. 1), or each be represented by an individual node.
+There are in principle no constraints on the number of replicates a plated node may represent.
+Errors will be thrown only if such nodes are used as input for a function, and the replicate count somehow violates that function's signature.
 
 ------------------------------
 Graphical user interface (GUI)

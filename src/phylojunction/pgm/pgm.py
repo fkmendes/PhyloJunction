@@ -79,8 +79,11 @@ class ProbabilisticGraphicalModel():
                 elif self.sample_size != node_pgm.sample_size and \
                         node_pgm.sample_size > 1:
 
-                    raise RuntimeError(
-                        "Number of simulations did not match. Exiting...")
+                    raise ec.DAGCannotAddNodeError(
+                        node_pgm.node_name,
+                        ("Specified number of simulations was both "
+                         "> 1 and different from that in a previous "
+                         "command."))
 
         replacing_node = False
         if node_pgm in self.node_dict:
