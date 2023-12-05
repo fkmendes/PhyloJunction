@@ -186,7 +186,7 @@ class ContentGUIMainWindow(object):
 
         self.compare_button = PJPushButton(
             text="Compare",
-            icon_path="icon_violins.svg"
+            icon_path="icon_compare.svg"
         )
 
         self.covg_button = PJPushButton(

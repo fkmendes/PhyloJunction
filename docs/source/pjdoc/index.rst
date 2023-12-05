@@ -10,33 +10,33 @@ Documentation
 Overview
 --------
 
-PhyloJunction: what is it?
-==========================
-
-|pj| is first and foremost an open-source (pure-)Python **evolutionary model simulator**.
-More specifically, and as of its current release, a simulator for a very general state-dependent speciation and extinction (`SSE <https://academic.oup.com/sysbio/article/56/5/701/1694265>`_) model.
-
-But |pj| is more than that.
-
-...
-
-.. note::
-    Users may find it useful to read the original manuscript introducing |pj| (Mendes and Landis, Journal, 2024).
-
 Origins and design
 ==================
 
-The |pj| project was born from our need to simulate arbitrarily complex SSE processes -- and, later, potentially not-yet-invented models -- but not being able to do so with existing applications.
+The |pj| project was born from our need to simulate arbitrarily complex SSE processes, but not being able to do so with many existing applications.
 A series of related diversification models had been implemented in excellent computational methods, but each of those tools made unique modeling assumptions that we wanted to relax.
 
 Instead of reverse-engineering and modifying code written by others, however, it seemed like the path of least resistance was to write our own simulator.
-We also figured our task would bear fruits faster if we used a programming language that was (i) cross-platform, and (ii) easy to prototype and debug model code in, (iii) supported object-oriented programming, and for which (iv) biology and data-science libraries were available.
-Python was our preferred choice.
+We also realized that our program could potentially come in handy in multiple projects, current and future, though only if written as more than a "one-off" chunk of code.
 
-When getting |pj| off the ground, we soon realized that |pj| could turn out to be useful in more than one project 
+Ideally, |pj| would have to be "modular" in its architecture, both in terms of its codebase as well as how models should be represented and specified.
+This modularity would allow future models to be more easily implemented -- potentially by other developers -- and seamlessly patched into |pj|.
+
+With the above in mind, we reasoned our work would be more likely to bear fruits (and faster) if we used a programming language that:
+    
+    (i) was easy to prototype and debug model code in, and
+    (ii) cross-platform,
+    (iii) supported object-oriented programming, and for which
+    (iv) biology and data-science libraries were available.
+
+Python was our language of choice.
+As for item (4), for example, we could make heavy use of the great `Dendropy <https://dendropy.org/>`_ library, maintained by Jeet Sukumaran and collaborators.
+
+Modularity was achieved by building |pj| around a graphical modeling architecture.
+This design (used in the past, see below) would not only make |pj| a more flexible simulator, but also more generally useful in the future, as a tool for method development and inference.
 
 Graphical models
-=============================
+================
 
 |pj| follows the graphical model paradigm popularized in the last decade by programs like `RevBayes <https://revbayes.github.io/>`_, `BEAST <https://beast.community/>`_ and `BEAST 2 <https://www.beast2.org/>`_.
 In what follows, we shall offer just a brief refresher on what probabilistic graphical models are, and one simple example of their use in evolutionary modeling.
