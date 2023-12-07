@@ -213,6 +213,12 @@ Errors will be thrown only if such nodes are used as input for a function, and t
 Graphical user interface (GUI)
 ------------------------------
 
+..  figure:: ../images/pjgui_model.png
+    :figwidth: 100%
+    :align: center
+
+    **Figure 3.** Test.
+
 ----------------------------
 Command-line interface (CLI)
 ----------------------------
