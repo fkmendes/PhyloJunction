@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation &mdash; PhyloJunction 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pj_custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="parametric.html" />
+    <link rel="prev" title="Installing and configuring PhyloJunction" href="../installing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> PhyloJunction
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#origins-and-design">Origins and design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#graphical-models">Graphical models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-read-a-dag">How to read a DAG?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#specifying-a-model-an-example">Specifying a model (an example)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#multiple-samples-and-replicates">Multiple samples and replicates</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#graphical-user-interface-gui">Graphical user interface (GUI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-interface-cli">Command-line interface (CLI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lexicon">Lexicon</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PhyloJunction</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pjdoc/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#overview" id="id10">Overview</a><ul>
+<li><a class="reference internal" href="#origins-and-design" id="id11">Origins and design</a></li>
+<li><a class="reference internal" href="#graphical-models" id="id12">Graphical models</a><ul>
+<li><a class="reference internal" href="#how-to-read-a-dag" id="id13">How to read a DAG?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#specifying-a-model-an-example" id="id14">Specifying a model (an example)</a><ul>
+<li><a class="reference internal" href="#multiple-samples-and-replicates" id="id15">Multiple samples and replicates</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#graphical-user-interface-gui" id="id16">Graphical user interface (GUI)</a></li>
+<li><a class="reference internal" href="#command-line-interface-cli" id="id17">Command-line interface (CLI)</a></li>
+<li><a class="reference internal" href="#lexicon" id="id18">Lexicon</a></li>
+</ul>
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<div class="section" id="origins-and-design">
+<h3>Origins and design<a class="headerlink" href="#origins-and-design" title="Permalink to this heading"></a></h3>
+<p>The PhyloJunction project was born from our need to simulate arbitrarily complex SSE processes, but not being able to do so with many existing applications.
+A series of related diversification models had been implemented in excellent computational methods, but each of those tools made unique modeling assumptions that we wanted to relax.</p>
+<p>Instead of reverse-engineering and modifying code written by others, however, it seemed like the path of least resistance was to write our own simulator.
+We also realized that our program could potentially come in handy in multiple projects, current and future, though only if written as more than a “one-off” chunk of code.</p>
+<p>Ideally, PhyloJunction would have to be “modular” in its architecture, both in terms of its codebase as well as how models should be represented and specified.
+This modularity would allow future models to be more easily implemented – potentially by other developers – and seamlessly patched into PhyloJunction.</p>
+<p>With the above in mind, we reasoned our work would be more likely to bear fruits (and faster) if we used a programming language that:</p>
+<blockquote>
+<div><ol class="lowerroman simple">
+<li>was easy to prototype and debug model code in, and</li>
+<li>cross-platform,</li>
+<li>supported object-oriented programming, and for which</li>
+<li>biology and data-science libraries were available.</li>
+</ol>
+</div></blockquote>
+<p>Python was our language of choice.
+As for item (4), for example, we could make heavy use of the great <a class="reference external" href="https://dendropy.org/" rel="noopener noreferrer" target="_blank">Dendropy</a> library, maintained by Jeet Sukumaran and collaborators.</p>
+<p>Modularity was achieved by building PhyloJunction around a graphical modeling architecture.
+This design (used in the past, see below) would not only make PhyloJunction a more flexible simulator, but also more generally useful in the future, as a tool for method development and inference.</p>
+</div>
+<div class="section" id="graphical-models">
+<h3>Graphical models<a class="headerlink" href="#graphical-models" title="Permalink to this heading"></a></h3>
+<p>PhyloJunction follows the graphical model paradigm popularized in the last decade by programs like <a class="reference external" href="https://revbayes.github.io/" rel="noopener noreferrer" target="_blank">RevBayes</a>, <a class="reference external" href="https://beast.community/" rel="noopener noreferrer" target="_blank">BEAST</a> and <a class="reference external" href="https://www.beast2.org/" rel="noopener noreferrer" target="_blank">BEAST 2</a>.
+In what follows, we shall offer just a brief refresher on what probabilistic graphical models are, and one simple example of their use in evolutionary modeling.
+Those interested in a more detailed exposition will find it in Höhna et al. (2014) and references therein (also, take a look <a class="reference external" href="https://revbayes.github.io/tutorials/intro/graph_models.html" rel="noopener noreferrer" target="_blank">here</a>).</p>
+<p>Just as with the RevBayes and BEAST programs, specifying a model in PhyloJunction amounts to writing down any number of conditional dependencies among random variables.
+When looked at collectively, random variables comprise a type of probabilistic graphical model called a Bayesian network.
+As the name suggest, such models can be described as graphs – directed acyclic graphs (<strong>DAG</strong>), more specifically – where each node (or vertex) represents a random variable, and each edge a conditional dependency between the two nodes (variables) it connects.</p>
+<p>A Bayesian network representing a very simple model can be seen in figure 1a:</p>
+<div class="figure align-center" id="id5" style="width: 100%">
+<a class="reference internal image-reference" href="../_images/simple_graphical_model_both_manual.png"><img alt="../_images/simple_graphical_model_both_manual.png" src="../_images/simple_graphical_model_both_manual.png" style="width: 436.40000000000003px; height: 216.8px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 1.</strong> A simple probabilistic model represented by (a) a Bayesian network, and (b) a factor graph.
+From the notation in the main text, <span class="math notranslate nohighlight">\(\theta=\{sd, m\}\)</span>.
+The dashed box is called a “plate”, and for each node it envelops it denotes multiple (in this case, precisely five) i.i.d. random variables.
+White and gray nodes denote random variables whose values we do (i.e., data) and do not know (i.e., parameters), respectively.</span><a class="headerlink" href="#id5" title="Permalink to this image"></a></p>
+</div>
+<p>If we were to pen down what this Bayesian network represents in probability terms, we would arrive at a joint density (assuming continuous variables) given by expression:</p>
+<div class="math notranslate nohighlight" id="equation-jointprob">
+<span class="eqno">(1)<a class="headerlink" href="#equation-jointprob" title="Permalink to this equation"></a></span>\[f_{\Theta,D}(\theta,d) = f_{\Theta|D}(\theta|D=d)f_D(d) = f_{D|\Theta}(d|\Theta=\theta)f_\Theta(\theta),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\theta=\{sd, m\}\)</span>.</p>
+<p>By comparing the Bayesian network graph and the expression above, the attentive reader will notice that functions are not represented in the graph.
+We do not know exactly how random variables are related, other than <span class="math notranslate nohighlight">\(d_1\)</span> through <span class="math notranslate nohighlight">\(d_5\)</span> depending somehow on <span class="math notranslate nohighlight">\(sd\)</span> and <span class="math notranslate nohighlight">\(m\)</span>.
+This is why it can be helpful to adopt a more general graphical representation: a factor graph (Fig. 1b).</p>
+<p>The model underlying the factor graph in figure 1b is the same as that shown by the Bayesian network, the main difference being the additional factor nodes (the filled squares).
+Factor nodes can make the relationships between two or more random variables more explicit, especially if their (factor) functions are annotated.</p>
+<p>In the example above we can see a factor whose function <span class="math notranslate nohighlight">\(f_{D|\Theta}(d|\Theta=\theta)\)</span> gives us the probability of <span class="math notranslate nohighlight">\(\boldsymbol{d} = \{d_i: 1 \leq i \leq n\}\)</span> given <span class="math notranslate nohighlight">\(\theta\)</span>.
+It is annotated as “Normal”, so we in fact know a close-form expression for this factor function; it is the probability density function of a normal distribution.
+Random variables <span class="math notranslate nohighlight">\(sd\)</span> and <span class="math notranslate nohighlight">\(m\)</span> stand for the standard deviation and the mean of that normal distribution.
+(For those curious to see just how complicated factor graphs can be, an example can be found in Zhang et al., 2023; see their Supplementary Fig. X.)</p>
+<div class="section" id="how-to-read-a-dag">
+<h4>How to read a DAG?<a class="headerlink" href="#how-to-read-a-dag" title="Permalink to this heading"></a></h4>
+<p>Most biologists specifying a DAG on a computer do so as the first step of statistical <strong>inference</strong>.
+They are interested in estimating unknown quantities about the natural world.
+These quantities – the random variables! – whose values we do not know (but would like to estimate) are referred to as the <strong>parameters</strong> of the model.
+Of course, parameter estimation requires that we know the value(s) of one or more random variables, which we naturally refer to as <strong>data</strong>.</p>
+<p>In the example in figure 1, the parameters are <span class="math notranslate nohighlight">\(sd\)</span> and <span class="math notranslate nohighlight">\(m\)</span>, jointly referred to as <span class="math notranslate nohighlight">\(\theta\)</span>; the data is node labeled <span class="math notranslate nohighlight">\(d_i\)</span>.
+(Note how they are colored differently, gray for data, white for parameter.)
+Carrying out statistical inference thus implies reading the DAG from its data nodes, normally at the bottom, towards the parameter nodes above.</p>
+<p>The most natural approach to parameter estimation requires that we simply take the middle and right-hand side terms in equation <a class="reference internal" href="#equation-jointprob">(1)</a>,
+and solve for <span class="math notranslate nohighlight">\(f_{\Theta|D}(\theta|D=d)\)</span>, the posterior density function:</p>
+<div class="math notranslate nohighlight" id="equation-bayestheorem">
+<span class="eqno">(2)<a class="headerlink" href="#equation-bayestheorem" title="Permalink to this equation"></a></span>\[f_{\Theta|D}(\theta|D=d) = \frac{f_{D|\Theta}(d|\Theta=\theta)f_\Theta(\theta)}{f_D(d)}\]</div>
+<p>This expression is known as Bayes theorem.
+What programs like RevBayes, BEAST and BEAST 2 do is evaluate the posterior density function at several values of <span class="math notranslate nohighlight">\(\theta\)</span>, and output the resulting (posterior) distribution.</p>
+<hr class="docutils" />
+<p>PhyloJunction, however, is among other things a collection of <strong>simulation</strong> (rather than estimation) engines.
+Borrowing the jargon used above, we are primarily interested in generating values for random variables, some of which are parameters, some data.</p>
+<p>Here, it makes sense to think of factors as the distributions from which values will be sampled (though as we will see below, factors can also represent deterministic functions).
+As opposed to estimation, simulation starts at the top (or “outer”) layers of the DAG, from parameters whose values we do know, and flows in the direction pointed to by arrows (normally downwards; Fig. 1b).</p>
+<p>In figure 1b, for example, we start from known values for the parameters of the distributions at the top.
+The exponential distribution from which we sample (i.e., simulate) <span class="math notranslate nohighlight">\(sd\)</span> has a rate of 1.0; the standard normal distribution (<span class="math notranslate nohighlight">\(Z\)</span>) from which we sample <span class="math notranslate nohighlight">\(m\)</span>, by definition, has a mean of 0.0 and a standard deviation of 1.0.
+We then define a normal distribution from the sampled values of <span class="math notranslate nohighlight">\(sd\)</span> and <span class="math notranslate nohighlight">\(m\)</span>, and in turn sample five times from that normal distribution, obtaining our data values in <span class="math notranslate nohighlight">\(\boldsymbol{d}\)</span>.</p>
+</div>
+</div>
+<div class="section" id="specifying-a-model-an-example">
+<h3>Specifying a model (an example)<a class="headerlink" href="#specifying-a-model-an-example" title="Permalink to this heading"></a></h3>
+<p>PhyloJunction takes a model specification approach that sits between those adopted by the BEAST and RevBayes communities, and that largely intersects with the <a class="reference external" href="https://linguaphylo.github.io/" rel="noopener noreferrer" target="_blank">LinguaPhylo</a> project.
+DAG-building instructions in PhyloJunction are written in its own programming language, <em>phylojunction</em> (written in lowercase), whose syntax evokes RevBayes’ Rev language.
+But unlike Rev, <em>phylojunction</em> is not a fully fledged scripting language; it is lightweight and behaves more like a markup language such as XML, BEAST’s format of choice.</p>
+<p>Commands in <em>phylojunction</em> can be read as mathematical statements, and are naturally interpreted as instructions for building a node in a DAG.
+Here is what a series of those commands would look like if written as a <em>phylojunction</em> script:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text"><strong>Example script 1.</strong> Script written in <em>phylojunction</em> specifying a time-homogenous birth-death model.</span><a class="headerlink" href="#id6" title="Permalink to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># hyperprior</span>
+<span class="n">m</span> <span class="o">&lt;-</span> <span class="mf">0.0</span> <span class="c1"># mean of log-normal below</span>
+<span class="n">sd</span> <span class="o">&lt;-</span> <span class="mf">0.1</span> <span class="c1"># standard deviation of log-normal below</span>
+
+<span class="c1"># rate values</span>
+<span class="n">d</span> <span class="o">&lt;-</span> <span class="mf">1.0</span> <span class="c1"># death</span>
+<span class="n">b</span> <span class="o">~</span> <span class="n">lognormal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sd</span><span class="p">)</span> <span class="c1"># birth</span>
+
+<span class="c1"># deterministic rate containers</span>
+<span class="n">dr</span> <span class="o">:=</span> <span class="n">sse_rate</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;death_rate&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;extinction&quot;</span><span class="p">)</span>
+<span class="n">br</span> <span class="o">:=</span> <span class="n">sse_rate</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;birth_rate&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;speciation&quot;</span><span class="p">)</span>
+
+<span class="n">O</span> <span class="o">&lt;-</span> <span class="mf">2.0</span> <span class="c1"># origin age</span>
+
+<span class="c1"># deterministic parameter stash</span>
+<span class="n">s</span> <span class="o">:=</span> <span class="n">sse_stash</span><span class="p">(</span><span class="n">flat_rate_mat</span><span class="o">=</span><span class="p">[</span><span class="n">dr</span><span class="p">,</span> <span class="n">br</span><span class="p">],</span> <span class="n">n_states</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># parameter stash</span>
+
+<span class="c1"># phylogenetic tree</span>
+<span class="n">T</span> <span class="o">~</span> <span class="n">discrete_sse</span><span class="p">(</span><span class="n">stash</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">stop_value</span><span class="o">=</span><span class="n">O</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;true&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Each line in the above script is a command instructing the application engine to take some form of user input, produce some value from it, and then store that value permanently in a new variable created on the spot.</p>
+<p>Every command string consists of an assignment operator (e.g., <code class="docutils literal notranslate"><span class="pre">&lt;-</span></code>, <code class="docutils literal notranslate"><span class="pre">:=</span></code>, <code class="docutils literal notranslate"><span class="pre">~</span></code>) placed between the variable being created (on its left side) and some user input (on its right side).
+We can look at some of these commands individually:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">&lt;-</span> <span class="pre">1.0</span></code> creates a variable <code class="docutils literal notranslate"><span class="pre">d</span></code> (the death rate) that is then passed and henceforth stores constant value <code class="docutils literal notranslate"><span class="pre">1.0</span></code>. We use <code class="docutils literal notranslate"><span class="pre">&lt;-</span></code> when we know the value of a random variable and want to create a constant node in the DAG;</li>
+<li><code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">~</span> <span class="pre">lognormal(mean=m,</span> <span class="pre">sd=sd)</span></code> creates a variable <code class="docutils literal notranslate"><span class="pre">b</span></code> (the birth rate) that will store a random value drawn from a user-specified distribution. Here, that distribution is a log-normal with mean <cite>m</cite> and standard deviation <cite>sd</cite>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">dr</span> <span class="pre">:=</span> <span class="pre">sse_rate(name=&quot;death_rate&quot;,</span> <span class="pre">value=d,</span> <span class="pre">event=&quot;extinction&quot;)</span></code> calls deterministic function <code class="docutils literal notranslate"><span class="pre">sse_rate</span></code>, which creates variable <code class="docutils literal notranslate"><span class="pre">dr</span></code> from the value stored in <code class="docutils literal notranslate"><span class="pre">d</span></code> and some other user input. There is no stochasticity to deterministic assignments; they help make explicit steps where variables are transformed, annotated or combined with others.</li>
+</ul>
+<p>And this is the DAG such script instantiates:</p>
+<div class="figure align-center" id="id7" style="width: 100%">
+<a class="reference internal image-reference" href="../_images/bd_graphical_model_manual.png"><img alt="../_images/bd_graphical_model_manual.png" src="../_images/bd_graphical_model_manual.png" style="width: 257.6px; height: 458.40000000000003px;" /></a>
+<p class="caption"><span class="caption-text"><strong>Figure 2.</strong> Factor graph representing the time-homogenous birth-death model specified in example script 1.</span><a class="headerlink" href="#id7" title="Permalink to this image"></a></p>
+</div>
+<p>Note how this DAG has a factor node characterized by a different type of function: deterministic function <code class="docutils literal notranslate"><span class="pre">sse_rate</span></code>.
+Such functions are denoted by filled diamonds instead of filled squares (those represent distributions), and will have their output enclosed in a hollow diamond.</p>
+<div class="section" id="multiple-samples-and-replicates">
+<h4>Multiple samples and replicates<a class="headerlink" href="#multiple-samples-and-replicates" title="Permalink to this heading"></a></h4>
+<p>Unlike other probabilistic programming languages, in <em>phylojunction</em> the output of every function is immutable and depends exclusively on that function’s input.
+Initialized variables cannot be altered by mutator methods or side-effects.</p>
+<p>An important consequence of variable immutability is that it precludes loop control structures (e.g., <em>for</em> and <em>while</em> loops).
+A reasonable question is then: <em>How does one have the model be sampled (i.e., simulated) multiple times?</em></p>
+<p>Let us look at the simple model shown in figure 1.
+Ten independent samples of that model can be obtained with following <em>phylojunction</em> script:</p>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text"><strong>Example script 2.</strong> Script written in <em>phylojunction</em> specifying the simple model in figure 1 and sampling (i.e., simulating) it ten times.</span><a class="headerlink" href="#id8" title="Permalink to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sd</span> <span class="o">~</span> <span class="n">exponential</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># this value will be vectorized</span>
+<span class="n">m</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="c1"># ... and so will this!</span>
+<span class="n">d</span> <span class="o">~</span> <span class="n">normal</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">nr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sd</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>As can be seen from the last line in script 2, all it took was providing argument <code class="docutils literal notranslate"><span class="pre">n=10</span></code> to the function call of a distribution.
+But note how the first and second lines in script 2 do not set <code class="docutils literal notranslate"><span class="pre">n=10</span></code>.
+There is just a single value being drawn from exponential and standard normal distributions; implicitly, those commands are setting <code class="docutils literal notranslate"><span class="pre">n=1</span></code>.</p>
+<p>PhyloJunction deals with this discrepancy in the requested number of samples by <strong>vectorizing</strong> the single values stored in <span class="math notranslate nohighlight">\(sd\)</span> and <span class="math notranslate nohighlight">\(m\)</span>.
+For example, if the sampled value of <span class="math notranslate nohighlight">\(m\)</span> is 0.1, under the hood PhyloJunction converts <span class="math notranslate nohighlight">\(m=1.0\)</span> into <span class="math notranslate nohighlight">\(\boldsymbol{m}=\{0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1\}\)</span>.
+In such case, all ten samples requested by command <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">~</span> <span class="pre">normal(n=10,</span> <span class="pre">nr=5,</span> <span class="pre">mean=m,</span> <span class="pre">sd=sd)</span></code> would thus come from normal distributions with the same mean of 0.1.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">PhyloJunction will raise an error if the number of samples <code class="docutils literal notranslate"><span class="pre">n</span></code> specified in two commands are both different and greater than 1.
+In other words, vectorization can only be applied on variables holding a single value.
+(This type of behavior should be familiar to R users.)</p>
+</div>
+<hr class="docutils" />
+<p>In addition to simulating an entire model multiple times as explained above, it is also possible to specify a model with multiple i.i.d. random variables, alternatively referred to as <strong>replicates</strong>.
+Multiple replicates can be specified by providing an additional argument <code class="docutils literal notranslate"><span class="pre">nr</span></code> to distribution calls, e.g., <code class="docutils literal notranslate"><span class="pre">nr=5</span></code> as in the last line of script 2.</p>
+<p>In a DAG, i.i.d. random variables can be collectively represented by a single plated node (Fig. 1), or each be represented by an individual node.
+There are in principle no constraints on the number of replicates a plated node may represent.
+Errors will be thrown only if such nodes are used as input for a function, and the replicate count somehow violates that function’s signature.</p>
+</div>
+</div>
+</div>
+<div class="section" id="graphical-user-interface-gui">
+<h2>Graphical user interface (GUI)<a class="headerlink" href="#graphical-user-interface-gui" title="Permalink to this heading"></a></h2>
+<div class="figure align-center" id="id9" style="width: 100%">
+<img alt="../_images/pjgui_model.png" src="../_images/pjgui_model.png" />
+<p class="caption"><span class="caption-text"><strong>Figure 3.</strong> Test.</span><a class="headerlink" href="#id9" title="Permalink to this image"></a></p>
+</div>
+</div>
+<div class="section" id="command-line-interface-cli">
+<h2>Command-line interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this heading"></a></h2>
+</div>
+<div class="section" id="lexicon">
+<h2>Lexicon<a class="headerlink" href="#lexicon" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../installing.html" class="btn btn-neutral float-left" title="Installing and configuring PhyloJunction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="parametric.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Fabio K. Mendes.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
