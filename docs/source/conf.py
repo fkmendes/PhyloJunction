@@ -53,6 +53,9 @@ napoleon_attr_annotations = True
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
+
+# these two are for placing the logo on the top-left corner
+# on the RTD website menu
 html_logo = 'images/pj_logo_doc.svg'
 html_theme_options = {
     'logo_only': True,
