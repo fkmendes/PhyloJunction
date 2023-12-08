@@ -1,6 +1,6 @@
-.. image:: https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/docs/source/images/pj_logo_github.png
+.. image:: https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/docs/source/images/pj_logo_github.png?sanitize=true
 
-   :align: right
+   :align: left
    :alt: PhyloJunction
 
 # PhyloJunction
