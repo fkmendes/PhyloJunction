@@ -10,6 +10,7 @@ import phylojunction.distribution.dn_discrete_sse as distsse
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
+
 class TestYuleTimeHetTrees(unittest.TestCase):
 
     @classmethod
@@ -79,14 +80,22 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         # seeds_list = [i+1 for i in range(n_sim)]
 
         # simulations
+        print(("Running TestYuleTimeHetTrees.test_tree_size_state_count_max_"
+               "taxa_timehet_yule"))
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
-            sse_sim = distsse.DnSSE(self.sse_stash, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
-                    start_states_list=start_states_list,
-                    epsilon=1e-12, runtime_limit=runtime_limit,
-                    condition_on_speciation=True, condition_on_survival=True,
-                    debug=False)
+            sse_sim = distsse.DnSSE(self.sse_stash,
+                                    n=n_sim,
+                                    origin=start_at_origin,
+                                    start_states_list=start_states_list,
+                                    stop=stop_condition,
+                                    stop_value=stop_condition_value,
+                                    condition_on_speciation=True,
+                                    condition_on_survival=True,
+                                    epsilon=1e-12,
+                                    runtime_limit=runtime_limit,
+                                    debug=False)
 
             trs = sse_sim.generate()
 

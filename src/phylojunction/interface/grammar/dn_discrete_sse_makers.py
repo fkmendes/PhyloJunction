@@ -207,12 +207,12 @@ def make_discrete_SSE_dn(
     # all unit test should still work if this initialization is done correctly
     return dnsse.DnSSE(
         stash,
-        stop_values_list,
         n=n_samples,
         n_replicates=n_repl,
-        stop=stop_str,
         origin=origin,
         start_states_list=start_states_list,
+        stop=stop_str,
+        stop_value=stop_values_list,
         condition_on_speciation=cond_spn,
         condition_on_survival=cond_surv,
         condition_on_obs_both_sides_root=cond_obs_both_sides,

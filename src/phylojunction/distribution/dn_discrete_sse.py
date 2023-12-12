@@ -1,12 +1,8 @@
 import typing as ty
-import time
-import numpy
-# import statistics
-import random
-# from random import seed, choice
+import numpy as np  # type: ignore
 import dendropy as dp  # type: ignore
-# from dendropy import Tree, Node, Taxon, TaxonNamespace
-# from matplotlib.pyplot import draw
+import random
+import time
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -25,48 +21,93 @@ __email__ = "f.mendes@wustl.edu"
 
 
 class DnSSE(pgm.DistributionPGM):
-    """Distribution class for State-dependent Speciation and Extinction (birth-death) process
+    """Discrete SSE distribution.
 
-    The sampling method in this class is a "rising tide" simulator,
-    where all living lineages grow together.
+    Class for the discrete state-dependent speciation and extinction
+    (SSE) distribution. Used for sampling phylogenetic trees annotated
+    with discrete states.
+    
+    The simulate() method in this class is a 'rising tide' sampler,
+    where all living lineages grow together. It is not a recursive
+    sampler in which lineages take care of growing themselves and recur
+    upon birth events.
 
-    At all times we know: (i) how many lineages are alive and dead, and (ii) all the character states represented by living lineages
-
-    This is not a recursive simulator (in which each lineage would take care of
-    growing only itself, and recur upon birth events).
+    At all times we know:
+        (i)  how many lineages are alive and dead
+        (ii) all the character states represented by living lineages
 
     Attributes:
-        sse_stash (SSEStash): Object holding all state-dependent parameters we need to simulate.
-        n (int): Number of simulations one wants.
-        n_replicates (int): Number of tree replicates per simulation.
-        stop (str): If "age", stops when origin or root age is equal to 'stop_condition_value'. If "size", stops when tree has 'stop_condition_value' observable nodes.
-        stop_val (float): Either maximum tree age, or maximum count of observable nodes.
-        start_at_origin (bool): Simulation starts at origin (i.e., seed == origin).
-        start_states (int): List of integer representing the starting states of all n_sim simulations.
-        state_count (int): Number of discrete states (obtained from 'events').
-        n_time_slices (int): Number of time slices (obtained from 'events').
-        slice_t_ends (int): List of end times from time slices (obtained from 'events').
-        condition_on_speciation (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to False.
-        condition_on_survival (bool): If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to True.
-        condition_on_obs_both_sides_root (bool): If true, rejects trees that do not have observed taxa on both sides of complete tree's root. Defaults to False.
-        min_rec_taxa (int): Required minimum number of observed taxa in reconstructed tree (at least or equal to). Defaults to zero.
-        max_rec_taxa (int): Required maximum number of observed taxa in reconstructed tree (at most and equal to). Defaults to 1e12.
-        abort_at_obs (int): If growing tree reaches this number of living taxa, we abort the sample (invalidate the tree). Defaults to 1e12.
-        epsilon (float, optional): Any values difference below this value is set to 0.0. Defaults to 1e-12.
-        runtime_limit (int, optional): Maximum number of minutes one is willing to wait until all 'n_sim' simulations are done. Defaults to 5.
-        debug (bool, optional): Whether to print debugging messages
-
-    Methods
-
+        sse_stash (SSEStash): Object holding all discrete
+            state-dependent parameters we need to sample (i.e.,
+            simulate). This object holds (i) the number of discrete
+            states of the process, (ii) the number of time slices if
+            process is time-heterogeneous, (iii) the end age of each
+            time slice.
+        n (int): Number of trees to sample. Defaults to 1.
+        n_replicates (int): Number of tree replicates per sample. This
+            is equivalent to the size of a plate in the DAG
+            representation. Defaults to 1.
+        start_at_origin (bool): Flag indicating if tree should start
+            at origin (if set to True) or root (if set to False).
+        start_states (int): List of integers representing the starting
+            states of each of the 'n' samples.
+        stop (str): Stop condition to end sampling (simulation)
+            procedure and return tree. If 'age', stops when age of
+            either origin or is equal to 'stop_val' (see below).
+            If "size", stops when tree has 'stop_val' observed nodes.
+        stop_val (float): List of values used by 'stop' (see above) to
+            end each of the 'n' sampling (simulation) procedures and
+            return tree. Either maximum age, or maximum count of
+            observable nodes.
+        condition_on_speciation (bool): Flag for rejecting tree samples
+            that do not go a single speciation event before 'stop_val'
+            is met. Note that this first speciation event may or not be
+            what is canonically the reconstructed tree root node.
+            If True, rejects tree sample. Defaults to False.
+        condition_on_survival (bool): Flag for rejecting tree samples
+            that go extinct before 'stop_val' is met. If True, rejects
+            tree sample. Defaults to True.
+        condition_on_obs_both_sides_root (bool): Flag for rejecting
+            tree samples that do not have observed nodes on both sides
+            of the complete tree's root node. If True, rejects tree
+            sample. Defaults to False.
+        min_rec_taxa (int): Required minimum number of observed taxa in
+            reconstructed tree. Defaults to 0.
+        max_rec_taxa (int): Required maximum number of observed taxa in
+            reconstructed tree. Defaults to 1e12.
+        abort_at_obs (int): Number of living (not observed!) nodes at
+            which point sample is rejected. This parameter is used to
+            abort samples whose SSE parameters cause trees to grow too
+            large. Defaults to 1e12.
+        epsilon (float, optional): Float threshold to determine if a
+            tiny decimal number is to be considered 0.0 or not. In
+            other words, if the difference between a tiny value 'x'
+            and 0.0 is smaller than epsilon, then 'x' is set to 0.0.
+            Defaults to 1e-12.
+        runtime_limit (int, optional): Runtime ceiling (in minutes)
+            for obtaining the 'n' tree samples. If this limit is met,
+            the sampling procedure is aborted. Defaults to 5.
+        rng_seed (int, optional): Integer seed for the two random
+            number generators used in this class. This seed is only
+            ever used by user if bypassing the scripting language
+            (otherwise random number generator seeds are handled in
+            cmd_parse.py). Defaults to None.
+        debug (bool, optional): Flag for whether to print debugging
+            messages during sampling procedure.
     """
 
     DN_NAME = "DnSSE"
 
+    sse_stash: sseobj.SSEStash
+    state_count: int
+    n_time_slices: int
+    slice_t_ends: ty.List[ty.Optional[float]]
+
     n_sim: int
     n_repl: int
     with_origin: bool
-    root_is_born: bool
-    # tree_died: bool
+    start_states: ty.List[int]
+    seed_age: ty.Optional[float]
     stop: str
     stop_val: ty.List[float]
     condition_on_speciation: bool
@@ -74,39 +115,36 @@ class DnSSE(pgm.DistributionPGM):
     condition_on_obs_both_sides_root: bool
     min_rec_taxa: int
     max_rec_taxa: int
-    abort_at_obs: int
-    sse_stash: sseobj.SSEStash
+
+    abort_at_living_count: int
     events: sseobj.MacroevolEventHandler
     prob_handler: sseobj.DiscreteStateDependentProbabilityHandler
-    start_states: ty.List[int]
-    state_count: int
-    n_time_slices: int
-    slice_t_ends: ty.List[ty.Optional[float]]
-    seed_age: ty.Optional[float]
-    seeds: ty.Optional[ty.List[int]]
     epsilon: float
     runtime_limit: int
+    rng_seed: int
     debug: bool
+
+    root_is_born: bool
 
     def __init__(
             self,
             sse_stash: sseobj.SSEStash,
-            stop_value: ty.List[float] = [],
             n: int = 1,
             n_replicates: int = 1,
-            stop: str = "",
             origin: bool = True,
             start_states_list: ty.List[int] = [],
+            stop: str = "",
+            stop_value: ty.List[float] = [],
             condition_on_speciation: bool = False,
             condition_on_survival: bool = True,
             condition_on_obs_both_sides_root: bool = False,
             min_rec_taxa: int = 0,
             max_rec_taxa: int = int(1e12),
             abort_at_obs: int = int(1e12),
-            seeds_list: ty.Optional[ty.List[int]] = None,
             epsilon: float = 1e-12,
-            runtime_limit: int = 15,
-            debug: bool = False) -> None:
+            runtime_limit: int = 5,
+            rng_seed: ty.Optional[int] = None,
+            debug: ty.Optional[bool] = False) -> None:
 
         # simulation parameters
         self.n_sim = int(n)
@@ -125,7 +163,7 @@ class DnSSE(pgm.DistributionPGM):
         # rejection sampling
         self.min_rec_taxa = min_rec_taxa
         self.max_rec_taxa = max_rec_taxa
-        self.abort_at_obs = abort_at_obs
+        self.abort_at_living_count = abort_at_obs
 
         # model parameters #
         self.start_states = start_states_list
@@ -141,18 +179,94 @@ class DnSSE(pgm.DistributionPGM):
         self.slice_t_ends = self.events.slice_t_ends
         self.seed_age = self.events.seed_age  # used just for verifying inputs
 
-        # other specs
-        self.seeds = seeds_list  # TODO: make this work
+        # other specs #
         self.epsilon = epsilon
         self.runtime_limit = runtime_limit
         self.debug = debug
+        # handling random number generator seeds
+        # (this is only ever used if this distribution
+        # is called without using cmd_parse.py)
+        self.rng_seed = rng_seed
+        if self.rng_seed is not None:
+            np.random.seed(seed=self.rng_seed)  # for event times
+            random.seed(self.rng_seed)  # for choosing lineages
 
         # checking number of provided values (vectorizing if necessary)
         self._check_sample_size()
 
-        ##################
-        # Input checking #
-        ##################
+        # checking input is OK
+        self._check_input_health()
+        
+
+    ##########################
+    # Initialization methods #
+    ##########################
+
+    def _check_sample_size(self) -> None:
+        # changing atomic_rate_params_matrix here
+        # should affect state_dep_rate_manager
+        #
+        # 1D: time slices, 2D: list of atomic rate params
+        atomic_rate_params_matrix = \
+            self.events.state_dep_rate_manager.matrix_state_dep_params
+
+        state_dep_probs_matrix = \
+            self.prob_handler.state_dep_prob_manager.matrix_state_dep_params
+
+        ############################
+        # Checking rate parameters #
+        ############################
+        # k-th time slice
+        for k, list_atomic_rate_params in enumerate(atomic_rate_params_matrix):
+            for arp in list_atomic_rate_params:
+                n_val = len(arp.value)
+
+                # we multiply values if one is provided, but > 1 sims
+                if n_val == 1 and (self.n_sim > 1):
+                    arp.value = [arp.value[0] for i in range(self.n_sim)]
+
+                # do not know how to multiply, error!
+                elif n_val > 1 and n_val != self.n_sim:
+                    raise ec.DimensionalityError(self.DN_NAME)
+
+        ###################################
+        # Checking sampling probabilities #
+        ###################################
+        for k, list_state_dep_probs in enumerate(state_dep_probs_matrix):
+            for state_dep_prob in list_state_dep_probs:
+                n_val = len(state_dep_prob.value)
+
+                # we multiply values if one is provided, but > 1 sims
+                if n_val == 1 and (self.n_sim > 1):
+                    state_dep_prob.value = [state_dep_prob.value[0] for i in range(self.n_sim)]
+
+                # do not know how to multiply, error!
+                elif n_val > 1 and n_val != self.n_sim:
+                    raise ec.DimensionalityError(self.DN_NAME)
+
+        ############################
+        # Checking starting states #
+        ############################
+        if len(self.start_states) > self.n_sim or (len(self.start_states) > 1 and len(self.start_states) < self.n_sim):
+            raise ec.DimensionalityError(self.DN_NAME)
+
+        # multiplying starting states if only one was passed and the number of simulations is > 1
+        elif len(self.start_states) < self.n_sim and len(self.start_states) == 1:
+            self.start_states = [int(self.start_states[0]) for i in range(self.n_sim)]
+
+        ########################
+        # Checking stop values #
+        ########################
+        if len(self.stop_val) > self.n_sim or (len(self.stop_val) > 1 and len(self.stop_val) < self.n_sim):
+            raise ec.DimensionalityError(self.DN_NAME)
+
+        # multiplying stop values if only one was passed and the number of simulations is > 1
+        elif len(self.stop_val) < self.n_sim and len(self.stop_val) == 1:
+            self.stop_val = [float(self.stop_val[0]) for i in range(self.n_sim)]
+
+        return None  # dummy return
+
+    def _check_input_health(self) -> None:
         if self.n_sim < 1:
             raise ec.ObjInitInvalidArgError(
                 self.DN_NAME,
@@ -273,82 +387,11 @@ class DnSSE(pgm.DistributionPGM):
                             ("Stop condition value (tree height) cannot be "
                              "negative."))
 
-    ##########################
-    # Initialization methods #
-    ##########################
-
-    def _check_sample_size(self) -> None:
-        # changing atomic_rate_params_matrix here
-        # should affect state_dep_rate_manager
-        #
-        # 1D: time slices, 2D: list of atomic rate params
-        atomic_rate_params_matrix = \
-            self.events.state_dep_rate_manager.matrix_state_dep_params
-
-        state_dep_probs_matrix = \
-            self.prob_handler.state_dep_prob_manager.matrix_state_dep_params
-
-        ############################
-        # Checking rate parameters #
-        ############################
-        # k-th time slice
-        for k, list_atomic_rate_params in enumerate(atomic_rate_params_matrix):
-            for arp in list_atomic_rate_params:
-                n_val = len(arp.value)
-
-                # we multiply values if one is provided, but > 1 sims
-                if n_val == 1 and (self.n_sim > 1):
-                    arp.value = [arp.value[0] for i in range(self.n_sim)]
-
-                # do not know how to multiply, error!
-                elif n_val > 1 and n_val != self.n_sim:
-                    raise ec.DimensionalityError(self.DN_NAME)
-
-        ###################################
-        # Checking sampling probabilities #
-        ###################################
-        for k, list_state_dep_probs in enumerate(state_dep_probs_matrix):
-            for state_dep_prob in list_state_dep_probs:
-                n_val = len(state_dep_prob.value)
-
-                # we multiply values if one is provided, but > 1 sims
-                if n_val == 1 and (self.n_sim > 1):
-                    state_dep_prob.value = [state_dep_prob.value[0] for i in range(self.n_sim)]
-
-                # do not know how to multiply, error!
-                elif n_val > 1 and n_val != self.n_sim:
-                    raise ec.DimensionalityError(self.DN_NAME)
-
-        ############################
-        # Checking starting states #
-        ############################
-        if len(self.start_states) > self.n_sim or (len(self.start_states) > 1 and len(self.start_states) < self.n_sim):
-            raise ec.DimensionalityError(self.DN_NAME)
-
-        # multiplying starting states if only one was passed and the number of simulations is > 1
-        elif len(self.start_states) < self.n_sim and len(self.start_states) == 1:
-            self.start_states = [int(self.start_states[0]) for i in range(self.n_sim)]
-
-        ########################
-        # Checking stop values #
-        ########################
-        if len(self.stop_val) > self.n_sim or (len(self.stop_val) > 1 and len(self.stop_val) < self.n_sim):
-            raise ec.DimensionalityError(self.DN_NAME)
-
-        # multiplying stop values if only one was passed and the number of simulations is > 1
-        elif len(self.stop_val) < self.n_sim and len(self.stop_val) == 1:
-            self.stop_val = [float(self.stop_val[0]) for i in range(self.n_sim)]
-
-        return None  # dummy return
-
     ######################
     # Simulation methods #
     ######################
 
-    def _get_next_event_time(
-            self,
-            total_rate: float,
-            a_seed: ty.Optional[int] = None) -> float:
+    def _get_next_event_time(self, total_rate: float) -> float:
         """Draw next exponentially distributed event time
 
         Args:
@@ -360,9 +403,6 @@ class DnSSE(pgm.DistributionPGM):
         Returns:
             float: Time to next event.
         """
-
-        if a_seed:
-            numpy.random.seed(a_seed)
 
         next_time = \
             float(dnpar.DnExponential.draw_exp(1,
@@ -1079,17 +1119,17 @@ class DnSSE(pgm.DistributionPGM):
             self,
             a_start_state: int,
             a_stop_value: ty.Union[int, float],
-            sample_idx: int = 0,
-            a_seed: ty.Optional[int] = None) -> AnnotatedTree:
-        """Sample (simulate) tree with states at its terminal nodes]
+            sample_idx: int = 0) -> AnnotatedTree:
+        """Sample (simulate) tree with states at its terminal nodes.
 
         Args:
             a_start_state (int): State at seed node (origin or root)
-            a_stop_value (float): Value to stop simulation with (number of tips or tree height)
+            a_stop_value (float): Value to stop simulation with (number
+                of tips or tree height)
             sample_idx (int): Sample index (i.e., simulation index)
 
         Returns:
-            (dendropy.Tree): One simulated tree.
+            (AnnotatedTree): An annotated tree
         """
 
         def debug_print_state_dict(state_dict):
@@ -1294,9 +1334,6 @@ class DnSSE(pgm.DistributionPGM):
             if self.stop == "age" and self.n_time_slices > 1 and latest_t > next_max_t:
                 excess_t = latest_t - next_max_t
                 latest_t = next_max_t
-
-                # print("latest_t at (4) = " + str(latest_t))
-                if latest_t < 0.0: exit("quit at (4)")
                 time_slice_idx += 1
 
                 # extend all lineages (could keep just the extend in the else-block
@@ -1341,9 +1378,6 @@ class DnSSE(pgm.DistributionPGM):
             # (5) new event time did not go over a time slice, all good, we will now
             # draw an event and execute it
             else:
-                # print("dn_discrete_sse.py: at (5)")
-                # print("latest_t at (5) = " + str(latest_t))
-                if latest_t < 0.0: exit("quit at (5)")
                 # check if tree grew beyond max age (need this check here because the
                 # max age check in the if-block above will not execute
                 # with a single time slice)
@@ -1454,7 +1488,6 @@ class DnSSE(pgm.DistributionPGM):
                 # (10) check for stop conditions
                 #
                 # check if all lineages went extinct, stop!
-                # print("dn_discrete_sse.py: at (5.5)")
                 if current_node_target_count == 0:
                     tree_died = True
 
@@ -1470,8 +1503,6 @@ class DnSSE(pgm.DistributionPGM):
 
                     reached_stop_condition = True
 
-                    # print("    all lineages went extinct!")
-
                     break
 
                 # [Condition is "age", but rejection sampling
@@ -1479,11 +1510,9 @@ class DnSSE(pgm.DistributionPGM):
                 #
                 # this helps stop trees growing out of control
                 # within age limit
-                if current_node_target_count == self.abort_at_obs:
+                if current_node_target_count == self.abort_at_living_count:
                     tree_invalid = True
                     reached_stop_condition = True
-
-                    # print("\n\n\n\n    tree grew out of control, aborting!")
 
                     break
 
@@ -1537,21 +1566,10 @@ class DnSSE(pgm.DistributionPGM):
 
                     reached_stop_condition = True
 
-                    # print("    tree reached its taxon count limit!")
-
                     break
-
-        # print("    tree is still going")
 
         # (11) got out of while loop because met stop condition
         # 'at' is scoped to simulate_a_tree() function
-
-        # debugging
-        # for nd_name, at_list in state_transition_dict.items():
-        #     print("nd_name = " + nd_name)
-        #     for at in at_list:
-        #         print(str(at))
-
         if self.stop == "age":
             # print("dn_discrete_sse.py: at (11)")
             at = AnnotatedTree(

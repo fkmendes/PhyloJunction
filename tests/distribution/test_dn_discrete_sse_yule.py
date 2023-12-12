@@ -11,6 +11,7 @@ import phylojunction.distribution.dn_discrete_sse as distsse
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
+
 class TestYuleTrees(unittest.TestCase):
 
     @classmethod
@@ -24,21 +25,25 @@ class TestYuleTrees(unittest.TestCase):
             )
         ]
     
-        # original implementation
-        # matrix_atomic_rate_params = [ [rates_t0_s0] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
-        matrix_atomic_rate_params = [ rates_t0_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
+        matrix_atomic_rate_params = [rates_t0_s0]
         
-        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, 1)
+        state_dep_par_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_atomic_rate_params,
+                1)
 
-        cls.event_handler = sseobj.MacroevolEventHandler(state_dep_par_manager)
+        cls.event_handler = \
+            sseobj.MacroevolEventHandler(state_dep_par_manager)
 
         cls.sse_stash = sseobj.SSEStash(cls.event_handler)
 
 
     def test_expected_root_height_yule(self):
         """
-        Test if Yule trees have expected size and how often 95% CI contains true tree height 
+        Test if Yule trees simulated with PJ have the expected root age
+        (against the theoretical expectation).
         """
+
         # setting up stopping conditions
         stop_condition = "size"
         stop_condition_value = [20] ## 20 species
@@ -51,16 +56,17 @@ class TestYuleTrees(unittest.TestCase):
         # seeds_list = [i+1 for i in range(n_sim)]
     
         # simulations
+        print("\n\nRunning TestYuleTrees.test_expected_root_height_yule")
         sim_batches = list()
         for i in range(n_batches):
             # print("Doing batch " + str(n_batches - i))
             sse_sim = distsse.DnSSE(
                 self.sse_stash,
-                stop_condition_value,
                 n=n_sim,
-                stop=stop_condition,
                 origin=start_at_origin,
                 start_states_list=start_states_list,
+                stop=stop_condition,
+                stop_value=stop_condition_value,
                 condition_on_survival=True,
                 epsilon=1e-12,
                 runtime_limit=3000)
@@ -73,7 +79,8 @@ class TestYuleTrees(unittest.TestCase):
             pjh.print_progress(i , n_batches)
 
         # parsing results
-        exp_age = pjmath.exp_root_height_yule_ntaxa(1.0, stop_condition_value[0])
+        exp_age = pjmath.exp_root_height_yule_ntaxa(1.0,
+                                                    stop_condition_value[0])
         
         extant_count_set = set()
         batch_cis = list()
@@ -95,7 +102,8 @@ class TestYuleTrees(unittest.TestCase):
         self.assertEqual(
             extant_count_set, 
             {20},
-            "All trees should have only 20 extant observable nodes. But found trees of size: " +
+            ("All trees should have only 20 extant observable nodes. But "
+             "found trees of size: ") +
             ", ".join(str(s) for s in extant_count_set) + "."
         )
 
@@ -107,15 +115,19 @@ class TestYuleTrees(unittest.TestCase):
         self.assertAlmostEqual(
             in_ci_count,
             exp_count,
-            msg="Truth should be contained within 95%-CI " + str(exp_count) + " (+/- " + str(a_delta) + ") out of 100 times.",
+            msg="Truth should be contained within 95%-CI " + str(exp_count) \
+                + " (+/- " + str(a_delta) + ") out of 100 times.",
             delta=a_delta
         )
 
 
     def test_expected_size_yule(self):
         """
-        Test if Yule trees have expected number of extant observable nodes
+        Test if Yule trees simulated with PJ have the expected number
+        of extant observable nodes (against the theoretical
+        expectation).
         """
+
         # setting up stopping conditions
         stop_condition = "age"
         stop_condition_value = [2.0] ## 2 time units
@@ -128,11 +140,18 @@ class TestYuleTrees(unittest.TestCase):
         # seeds_list = [i+1 for i in range(n_sim)]
     
         # simulations
+        print("\n\nRunning TestYuleTrees.test_expected_size_yule")
         sim_batches = list()
         for i in range(n_batches):
-            sse_sim = distsse.DnSSE(self.sse_stash, stop_condition_value, n=n_sim, stop=stop_condition, origin=start_at_origin,
-                    start_states_list=start_states_list, epsilon=1e-8, runtime_limit=3000,
-                    debug=False)
+            sse_sim = distsse.DnSSE(self.sse_stash,
+                                    n=n_sim,
+                                    origin=start_at_origin,
+                                    start_states_list=start_states_list,
+                                    stop=stop_condition,
+                                    stop_value=stop_condition_value,
+                                    epsilon=1e-8,
+                                    runtime_limit=3000,
+                                    debug=False)
 
             trs = sse_sim.generate()
 
@@ -147,7 +166,8 @@ class TestYuleTrees(unittest.TestCase):
         batch_cis = list()
         in_ci_count = 0
         for i, batch in enumerate(sim_batches):
-            n_extant_terminal_nodes = [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
+            n_extant_terminal_nodes = [ann_tr.n_extant_terminal_nodes
+                                       for ann_tr in batch]
             stdevs = statistics.stdev(n_extant_terminal_nodes)
             sterr = stdevs / math.sqrt(n_sim)
             diff = 1.96 * sterr
@@ -166,6 +186,7 @@ class TestYuleTrees(unittest.TestCase):
             msg="Truth should be contained within 95%-CI " \
             + str(exp_count) + " (+/- " + str(a_delta) \
             + ") out of 100 times.", delta=a_delta)
+
 
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder

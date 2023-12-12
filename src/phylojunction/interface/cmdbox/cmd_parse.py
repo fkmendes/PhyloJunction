@@ -1,8 +1,8 @@
 import re
-import io
-import traceback
 import typing as ty
+import numpy as np
 import matplotlib.pyplot as plt  # type: ignore
+import random
 
 # pj imports
 import phylojunction.pgm.pgm as pgm
@@ -20,9 +20,8 @@ __email__ = "f.mendes@wustl.edu"
 
 
 def script2pgm(script_file_path_or_model_spec: str,
-               in_pj_file: bool = True) \
-        -> pgm.ProbabilisticGraphicalModel:
-    """Go through .pj lines and populate graphical model
+               in_pj_file: bool = True) -> pgm.ProbabilisticGraphicalModel:
+    """Go through .pj lines and populate DAG
 
     Args:
         script_file_path_or_model_spec (str): Path to script .pj
@@ -37,7 +36,11 @@ def script2pgm(script_file_path_or_model_spec: str,
             line = line.lstrip().rstrip()
             _ = cmdline2pgm(pgm_obj, line)
 
-    pgm_obj = pgm.ProbabilisticGraphicalModel()
+    # handle seed if specified
+    np.random.seed(seed=123)
+    random.seed(123)
+
+    dag = pgm.ProbabilisticGraphicalModel()
 
     all_lines_list: ty.List[str] = []
 
@@ -48,8 +51,8 @@ def script2pgm(script_file_path_or_model_spec: str,
     else:
         all_lines_list = script_file_path_or_model_spec.split("\n")
 
-    # side-effect: populates pgm_obj
-    _execute_spec_lines(all_lines_list, pgm_obj)
+    # side-effect: populates DAG
+    _execute_spec_lines(all_lines_list, dag)
 
     ###################
     # Debugging space #
@@ -106,7 +109,7 @@ def script2pgm(script_file_path_or_model_spec: str,
     # End of debugging space #
     ##########################
 
-    return pgm_obj
+    return dag
 
 
 def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
@@ -900,5 +903,42 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    pgm_obj = script2pgm(script_str40, in_pj_file=False)
-    # pgm_pbj = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)
+    dag = script2pgm(script_str8, in_pj_file=False)
+    # dag = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)
+
+    # looking at dag nodes
+    for node_name, node_dag in dag.node_name_val_dict.items():
+        if isinstance(node_dag, pgm.StochasticNodePGM):
+            if isinstance(node_dag.value[0], pjtr.AnnotatedTree):
+                print(node_dag.value[0].tree.as_string(schema="newick"))
+
+                if False:
+                    # note that pjgui uses matplotlib.figure.Figure
+                    # (which is part of Matplotlib's OOP class library)
+                    # here, we instead use pyplot's figure, which is the
+                    # Matlab-like state-machine API
+                    fig = plt.figure()
+                    ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+                    ax.patch.set_alpha(0.0)
+                    ax.xaxis.set_ticks([])
+                    ax.yaxis.set_ticks([])
+                    ax.spines['left'].set_visible(False)
+                    ax.spines['bottom'].set_visible(False)
+                    ax.spines['right'].set_visible(False)
+                    ax.spines['top'].set_visible(False)
+
+                    pjtr.plot_ann_tree(
+                        node_dag.value[0],
+                        ax,
+                        use_age=False,
+                        start_at_origin=False,
+                        sa_along_branches=True
+                    )
+
+                    plt.show()
+
+            else:
+                print(node_dag.value)
+
+            # print(node_dag.get_node_stats_str(0, len(node_dag.value), 0))
+
