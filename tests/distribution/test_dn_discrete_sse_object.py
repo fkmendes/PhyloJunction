@@ -8,31 +8,41 @@ import phylojunction.distribution.dn_discrete_sse as distsse
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
+
 class TestDnSSEObject(unittest.TestCase):
 
     def test_dnsse_vectorization(self):
-        """Test if DnSSE is vectorized
-        
-        First 5 trees must be a Yule trees (l = 1.0, mu = 0.0)
-        Second 5 trees must not speciate (l = 0.0, mu = 10.0)
-        """
+        """Test if DnSSE takes vectorized input correctly."""
 
-        #########################
-        # Birth-death ingredients #
-        #########################
+        # NOTE
+        # first 5 trees must be alive (l = 1.0, mu = 0.0)
+        # second 5 trees must be dead (l = 0.0, mu = 1.0)
         total_n_states = 2
 
-        l = [ 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-        lrate = sseobj.DiscreteStateDependentRate(name="lambda0", val=l, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
+        l = [1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        lrate = \
+            sseobj.DiscreteStateDependentRate(
+                name="lambda0",
+                val=l,
+                event=sseobj.MacroevolEvent.W_SPECIATION,
+                states=[0,0,0])
         
-        mu = [ 0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0, 10.0, 10.0 ]
-        murate = sseobj.DiscreteStateDependentRate(name="mu0", val=mu, event=sseobj.MacroevolEvent.EXTINCTION, states=[0])
+        mu = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        murate = \
+            sseobj.DiscreteStateDependentRate(
+                name="mu0",
+                val=mu,
+                event=sseobj.MacroevolEvent.EXTINCTION,
+                states=[0])
         
-        rates_t0 = [ lrate, murate ]
+        rates_t0 = [lrate, murate]
 
-        matrix_atomic_rate_params = [ rates_t0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
+        matrix_atomic_rate_params = [rates_t0]
         
-        state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(matrix_atomic_rate_params, total_n_states)
+        state_dep_par_manager = \
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_atomic_rate_params, \
+                total_n_states)
 
         meh = sseobj.MacroevolEventHandler(state_dep_par_manager)
 
@@ -50,16 +60,17 @@ class TestDnSSEObject(unittest.TestCase):
         sse_sim = distsse.DnSSE(
             sse_stash,
             n=n_sim,
-            stop=stop_condition,
-            stop_value=stop_condition_value,
             origin=start_at_origin,
             start_states_list=start_states_list,
-            epsilon=1e-12,
-            runtime_limit=3600,
+            stop=stop_condition,
+            stop_value=stop_condition_value,
             condition_on_speciation=False,
             condition_on_survival=False,
+            epsilon=1e-12,
+            runtime_limit=3600,
             debug=False)
 
+        print("\n\nRunning TestDnSSEObject.test_dnsse_vectorization")
         trs = sse_sim.generate()
 
         trs1to5 = [ tr for tr in trs[:5] ]
@@ -68,9 +79,11 @@ class TestDnSSEObject(unittest.TestCase):
         for tr in trs1to5:
             # first 5 trees are Yule trees and cannot have died
             self.assertFalse(tr.tree_died)
+
         for tr in trs6to10:
             # second 5 trees must have died
             self.assertTrue(tr.tree_died)
+
 
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder
@@ -90,7 +103,7 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/distribution/test_dn_discrete_sse_object.py
+    # $ python3.9 tests/distribution/test_dn_discrete_sse_object.py
     # 
     # or
     #

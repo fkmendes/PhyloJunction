@@ -36,22 +36,22 @@ class DnSSE(pgm.DistributionPGM):
     debug: bool
     def __init__(self,
                  sse_stash: sseobj.SSEStash = ...,
-                 stop_value: ty.List[float] = ...,
                  n: int = ...,
                  n_replicates: int = ...,
-                 stop: ty.Optional[str] = ...,
                  origin: bool = ...,
                  start_states_list: ty.List[int] = ...,
+                 stop: str = "",
+                 stop_value: ty.List[float] = [],
                  condition_on_speciation: bool = ...,
                  condition_on_survival: bool = ...,
                  condition_on_obs_both_sides_root: bool = ...,
                  min_rec_taxa: int = ...,
                  max_rec_taxa: int = ...,
                  abort_at_obs: int = ...,
-                 seeds_list: ty.Optional[ty.List[int]] = ...,
-                 epsilon: float = ...,
-                 runtime_limit: int = ...,
-                 debug: bool = ...) -> None: ...
+                 epsilon: float = 1e-12,
+                 runtime_limit: int = 5,
+                 rng_seed: ty.Optional[int] = None,
+                 debug: ty.Optional[bool] = False) -> None: ...
     def _initialize_missing_prob_handler(self) -> None: ...
     def _check_sample_size(self) -> None: ...
     def get_next_event_time(self, total_rate: float, a_seed: ty.Optional[int] = ...) -> float: ...
