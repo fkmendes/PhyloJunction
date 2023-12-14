@@ -4,9 +4,12 @@ import typing as ty
 # pj imports
 import phylojunction.pgm.pgm as pgm
 import phylojunction.calculation.discrete_sse as sseobj
-import phylojunction.data.sampled_ancestor as pjsa
 import phylojunction.data.attribute_transition as pjat
 from phylojunction.data.tree import AnnotatedTree
+from phylojunction.data.sampled_ancestor \
+    import SampledAncestor  # type: ignore
+from phylojunction.data.attribute_transition \
+    import AttributeTransition  # type: ignore
 
 class DnSSE(pgm.DistributionPGM):
     DN_NAME: str
@@ -54,56 +57,70 @@ class DnSSE(pgm.DistributionPGM):
                  debug: ty.Optional[bool] = False) -> None: ...
     def _initialize_missing_prob_handler(self) -> None: ...
     def _check_sample_size(self) -> None: ...
-    def get_next_event_time(self, total_rate: float, a_seed: ty.Optional[int] = ...) -> float: ...
-    def execute_birth(self,
-                      tr_namespace: dp.TaxonNamespace,
-                      chosen_node: dp.Node,
-                      state_representation_dict: ty.Dict[int, ty.Set[str]],
-                      sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
-                      untargetable_node_set: ty.Set[str],
-                      cumulative_node_count: int,
-                      macroevol_atomic_param: sseobj.DiscreteStateDependentRate,
-                      event_t: float,
-                      debug: bool = ...) -> ty.Tuple[dp.Node, int]: ...
-    def execute_death(self,
-                      chosen_node: dp.Node,
-                      state_representation_dict: ty.Dict[int, ty.Set[str]],
-                      sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
-                      untargetable_node_set: ty.Set[str],
-                      event_t: float,
-                      debug: bool = ...) -> dp.Node: ...
-    def execute_anatrans(self,
-                         tr_namespace: dp.TaxonNamespace,
-                         chosen_node: dp.Node,
-                         state_representation_dict: ty.Dict[int, ty.Set[str]],
-                         state_transition_dict: ty.Dict[str, ty.List[pjat.AttributeTransition]],
-                         sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
-                         untargetable_node_set: ty.Set[str],
-                         macroevol_rate_param: sseobj.DiscreteStateDependentRate,
-                         event_t: float,
-                         debug: bool = ...) -> None: ...
-    def execute_sample_ancestor(self,
-                                tr_namespace: dp.TaxonNamespace,
-                                chosen_node: dp.Node,
-                                state_representation_dict: ty.Dict[int, ty.Set[str]],
-                                sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]],
-                                untargetable_node_set: ty.Set[str],
-                                cumulative_sa_count: int,
-                                event_t: float,
-                                debug: bool = ...) -> int: ...
-    def update_sa_lineage_dict(self, a_time: float, sa_lineage_dict: ty.Dict[str, ty.List[pjsa.SampledAncestor]], sa_lineage_node_labels: ty.List[str], debug: bool=False) -> None: ...
-    def execute_event(self,
-                      tr_namespace,
-                      macroevol_rate_param: sseobj.DiscreteStateDependentRate,
-                      chosen_node: dp.Node,
-                      state_representation_dict: ty.Dict[int, ty.Set[str]],
-                      state_transition_dict: ty.Dict[str, ty.List[pjat.AttributeTransition]],
-                      untargetable_node_set: ty.Set[str],
-                      cumulative_node_count: int,
-                      cumulative_sa_count: int,
-                      last_chosen_node,
-                      event_t: float,
-                      debug: bool = ...) -> ty.Tuple[dp.Node, int, int]: ...
+    def _germinate_tree(self,
+                        a_start_state: int,
+                        with_origin: bool,
+                        state_representation_dict: ty.Dict[int, ty.Set[str]],
+                        untargetable_node_set: ty.Set[str]) -> ty.Tuple[dp.Tree, dp.Node, int, bool]: ...
+    def _update_sa_lineage_dict(self,
+                               a_time: float,
+                               sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                               sa_lineage_node_labels: ty.List[str],
+                               debug: bool=False) -> None: ...
+    def _execute_birth(self,
+                       tr_namespace: dp.TaxonNamespace,
+                       chosen_node: dp.Node,
+                       state_representation_dict: ty.Dict[int, ty.Set[str]],
+                       sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                       state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+                       untargetable_node_set: ty.Set[str],
+                       cumulative_node_count: int,
+                       sse_birth_rate_object: sseobj.DiscreteStateDependentRate,
+                       event_t: float,
+                       debug=False) -> ty.Tuple[dp.Node, int]: ...
+    def _execute_death(self,
+                       tr_namespace: dp.TaxonNamespace,
+                       chosen_node: dp.Node,
+                       state_representation_dict: ty.Dict[int, ty.Set[str]],
+                       sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                       untargetable_node_set: ty.Set[str],
+                       event_t: float,
+                       debug=False) -> dp.Node: ...
+    def _execute_anatrans(self,
+                          tr_namespace: dp.TaxonNamespace,
+                          chosen_node: dp.Node,
+                          state_representation_dict: ty.Dict[int, ty.Set[str]],
+                          state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+                          untargetable_node_set: ty.Set[str],
+                          sse_anatrans_rate_object: sseobj.DiscreteStateDependentRate,
+                          event_t: float,
+                          debug: bool = False) -> None: ...
+    def _execute_sample_ancestor(self,
+                                 tr_namespace: dp.TaxonNamespace,
+                                 chosen_node: dp.Node,
+                                 state_representation_dict: ty.Dict[int, ty.Set[str]],
+                                 sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                                 untargetable_node_set: ty.Set[str],
+                                 cumulative_sa_count: int,
+                                 event_t: float,
+                                 debug: bool = False) -> int: ...
+    def _execute_event(self,
+                       tr_namespace,
+                       sse_rate_object: sseobj.DiscreteStateDependentRate,
+                       chosen_node: dp.Node,
+                       state_representation_dict: ty.Dict[int, ty.Set[str]],
+                       state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+                       sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+                       untargetable_node_set: ty.Set[str],
+                       cumulative_node_count: int,
+                       cumulative_sa_count: int,
+                       event_t: float,
+                       debug: bool = False) -> ty.Tuple[dp.Node, int, int]: ...
+    def _annotate_sampled(self,
+                          a_time: float,
+                          living_nodes: ty.List[dp.Node],
+                          sample_idx: int) -> None: ...
+    def _get_next_event_time(total_rate: float) -> float: ...
     def simulate(self, a_start_state: int, value_idx: int = ..., a_seed: ty.Optional[int] = ...) -> AnnotatedTree: ...
     def generate(self) -> ty.List[AnnotatedTree]: ...
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...

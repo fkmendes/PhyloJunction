@@ -544,7 +544,7 @@ class TestBDTrees(unittest.TestCase):
 
     def test_expected_size_bd(self):
         """
-        Test if birth-death trees simulated with PK have the expected
+        Test if birth-death trees simulated with PJ have the expected
         number of extant observable nodes (against the theoretical
         expectation).
         """
@@ -591,6 +591,7 @@ class TestBDTrees(unittest.TestCase):
         # origin_heights_when_gt_0 = set()
         batch_cis = list()
         in_ci_count = 0
+        global_avg_size = list()
         for i, batch in enumerate(sim_batches):
             n_extant_obs_nodes = \
                 [ann_tr.n_extant_terminal_nodes for ann_tr in batch]
@@ -598,10 +599,15 @@ class TestBDTrees(unittest.TestCase):
             sterr = stdevs / math.sqrt(n_sim)
             diff = 1.96 * sterr
             avg_size = statistics.mean(n_extant_obs_nodes)
+            global_avg_size.append(avg_size)
             batch_cis = (avg_size - diff, avg_size + diff)
 
             if exp_size >= batch_cis[0] and exp_size <= batch_cis[1]:
                 in_ci_count += 1
+
+        print("\n\nPJ global mean extant taxon count = " \
+              + str(statistics.mean(global_avg_size)))
+        print("Expected BD tree size =", exp_size)
 
         print("\n\n95% CI includes expectation " + str(in_ci_count) + " times.")
         exp_count = int(0.95 * n_batches)

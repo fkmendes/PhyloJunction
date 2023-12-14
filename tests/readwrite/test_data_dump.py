@@ -95,16 +95,16 @@ class TestDataDump(unittest.TestCase):
 
         sse_sim = dnsse.DnSSE(
             sse_stash,
-            stop_condition_value,
             n=n_sim,
             n_replicates=n_repl,
-            stop=stop_condition,
             origin=start_at_origin,
             start_states_list=start_states_list,
-            epsilon=1e-12,
-            runtime_limit=3600,
+            stop=stop_condition,
+            stop_value=stop_condition_value,
             condition_on_speciation=True,
             condition_on_survival=True,
+            epsilon=1e-12,
+            runtime_limit=3600,
             debug=False
         )
 

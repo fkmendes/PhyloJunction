@@ -320,7 +320,8 @@ class DnExponential(pgm.DistributionPGM):
             scale_or_rate_param (float): Scale (default) or rate of
                 exponential distribution.
             rate_parameterization (bool, optional): Argument of
-                'scale_or_rate_param' is rate instead of scale. Defaults to True.
+                'scale_or_rate_param' is rate instead of scale.
+                Defaults to True.
 
         Returns:
             float: Sample (list) from exponential distribution.

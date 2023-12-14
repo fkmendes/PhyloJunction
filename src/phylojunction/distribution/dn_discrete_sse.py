@@ -98,33 +98,43 @@ class DnSSE(pgm.DistributionPGM):
 
     DN_NAME = "DnSSE"
 
-    sse_stash: sseobj.SSEStash
-    state_count: int
-    n_time_slices: int
-    slice_t_ends: ty.List[ty.Optional[float]]
-
+    # for typing #
+    # basic simulation parameters
     n_sim: int
     n_repl: int
+
+    # start conditions
     with_origin: bool
+    root_is_born: bool
     start_states: ty.List[int]
     seed_age: ty.Optional[float]
-    stop: str
-    stop_val: ty.List[float]
+
+    # conditioning flags and values
     condition_on_speciation: bool
     condition_on_survival: bool
     condition_on_obs_both_sides_root: bool
+    
+    # stop condition and values
+    stop: str
+    stop_val: ty.List[float]
     min_rec_taxa: int
     max_rec_taxa: int
-
     abort_at_living_count: int
+    
+    # model parameters
+    sse_stash: sseobj.SSEStash
     events: sseobj.MacroevolEventHandler
+    state_count: int
+    n_time_slices: int
+    slice_t_ends: ty.List[ty.Optional[float]]
     prob_handler: sseobj.DiscreteStateDependentProbabilityHandler
+    
+    # other specs
     epsilon: float
     runtime_limit: int
     rng_seed: int
     debug: bool
-
-    root_is_born: bool
+    info: bool
 
     def __init__(
             self,
@@ -144,17 +154,23 @@ class DnSSE(pgm.DistributionPGM):
             epsilon: float = 1e-12,
             runtime_limit: int = 5,
             rng_seed: ty.Optional[int] = None,
-            debug: ty.Optional[bool] = False) -> None:
+            debug: ty.Optional[bool] = False,
+            info: ty.Optional[bool] = False) -> None:
 
-        # simulation parameters
-        self.n_sim = int(n)
-        # number of replicate trees (in plate) for a given simulation
-        self.n_repl = int(n_replicates)
+        # basic simulation parameters
+        self.n_sim = int(n)  # number of full model samples
+        self.n_repl = int(n_replicates)  # plating (iid r.v.'s)!
+        
+        # start conditions
         self.with_origin = origin
         self.root_is_born = False
-        # self.tree_died = False
+        self.start_states = start_states_list
+        
+        # stop condition, stop value
         self.stop = stop
         self.stop_val = stop_value
+        
+        # conditioning flags
         self.condition_on_speciation = condition_on_speciation
         self.condition_on_survival = condition_on_survival
         self.condition_on_obs_both_sides_root = \
@@ -166,23 +182,23 @@ class DnSSE(pgm.DistributionPGM):
         self.abort_at_living_count = abort_at_obs
 
         # model parameters #
-        self.start_states = start_states_list
+        # macroevol rate handler and prob handler inside
         self.sse_stash = sse_stash
+
         # all rates, number of states and of slices
         self.events = sse_stash.get_meh()
         self.state_count = self.events.state_count
         self.n_time_slices = self.events.n_time_slices
+        self.slice_t_ends = self.events.slice_t_ends  # for time-het processes
+        self.seed_age = self.events.seed_age  # required for checking input
         # sampling probabilities, if provided
         self.prob_handler = sse_stash.get_prob_handler()
-
-        # for time-heterogeneous processes
-        self.slice_t_ends = self.events.slice_t_ends
-        self.seed_age = self.events.seed_age  # used just for verifying inputs
 
         # other specs #
         self.epsilon = epsilon
         self.runtime_limit = runtime_limit
         self.debug = debug
+        self.info = info
         # handling random number generator seeds
         # (this is only ever used if this distribution
         # is called without using cmd_parse.py)
@@ -196,7 +212,6 @@ class DnSSE(pgm.DistributionPGM):
 
         # checking input is OK
         self._check_input_health()
-        
 
     ##########################
     # Initialization methods #
@@ -387,30 +402,208 @@ class DnSSE(pgm.DistributionPGM):
                             ("Stop condition value (tree height) cannot be "
                              "negative."))
 
-    ######################
-    # Simulation methods #
-    ######################
+    ############################
+    # Large simulation methods #
+    ############################
 
-    def _get_next_event_time(self, total_rate: float) -> float:
-        """Draw next exponentially distributed event time.
+    # NOTE: Python passes arguments 'by assignment', which means that for
+    # mutable arguments, we are doing something akin to 'pass by reference';
+    # we can mutate -- but not reassign! -- the argument variable and
+    # changes will be reflected outside the function.
+    #
+    # In the following executers, we make use of the above Python feature.
+    # Class members are passed as arguments and modified (side-effect) inside
+    # the executers. We choose to do so to make the behavior of each of the
+    # executers more explicit by just looking at the method's signature
+
+    def _germinate_tree(self,
+                        a_start_state: int,
+                        with_origin: bool,
+                        state_representation_dict: ty.Dict[int, ty.Set[str]],
+                        untargetable_node_set: ty.Set[str]) \
+                            -> ty.Tuple[dp.Tree, dp.Node, int, bool]:
+        """
+        Initialize (germinate) tree with either origin or root.
 
         Args:
-            current_node_target_count (int): Number of nodes that
-                can experience an event.
-            total_rate (float): Sum of all rates currently represented
-                by nodes that can experience an event.
+            a_start_state (int): State at seed node (origin or root).
+            with_origin (bool): Flag specifying whether tree is to be
+                germinated at origin node (we automatically attach the
+                'brosc' node), or at the root node (no 'brosc' node).
+            state_representation_dict (dict): Dictionary that keeps
+                track of all states currently represented by living
+                lineages. Keys are integer representing the states,
+                values are sets of taxon names (strings).
+            untargetable_node_set (set): Set of Node labels that
+                cannot be targeted for events anymore (went extinct).
 
         Returns:
-            float: Time to next event.
+            (tuple): Tuple with four items. The germinated tree
+                (dendropy.Tree), the 'brosc' node if there is one
+                (dendropy.Node), the cumulative node count (integer),
+                and a boolean specifying if a root exists or not.
         """
 
-        next_time = \
-            float(
-                dnpar.DnExponential.draw_exp(1,
-                                             total_rate,
-                                             rate_parameterization=True))
+        cumulative_node_count: int = 0
+        brosc_node: dp.Node = None
+        root_is_born: bool = False
 
-        return next_time
+        # simulation starts at origin
+        if with_origin:
+            ##################################################################
+            # brosc: before-root-origin-single-child                         #
+            # Node that might be necessary for tying process off if a        #
+            # peciation never happens before the process either dies, or     #
+            # reaches stop condition                                         #
+            #                                                                #
+            # Note: brosc can become an SA lineage node if ancestor sampling #
+            # happens, but a root is never born                              #
+            ##################################################################
+
+            # this particular brosc_node instance below will be used
+            # within the simulate() method, but not inside
+            # "execute_sample_ancestor()", which has its own instance of
+            # brosc_node being created
+            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
+                                label="brosc",
+                                edge_length=0.0)
+            brosc_node.state = a_start_state
+            brosc_node.annotations.add_bound_attribute("state")
+            brosc_node.sampled = True
+            brosc_node.is_sa = False
+            brosc_node.is_sa_dummy_parent = False
+            brosc_node.is_sa_lineage = False
+
+            # origin node will be the seed_node
+            origin_node = dp.Node(taxon=dp.Taxon(label="origin"),
+                                label="origin",
+                                edge_length=0.0)
+            origin_node.state = a_start_state
+            origin_node.annotations.add_bound_attribute("state")
+            origin_node.alive = True
+            origin_node.sampled = False
+            origin_node.is_sa = False
+            origin_node.is_sa_dummy_parent = False
+            origin_node.is_sa_lineage = False
+            state_representation_dict[origin_node.state] \
+                .add(origin_node.label)
+
+            # now make tree #
+            # will remain a "is_leaf() == True" until we add children
+            tr = dp.Tree(seed_node=origin_node)
+            tr.taxon_namespace.add_taxon(origin_node.taxon)
+
+        # simulation starts at root
+        else:
+            # root node will be the seed_node,
+            # and will be untargetable from the get-go
+            root_node = dp.Node(taxon=dp.Taxon(label="root"),
+                                label="root",
+                                edge_length=0.0)
+            root_node.state = a_start_state
+            root_node.annotations.add_bound_attribute("state")
+            root_node.alive = False
+            root_node.sampled = False
+            root_node.is_sa = False
+            root_node.is_sa_dummy_parent = False
+            root_node.is_sa_lineage = False
+            untargetable_node_set.add("root")
+            root_is_born = True
+
+            # we will actually start off with the
+            # left and right nodes being targetable
+            left_node = dp.Node(taxon=dp.Taxon(label="nd1"),
+                                label="nd1",
+                                edge_length=0.0)
+            left_node.is_sa = False
+            left_node.is_sa_dummy_parent = False
+            left_node.is_sa_lineage = False
+            left_node.alive = True
+            left_node.sampled = True
+            left_node.state = root_node.state  # get state from parent (root)
+            left_node.annotations.add_bound_attribute("state")
+            root_node.add_child(left_node)
+            state_representation_dict[left_node.state].add(left_node.label)
+            cumulative_node_count += 1
+
+            right_node = dp.Node(taxon=dp.Taxon(label="nd2"),
+                                label="nd2",
+                                edge_length=0.0)
+            right_node.is_sa = False
+            right_node.is_sa_dummy_parent = False
+            right_node.is_sa_lineage = False
+            right_node.alive = True
+            right_node.sampled = True
+            right_node.state = root_node.state  # get state from parent (root)
+            right_node.annotations.add_bound_attribute("state")
+            root_node.add_child(right_node)
+            state_representation_dict[right_node.state].add(right_node.label)
+            cumulative_node_count += 1
+
+            # now make tree #
+            # will remain a "is_leaf() == True" until we add children
+            tr = dp.Tree(seed_node=root_node)
+            tr.taxon_namespace.add_taxon(root_node.taxon)
+            tr.taxon_namespace.add_taxon(left_node.taxon)
+            tr.taxon_namespace.add_taxon(right_node.taxon)
+    
+        return tr, brosc_node, cumulative_node_count, root_is_born
+    
+    def _update_sa_lineage_dict(
+            self,
+            a_time: float,
+            sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
+            sa_lineage_node_labels: ty.List[str],
+            debug: bool = False) -> None:
+        """
+        Update sa_lineage_dict class member as a side-effect.
+
+        This function is called whenever a branch stops growing:
+            (i) When a node undergoes a birth event (effectively
+            becoming an internal node);
+            (ii) When living nodes reach the present moment or a stop
+            condition (i.e., the tree stops growing).
+
+        These two possibilities only matter when the node(s) involved
+        have direct (sampled) ancestors on the branch leading to them
+        (i.e., if for that node .is_sa_lineage == True).
+
+        In case (i), 'sa_lineage_node_label' will have a single
+        element, the label of the node undergoing birth. In case (ii),
+        'sa_lineage_node_label' will have the labels of all terminal
+        living nodes for which .is_sa_lineage == True.
+
+        By updating sa_lineage_dict as the tree is built, we don't have
+        to do tree traversals later to get sampled ancestor times for
+        plotting (when initializing an AnnotatedTree).
+
+        Args:
+            a_time (float): Either the time of the last birth event
+                undergone by an SA lineage or the simulation end time.
+            sa_lineage_dict (dict): Dictionary that keeps track of
+                nodes that have direct (sampled) ancestor children.
+                Keys are taxon names (strings) and values are lists
+                of SampledAncestor objects.
+            sa_lineage_node_labels (str): List of node labels whose
+                subtending branch has direct (sampled) ancestors.
+        """
+
+        if debug:
+            print("\n>> Updating SA lineage dictionary. Keys are is \'" +
+                  + ", ".join(sa_label
+                              for sa_label in sa_lineage_node_labels) +
+                  + "\' and time being added is " + str(a_time) +
+                  + "\n   SA lineage dict:")
+            print("      " + "\n      ".join(
+                k + " has in its lineage " +
+                + ", ".join(sa.label for sa in sas) for k, sas
+                in sa_lineage_dict.items()))
+
+        for sa_lineage_node_label in sa_lineage_node_labels:
+            sa_list = sa_lineage_dict[sa_lineage_node_label]
+
+            for sa in sa_list:
+                sa.time_to_lineage_node = a_time - sa.global_time
 
     def _execute_birth(
             self,
@@ -437,12 +630,6 @@ class DnSSE(pgm.DistributionPGM):
             (iv)  self.state_transition_dict
             (v)   self.root_is_born
             (vi)  self.untargetable_node_set
-        
-        (Note that Python passes arguments 'by assignment',
-        which means that for mutable arguments, we are doing something
-        akin to 'pass by reference'; we can mutate -- but not
-        reassign! -- the argument variable and changes will be
-        reflected outside the function.)
 
         Args:
             tr_namespace (dendropy.TaxonNamespace): Dendropy object
@@ -461,7 +648,7 @@ class DnSSE(pgm.DistributionPGM):
                 of nodes subtending which state transitions happen
                 (used for plotting). Keys are taxon names (strings)
                 and values are lists of AttributeTransition objects.
-            untargetable_node_set (set): Set of Node labels that
+            untargetable_node_set (str): Set of Node labels that
                 cannot be targeted for events anymore (went extinct).
             cumulative_node_count (int): Total number of nodes in the
                 tree (to be used in labeling).
@@ -688,13 +875,13 @@ class DnSSE(pgm.DistributionPGM):
             chosen_node: dp.Node,
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-            untargetable_node_set: ty.Set[dp.Node],
+            untargetable_node_set: ty.Set[str],
             event_t: float,
             debug=False) -> dp.Node:
         """Execute lineage death.
 
-        This method has both side-effects and a return.
-        The side-effects include the updating of class members. These
+        This method has both side-effects and a return. The
+        side-effects include the updating of class members. These
         members are passed as arguments in the signature so that we
         can have a better idea of what to expect as behavior:
         
@@ -702,12 +889,6 @@ class DnSSE(pgm.DistributionPGM):
             (ii)  self.state_representation_dict
             (iii) self.sa_lineage_dict
             (iv)  self.untargetable_node_set
-        
-        (Note that Python passes arguments 'by assignment',
-        which means that for mutable arguments, we are doing something
-        akin to 'pass by reference'; we can mutate -- but not
-        reassign! -- the argument variable and changes will be
-        reflected outside the function.)
 
         Args:
             tr_namespace (dendropy.TaxonNamespace): Dendropy object
@@ -722,10 +903,8 @@ class DnSSE(pgm.DistributionPGM):
                 nodes that have direct (sampled) ancestor children.
                 Keys are taxon names (strings), values are lists
                 of SampledAncestor objects.
-            untargetable_node_set (set): Set of Node labels that
+            untargetable_node_set (str): Set of Node labels that
                 cannot be targeted for events anymore (went extinct).
-            cumulative_node_count (int): Total number of nodes in the
-                tree (to be used in labeling).
             event_t (float): Time of death event taking place.
             debug (bool): Flag for printing debugging messages.
                 If 'True', prints messages. Defaults to 'False'.
@@ -790,12 +969,22 @@ class DnSSE(pgm.DistributionPGM):
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
             untargetable_node_set: ty.Set[str],
-            macroevol_rate_param: sseobj.DiscreteStateDependentRate,
+            sse_anatrans_rate_object: sseobj.DiscreteStateDependentRate,
             event_t: float,
             debug: bool = False) -> None:
         """
         Execute anagenetic trait-state transition on path to chosen
-        node (side-effect)
+        node.
+
+        This method has only side-effects. These include the updating
+        of class members, which are passed as arguments in the
+        signature so that we can have a better idea of what to expect
+        as behavior:
+        
+            (i)   self.tr.tr_namespace,
+            (ii)  self.state_representation_dict
+            (iii) self.state_transition_dict
+            (iv)  self.untargetable_node_set
 
         Args:
             tr_namespace (dendropy.TaxonNamespace): Dendropy object
@@ -804,12 +993,17 @@ class DnSSE(pgm.DistributionPGM):
                 anagenetic trait-state transition.
             state_representation_dict (dict): Dictionary that keeps
                 track of all states currently represented by living
-                lineages.
+                lineages. Keys are integer representing the states,
+                values are sets of taxon names (strings).
             state_transition_dict (dict): Dictionary that keeps track
                 of nodes subtending which state transitions happen
-                (used for plotting)
-            macroevol_rate_param (AtomicRateParameter): Atomic rate
-                parameter containing departing/arriving state.
+                (used for plotting). Keys are taxon names (strings)
+                and values are lists of AttributeTransition objects.
+            untargetable_node_set (set): Set of Node labels that
+                cannot be targeted for events anymore (went extinct).
+            sse_anatrans_rate_object (DiscreteStateDependentRate): SSE
+                rate parameter object holding the departing/arriving
+                states.
             event_t (float): Time of anagenetic transition event taking
                 place.
             debug (bool): If 'True', prints debugging messages.
@@ -820,10 +1014,10 @@ class DnSSE(pgm.DistributionPGM):
             print("TRANSITION of node " + chosen_node.label \
                   + " from state " + str(chosen_node.state) \
                   + " to state " \
-                  + str(macroevol_rate_param.arriving_states[0]))
+                  + str(sse_anatrans_rate_object.arriving_states[0]))
 
         # new state
-        arriving_state = macroevol_rate_param.arriving_states[0]
+        arriving_state = sse_anatrans_rate_object.arriving_states[0]
 
         # old state is not represented anymore
         state_representation_dict[chosen_node.state].remove(chosen_node.label)
@@ -892,24 +1086,51 @@ class DnSSE(pgm.DistributionPGM):
             chosen_node: dp.Node,
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-            untargetable_node_set,
+            untargetable_node_set: ty.Set[str],
             cumulative_sa_count: int,
             event_t: float,
             debug: bool = False) -> int:
-        """Execute sampling of direct lineage ancestor (side-effect and return)
+        """Execute sampling of direct lineage ancestor.
+
+        This method has both side-effects and a return. The
+        side-effects include the updating of class members. These
+        members are passed as arguments in the signature so that we
+        can have a better idea of what to expect as behavior:
+        
+            (i)   self.tr.tr_namespace,
+            (ii)  self.state_representation_dict
+            (iii) self.sa_lineage_dict
+            (iv)  self.untargetable_node_set
 
         Args:
-            tr_namespace (dendropy.TaxonNamespace):
-            chosen_node (dendropy.Node): Node that will undergo event.
-            state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children.
-            cumulative_sa_count (int): Total number of sampled ancestors nodes in the tree (to be used in labeling).
-            event_t (float): Time of ancestor sampling event taking place.
-            debug (bool): If 'true', prints debugging messages. Defaults to False.
+            tr_namespace (dendropy.TaxonNamespace): Dendropy object
+                recording taxa in the tree.
+            chosen_node (dendropy.Node): Node that will undergo the
+                direct ancestor sampling.
+            state_representation_dict (dict): Dictionary that keeps
+                track of all states currently represented by living
+                lineages. Keys are integer representing the states,
+                values are sets of taxon names (strings).
+            sa_lineage_dict (dict): Dictionary that keeps track of
+                nodes that have direct (sampled) ancestor children.
+                Keys are taxon names (strings) and values are lists
+                of SampledAncestor objects.
+            untargetable_node_set (str): Set of Node labels that
+                cannot be targeted for events anymore (went extinct).
+            cumulative_sa_count (int): Total number of nodes in the
+                tree (to be used in labeling).
+            event_t (float): Time of ancestor sampling event taking
+                place.
+            debug (bool): If 'True', prints debugging messages.
+                Defaults to False.
+
+        Returns:
+            (int): Cumulative number of direct (sampled) ancestors.
         """
 
         if debug:
-            print("> ANCESTOR-SAMPLING of node " + chosen_node.label + " , keeping state " + str(chosen_node.state))
+            print("> ANCESTOR-SAMPLING of node " + chosen_node.label \
+                  + " , keeping state " + str(chosen_node.state))
 
         # modeling sampled ancestor as bifurcating event, one child is the same as parent lineage,
         # second child is a terminal node that will never be elongated (branch length = 0.0);
@@ -926,7 +1147,9 @@ class DnSSE(pgm.DistributionPGM):
             # the brosc node being added -- we must add event_t as the brosc node edge_length (other
             # nodes are always added with edge_length = 0.0, and have their edges extended when a new
             # event takes place)
-            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"), label="brosc", edge_length=event_t)
+            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
+                                 label="brosc",
+                                 edge_length=event_t)
             brosc_node.alive = True
             brosc_node.sampled = True
             brosc_node.is_sa = False
@@ -952,7 +1175,9 @@ class DnSSE(pgm.DistributionPGM):
 
         # doing lineage that remains alive
         parent_label = chosen_node.label  # (parent's label will change below)
-        left_child = dp.Node(taxon=dp.Taxon(label=parent_label), label=parent_label, edge_length=0.0)
+        left_child = dp.Node(taxon=dp.Taxon(label=parent_label),
+                             label=parent_label,
+                             edge_length=0.0)
         left_child.is_sa = False
         left_child.is_sa_lineage = True
         left_child.is_sa_dummy_parent = False
@@ -1019,69 +1244,10 @@ class DnSSE(pgm.DistributionPGM):
 
         return cumulative_sa_count
 
-    def _update_sa_lineage_dict(
-            self,
-            a_time: float,
-            sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
-            sa_lineage_node_labels: ty.List[str],
-            debug: bool = False) -> None:
-        """
-        Update sa_lineage_dict (side-effect) when lineage node undergoes
-        event and at tree stop condition
-
-        This function is called every time a node (whose subtending branch
-        has sampled ancestors, by asking if the node .is_sa_lineage == True)
-        undergoes an event, and when the tree reaches its stop condition.
-
-        When this function is called because a single node undergoes an
-        event, then 'sa_lineage_node_label' will have a single element.
-        When this function is called because the process reached its
-        stop condition, then 'sa_lineage_node_label' will have the labels
-        of all terminal nodes for which .is_sa_lineage == True.
-
-        By updating the dictionary as the tree is built, we don't have to do
-        tree traversals later to get sampled ancestor times for plotting
-        (when initializing an AnnotatedTree).
-
-        Args:
-            a_time (float): Either the time of the last event an SA lineage
-                node undergoes, or the simulation end time.
-            sa_lineage_dict (dict): Dictionary that keeps track of nodes that
-                have sampled ancestor children..
-            sa_lineage_node_labels (str): List of node labels, whose
-                subtending branch has SAs.
-        """
-
-        if debug:
-            print("\n>> Updating SA lineage dictionary. Keys are is \'" +
-                  + ", ".join(sa_label
-                              for sa_label in sa_lineage_node_labels) +
-                  + "\' and time being added is " + str(a_time) +
-                  + "\n   SA lineage dict:")
-            print("      " + "\n      ".join(
-                k + " has in its lineage " +
-                + ", ".join(sa.label for sa in sas) for k, sas
-                in sa_lineage_dict.items()))
-
-        for sa_lineage_node_label in sa_lineage_node_labels:
-            sa_list = sa_lineage_dict[sa_lineage_node_label]
-
-            for sa in sa_list:
-                sa.time_to_lineage_node = a_time - sa.global_time
-        # if isinstance(sa_lineage_node_label, str):
-        #     sa_list = sa_lineage_dict[sa_lineage_node_label]
-
-        #     for sa in sa_list:
-        #         sa.time_to_lineage_node = a_time - sa.global_time
-
-        # for _, sa_list in sa_lineage_dict.items():
-        #     for sa in sa_list:
-        #         sa.time_to_lineage_node = a_time - sa.global_time
-
     def _execute_event(
             self,
             tr_namespace,
-            macroevol_rate_param: sseobj.DiscreteStateDependentRate,
+            sse_rate_object: sseobj.DiscreteStateDependentRate,
             chosen_node: dp.Node,
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
@@ -1089,32 +1255,59 @@ class DnSSE(pgm.DistributionPGM):
             untargetable_node_set: ty.Set[str],
             cumulative_node_count: int,
             cumulative_sa_count: int,
-            last_chosen_node,
             event_t: float,
             debug: bool = False) -> ty.Tuple[dp.Node, int, int]:
-        """Execute event on chosen node and bookkeep things
+        """Execute event on chosen node.
+
+        This method calls the correct event executer depending on which
+        discrete SSE rate was passed as argument. That executer will
+        have side-effects and/or returns (the latter will be captured
+        and returned).
 
         Args:
-            tr_namespace (dendropy.TaxonNamespace): Dendropy object recording taxa in the tree.
-            macroevol_rate_param (DiscreteStateDependentRate): Instance of DiscreteStateDependentRate carrying event information.
-            chosen_node (dendropy.Node): Node that will undergo event.
-            state_representation_dict (dict): Dictionary that keeps track of all states currently represented by living lineages.
-            sa_lineage_dict (dict): Dictionary that keeps track of nodes that have sampled ancestor children..
-            state_transition_dict (dict): Dictionary that keeps track of nodes below which state transitions happen (used for plotting).
-            untargetable_node_set (set): Set of Node labels that cannot be targeted for events anymore (went extinct).
-            cumulative_node_count (int): Total number of nodes in the tree (to be used in labeling).
-            cumulative_sa_count (int): Total number of sampled ancestor nodes in the tree (to be used in labeling).
-            last_chosen_node (dendropy.Node): Last node undergoing event.
+            tr_namespace (dendropy.TaxonNamespace): DendroPy object
+                recording taxa in the tree.
+            sse_rate_object (DiscreteStateDependentRate): SSE rate
+                parameter object holding the departing/arriving states.
+            chosen_node (dendropy.Node): Node that will undergo
+                birth event.
+            state_representation_dict (dict): Dictionary that keeps
+                track of all states currently represented by living
+                lineages. Keys are integer representing the states,
+                values are sets of taxon names (strings).
+            state_transition_dict (dict): Dictionary that keeps track
+                of nodes subtending which state transitions happen
+                (used for plotting). Keys are taxon names (strings)
+                and values are lists of AttributeTransition objects.
+            sa_lineage_dict (dict): Dictionary that keeps track of
+                nodes that have direct (sampled) ancestor children.
+                Keys are taxon names (strings), values are lists
+                of SampledAncestor objects.
+            untargetable_node_set (set): Set of Node labels that
+                cannot be targeted for events anymore (went extinct).
             event_t (float): Time of event taking place.
-            debug (bool): If 'true', prints debugging messages. Defaults to False.
+            debug (bool): If 'True', prints debugging messages.
+                Defaults to False.
 
         Returns:
-            (dendropy.Node, int): Tuple with last node to under go event and total (cumulative) node count.
+            (tuple): Tuple with three objects, the last node to
+            speciate (dendropy.Node) and the tree's cumulative node
+            count (int) and cumulative direct (sampled) ancestor count
+            (int).
         """
-        macroevol_event = macroevol_rate_param.event
+
+        macroevol_event = sse_rate_object.event
+
+        # unlike in C++ (which has 'block-level' scoping), we do not need to
+        # declare/initialize variables in Python if used in if/for/while
+        # blocks -- Python has 'function-level' scoping.
+        #
+        # however, the design in PJ is to pretend Python has block-level
+        # scoping, so:
+        last_chosen_node: dp.Node = None
 
         if macroevol_event == sseobj.MacroevolEvent.W_SPECIATION or \
-                macroevol_event == sseobj.MacroevolEvent.BW_SPECIATION or \
+           macroevol_event == sseobj.MacroevolEvent.BW_SPECIATION or \
                 macroevol_event == sseobj.MacroevolEvent.ASYM_SPECIATION:
 
             last_chosen_node, cumulative_node_count = \
@@ -1126,7 +1319,7 @@ class DnSSE(pgm.DistributionPGM):
                     state_transition_dict,
                     untargetable_node_set,
                     cumulative_node_count,
-                    macroevol_rate_param,
+                    sse_rate_object,
                     event_t,
                     debug=debug)
 
@@ -1147,7 +1340,7 @@ class DnSSE(pgm.DistributionPGM):
                 state_representation_dict,
                 state_transition_dict,
                 untargetable_node_set,
-                macroevol_rate_param,
+                sse_rate_object,
                 event_t,
                 debug=debug)
 
@@ -1169,14 +1362,30 @@ class DnSSE(pgm.DistributionPGM):
             self,
             a_time: float,
             living_nodes: ty.List[dp.Node],
-            sample_idx: int):
+            sample_idx: int) -> None:
         """
-        Annotate each living node by setting .sampled to True or False
-        depending on its state and the rho associated to that state
-        in the appropriate time slice
+        Annotate each living node as sampled or not.
+        
+        This method is called whenever a maximum-time stop condition
+        has been met. (It is not called when the maximum taxon count is
+        met because bookkeeping which taxa get sampled as the tree
+        grows it more complicated; currently this class does not
+        support it.)
+
+        This method has the side-effect of setting node attribute
+        .sampled to 'True' or 'False' depending on:
+            (i)  the sampling probability of its associated state, and
+            (ii) the time slice (epoch) that node lives in.
 
         By default, all events but 'death' set .sampled to True for
-        terminal nodes, and to False for internal nodes
+        terminal nodes, and to False for internal nodes.
+
+        Args:
+            a_time (float): The time at which the simulation stopped
+                (i.e., the 'stop_value' provided to the distribution,
+                or the tree height).
+            living_nodes (dp.Node): List of DendroPy nodes.
+            sample_idx (int): Index of current sample.
         """
 
         for living_nd in living_nodes:
@@ -1185,205 +1394,145 @@ class DnSSE(pgm.DistributionPGM):
                 .randomly_decide_taxon_sampling_at_time_at_state(
                     a_time, st, sample_idx)
 
-            # debugging
-            # print("Sample " + str(sample_idx) + ", checking if node " + living_nd.label + " in state " \
-            #     + str(living_nd.state) + " is sampled: " + str(is_sampled))
-
             living_nd.sampled = is_sampled
 
     ##########################
     # Main simulation method #
     ##########################
 
-    def simulate(
-            self,
-            a_start_state: int,
-            a_stop_value: ty.Union[int, float],
-            sample_idx: int = 0) -> AnnotatedTree:
-        """Sample (simulate) tree with states at its terminal nodes.
+    def simulate(self,
+                 a_start_state: int,
+                 a_stop_value: ty.Union[int, float],
+                 sample_idx: int = 0) -> AnnotatedTree:
+        """Sample (simulate) discrete-SSE tree.
+
+        The simulated tree may or not meet the conditions specified by
+        the user. Conditioning is handled outside of this method (see
+        documentation for .generate()).
 
         Args:
-            a_start_state (int): State at seed node (origin or root)
+            a_start_state (int): State at seed node (origin or root).
             a_stop_value (float): Value to stop simulation with (number
-                of tips or tree height)
-            sample_idx (int): Sample index (i.e., simulation index)
+                of tips or tree height).
+            sample_idx (int): Index of current sample.
 
         Returns:
-            (AnnotatedTree): An annotated tree
+            (AnnotatedTree): A tree annotated with discrete states.
         """
 
-        def debug_print_state_dict(state_dict):
+        def _debug_print_state_dict(state_dict):
             for k, v in state_dict.items():
                 print("  state " + str(k) + ": " + ", ".join(v))
 
-        def _extend_all_living_nodes(branch_length, end=False):
+        def _get_next_event_time(total_rate: float) -> float:
+            """Draw next exponentially distributed event time.
+
+            Args:
+                current_node_target_count (int): Number of nodes that
+                    can experience an event.
+                total_rate (float): Sum of all rates currently represented
+                    by nodes that can experience an event.
+
+            Returns:
+                (float): Time to next event.
+            """
+
+            next_time = \
+                float(
+                    dnpar.DnExponential.draw_exp(1,
+                                                total_rate,
+                                                rate_parameterization=True))
+
+            return next_time
+    
+        def _extend_all_living_nodes(branch_length: float):
             for nd in tr:
                 # the root node is extended (root_edge is made > 0.0)
                 # here too, when the root is picked
                 if nd.label not in untargetable_node_set and \
                         nd.label != "origin" and nd.alive:
                     nd.edge_length += branch_length
-
+        
+        ############################################
         # START initializing values pre-simulation #
-
-        # time variables
-        # variables with "t" are times (0.0 is origin or root)
-        t_stop = 0.0
-        latest_t = 0.0  # will increase as simulation progresses
-
-        max_obs_nodes = 0
-
-        current_node_target_count = 1
-        cumulative_node_count = 1
-        cumulative_sa_count = 0
-
-        # not really used for anything, .alive takes care of everything
-        untargetable_node_set = set()
-        reached_stop_condition = False
+        #
+        # start variables
         start_state = a_start_state
-        # { 0: ["origin", "root"], 1: ["nd1", "nd2"], 2:["nd3",...], ... }
-        state_representation_dict: ty.Dict[int, ty.Set[str]] = \
-            dict((i, set()) for i in range(self.events.state_count))
-        last_chosen_node = None
-        tr = dp.Tree()
-        tree_invalid = False
-        tree_died = False
 
-        # tree info for plotting
-        state_transition_dict: \
-            ty.Dict[str, ty.List[AttributeTransition]] = dict()
-        # tree info for plotting
-        sa_lineage_dict: \
-            ty.Dict[str, ty.List[SampledAncestor]] = dict()
-
+        # stop variables
+        reached_stop_condition: bool = False
+        t_stop: float = 0.0  # time, not age
+        max_obs_nodes: int = 0
         if self.stop == "age" and isinstance(a_stop_value, float):
             t_stop = a_stop_value
 
         elif self.stop == "size" and isinstance(a_stop_value, int):
             max_obs_nodes = a_stop_value
 
-        # simulation starts at origin
-        if self.with_origin:
-            ############################################################################
-            # brosc: before-root-origin-single-child                                   #
-            # Node that might be necessary for tying process off if a speciation never #
-            # happens before the process either dies, or reaches stop condition        #
-            #                                                                          #
-            # Note: brosc can become an sa lineage node if ancestor sampling happens,  #
-            # but a root is never born                                                 #
-            ############################################################################
+        # variables for during simulation
+        latest_t: float = 0.0  # will increase as simulation progresses
+        last_chosen_node: dp.Node = None
+        current_node_target_count: int = 1
+        cumulative_node_count: int = 1  # not being used atm
+        cumulative_sa_count: int = 0  # not being used atm
+        untargetable_node_set = set()  # not being used atm (.alive is used)
+        tree_invalid: bool = False
+        tree_died: bool = False
 
-            # this particular brosc_node instance below will be used
-            # within the simulate() method, but not inside
-            # "execute_sample_ancestor()", which has its own instance of
-            # brosc_node being created
-            brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
-                                 label="brosc",
-                                 edge_length=0.0)
-            brosc_node.state = start_state
-            brosc_node.annotations.add_bound_attribute("state")
-            brosc_node.sampled = True
-            brosc_node.is_sa = False
-            brosc_node.is_sa_dummy_parent = False
-            brosc_node.is_sa_lineage = False
+        # bookkeeping members
+        # { 0: ["origin", "root"], 1: ["nd1", "nd2"], 2:["nd3",...], ... }
+        state_representation_dict: ty.Dict[int, ty.Set[str]] = \
+            dict((i, set()) for i in range(self.events.state_count))
+        # these last two are for plotting
+        state_transition_dict: \
+            ty.Dict[str, ty.List[AttributeTransition]] = dict()
+        sa_lineage_dict: \
+            ty.Dict[str, ty.List[SampledAncestor]] = dict()
 
-            # origin node will be the seed_node
-            origin_node = dp.Node(taxon=dp.Taxon(label="origin"),
-                                  label="origin",
-                                  edge_length=0.0)
-            origin_node.state = start_state
-            origin_node.annotations.add_bound_attribute("state")
-            origin_node.alive = True
-            origin_node.sampled = False
-            origin_node.is_sa = False
-            origin_node.is_sa_dummy_parent = False
-            origin_node.is_sa_lineage = False
-            state_representation_dict[origin_node.state] \
-                .add(origin_node.label)
-
-            # now make tree #
-            # will remain a "is_leaf() == True" until we add children
-            tr = dp.Tree(seed_node=origin_node)
-            tr.taxon_namespace.add_taxon(origin_node.taxon)
-
-        # simulation starts at root
-        else:
-            # root node will be the seed_node,
-            # and will be untargetable from the get-go
-            root_node = dp.Node(taxon=dp.Taxon(label="root"),
-                                label="root",
-                                edge_length=0.0)
-            root_node.state = start_state
-            root_node.annotations.add_bound_attribute("state")
-            root_node.alive = False
-            root_node.sampled = False
-            root_node.is_sa = False
-            root_node.is_sa_dummy_parent = False
-            root_node.is_sa_lineage = False
-            untargetable_node_set.add("root")
-            self.root_is_born = True
-
-            # we will actually start off with the
-            # left and right nodes being targetable
-            left_node = dp.Node(taxon=dp.Taxon(label="nd1"),
-                                label="nd1",
-                                edge_length=0.0)
-            left_node.is_sa = False
-            left_node.is_sa_dummy_parent = False
-            left_node.is_sa_lineage = False
-            left_node.alive = True
-            left_node.sampled = True
-            left_node.state = root_node.state  # get state from parent (root)
-            left_node.annotations.add_bound_attribute("state")
-            root_node.add_child(left_node)
-            state_representation_dict[left_node.state].add(left_node.label)
-            cumulative_node_count += 1
-
-            right_node = dp.Node(taxon=dp.Taxon(label="nd2"),
-                                 label="nd2",
-                                 edge_length=0.0)
-            right_node.is_sa = False
-            right_node.is_sa_dummy_parent = False
-            right_node.is_sa_lineage = False
-            right_node.alive = True
-            right_node.sampled = True
-            right_node.state = root_node.state  # get state from parent (root)
-            right_node.annotations.add_bound_attribute("state")
-            root_node.add_child(right_node)
-            state_representation_dict[right_node.state].add(right_node.label)
-            cumulative_node_count += 1
-
-            # now make tree #
-            # will remain a "is_leaf() == True" until we add children
-            tr = dp.Tree(seed_node=root_node)
-            tr.taxon_namespace.add_taxon(root_node.taxon)
-            tr.taxon_namespace.add_taxon(left_node.taxon)
-            tr.taxon_namespace.add_taxon(right_node.taxon)
+        # germinate the tree #
+        tr: dp.Tree
+        brosc_node: dp.Node  # will be None if tree starts at root
+        root_is_born: bool = False
+        tr, brosc_node, cumulative_node_count, root_is_born = \
+            self._germinate_tree(start_state,
+                                 self.with_origin,
+                                 state_representation_dict,
+                                 untargetable_node_set)
+        self.root_is_born = root_is_born
 
         # need these counts initialized for sampling first event
         living_nodes = [nd for nd in tr if nd.alive]
         current_node_target_count = len([nd for nd in tr if nd.alive])
 
-        # debugging
+        # info for printing if user asks for it
+        size_set: set(int) = set([])
+
+        # debugging #
         # if self.debug:
         #     print("\nLiving nodes: " + ", ".join(nd.label for nd in living_nodes))
         #     print("State representation:")
         #     debug_print_state_dict(state_representation_dict)
 
         # END initializing values pre-simulation #
+        ##########################################
 
         # START simulation loop #
-        # size_set = set([])
-        time_slice_idx = 0
-        while (time_slice_idx < self.n_time_slices and not reached_stop_condition):
+        time_slice_idx: int = 0
+        while (time_slice_idx < self.n_time_slices and \
+               not reached_stop_condition):
 
-            # (1) Find out the overall total rate given the current targetable nodes' states
-            # checking tree size
-            # tr_size = len(tr)
-            # if tr_size % 100 == 0 and tr_size not in size_set:
-            #     size_set.add(tr_size)
-            #     print("tree size = " + str(len(tr)))
+            # checking and printing tree size info #
+            if self.info:
+                tr_size = len(tr)
+                
+                if tr_size % 100 == 0 and tr_size not in size_set:
+                    size_set.add(tr_size)
+                    print("Tree size =", str(len(tr)))
 
+            # (1) Calculate total overall rate
+            # 
+            # overall rate depends on the states of current targetable
+            # nodes
             rate_for_exponential_distn, \
                 state_total_rates = \
                 self.events.total_rate(latest_t,
@@ -1394,23 +1543,29 @@ class DnSSE(pgm.DistributionPGM):
 
             # (2) get the time to the next event
             t_to_next_event = \
-                self._get_next_event_time(rate_for_exponential_distn)
+                _get_next_event_time(rate_for_exponential_distn)
             latest_t += t_to_next_event
 
-            # (3) get end time of this slice (user provides it as end ages,
-            # but DiscreteStateDependentParameterManager converts it to time ends)
+            # (3) get end time of this time slice (epoch) #
+            # 
+            # user provides it as end ages, but self.events
+            # (MacroevolEventHandler) converts it to time slice ends
+            # upon initialization
             next_max_t: float
             t_end = self.slice_t_ends[time_slice_idx]
             if isinstance(t_end, float):
                 next_max_t = t_end
 
-            # (4) check if new event time cut through the end of a time slice, provided
-            # there is more than 1 time slice, and that a max age was specified
-            # through the "age stop condition"
+            # (4) check if new event time cut through the end of a #
+            # time slice 
+            # 
+            # NOTE: this step executes if there is more than 1 time
+            # slice (epoch) and the stop condition is maximum age
             #
             # next_max_t will be None if self.slice_t_ends is empty
             excess_t = 0.0
-            if self.stop == "age" and self.n_time_slices > 1 and latest_t > next_max_t:
+            if self.stop == "age" and self.n_time_slices > 1 \
+                    and latest_t > next_max_t:
                 excess_t = latest_t - next_max_t
                 latest_t = next_max_t
                 time_slice_idx += 1
@@ -1419,15 +1574,18 @@ class DnSSE(pgm.DistributionPGM):
                 # below) and keep everything up-to-date
                 _extend_all_living_nodes(t_to_next_event - excess_t)
 
+                # STOP CHECK: tree grew beyond its maximum time duration #
+                #
                 # this last event goes beyond _next_max_t, which, if t_stop
                 # means we should stop this process
                 if next_max_t == t_stop:
+                    # updates SA info for plotting
                     sa_lineage_node_labels = \
                         [nd.label for nd in living_nodes if nd.is_sa_lineage]
                     self._update_sa_lineage_dict(
                         t_stop,
                         sa_lineage_dict,
-                        sa_lineage_node_labels)  # updates SA info for plotting
+                        sa_lineage_node_labels)
 
                     # if origin is the only node (root always has children),
                     # we slap finish node at end of process
@@ -1454,21 +1612,23 @@ class DnSSE(pgm.DistributionPGM):
                 # goes back to top of while-loop restarting at next time slice
                 continue
 
-            # (5) new event time did not go over a time slice, all good, we will now
-            # draw an event and execute it
+            # (5) draw event and execute it #
+            # 
+            # new event time did not go over a time slice
             else:
-                # check if tree grew beyond max age (need this check here because the
-                # max age check in the if-block above will not execute
-                # with a single time slice)
+                # STOP CHECK: tree grew beyond its maximum time duration #
+                #
+                # we check here as well as the if-block in (4) above because
+                # that one only executes if there is more than one time slice
+                # (epoch)
                 if (self.stop == "age" and (latest_t > t_stop)) or \
                         latest_t < 0.0:
                     _extend_all_living_nodes(
-                        t_stop - (latest_t - t_to_next_event),
-                        end=True)
+                        t_stop - (latest_t - t_to_next_event))
 
+                    # updates SA info for plotting
                     sa_lineage_node_labels = \
                         [nd.label for nd in living_nodes if nd.is_sa_lineage]
-                    # updates SA info for plotting
                     self._update_sa_lineage_dict(
                         t_stop,
                         sa_lineage_dict,
@@ -1499,9 +1659,10 @@ class DnSSE(pgm.DistributionPGM):
                 # original implmn w/o slices
                 _extend_all_living_nodes(t_to_next_event)
 
-                # (6) draw a node we'll apply the event to
+                # (6) draw a node we'll apply the event to #
                 #
-                # a lineage will be chosen in proportion to the total rate of its state
+                # a lineage will be chosen in proportion to the total rate
+                # of its state
                 lineage_weights = \
                     [state_total_rates[nd.state] for nd in living_nodes]
                 chosen_node = \
@@ -1550,17 +1711,19 @@ class DnSSE(pgm.DistributionPGM):
                         untargetable_node_set,
                         cumulative_node_count,
                         cumulative_sa_count,
-                        last_chosen_node,
                         latest_t,
                         debug=self.debug
                     )
 
                 # (9) update number of lineages after event
                 #
-                # what counts for targetable node here are living terminal nodes
-                # TODO: at some point, make 'living_nodes' a set that is passed to all execute_birth
-                # and execute_death functions so that we don't need to traverse the tree every event
+                # TODO: at some point, make 'living_nodes' a list that is
+                # passed to all execute_birth and execute_death functions
+                # so that we don't need to traverse the tree every event
                 # to list living nodes that can be  targeted
+                #
+                # what counts for targetable node here are living
+                # terminal nodes
                 living_nodes = [nd for nd in tr if nd.alive]
                 current_node_target_count = len(living_nodes)
 
@@ -1570,11 +1733,10 @@ class DnSSE(pgm.DistributionPGM):
                 if current_node_target_count == 0:
                     tree_died = True
 
+                    # updates SA info for plotting
                     sa_lineage_node_labels = \
                         [nd.label for nd in living_nodes
                          if nd.is_sa_lineage]
-
-                    # updates SA info for plotting
                     self._update_sa_lineage_dict(
                         latest_t,
                         sa_lineage_dict,
@@ -1595,7 +1757,7 @@ class DnSSE(pgm.DistributionPGM):
 
                     break
 
-                # check tree grew beyond its max taxon count, stop!
+                # STOP CHECK: tree grew beyond its max taxon count #
                 #
                 # it's '>' max_obs_nodes below, instead of '==' or '>='
                 # because we want to have one extra species (that then gets removed),
@@ -1613,20 +1775,21 @@ class DnSSE(pgm.DistributionPGM):
                     untargetable_node_set.remove(last_chosen_node.label)
 
                     if max_obs_nodes == 1:
-                        # special case: birth happens on just-added root, and we want just a single lineage;
-                        # (only makes sense if starting at origin, if starting at root, two lineages already exist)
-                        # we will replace the root node with a brosc node
+                        # special case: birth happens on just-added root, and
+                        # we want just a single lineage; only makes sense if
+                        # starting at origin, b/c if starting at root, two
+                        # lineages already exist)
                         if self.with_origin:
                             # getting root attributes
                             brosc_node.state = last_chosen_node.state
                             brosc_node.edge_length = \
                                 last_chosen_node.edge_length
-                            # should be True
+                            # should be 'True'
                             brosc_node.alive = last_chosen_node.alive
                             # connecting brosc to origin
                             last_chosen_node.parent_node.add_child(brosc_node)
                             tr.taxon_namespace.add_taxon(brosc_node.taxon)
-                            # removing root
+                            # removing root and replacing it with brosc
                             last_chosen_node.parent_node \
                                 .remove_child(last_chosen_node)
                             last_chosen_node = brosc_node
@@ -1635,10 +1798,10 @@ class DnSSE(pgm.DistributionPGM):
                     state_representation_dict[last_chosen_node.state] \
                         .add(last_chosen_node.label)
 
-                    sa_lineage_node_labels = \
-                        [nd.label for nd in living_nodes if nd.is_sa_lineage]
-
                     # updates SA info for plotting
+                    sa_lineage_node_labels = \
+                        [nd.label for nd in tr.leaf_node_iter() \
+                         if nd.is_sa_lineage]
                     self._update_sa_lineage_dict(t_stop,
                                                  sa_lineage_dict,
                                                  sa_lineage_node_labels)
@@ -1660,7 +1823,8 @@ class DnSSE(pgm.DistributionPGM):
                 slice_age_ends=self.events.slice_age_ends,
                 sa_lineage_dict=sa_lineage_dict,
                 at_dict=state_transition_dict,
-                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
+                condition_on_obs_both_sides_root=\
+                    self.condition_on_obs_both_sides_root,
                 tree_invalid=tree_invalid,
                 tree_died=tree_died)
 
@@ -1671,12 +1835,11 @@ class DnSSE(pgm.DistributionPGM):
                 start_at_origin=self.with_origin,
                 sa_lineage_dict=sa_lineage_dict,
                 at_dict=state_transition_dict,
-                condition_on_obs_both_sides_root=self.condition_on_obs_both_sides_root,
+                condition_on_obs_both_sides_root=\
+                    self.condition_on_obs_both_sides_root,
                 tree_invalid=tree_invalid)
 
         if self.debug:
-            # print(at.tree)
-            # print(at.tree.as_string(schema="nexus", suppress_annotations=True, suppress_internal_taxon_labels=True))
             print(at.tree.as_string(schema="newick",
                                     suppress_annotations=False,
                                     suppress_internal_taxon_labels=True))
@@ -1688,19 +1851,21 @@ class DnSSE(pgm.DistributionPGM):
             self,
             ann_tr: AnnotatedTree,
             a_stop_value: ty.Union[int, float]) -> bool:
-        """Check that simulated tree meets stop conditions, so that it can be returned
+        """Check if simulated tree meets stop conditions.
 
         Args:
-            a_tree (AnnotatedTree): A tree with extra annotations
-            a_stop_value [int or float]: Value specified for stopping simulation
+            a_tree (AnnotatedTree): A tree with discrete-state
+                annotation.
+            a_stop_value (Union[int, float]): Value specified for
+                stopping simulation.
 
         Returns:
-            bool: If tree meets stop condition value.
+            (bool): Boolean specifying if tree meets stop condition.
         """
 
-        # print("inside _is_tr_ok()")
-        # print("self.tree_died inside SSE dn: " + str(ann_tr.tree_died))
-
+        ##############################
+        # STOP: conditioning not met #
+        ##############################
         if self.condition_on_survival and ann_tr.tree_died:
             return False
 
@@ -1711,43 +1876,40 @@ class DnSSE(pgm.DistributionPGM):
         # need to worry about rejection sampling
         # when user conditions reconstructed tree
         if self.condition_on_obs_both_sides_root:
+            # condition on speciation means we want a root node!
+            # (one could still have internal nodes because of direct ancestor
+            # sampling, which is why we test this condition here)
             if self.condition_on_speciation and not \
                     isinstance(ann_tr.root_node, dp.Node):
                 return False
 
+            # reconstructed tree is empty, i.e., maybe there was a root, but
+            # everyone died
             rec_tree = ann_tr.extract_reconstructed_tree()
-
             if rec_tree.__str__() == "":
-                # debugging
-                # print("\nRejected reconstructed tree")
-                # print("    Complete tree:")
-                # print("    " + ann_tr.tree.as_string(
-                #     schema="newick",
-                #     suppress_annotations=True,
-                #     suppress_internal_node_labels=False,
-                #     suppress_internal_taxon_labels=True))
-                # for ch in ann_tr.tree.leaf_node_iter():
-                #     print(ch.label + " alive = " + str(ch.alive))
-                # print("\n")
                 return False
 
-            # debugging
-            # print("\nSuccessful reconstructed tree:")
-            # print(rec_tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
-
+        ###################
+        # STOP: Tree size #
+        ###################
         if self.stop == "size":
+            # we want a root node and that it has children (alive or not)
             if self.condition_on_speciation and \
                     isinstance(ann_tr.root_node, dp.Node) and \
                     len(ann_tr.root_node.child_nodes()) == 0:
                 return False
 
+            # we want a specific number of living extant taxa
             if self.condition_on_survival and \
                     ann_tr.n_extant_terminal_nodes != a_stop_value:
                 return False
 
-            # if conditions are not specified, returns all trees
+            # if conditions are not met, tree is fine
             return True
 
+        #####################
+        # STOP: Tree height #
+        #####################
         elif self.stop == "age":
             # grew out of control! #
             if ann_tr.tree_invalid:
@@ -1762,52 +1924,62 @@ class DnSSE(pgm.DistributionPGM):
                     return False
                 # starting from origin
 
-            # print("WARNING: don't forget to remove n-extant-tip bracketing in is_tr_ok() after FIG validation!!!")
-            # TODO: remove these two ifs after done with FIG validation
             # reconstructed tree is too small
             if ann_tr.n_extant_sampled_terminal_nodes < self.min_rec_taxa:
-                # print("Rejected: too small, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
 
             # reconstructed tree is too large
             if ann_tr.n_extant_sampled_terminal_nodes > self.max_rec_taxa:
-                # print("Rejected: too large, " + str(ann_tr.n_extant_terminal_nodes))
                 return False
 
+            # neither too large nor too small, and also not out of control
+            #
+            # from origin #
+            seed_age: float = -1.0
             if ann_tr.with_origin and isinstance(ann_tr.origin_age, float):
-                # tree is ok if either it reached the max age by epsilon, or if its age is smaller than max age
-                if abs(a_stop_value - ann_tr.origin_age) <= self.epsilon or \
-                        ann_tr.origin_age < a_stop_value:
-                    # print("    tree was accepted!")
-                    # print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True))
-                    return True
-                elif ann_tr.origin_age > a_stop_value:
-                    # print("    tree was rejected, origin_age = " + str(ann_tr.origin_age))
-                    # print("    " + ann_tr.tree.as_string(schema="newick", suppress_annotations=True))
-                    return False
+                seed_age = ann_tr.origin_age
+            # from root #
+            elif not ann_tr.with_origin and isinstance(ann_tr.root_age, float):
+                seed_age = ann_tr.root_age
 
-            elif not ann_tr.with_origin and \
-                    isinstance(ann_tr.root_age, float):
-                if (a_stop_value - ann_tr.root_age) <= self.epsilon:
-                    return True
-                else:
-                    return False
+            # tree is OK if either
+            #     (i)  it reached the max age, or
+            #     (ii) its age is smaller than max age (it died!)
+            if abs(a_stop_value - seed_age) <= self.epsilon or \
+                seed_age < a_stop_value:
+                return True
 
-        # stop condition is neither "size" nor "age", and no conditioning was violated
-        # then something is off...
+            # somehow tree is taller than the maximum specified height;
+            # this block has to be below the one above, otherwise trees
+            # that are epsilon-taller than the maximum age get incorrectly
+            # rejected
+            elif seed_age > a_stop_value:
+                return False
 
         return False
 
     def generate(self) -> ty.List[AnnotatedTree]:
+        """
+        Generate samples according to distribution.
+
+        The number of samples will be the specified number of samples
+        times the number of replicates (per sample).
+
+        Returns:
+            (AnnotatedTree): Valid simulated trees annotated with
+                discrete traits
+        """
+
         # output
-        output: ty.List[AnnotatedTree] = []
+        output: ty.List[AnnotatedTree] = list()
 
         # do something with self.runtime_limit
         start_time = time.time()
         ith_sim = 0
         j = 0
         while len(output) < (self.n_sim * self.n_repl):
-            ellapsed_time = pjh.get_ellapsed_time_in_minutes(start_time, time.time())
+            ellapsed_time = \
+                pjh.get_ellapsed_time_in_minutes(start_time, time.time())
 
             if ellapsed_time >= self.runtime_limit:
                 print("Aborted simulations, hit runtime limit")
@@ -1816,8 +1988,6 @@ class DnSSE(pgm.DistributionPGM):
             # simulate!
             repl_size = 0
             while repl_size < self.n_repl:
-                # print("\n\nsimulation #" + str(ith_sim))
-                
                 tr = self.simulate(
                     self.start_states[ith_sim],
                     self.stop_val[ith_sim],

@@ -38,14 +38,36 @@ class TestYuleTimeHetTrees(unittest.TestCase):
         # not state-dependent (just state 0, and no transition)
         total_n_states = 1
 
-        rates_t0_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t0", val=1.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=1)]
-        rates_t1_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t1", val=0.25, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=2)]
-        rates_t2_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t2", val=3.0, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=3)]
-        rates_t3_s0 = [sseobj.DiscreteStateDependentRate(name="lambda_t3", val=0.4, event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0], epoch_idx=4)]
+        rates_t0_s0 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda_t0",
+                val=1.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION,
+                states=[0,0,0],
+                epoch_idx=1)]
+        rates_t1_s0 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda_t1",
+                val=0.25,
+                event=sseobj.MacroevolEvent.W_SPECIATION,
+                states=[0,0,0],
+                epoch_idx=2)]
+        rates_t2_s0 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda_t2",
+                val=3.0,
+                event=sseobj.MacroevolEvent.W_SPECIATION,
+                states=[0,0,0],
+                epoch_idx=3)]
+        rates_t3_s0 = [
+            sseobj.DiscreteStateDependentRate(
+                name="lambda_t3",
+                val=0.4,
+                event=sseobj.MacroevolEvent.W_SPECIATION,
+                states=[0,0,0],
+                epoch_idx=4)]
 
-        # original implementation
-        # matrix_atomic_rate_params = [ [ rates_t0_s0 ], [ rates_t1_s0 ], [ rates_t2_s0 ], [ rates_t3_s0 ] ] # 1D: time slices, 2D: states, 3D: parameters of state, several parameters -> matrix
-        matrix_atomic_rate_params = [ rates_t0_s0, rates_t1_s0, rates_t2_s0, rates_t3_s0 ] # 1D: time slices (i) , 2D: all rates from all states in i-th time slice
+        matrix_atomic_rate_params = [rates_t0_s0, rates_t1_s0, rates_t2_s0, rates_t3_s0]
 
         state_dep_par_manager = sseobj.DiscreteStateDependentParameterManager(
             matrix_atomic_rate_params,

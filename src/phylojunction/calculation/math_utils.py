@@ -1,3 +1,4 @@
+import typing as ty
 import math
 from enum import Enum, EnumMeta
 
@@ -31,27 +32,29 @@ def exp_root_height_yule_ntaxa(birth_rate: float, n_taxa: int) -> float:
 def exp_extant_count_bd(birth_rate: float,
                         death_rate: float,
                         tree_age: float,
-                        speciation_k: int = 1) -> float:
+                        n_starting_lineages: ty.Optional[int] = 1) -> float:
     """Return expected count of extant taxa in a birth-death tree
 
     Args:
-        birth_rate (float): Birth-rate (lambda) of birth-death process.
+        birth_rate (float): Birth-rate (lambda) of birth-death
+            process.
         death_rate (float): Death-rate (mu) of birth-death process.
-        tree_age (float): Age of birth-death tree (starting from origin).
-        speciation_k (int): Extant taxa are counted conditioning on process
-            starting on k-th speciation event. Default: 1.
+        tree_age (float): Age of birth-death tree (starting from
+            origin).
+        n_starting_lineages (int): Number of starting lineages.
+            Defaults to 1.
 
     Returns:
         int: Expected count of extant taxa.
     """
 
-    k: int = speciation_k  # default: first speciation event (root!)
+    n0: int = -1  # default: first speciation event (root!)
 
-    if speciation_k:
-        k = speciation_k
+    if n_starting_lineages:
+        n0 = n_starting_lineages
 
     expected_extant_count = \
-        k * math.exp((birth_rate - death_rate) * tree_age)
+        n0 * math.exp((birth_rate - death_rate) * tree_age)
 
     return expected_extant_count
 

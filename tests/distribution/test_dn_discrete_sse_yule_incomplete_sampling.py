@@ -73,9 +73,9 @@ class TestYuleIncompleteSamplingTrees(unittest.TestCase):
         for i in range(n_batches):
             sse_sim = distsse.DnSSE(
                 self.sse_stash_complete,
-                stop_condition_value,
                 n=n_sim,
                 stop=stop_condition,
+                stop_value=stop_condition_value,
                 origin=start_at_origin,
                 start_states_list=start_states_list,
                 epsilon=1e-8,
@@ -130,11 +130,11 @@ class TestYuleIncompleteSamplingTrees(unittest.TestCase):
         for i in range(n_batches):
             sse_sim = distsse.DnSSE(
                 self.sse_stash_incomplete,
-                stop_condition_value,
                 n=n_sim,
-                stop=stop_condition,
                 origin=start_at_origin,
                 start_states_list=start_states_list,
+                stop=stop_condition,
+                stop_value=stop_condition_value,
                 epsilon=1e-8,
                 runtime_limit=3000,
                 debug=False)

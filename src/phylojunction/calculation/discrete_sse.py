@@ -1088,7 +1088,7 @@ class MacroevolEventHandler():
 
         if debug:
             print("Total rate = " + str(total_rate))
-
+        
         if departing_state is None:
             return total_rate, state_rates
 
