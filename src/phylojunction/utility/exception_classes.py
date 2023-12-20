@@ -124,20 +124,27 @@ class IncorrectDimensionError(Exception):
 
 class DimensionalityError(Exception):
     dn_name: str
+    par_name: str
     message: str
 
-    def __init__(self, dn_name: str) -> None:
+    def __init__(self, dn_name: str, par_name: ty.Optional[str] = "") -> None:
         self.dn_name = dn_name
-        self.message = ""
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return "ERROR: When specifying distribution " + self.dn_name \
-            + ":\n(i) the number of values provided for each parameters " \
-            + "differed, or\n (ii) the number(s) was larger than the " \
+        self.par_name = par_name
+        self.message = \
+            "ERROR: When specifying distribution " + self.dn_name
+        if self.par_name:
+            self.message += " (parameter " + self.par_name + ")"
+        self.message += \
+            ":\n (i)   the number of values provided for the parameter(s) " \
+            + "differed, or\n (ii)  the number(s) was larger than the " \
             + "specified number of samples (i.e., draws), or\n (iii) the " \
             + "number(s) was larger than 1, but smaller than the specified " \
             + "number of samples."
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
 
 
 class NodeInferenceDimensionalityError(Exception):
@@ -246,13 +253,14 @@ class InvalidMCMCChainLength(Exception):
 
 # Initialization errors
 class ObjInitInvalidArgError(Exception):
-    dn_name: str
+    obj_name: str
     message: str
 
-    def __init__(self, dn_name: str, par_name: str, message: str = "") -> None:
-        self.dn_name = dn_name
-        self.message = "Could not initialize the object of \'" + dn_name + \
+    def __init__(self, obj_name: str, par_name: str, message: ty.Optional[str] = "") -> None:
+        self.obj_name = obj_name
+        self.message = "Could not initialize the object of \'" + obj_name + \
             "\'. The argument provided to " + par_name + " was invalid."
+
         if message:
             self.message += " " + message
 
@@ -266,7 +274,7 @@ class ObjInitMissingParameterError(Exception):
     obj_name: str
     message: str
 
-    def __init__(self, obj_name: str, par_name: str, message: str = "") -> None:
+    def __init__(self, obj_name: str, par_name: str, message: ty.Optional[str] = "") -> None:
         self.obj_name = obj_name
         self.message = "Could not initialize the object of " + obj_name + \
             " . Parameter " + par_name + " was not provided an argument."
@@ -295,9 +303,9 @@ class ObjInitIncorrectDimensionError(Exception):
         self.obj_name = obj_name
         self.obs_len = obs_len
         self.exp_len = exp_len
-        self.message = "Could not initialize the object of \'" + obj_name \
-            + "\'. Incorrect dimension of container \'" + container_name \
-            + "\', which was of size " + str(obs_len) + ". "
+        self.message = "Could not initialize the object of " + obj_name \
+            + ". Incorrect dimension of container " + container_name \
+            + ", which was of size " + str(obs_len) + ". "
 
         if exp_len != 0:
             if at_least:

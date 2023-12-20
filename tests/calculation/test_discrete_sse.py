@@ -265,34 +265,19 @@ class TestDiscreteSSE(unittest.TestCase):
                 event=sseobj.MacroevolEvent.W_SPECIATION, states=[1,1,1])
         ]
 
-        # issue: missing rate characterized by states [1, 1, 1]
-        rates_t1 = [
-            sseobj.DiscreteStateDependentRate(name="lambda0_t1", val=1.0,
-                event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
-        ]
-
         # issue: repeated states
-        rates_t1_2 = [
+        rates_t1_1 = [
             sseobj.DiscreteStateDependentRate(name="lambda0_t1", val=1.0,
                 event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
             sseobj.DiscreteStateDependentRate(name="lambda0_t1", val=1.0,
                 event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0])
         ]
 
-        # issue: this time slice has a rate with [2, 2, 2] for states, but
-        # no [1, 1, 1] 
-        # rates_t1_3 = [
-        #     sseobj.DiscreteStateDependentRate(name="lambda0_t1", val=1.0,
-        #         event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
-        #     sseobj.DiscreteStateDependentRate(name="lambda2_t1", val=1.0,
-        #         event=sseobj.MacroevolEvent.W_SPECIATION, states=[2,2,2])
-        # ]
-
         # issue: no rates in epoch!
-        rates_t1_4 = []
+        rates_t1_2 = []
 
         # issue: all rates in this epoch are zero, this is not allowed
-        rates_t1_5 = [
+        rates_t1_3 = [
             sseobj.DiscreteStateDependentRate(name="lambda0_t1", val=0.0,
                 event=sseobj.MacroevolEvent.W_SPECIATION, states=[0,0,0]),
             sseobj.DiscreteStateDependentRate(name="lambda1_t1", val=0.0,
@@ -303,21 +288,15 @@ class TestDiscreteSSE(unittest.TestCase):
         # 2D: all rates from all states in i-th time slice
         matrix_state_dep_probs_error1 = [ probs_t0, probs_t1 ]
         matrix_state_dep_probs_error2 = [ probs_t0, prob_rate_t1 ]
-        # DEPRECATED: not an error anymore
-        # matrix_state_dep_probs_error3 = [ probs_t0, probs_t1_2 ]
-        matrix_state_dep_probs_error4 = [ probs_t0, probs_t1_3 ]
+        matrix_state_dep_probs_error3 = [ probs_t0, probs_t1_3 ]
                     
-        matrix_state_dep_rates_error1 = [ rates_t0, rates_t1_2 ]
-        # DEPRECATED: not an error anymore
-        # matrix_state_dep_rates_error2 = [ rates_t0, rates_t1 ]
-        # matrix_state_dep_rates_error3 = [ rates_t0, rates_t1_3 ]
-        matrix_state_dep_rates_error4 = [ rates_t0, rates_t1_4 ]
-        matrix_state_dep_rates_error5 = [ rates_t0, rates_t1_5 ]
+        matrix_state_dep_rates_error1 = [ rates_t0, rates_t1_1 ]
+        matrix_state_dep_rates_error2 = [ rates_t0, rates_t1_2 ]
+        matrix_state_dep_rates_error3 = [ rates_t0, rates_t1_3 ]
 
-        # number of time slices deduced from matrix of parameters does
-        # not match default number of slices (as a result of not
-        # explicitly passing a list of epoch age ends from which the
-        # number of time slices could be deduced)
+        # first epoch there are two probabilities (for state 0 and 1)
+        # but second epoch has only one probability (for state 0);
+        # we need 'total_n_states' probabilities per time slice!
         total_n_states = 2
         with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc1:
             state_dep_par_manager = \
@@ -327,11 +306,11 @@ class TestDiscreteSSE(unittest.TestCase):
                 )
 
         self.assertEqual(str(exc1.exception),
-            ("Could not initialize the object of "
-             "\'DiscreteStateDependentParameterManager\'. "
-             "Incorrect dimension of container \'matrix_state_dep_params\', " \
-             "which was of size 2. The expected dimension was 1.")
-        )
+            ("Could not initialize the object of 'sse_stash' ('DiscreteState"
+             "DependentParameterManager' in the backend). Incorrect "
+             "dimension of container 'flat_prob_mat' ('matrix_state_dep_"
+             "params[1]' in the backend), which was of size 1. The expected"
+             " dimension was 2."))
 
         # rate and prob both passed together
         # but only one type allowed
@@ -350,114 +329,62 @@ class TestDiscreteSSE(unittest.TestCase):
             ("When specifying object DiscreteStateDependentParameterManager "
              "only one type of parameter is allowed. Found 2."))
 
-        # DEPRECATED: we now let rates for specific states to be missing
-        # from one or more epochs
-        # total_n_states = 3
-        # with self.assertRaises(
-        #     ec.ObjInitMissingStateDependentParameterError) as exc3:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_probs_error3,
-        #         total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
-
-        # self.assertEqual(str(exc3.exception),
-        #     "One or more state-dependent parameters were missing " \
-        #     + "at least from time slice 1. The symmetric difference " \
-        #     + "between time-slice state sets is ( 1, 2 )."
-        # )
-
         total_n_states = 2
         with self.assertRaises(
-            ec.ObjInitRepeatedStateDependentParameterError) as exc4:
+            ec.ObjInitRepeatedStateDependentParameterError) as exc3:
             sseobj.DiscreteStateDependentParameterManager(
-                matrix_state_dep_probs_error4,
+                matrix_state_dep_probs_error3,
                 total_n_states,
                 seed_age_for_time_slicing=2.0,
                 list_time_slice_age_ends=[1.0]
             )
 
-        self.assertEqual(str(exc4.exception),
+        self.assertEqual(str(exc3.exception),
             "State-dependent parameter defined by states 0 were repeated " \
             + "in epoch 1."
         )
 
         with self.assertRaises(
-            ec.ObjInitRepeatedStateDependentParameterError) as exc1:
+            ec.ObjInitRepeatedStateDependentParameterError) as exc4:
             sseobj.DiscreteStateDependentParameterManager(
                 matrix_state_dep_rates_error1, total_n_states,
                 seed_age_for_time_slicing=2.0,
                 list_time_slice_age_ends=[1.0]
             )
 
-        self.assertEqual(str(exc1.exception),
+        self.assertEqual(str(exc4.exception),
             "State-dependent parameter defined by states " \
             + "(event: W_SPECIATION) (0, 0, 0) were repeated in epoch 1."
         )
 
-        # DEPRECATED: we now let rates for specific states to be missing
-        # from one or more epochs
-        # total_n_states = 2
-        # with self.assertRaises(
-        #     ec.ObjInitMissingStateDependentParameterError) as exc5:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_rates_error2,
-        #         total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
-
-        # self.assertEqual(str(exc5.exception),
-        #     "One or more state-dependent parameters were missing " \
-        #     + "at least from time slice 1. The symmetric difference " \
-        #     + "between time-slice state sets is ( (1, 1, 1) )."
-        # )
-
-        # DEPRECATED: we now let rates for specific states to be missing
-        # from one or more epochs
-        # total_n_states = 3
-        # with self.assertRaises(
-        #     ec.ObjInitMissingStateDependentParameterError) as exc7:
-        #     sseobj.DiscreteStateDependentParameterManager(
-        #         matrix_state_dep_rates_error3,
-        #         total_n_states,
-        #         seed_age_for_time_slicing=2.0,
-        #         list_time_slice_age_ends=[1.0]
-        #     )
-
-        # self.assertEqual(str(exc7.exception),
-        #     "One or more state-dependent parameters were missing " \
-        #     + "at least from time slice 1. The symmetric difference " \
-        #     + "between time-slice state sets is ( (1, 1, 1), (2, 2, 2) )."
-        # )
-
         total_n_states = 2
-        with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc4:
+        with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc5:
             sseobj.DiscreteStateDependentParameterManager(
-                matrix_state_dep_rates_error4,
-                total_n_states,
-                seed_age_for_time_slicing=2.0,
-                list_time_slice_age_ends=[1.0]
-            )
-
-        self.assertEqual(str(exc4.exception),
-            "Could not initialize the object of \'DiscreteStateDependentParameterManager\'. "
-            "Incorrect dimension of container \'matrix_state_dep_params[2]\', which was of size 0. "
-            "The expected dimension was at least 1."
-        )
-
-        total_n_states = 2
-        with self.assertRaises(
-            ec.ObjInitRequireNonZeroStateDependentParameterError) as exc5:
-            sseobj.DiscreteStateDependentParameterManager(
-                matrix_state_dep_rates_error5,
+                matrix_state_dep_rates_error2,
                 total_n_states,
                 seed_age_for_time_slicing=2.0,
                 list_time_slice_age_ends=[1.0]
             )
 
         self.assertEqual(str(exc5.exception),
+            ("Could not initialize the object of 'sse_stash' ('DiscreteState"
+             "DependentParameterManager' in the backend). Incorrect dimension"
+             " of container 'flat_rate_mat' ('matrix_state_dep_params[2]' in"
+             " the backend), which was of size 0. The expected dimension was"
+             " at least 1.")
+        )
+
+        total_n_states = 2
+        with self.assertRaises(
+            ec.ObjInitRequireNonZeroStateDependentParameterError) as exc6:
+            sseobj.DiscreteStateDependentParameterManager(
+                matrix_state_dep_rates_error3,
+                total_n_states,
+                seed_age_for_time_slicing=2.0,
+                list_time_slice_age_ends=[1.0]
+            )
+
+        self.assertEqual(str(exc6.exception),
             "When specifying object DiscreteStateDependentParameterManager, "
             "one of its dimensions (1) had zero-valued state-dependent "
             "parameters. At least one non-zero parameter must be provided."

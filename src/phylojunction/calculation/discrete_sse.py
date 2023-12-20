@@ -14,7 +14,14 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-# MacroevolEvent = enum.Enum("Macroevol. event", ["W_SPECIATION", "BW_SPECIATION", "ASYM_SPECIATION", "EXTINCTION", "ANAGENETIC_TRANSITION", "ANCESTOR_SAMPLING"], start=0)
+# MacroevolEvent = enum.Enum("Macroevol. event",
+#                            ["W_SPECIATION",
+#                             "BW_SPECIATION",
+#                             "ASYM_SPECIATION",
+#                             "EXTINCTION",
+#                             "ANAGENETIC_TRANSITION",
+#                             "ANCESTOR_SAMPLING"],
+#                             start=0)
 
 class MacroevolEvent(enum.Enum):
     W_SPECIATION = 0
@@ -24,16 +31,30 @@ class MacroevolEvent(enum.Enum):
     ANAGENETIC_TRANSITION = 4
     ANCESTOR_SAMPLING = 5
 
+
 class DiscreteStateDependentParameterType(enum.Enum):
     UNDEFINED = 0
     RATE = 1
     PROBABILITY = 2
 
+
 class DiscreteStateDependentParameter():
     """
-    Main class for discrete state-dependent parameters
+    Discrete state-dependent parameter.
+
+    This is the parent class for either state-dependent rates or
+    state-dependent parameters.
 
     Supports vectorization of values only.
+
+    Attributes:
+        value (Union[int, float, str]): Either an integer, float or
+            string, or a list of any of those.
+        name (str): Name of SSE parameter.
+        state (int): Integer representing the state this SSE parameter
+            is associated to.
+        epoch_idx (int): Time slice (epoch) this SSE parameter is
+            associated to.
     """
 
     value: ty.Union[int,
@@ -41,18 +62,17 @@ class DiscreteStateDependentParameter():
                     str,
                     ty.List[ty.Union[int, float, str]]]
     name: str
-    state: int = 0  # associated state
-    epoch_idx: int = 1  # associated epoch
+    state: int
+    epoch_idx: int
 
-    def __init__(
-            self,
-            val: ty.Union[int,
-                          float,
-                          str,
-                          ty.List[ty.Union[int, float, str]]],
-            name: str = "",
-            state: int = 0,
-            epoch_idx: int = 1):
+    def __init__(self,
+                 val: ty.Union[int,
+                               float,
+                               str,
+                               ty.List[ty.Union[int, float, str]]],
+                 name: str = "",
+                 state: int = 0,
+                 epoch_idx: int = 1):
 
         self.name = name
         self.state = state
@@ -79,163 +99,48 @@ class DiscreteStateDependentParameter():
             raise ec.StateDependentParameterMisspec(
                 message=("Argument to value parameter is not either in "
                          "scalar or vectorized form (it is likely an "
-                         "object). Cannot initialize. " + name))
+                         "object). Cannot initialize " + name + "."))
 
     @abstractmethod
     def _initialize_str_representation(self) -> None:
         pass
 
-    def __len__(self):
+    def __len__(self) -> int:
         if isinstance(self.value, list):
             return len(self.value)
+
         else:
             return 1
 
 
-# class DiscreteStateDependentRate_old_and_working():
-#     """
-#     Main class for discrete state-dependent rate parameters
-
-#     Supports vectorization of values only.
-#     """
-
-#     value: ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]]
-#     event: MacroevolEvent
-#     name: str
-#     states: ty.List[int]
-
-#     def __init__(
-#             self,
-#             val: ty.Union[int,
-#                           float,
-#                           str,
-#                           ty.List[ty.Union[int, float, str]]],
-#             event: MacroevolEvent,
-#             name: str = "",
-#             states: ty.List[int] = [0, 0, 0]):
-
-#         self.name = name
-#         self.value = []
-
-#         # scalar
-#         # if not type(val) in (list, np.ndarray):
-#         # if type(val) in (int, float, str):
-#         if isinstance(val, (float, int, str)):
-#             self.value = [float(val)]
-#             # vectorizing if input wasn't in list or ndarray form
-#             # if it is an instance of an object like RandomVariablePGM
-
-#         # list
-#         # TODO: make sure that parametric distributions get output converted to list
-#         # inside their own classes so the line below is not necessary (and mypy passes)
-#         # or type(val) == np.ndarray:
-#         elif isinstance(val, list):
-#             # if isinstance(val, np.ndarray):
-#             #     val = val.tolist()
-#             if isinstance(val[0], (int, float, str, np.float64)):
-#                 self.value = [float(v) for v in val]
-
-#             else:
-#                 raise ec.StateDependentParameterMisspec(
-#                     message=("Could not recognize type of value argument, "
-#                              " for parameter " + self.name + ". Cannot "
-#                              "initialize " + name + "."))
-
-#         else:
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("Argument to value parameter is not either in "
-#                          "scalar or vectorized form (it is likely an "
-#                          "object). Cannot initialize. " + name))
-
-#         self.state_tuple = tuple(int(s) for s in states)
-#         self.departing_state = self.state_tuple[0]
-#         # does not include time_slice_index 1
-#         self.arriving_states = self.state_tuple[1:]
-#         self.event = event
-
-#         self.str_representation = \
-#             "AtomicRateParam\n" \
-#             + "   Name:                " \
-#             + self.name + "\n" \
-#             + "   Value:               " \
-#             + ", ".join(str(v) for v in self.value) + "\n" \
-#             + "   Departing state:     " \
-#             + str(self.departing_state) + "\n" \
-#             + "   Arriving state(s):   " \
-#             + ", ".join(str(v) for v in self.arriving_states) + "\n" \
-#             + "   Associated event:    " \
-#             + str(self.event) + "\n\n"
-
-#         # making sure inputs are ok
-#         if self.event == MacroevolEvent.EXTINCTION and self.arriving_states:
-
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("Extinction only takes a departing state "
-#                          "(and no arriving states)."))
-
-#         if self.event == MacroevolEvent.W_SPECIATION and \
-#             len(set(self.arriving_states)) != 1 and \
-#                 self.departing_state not in self.arriving_states:
-
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("Within-state speciation requires the "
-#                          "departing and arriving states to be "
-#                          "all the same."))
-
-#         if self.event == MacroevolEvent.BW_SPECIATION and \
-#             len(set(self.arriving_states)) != 2 and \
-#                 self.departing_state in self.arriving_states:
-
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("Between-state speciation requires the departing "
-#                          "and the two arriving states to be all different."))
-
-#         if self.event == MacroevolEvent.ASYM_SPECIATION and \
-#             len(set(self.arriving_states)) != 2 and \
-#                 self.departing_state not in self.arriving_states:
-
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("Asymmetric-state speciation requires the "
-#                          "departing and one of the arriving states "
-#                          "to be the same, and the other arriving "
-#                          "state to be different. Exiting..."))
-
-#         if self.event == MacroevolEvent.ANAGENETIC_TRANSITION and \
-#             len(set(self.arriving_states)) != 1 and \
-#                 self.departing_state in self.arriving_states:
-
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("State transition requires the departing and "
-#                          "arriving states to be different."))
-
-#         if self.event == MacroevolEvent.ANCESTOR_SAMPLING and \
-#                 self.arriving_states:
-
-#             raise ec.StateDependentParameterMisspec(
-#                 message=("Ancestor sampling only takes a departing state "
-#                          "(and no arriving states)."))
-
-#     def __str__(self):
-#         return self.str_representation
-
-#     def __repr__(self):
-#         return self.str_representation
-
-#     def __len__(self) -> int:
-#         if isinstance(self.value, list):
-#             return len(self.value)
-#         else:
-#             return 1
-
-
 class DiscreteStateDependentRate(DiscreteStateDependentParameter):
     """
-    Main class for discrete state-dependent rate parameters
+    State-dependent rate main class.
+
+    This class is derived from DiscreteStateDependentParameter. It
+    holds a value for the rate, the type of rate, the name of
+    variable holding it, the state associated to the rate, and
+    the time slice (epoch) that rate applies to.
 
     Supports vectorization of values only.
+
+    Attributes:
+        state_tuple (int): Tuple storing all states associated to SSE
+            parameter.
+        departing_state (int): State event is departing from.
+        arriving_state (int): State event is arriving at.
+        event (MacroevolEvent): The type of macroevolutionary event
+            (e.g., within-region speciation, extinction, etc.) this SSE
+            parameter is associated to.
+        str_representation (str): The string that is put together
+            upon initialization and printed when __str__() is called.
     """
 
+    departing_state: int
+    arriving_state: int
     state_tuple: ty.Tuple[int]
+    event: MacroevolEvent
+    str_representation: str
 
     def __init__(
             self,
@@ -333,10 +238,10 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
             + "   Associated event:    " + str(self.event) + "\n" \
             + "   Epoch:               " + str(self.epoch_idx) + "\n\n"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.str_representation
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.str_representation
 
     def __len__(self) -> int:
@@ -345,22 +250,30 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
 
 class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
     """
-    Main class for discrete state-dependent probability parameters
+    State-dependent probability main class.
+
+    This class is derived from DiscreteStateDependentParameter. It
+    holds a value for the probability, the name of the variable
+    holding it, the state associated to the probability, and
+    the time slice (epoch) that probability applies to.
 
     Supports vectorization of values only.
+
+    Attributes:
+        str_representation (str): The string that is put together
+            upon initialization and printed when __str__() is called.
     """
 
     state_representation: str
 
-    def __init__(
-            self,
-            val: ty.Union[int,
-                          float,
-                          str,
-                          ty.List[ty.Union[int, float, str]]],
-            name: str = "",
-            state: int = 0,
-            epoch_idx: int = 1):
+    def __init__(self,
+                 val: ty.Union[int,
+                               float,
+                               str,
+                               ty.List[ty.Union[int, float, str]]],
+                 name: str = "",
+                 state: int = 0,
+                 epoch_idx: int = 1) -> None:
 
         # side-effect: populates self.values (list of floats)
         super().__init__(val=val,
@@ -377,7 +290,7 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
 
         self._initialize_str_representation()
 
-    def _initialize_str_representation(self):
+    def _initialize_str_representation(self) -> None:
         self.str_representation = "Discrete state-dependent probability\n" \
             + "   Name:   " + self.name + "\n" \
             + "   Value:  " \
@@ -385,10 +298,10 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
             + "   State:  " + str(self.state) + "\n" \
             + "   Epoch:  " + str(self.epoch_idx) + "\n\n"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.str_representation
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.str_representation
 
     def __len__(self) -> int:
@@ -396,22 +309,43 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
 
 
 class DiscreteStateDependentParameterManager:
-    """Stash for discrete state-dependent parameters and time slices
+    """Class for checking, organizing, and storing SSE parameters.
 
-    At the moment, this class does not care about vectorization.
-    It manipulates whole instances of DiscreteStateDependentParameter,
-    which then in turn contain multiple values if vectors have been passed
-    by user.
+    Upon initialization, this class verifies that user provided SSE
+    parameters (and their time slice annotation) is acceptable. Then
+    given a seed age for anchoring ages and converting them into times,
+    and time slice age ends, this class produces computes time slice
+    time ends.
 
-    Later, vectorization of seed ages for time slicing and time slices themselves
-    might become vectorized.
+    This class does not care about vectorization. It manipulates
+    instances of DiscreteStateDependentParameter, which then in turn
+    contain multiple values if vectors have been passed by user.
+
+    Currently there is no support for vectorization of seed ages nor
+    of time slices.
+
+    Attributes:
+        matrix_state_dep_params (DiscreteStateDependentParameter): 2D
+            list, with first dimension being time slices, the second
+            being SSE parameters.
+        seed_age (float, optional): Age of origin or root used to
+            anchor time slice age ends so as to convert them into time
+            slice time ends.
+        slice_age_ends (float): List of time slice age ends.
+        slice_t_ends (float, optional): List of time slice time ends.
+            It is automatically filled upon initialization.
+        param_type (DiscreteStateDependentParameterType): Attribute
+            holding what type of SSE parameter this is (rate or
+            probability).
+        epsilon (float): Threshold for considering a difference equal
+            to zero.
     """
 
     matrix_state_dep_params: \
         ty.List[ty.List[DiscreteStateDependentParameter]]
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
-    slice_t_ends: ty.List[ty.Optional[float]]
+    slice_t_ends: ty.Optional[ty.List[float]]
     param_type: DiscreteStateDependentParameterType
     epsilon: float
 
@@ -422,22 +356,22 @@ class DiscreteStateDependentParameterManager:
     # all time slices
 
     def __init__(self,
-                 matrix_state_dep_params:
-                 ty.List[ty.List[DiscreteStateDependentParameter]],
+                 matrix_state_dep_params: \
+                    ty.List[ty.List[DiscreteStateDependentParameter]],
                  total_state_count: int,
                  seed_age_for_time_slicing: ty.Optional[float] = None,
                  list_time_slice_age_ends: ty.Optional[ty.List[float]] = None,
-                 epsilon: float = 1e-12):
+                 epsilon: float = 1e-12) -> None:
         
         self.epsilon = epsilon
 
         # 1D: time slices
-        # 2D: list of atomic rate params
+        # 2D: list of SSE params
         self.matrix_state_dep_params = matrix_state_dep_params
 
-        # make sure it's all rates or all probabilities
-        # and initialize self.param_type
-        self._check_single_and_init_param_type()
+        # make sure it's all rates or all probabilities and
+        # initialize self.param_type
+        self._init_check_single_and_init_param_type()
 
         self.state_count = total_state_count
 
@@ -455,133 +389,134 @@ class DiscreteStateDependentParameterManager:
         # (t = seed_age = stop_value with "age" condition)
         self.slice_t_ends = [self.seed_age]
 
-        # updates self.n_time_slices below
+        # if user provides age ends for time slices
         if list_time_slice_age_ends:
-            # self.n_time_slices += len(list_time_slice_age_ends)
+            self._init_update_slice_age_and_t_ends(
+                list_time_slice_age_ends)
 
-            # we do not want to change this object outside
-            # of this class instance, because other state-dep
-            # param managers may be created (and will be taking
-            # 'list_time_slice_age_ends' as arguments)
-            self.slice_age_ends = deepcopy(list_time_slice_age_ends)
+        # if rate, must have at least one per time slice;
+        # if probability, muast have one per state for all time slices
+        self._init_check_correct_number_params_per_time_slice()
 
-            # appends age end of time slice ending in present
-            self.slice_age_ends.append(0.0)
+        # repeated SSE parameters per time slice are not allowed
+        self._init_check_repeated_parameter_in_time_slice()
 
-            # convert into time ends
-            # (0.0 at origin, seed_age = stop_val for "age" stop
-            # condition in the present)
-            if self.seed_age:
-                # reset slice_t_ends member
-                self.slice_t_ends: ty.List[float] = list()
-
-                # self.slice_t_ends = \
-                #     [self.seed_age - age_end
-                #      for age_end in self.slice_age_ends]
-                #         # no need to append seed_age, because
-                #         # self.slice_age_ends already has 0.0 in it
-
-                for age_end in self.slice_age_ends:
-                    if age_end > self.seed_age:
-                        continue
-
-                    else:
-                        self.slice_t_ends.append(self.seed_age - age_end)
-
-                self.n_time_slices = len(self.slice_t_ends)
-
-        # the number of PROBABILITIES in all epochs must be the same;
-        # this check here is necessary because at the moment we don't allow
-        # the user to specify epoch age ends for probabilities, so then we must
-        # check that we get the same number of probabilities in every epoch for
-        # things to work
-        elif self.param_type == \
-                DiscreteStateDependentParameterType.PROBABILITY:
-            min_param_count = \
-                min(len(t) for t in self.matrix_state_dep_params)
-            
-            max_param_count = \
-                max(len(t) for t in self.matrix_state_dep_params)
-            
-            if min_param_count != max_param_count:
-                raise ec.ObjInitIncorrectDimensionError(
-                    "DiscreteStateDependentParameterManager",
-                    "matrix_state_dep_params",
-                    max_param_count,
-                    exp_len=min_param_count
-                )
-            
-            self.n_time_slices = len(self.matrix_state_dep_params)
-
-        if self.param_type == \
-                DiscreteStateDependentParameterType.RATE:
-            self._check_at_least_one_non_zero_rate_per_epoch()
-
-        self._check_repeated_parameter_in_epoch()
-        # DEPRECATED: not needed anymore, see comment above
-        # definition of _check_all_states_in_all_time_slices
-        # if self.n_time_slices > 1:
-        #     self._check_all_states_in_all_time_slices()
-
-        # TODO: at this point, we should check that we have
-        # a # of parameters that is a multiple of the number of
-        # states
-        #
-        # if manager is holding rates, we need to build a dictionary
-        # of state-triplets [(0,0,0), (2,0,1)] and make sure all triplets
-        # appear in all time slices ()
-        #
-        # some of this testing is already being done at the interface level
-        # within dn_fn_discrete_sse.py.make_SSEStash(), but
-        # that testing is weaker, because it just checks that the number
-        # of specified parameters is a multiple of the number of time slices
-        # irrespective of what parameter states are
-
-        self.state_dep_params_dict: \
-            ty.Dict[int, ty.List[ty.List[DiscreteStateDependentParameter]]] = \
-            dict((s, [[] for j in range(self.n_time_slices)])
-                 for s in range(self.state_count))
-
-        # side effect: initializes self.state_dep_params_dict
+        # side effect: initializes and populates self.state_dep_params_dict
         self._init_matrix_state_dep_params_dict()
-        # self.state_dep_params_dict =
-        # { state0:
-        #           [ [ #slice1#; atomic_param1, atomic_param2, ...] [ #slice2#; atomic_param1, atomic_param2 ] ], ... ]
-        #   state1:
-        #           [ [ #slice1#; atomic_param1, atomic_param2, ...] [ #slice2#; atomic_param1, atomic_param2 ] ], ... ]
-        # }
 
-    ##################
-    # init functions #
-    ##################
-    def _init_matrix_state_dep_params_dict(self):
-        # k-th time slice
-        for k, list_params in enumerate(
+    ######################
+    # populate functions #
+    ######################
+    def _init_matrix_state_dep_params_dict(self) -> None:
+        """Populate class member dictionary with SSE parameters.
+        
+        Raises:
+            ObjInitInvalidArgError: Is raised if the state (int)
+                associated to the SSE parameter is not an integer
+                between 0 and the total number of states.
+        """
+        
+        # key (int): state
+        # value (2D list): 1D are time slices, 2D are SSE parameters
+        self.state_dep_params_dict: \
+            ty.Dict[int,
+                    ty.List[ty.List[DiscreteStateDependentParameter]]] = \
+                        dict((s, [[] for j in range(self.n_time_slices)])
+                             for s in range(self.state_count))
+        
+        # t-th time slice
+        for t, list_params in enumerate(
                 self.matrix_state_dep_params[:self.n_time_slices]):
             for param in list_params:
                 try:
-                    self.state_dep_params_dict[param.state][k].append(param)
+                    self.state_dep_params_dict[param.state][t].append(param)
 
-                except Exception as e:
-                    exit("Parameter " + param.name + "'s associated "
-                         + "(possibly departing) state is " + str(param.state) +
-                         ", but this state is not represented between 0 and " +
-                         str(self.state_count) +
-                         ". Likely the total number of states was misspecified.")
-                    
+                except KeyError:
+                    arg_name: str = "flat_rate_mat"
+                    if self.param_type == DiscreteStateDependentParameterType\
+                            .PROBABILITY:
+                        arg_name = "flat_rate_prob"
+
+                    raise(ec.ObjInitInvalidArgError(
+                        ("'sse_stash' ('DiscreteStateDependentParameter'"
+                         "Manager' in the backend)"),
+                        arg_name + (" ('matrix_state_dep_params' in the "
+                         "backend)"),
+                        message="Parameter " + param.name + "'s associated " \
+                            + "(possibly departing) state is " \
+                            + str(param.state) \
+                            + ", but this state is not represented between " \
+                            + "0 and " + str(self.state_count) \
+                            + (". Likely the total number of states was "
+                               "misspecified.")))
+
+    def _init_update_slice_age_and_t_ends(self,
+                                          list_time_slice_age_ends) -> None:
+        """Update class members related to time slices.
+
+        This method will update:
+            (i)   self.n_time_slices
+            (ii)  self.slice_age_ends
+            (iii) self.slice_t_ends
+        """
+
+        # we do not want to change this object outside
+        # of this class instance, because other state-dep
+        # param managers may be created (and will be taking
+        # 'list_time_slice_age_ends' as arguments)
+        self.slice_age_ends = deepcopy(list_time_slice_age_ends)
+
+        # appends age end of time slice ending in present
+        self.slice_age_ends.append(0.0)
+
+        # convert into time ends
+        # (0.0 at origin, seed_age = stop_val for "age" stop
+        # condition in the present)
+        if self.seed_age:
+            # reset slice_t_ends member
+            self.slice_t_ends: ty.List[float] = list()
+
+            # old first, young last
+            for age_end in self.slice_age_ends:
+                # we ignore user-specified age ends that for some reason
+                # older than the seed (origin/root) age; must have been
+                # a user oversight...
+                if age_end > self.seed_age:
+                    continue
+
+                else:
+                    self.slice_t_ends.append(self.seed_age - age_end)
+
+            self.n_time_slices = len(self.slice_t_ends)
+
     ##########################
     # health check functions #
     ##########################
-    def _check_single_and_init_param_type(self):
-        """Make sure it is all rates or all probabilities."""
+    def _init_check_single_and_init_param_type(self) -> None:
+        """Check discrete SSE paramaters are all of the same kind.
+        
+        This initialization method verifies that the manager was passed
+        either all SSE rates, or SSE probabilities. It will raise an
+        error if not.
+
+        The method has a side-effect, the initialization of
+        self.param_type to either:
+            (i)  DiscreteStateDependentParameterType.RATE
+            (ii) DiscreteStateDependentParameterType.PROBABILITY.
+
+        Raises:
+            ObjInitRequireSameParameterTypeError: Is raised if
+                parameters passed to manager by the user are not
+                all of the same type.
+        """
 
         different_par_type_set: \
             ty.Set(DiscreteStateDependentParameter) = set()
 
-        param_type = None
+        param_type: DiscreteStateDependentParameterType = None
 
-        # t-th time slice
-        for t, list_params in enumerate(self.matrix_state_dep_params):
+        # iterating over time slices (epochs)
+        for list_params in self.matrix_state_dep_params:
             for param in list_params:
                 this_param_type = type(param)
                 param_type = this_param_type
@@ -601,41 +536,102 @@ class DiscreteStateDependentParameterManager:
         elif param_type is DiscreteStateDependentProbability:
             self.param_type = \
                 DiscreteStateDependentParameterType.PROBABILITY
-    
-    def _check_at_least_one_non_zero_rate_per_epoch(self):
-        """Make sure at least one non-zero parameter per epoch."""
 
-        # t-th time slice
-        for t in range(self.n_time_slices):
-            tth_param_list = self.matrix_state_dep_params[t]
+    def _init_check_correct_number_params_per_time_slice(self) -> None:
+        """Check if number of SSE paramaters per time slice is valid.
 
-            # first we check that at least one rate was provided
-            if len(tth_param_list) < 1:
-                raise ec.ObjInitIncorrectDimensionError(
-                    "DiscreteStateDependentParameterManager",
-                    "matrix_state_dep_params[" + str(t+1) + "]",
-                    0,
-                    1,
-                    at_least=True)
+        This initialization method verifies that the manager was passed
+        valid numbers of discrete SSE parameters in all time slices. If
+        parameters are probabilities, then we need one per state per
+        time slice. If rates, we need at least one non-zero rate per
+        time slice.
+
+        Raises:
+            ObjInitIncorrectDimensionError: Is raised if at least one
+                state-dependent probability is not specified for each
+                state for each time slice. Is also raised if not at
+                least one state-dependent rate is not specified for
+                each time slice.
+            ObjInitRequireNonZeroStateDependentParameterError: Is
+                raised if at least one non-zero state-dependent rate
+                is not provided for all time slices.
+        """
+        
+        # one SSE probability per state per time slice (at the moment SSE
+        # probabilities cannot be annotated with a time slice they belong)
+        if self.param_type == \
+                DiscreteStateDependentParameterType.PROBABILITY:
+            # time slice t
+            for t, sse_param_list in enumerate(self.matrix_state_dep_params):
+                n_sse_params: int = len(sse_param_list)
+                if n_sse_params != self.state_count:
+                    raise ec.ObjInitIncorrectDimensionError(
+                        ("'sse_stash' ('DiscreteStateDependentParameter"
+                         "Manager' in the backend)"),
+                        ("'flat_prob_mat' ('matrix_state_dep_params[" + str(t) \
+                         + "]' in the backend)"),
+                        n_sse_params,
+                        exp_len=self.state_count
+                    )
             
-            # second, we check that of the provided rates, at 
-            # least one is non-zero
-            else:
-                # each param.value will contain values for all samples
-                # of a specific type of rate, so if ANY of the values of
-                # param_vals_list is zero, it means that specific rate is 0.0
-                all_rate_types_are_zero = True
-                for param in tth_param_list:
-                    if any(v != 0.0 for v in param.value):
-                        all_rate_types_are_zero = False
+            # min_param_count = \
+            #     min(len(t) for t in self.matrix_state_dep_params)
+            
+            # max_param_count = \
+            #     max(len(t) for t in self.matrix_state_dep_params)
+            
+            # if min_param_count != max_param_count:
+            #     raise ec.ObjInitIncorrectDimensionError(
+            #         "DiscreteStateDependentParameterManager",
+            #         "matrix_state_dep_params",
+            #         max_param_count,
+            #         exp_len=min_param_count
+            #     )
+            
+            # self.n_time_slices = len(self.matrix_state_dep_params)
 
-                if all_rate_types_are_zero:
-                    raise ec.ObjInitRequireNonZeroStateDependentParameterError(
-                            "DiscreteStateDependentParameterManager",
-                            t)    
+        # at least one non-zero SSE rate per time slice
+        elif self.param_type == \
+                DiscreteStateDependentParameterType.RATE:
+            # t-th time slice
+            for t in range(self.n_time_slices):
+                tth_param_list = self.matrix_state_dep_params[t]
 
-    def _check_repeated_parameter_in_epoch(self):
-        """Make sure parameters are not repeated in epoch."""
+                # first we check that at least one rate was provided
+                if len(tth_param_list) < 1:
+                    raise ec.ObjInitIncorrectDimensionError(
+                        ("'sse_stash' ('DiscreteStateDependentParameter"
+                         "Manager' in the backend)"),
+                        "'flat_rate_mat' ('matrix_state_dep_params[" + str(t+1) \
+                        + "]' in the backend)",
+                        0,
+                        1,
+                        at_least=True)
+                
+                # second, we check that of the provided rates, at 
+                # least one is non-zero
+                else:
+                    # each param.value will contain values for all samples
+                    # of a specific type of rate, so if ANY of the values of
+                    # param_vals_list is zero, it means that specific rate is 0.0
+                    all_rate_types_are_zero = True
+                    for param in tth_param_list:
+                        if any(v != 0.0 for v in param.value):
+                            all_rate_types_are_zero = False
+
+                    if all_rate_types_are_zero:
+                        raise ec.ObjInitRequireNonZeroStateDependentParameterError(
+                                "DiscreteStateDependentParameterManager",
+                                t)
+
+    def _init_check_repeated_parameter_in_time_slice(self) -> None:
+        """Make sure parameters are not repeated in epoch.
+        
+        Raises:
+            ObjInitRepeatedStateDependentParameterError: Is raised if
+                there is more than one SSE rate (or probability)
+                representing the same state.
+        """
 
         states_per_epoch_dict = \
             dict((t, set()) for t in range(self.n_time_slices))
@@ -673,32 +669,6 @@ class DiscreteStateDependentParameterManager:
                 
                 states_per_epoch_dict[t].add(sts)
 
-    # DEPRECATED: currently, discrete state-dep parameters
-    # are annotated with the epoch they belong to, so we allow
-    # users to have epochs with no rates or no probs, or epochs
-    # missing certain rates or probs for specific states
-    def _check_all_states_in_all_time_slices(self):
-        """Make sure all states appear in all time slices."""
-
-        states_per_epoch_dict = \
-            dict((k, set()) for k in range(self.n_time_slices))
-
-        # debugging
-        # print("states_per_epoch_dict after populating")
-        # print(states_per_epoch_dict)
-
-        oldest_epoch_state_set = states_per_epoch_dict[0]
-        for k, state_tup_set in states_per_epoch_dict.items():
-            if k > 0:
-                if oldest_epoch_state_set != state_tup_set:
-                    raise ec.ObjInitMissingStateDependentParameterError(
-                        k,
-                        pjh.symmetric_difference(
-                            oldest_epoch_state_set,
-                            state_tup_set
-                        )
-                    )
-
     ###########
     # getters #
     ###########
@@ -708,48 +678,52 @@ class DiscreteStateDependentParameterManager:
             params_matrix: ty.Optional[
                 ty.List[ty.List[DiscreteStateDependentParameter]]] = None) \
             -> ty.List[DiscreteStateDependentParameter]:
-        # see where a_time falls within (get time_slice_index)
-        # grab list of discrete state-dep params at that time_slice_index
-        # print("self.n_time_slices = " + str(self.n_time_slices))
+        """Return list of SSE parameters given a specific time.
 
-        time_slice_index = -1
-        # try:
-        while time_slice_index < self.n_time_slices:
-            time_slice_index += 1
+        This method finds the time slice a specific time belongs to,
+        and retrieves the list of SSE parameters pertaining to that
+        time slice. This list is retrieved from a user-specified
+        matrix, or from the matrix member of the enclosing class,
+        self.matrix_state_dep_params.
 
-            try:
-            # if self.n_time_slices == len(self.slice_age_ends):
-                if isinstance(self.slice_t_ends, list) and \
-                        isinstance(self.slice_t_ends[time_slice_index], float):
-                    time_slice_t_end = \
-                        ty.cast(float, self.slice_t_ends[time_slice_index])
+        Args:
+            a_time (float): A time at which we want to grab SSE
+                parameters.
+            param_matrix (DiscreteStateDependentParameter): A 2D list
+                where the first dimension are time slices, and the
+                second dimension are SSE parameters.
+        
+        Returns:
+            (DiscreteStateDependentParameter): a list of SSE parameters
+                from the appropriate time slice.
+        """
 
-                    if a_time > time_slice_t_end or \
-                            (abs(a_time - time_slice_t_end) <= self.epsilon):
-                        continue
+        # find out which time slice (by getting its index) to get
+        # SSE parameter value from
+        time_slice_index: int = 0
+        # (if n_time_slices is 0, for loop has no effect)
+        for time_slice_index in range(0, self.n_time_slices):
 
-            # self.slice_t_ends will be None if no seed age
-            # or time slice age ends are provided
-            #
-            except Exception as e:
-            #
-            # if-else is better than try-except if the exception gets thrown
-            # a lot; the overhead of raising is greater than the cost of
-            # an if statement
-            # else:
-                # print("Exception 2 inside discrete_sse.py: ",
-                #       type(e).__name__, " - ", e)
-                # in which case we want the index to just be 0
-                time_slice_index = 0
+            # try:
+            if isinstance(self.slice_t_ends, list) and \
+                    isinstance(self.slice_t_ends[time_slice_index], float):
+                # time end of this time slice
+                time_slice_t_end = \
+                    ty.cast(float, self.slice_t_ends[time_slice_index])
+
+                # if time is larger than this time slice time end OR
+                # if time is the same as the time slice, we continue to
+                # the next time slice and check again
+                if a_time > time_slice_t_end or \
+                        (abs(a_time - time_slice_t_end) <= self.epsilon):
+                    continue
 
             break
 
-        # adjusting
-        # if time_slice_index > (self.n_time_slices - 1):
-        #     time_slice_index = self.n_time_slices - 1
-
-        # params_matrix will have been provided as a
-        # matrix conditioned on a departing state
+        # now that we know the time slice, we get the SSE parameter
+        #
+        # params_matrix will have been provided as a matrix conditioned on a
+        # departing state
         if params_matrix is not None:
             return params_matrix[time_slice_index]
 
@@ -929,76 +903,94 @@ class DiscreteStateDependentParameterManager:
 
 
 class MacroevolEventHandler():
-    """Class for sampling of discrete-state macroevolutionary events
+    """Class for handling state-dependent rates.
 
     Some of the methods in this class are vector-aware (through parameter
     value_idx), because instances of this class will be directly called by
     dn_sse.simulate() method, which in turn will try to access parameter values
     stored in a #-simulations-sized list.
+
+    Attributes:
+        sse_rate_manager (DiscreteStateDependentParameterManager):
+            Object that checks, organizes and stores SSE rates.
+        state_count (int): Number of states characterizing the SSE
+            process.
+        n_time_slices (int): Number of time slices.
+        slice_age_ends (float): List of time slice age ends.
+        slice_t_ends (float, optional): List of time slice time ends.
+        seed_age (float, optional): Age of seed (origin or root),
+            stored in 'state_dep_rate_manager'.
+        str_representation (str): The string that is put together
+            upon initialization and printed when __str__() is called.
     """
 
-    # NOTE: This class depends on DiscreteStateDependentParameterManager, which allows different
-    # parameter numbers per time slice, for whatever that is worth. However,
-    # the user interface has a check inside make_SSEStash()
-    # that forces the user to specify the same number of parameters in
-    # all time slices
-
-    state_dep_rate_manager: DiscreteStateDependentParameterManager
+    sse_rate_manager: DiscreteStateDependentParameterManager
     state_count: int
     n_time_slices: int
-    seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
-    slice_t_ends: ty.List[ty.Optional[float]]
+    slice_t_ends: ty.Optional[ty.List[float]]
+    seed_age: ty.Optional[float]
     str_representation: str
 
-    def __init__(
-            self,
-            state_dep_rate_manager: DiscreteStateDependentParameterManager) \
-            -> None:
+    def __init__(self,
+                 sse_rate_manager: \
+                    DiscreteStateDependentParameterManager) -> None:
 
-        self.state_dep_rate_manager = state_dep_rate_manager
-        self.state_count = self.state_dep_rate_manager.state_count
-        self.n_time_slices = self.state_dep_rate_manager.n_time_slices
-        self.seed_age = self.state_dep_rate_manager.seed_age
-        self.slice_age_ends = self.state_dep_rate_manager.slice_age_ends
-
-        self.slice_t_ends = self.state_dep_rate_manager.slice_t_ends
+        self.sse_rate_manager = sse_rate_manager
+        self.state_count = self.sse_rate_manager.state_count
+        self.n_time_slices = self.sse_rate_manager.n_time_slices
+        self.slice_age_ends = self.sse_rate_manager.slice_age_ends
+        self.slice_t_ends = self.sse_rate_manager.slice_t_ends
+        # if there are more time slice age ends than there are time ends,
+        # for each extra age end we add a 'Older than tree' string to this
+        # list to use it when printing an instance of this class as a string
         filler_t_ends_list = \
             ["Older than tree" for i in range(
              len(self.slice_age_ends) - len(self.slice_t_ends))]
+        # and here we prepend those filler strings, so they can be printed
+        # as the time end of time slices that are older than the seed age
+        # of the tree
         self.slice_t_ends_for_printing = \
             filler_t_ends_list + self.slice_t_ends
 
+        self.seed_age = self.sse_rate_manager.seed_age
+
+        # side-effect: populates self.str_representation
+        self._initialize_str_representation()
+
+    # init methods
+    def _initialize_str_representation(self) -> None:
+        """Populate str_representation class member."""
+
         self.str_representation = "State-dependent rates"
+
         # state s
-        for s, atomic_rates_state_mat in self.state_dep_rate_manager.state_dep_params_dict.items():
+        for s, sse_rate_state_mat in \
+                self.sse_rate_manager.state_dep_params_dict.items():
             self.str_representation += "\n  State " + str(s) + ":\n"
 
-            # time slice k
-            for k, list_atomic_rates_slice in enumerate(atomic_rates_state_mat):
+            # time slice t
+            for t, list_sse_rate_slice in enumerate(sse_rate_state_mat):
                 if self.seed_age and isinstance(self.slice_t_ends_for_printing, list):
-                    # time_slice_t_end = ty.cast(float, self.slice_t_ends_for_printing[k])
-                    time_slice_t_end = self.slice_t_ends_for_printing[k]
+                    time_slice_t_end = self.slice_t_ends_for_printing[t]
 
-                    # time_slice_t_end = ty.cast(float, self.slice_t_ends[k])
                     self.str_representation += \
-                        "    Time slice " + str(k + 1) + " (time = " \
+                        "    Time slice " + str(t + 1) + " (time = " \
                         + (str(round(time_slice_t_end, 4)) \
                            if isinstance(time_slice_t_end, float) \
                            else time_slice_t_end) + ", age = " \
-                        + str(round(self.slice_age_ends[k], 4)) + ")\n"
+                        + str(round(self.slice_age_ends[t], 4)) + ")\n"
 
                 else:
                     self.str_representation += "    Time slice " \
-                        + str(k + 1) + " (age = " \
-                        + str(round(self.slice_age_ends[k], 4)) + ")\n"
+                        + str(t + 1) + " (age = " \
+                        + str(round(self.slice_age_ends[t], 4)) + ")\n"
 
-                # atomic rate 'ar'
-                for ar in list_atomic_rates_slice:
-                    self.str_representation += "      " + ar.name \
-                        + " = " + ", ".join(str(v) for v in ar.value) \
+                for sse_rate in list_sse_rate_slice:
+                    self.str_representation += "      " + sse_rate.name \
+                        + " = " + ", ".join(str(v) for v in sse_rate.value) \
                         + "\n"
-
+                    
     # this function deals with vectorization
     def total_rate(
             self,
@@ -1006,11 +998,28 @@ class MacroevolEventHandler():
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             value_idx: int = 0,
             departing_state: ty.Optional[int] = None,
-            debug: bool = False) -> \
-            ty.Union[float, ty.Tuple[float, ty.List[float]]]:
-        """
-        Calculate total rate for either any event, or for events
-        conditioned on a specific state.
+            debug: ty.Optional[bool] = False) -> \
+                ty.Union[float, ty.Tuple[float, ty.List[float]]]:
+        """Get total rate given possible events at time slice and tree.
+
+        This method is called by DnSSE (dn_discrete_sse.py) when it is
+        time to draw the time to the next event, which is exponentially
+        distributed with rate equal to the total sum of rates being
+        computed by this method (the first return in the tuple).
+
+        For the first return in the tuple, this method gets all event
+        rates for a given time slice, and adds them up. Different rates
+        are weighed depending on their departing states, with the weight
+        being the number of lineages representing that state.
+        
+        For the second return in the tuple, this method adds up rates
+        by their departing states, but there is no weighing. The
+        grouped rates are put into a list, at index = state index.
+        
+        The 'departing_state' argument remains as legacy; this method
+        never actually gets called with departing_state. This also means
+        that a pure float return also never happens (only the tuple
+        return).
 
         Args:
             a_time (float): Forward time (not age!) we want to recover
@@ -1036,13 +1045,26 @@ class MacroevolEventHandler():
                 print("\nCalculating rate for exponential:")
 
             else:
-                print("\nCalculating denominator for sampling event:")
+                print(("\nCalculating denominator for randomly choosing an "
+                       "event to take place:"))
 
-        total_rate = 0.0
-        state_rates = [0.0 for i in range(len(state_representation_dict))]
+        # TODO: the total_rate (for each time slice) when there is a
+        # departing_state can calculated just once and cached; this should
+        # be done in sse_rate_manager (need to implement a method in that
+        # class's _init_ for calculation, and then implement a getter)
+        #
+        # we only need to calculate total_rate again (as below) when not
+        # conditioning on a departing_state (because of weighing, which
+        # depends on the stochastically growing tree)
+
+        # returns
+        total_rate: float = 0.0
+        state_rates: ty.List[float] = \
+            [0.0 for i in range(len(state_representation_dict))]
 
         for state_idx, nd_labels in state_representation_dict.items():
-            # if departing state is provided, then we do not care about rates not departing from it
+            # if departing state is provided, then we do not care about rates
+            # not departing from it
             if departing_state is not None and departing_state != state_idx:
                 continue
 
@@ -1050,27 +1072,23 @@ class MacroevolEventHandler():
 
             if debug:
                 if departing_state is None:
-                    print("  state " + str(state_idx) + " is represented by " + str(n_lineages_in_state) + " lineages (weight).")
+                    print("  state " + str(state_idx) + " is represented by " \
+                          + str(n_lineages_in_state) + " lineages (weight).")
 
-            # scoped to total_rate
-            # conditioning
-            atomic_rate_params_matrix = \
-                self.state_dep_rate_manager.state_dep_params_dict[state_idx]
+            # conditioning on state (variable scoped to function!)
+            sse_rate_params_from_state_mat = \
+                self.sse_rate_manager.state_dep_params_dict[state_idx]
 
-            atomic_rate_params_at_time = \
-                self.state_dep_rate_manager.state_dep_params_at_time(
+            sse_rate_params_from_state_at_time = \
+                self.sse_rate_manager.state_dep_params_at_time(
                     a_time,
-                    params_matrix=atomic_rate_params_matrix)
+                    params_matrix=sse_rate_params_from_state_mat)
 
-            for atomic_rate_param in atomic_rate_params_at_time:
-                w = 1.0  # weight
+            for sse_rate_param_from_state in \
+                    sse_rate_params_from_state_at_time:
+                w: float = 1.0  # weight
 
-                # if we already drew the time to the next event and a node
-                # representation does not matter, the total is just the
-                # sum of all rates of the specified state (this is guaranteed
-                # by the if statement above)
-
-                # otherwise, we are getting the total rate for the whole tree,
+                # we are getting the total rate for the whole tree,
                 # before picking a node; the weight is then the number of
                 # targetable nodes at a given state
                 if departing_state is None:
@@ -1078,33 +1096,57 @@ class MacroevolEventHandler():
 
                 if debug:
                     print("    This rate's value is "
-                          + str(atomic_rate_param.value[value_idx]))
+                          + str(sse_rate_param_from_state.value[value_idx]))
 
                 # value_idx is what introduces vectorization here
                 # if we have 100 lambda values (b/c we are doing 100 simulations)
                 # then we will be only looking at the i-th (0 < i < 99) lambda at a time
-                state_rates[state_idx] += atomic_rate_param.value[value_idx]
-                total_rate += w * atomic_rate_param.value[value_idx]
+                state_rates[state_idx] += sse_rate_param_from_state.value[value_idx]
+                total_rate += w * sse_rate_param_from_state.value[value_idx]
 
         if debug:
-            print("Total rate = " + str(total_rate))
+            print("Total rate =", total_rate)
         
+        # total_rate will be simply the sum of all possible event rates,
+        # normalized by the number of lineages representing each and all
+        # possible departing states
+        #
+        # state_rates just groups all rates by their departing states,
+        # no weighing
+        #
+        # this is the only return we actually use in dn_discrete_sse (DnSSE)
+        # when determining the rate of (any) events for the Poisson process
+        # (the rate of the exponential)
         if departing_state is None:
             return total_rate, state_rates
 
+        # total_rate will be the sum of event rates that start at the
+        # specified departing_state, with all events weighed equally
+        #
+        # we currently do not use this return
         else:
             return total_rate
 
     # this function deals with vectorization
-    def sample_event_atomic_parameter(
+    def sample_event_sse_rate_param(
             self,
             denominator: float,
             a_time: float,
             state_indices: ty.List[int],
             value_idx: int = 0,
             a_seed: ty.Optional[float] = None,
-            debug: bool = False):
-        """Return one-sized list with a sampled macroevolutionary event
+            debug: ty.Optional[bool] = False):
+        """Return one-sized list with a random SSE rate.
+
+        This method accesses the sse_rate_manager member to grab all
+        SSE rates departing from one or more focal states. It then
+        weighs each SSE rate by their value divided by the sum of the
+        values of all SSE rates departing from the focal state. Given
+        these weighed SSE rates, it randomly picks one and returns.
+
+        This method is called by DnSSE (dn_discrete_sse.py) when
+        randomly choosing an event, after an event time and a node have
+        already been chosen.
 
         Args:
             denominator (float): Normalization term for computing weights
@@ -1121,7 +1163,7 @@ class MacroevolEventHandler():
                 Defaults to False.
 
         Returns:
-            MacroevolEvent: Sampled macroevolutionary event that will take place
+            DiscreteStateDependentRate: List with a single SSE rate.
         """
 
         if debug:
@@ -1131,34 +1173,41 @@ class MacroevolEventHandler():
         if a_seed:
             random.seed(a_seed)
 
-        all_states_atomic_rate_params = list()
-        ws = list()  # weights for sampling proportional to rate value
+        all_states_sse_rate_params_at_time: \
+            ty.List[DiscreteStateDependentRate] = list()
+        # weights for sampling proportional to rate value
+        ws: ty.List[float] = list()
 
+        # produce weight list (one weight per SSE rate)
+        # so we can sample SSE rates proportionally
         for state_idx in state_indices:
-            atomic_rate_params_matrix = \
-                self.state_dep_rate_manager.state_dep_params_dict[state_idx]
-            this_state_atomic_rate_params = \
-                self.state_dep_rate_manager.state_dep_params_at_time(
-                    a_time, params_matrix=atomic_rate_params_matrix)
-            all_states_atomic_rate_params += this_state_atomic_rate_params
+            this_state_sse_rate_params_mat = \
+                self.sse_rate_manager.state_dep_params_dict[state_idx]
+            this_state_sse_rate_params_at_time_list = \
+                self.sse_rate_manager.state_dep_params_at_time(
+                    a_time,
+                    params_matrix=this_state_sse_rate_params_mat)
+            all_states_sse_rate_params_at_time += \
+                this_state_sse_rate_params_at_time_list
 
             # total rate of outcomes must depend
             # on "adjacent" states across events
-            for atomic_rate_param in this_state_atomic_rate_params:
-                ws.append((atomic_rate_param.value[value_idx] / denominator))
+            for sse_rate_param in \
+                    this_state_sse_rate_params_at_time_list:
+                ws.append((sse_rate_param.value[value_idx] / denominator))
 
         if debug:
             print("    \nThe following events are allowed:")
             print("   " + "   ".join(
-                str(ap) for ap in all_states_atomic_rate_params))
+                str(ap) for ap in all_states_sse_rate_params_at_time))
 
         return random.choices(
-            [atomic_param for atomic_param
-             in all_states_atomic_rate_params], weights=ws)
+            [sse_rate_param for sse_rate_param
+             in all_states_sse_rate_params_at_time], weights=ws)
 
     def __len__(self) -> int:
-        if self.state_dep_rate_manager:
-            return len(self.state_dep_rate_manager)
+        if self.sse_rate_manager:
+            return len(self.sse_rate_manager)
 
         else:
             return 0
@@ -1169,27 +1218,30 @@ class MacroevolEventHandler():
     def __repr__(self) -> str:
         return self.str_representation
 
-    def get_gcf(self):
-        pass
+    # def get_gcf(self):
+    #     pass
 
-    def get_length(self):
-        pass
+    # def get_length(self):
+    #     pass
 
 
 class DiscreteStateDependentProbabilityHandler():
-    """Class for managing time-heterogeneous state-dependent probabilities
+    """Class for handling state-dependent taxon sampling.
 
-    Time slices do not have to be the same as those for state-dependent
-    rates.
+    This is the sister class to MacroevolEventHandler. Note that time
+    slices do not have to be the same as those for SSE rates.
+
+    Attributes:
+        state_dep_prob_manager (DiscreteStateDependentParameterManager):
+            Object that checks, organizes and stores SSE probabilities.
+        state_count (int): Number of states characterizing the SSE
+            process.
+        n_time_slices (int): Number of time slices.
+        slice_age_ends (float): List of time slice age ends.
+        slice_t_ends (float, optional): List of time slice time ends.
+        str_representation (str): The string that is put together
+            upon initialization and printed when __str__() is called.
     """
-
-    # NOTE: This class depends on DiscreteStateDependentParameterManager,
-    # which allows different parameter numbers per time slice, for whatever
-    # that is worth.
-    #
-    # However, the user interface has a check inside
-    # make_SSEStash() that forces the user to specify the same
-    # number of parameters in all time slices
 
     state_dep_prob_manager: DiscreteStateDependentParameterManager
     state_count: int
@@ -1220,6 +1272,7 @@ class DiscreteStateDependentProbabilityHandler():
         self._initialize_str_representation()
 
     def _initialize_str_representation(self) -> None:
+        """Populate str_representation class member."""
 
         self.str_representation = "State-dependent probabilities"
 
@@ -1228,24 +1281,25 @@ class DiscreteStateDependentProbabilityHandler():
                 self.state_dep_prob_manager.state_dep_params_dict.items():
             self.str_representation += "\n  State " + str(s) + ":\n"
 
-            # time slice k
-            for k, list_state_dep_params_slice in \
+            # time slice t
+            for t, list_state_dep_params_slice in \
                     enumerate(atomic_rates_state_mat):
-                if self.seed_age and isinstance(self.slice_t_ends_for_printing, list):
-                    # time_slice_t_end = ty.cast(float, self.slice_t_ends_for_printing[k])
-                    time_slice_t_end = self.slice_t_ends_for_printing[k]
+                if self.seed_age and \
+                        isinstance(self.slice_t_ends_for_printing, list):
+                    time_slice_t_end = self.slice_t_ends_for_printing[t]
 
-                    self.str_representation += "    Time slice " + str(k + 1) \
-                        + " (time = " + (str(round(time_slice_t_end, 4)) \
-                                         if isinstance(time_slice_t_end, float) \
-                                         else time_slice_t_end) \
+                    self.str_representation += "    Time slice " \
+                        + str(t + 1) + " (time = " \
+                            + (str(round(time_slice_t_end, 4)) if \
+                               isinstance(time_slice_t_end, float) else \
+                                time_slice_t_end) \
                         + ", age = " \
-                        + str(round(self.slice_age_ends[k], 4)) + ")\n"
+                        + str(round(self.slice_age_ends[t], 4)) + ")\n"
 
                 else:
                     self.str_representation += "    Time slice " \
-                        + str(k + 1) + " (age = " \
-                        + str(round(self.slice_age_ends[k], 4)) + ")\n"
+                        + str(t + 1) + " (age = " \
+                        + str(round(self.slice_age_ends[t], 4)) + ")\n"
 
                 for state_dep_param in list_state_dep_params_slice:
                     self.str_representation += "      " \
@@ -1254,8 +1308,19 @@ class DiscreteStateDependentProbabilityHandler():
                         str(v) for v in state_dep_param.value) + "\n"
 
     def _state_dep_prob_at_time(self, a_time, state_idx) \
-            -> ty.List[DiscreteStateDependentParameter]:
+            -> ty.List[DiscreteStateDependentProbability]:
+        """Get the SSE probability of a state at a specific time.
+        
+        Args:
+            a_time (float): Time at which we want to know the
+                probability of sampling a taxon at the state
+                represented by 'state_idx'.
+            state_idx (int): Integer representing a state.
 
+        Returns:
+            DiscreteStateDependentProbability: A list with a single
+                SSE probability inside.
+        """
         # scoped to total_rate
         state_cond_prob_matrix = \
             self.state_dep_prob_manager \
@@ -1275,6 +1340,10 @@ class DiscreteStateDependentProbabilityHandler():
     def randomly_decide_taxon_sampling_at_time_at_state(
             self, a_time, state_idx, sample_idx) \
             -> bool:
+        """
+
+        Raises:
+        """
         prob_at_state_in_slice_list = \
             self._state_dep_prob_at_time(a_time, state_idx)
 
@@ -1307,6 +1376,9 @@ class DiscreteStateDependentProbabilityHandler():
     def __str__(self) -> str:
         return self.str_representation
 
+    def __repl__(self) -> str:
+        return self.str_representation
+
 
 class SSEStash():
     """
@@ -1330,29 +1402,39 @@ class SSEStash():
         if state_dep_prob_handler is None:
             self._initialize_missing_prob_handler()
 
-        self._init_str_representation()
+        self._initialize_str_representation()
 
     # side-effect: creates and populates self.prob_handler if user did
-    # not provide it (one probability per state, per epoch)
-    #
-    # TODO: if user provides a single state-dep probability, need to
-    # then implement health checks and or default probs = 1 for all
-    # missing state-dep probs
+    # not provide it (one probability per state, per time slice)
     def _initialize_missing_prob_handler(self) -> None:
+        """Populate class member self.prob_handler.
+        
+        This method is called when the user only specified
+        state-dependent rates for an SSE process, but no
+        state-dependent probabilities. We still need the probabilities,
+        so we create them here from scratch, assuming they are all
+        1.0.
+        
+        The class member self.prob_handler is initialized as a
+        side-effect.
+        """
+
         matrix_state_dep_probs: \
-            ty.List[ty.List[DiscreteStateDependentProbability]] = []
+            ty.List[ty.List[DiscreteStateDependentProbability]] = list()
 
         # TODO: this code is wrong, fix it!
         for t in range(0,
-                       self.meh.state_dep_rate_manager.n_time_slices):
+                       self.meh.sse_rate_manager.n_time_slices):
             state_dep_probs: \
-                ty.List[DiscreteStateDependentProbability] = []
+                ty.List[DiscreteStateDependentProbability] = list()
 
             for st in range(self.meh.state_count):
                 # st = j % n_prob_per_slice
-                state_dep_prob = DiscreteStateDependentProbability(
-                    name="rho" + str(st) + "_t" + str(t),
-                    val=1.0, state=st)
+                state_dep_prob = \
+                    DiscreteStateDependentProbability(
+                        name="rho" + str(st) + "_t" + str(t),
+                        val=1.0,
+                        state=st)
 
                 # so mypy won't complain
                 if isinstance(state_dep_prob,
@@ -1380,7 +1462,8 @@ class SSEStash():
             state_dep_probs_manager
         )
 
-    def _init_str_representation(self) -> None:
+    def _initialize_str_representation(self) -> None:
+        """Populate str_representation class member."""
         self.str_representation = str(self.meh)
 
         if self.prob_handler:
@@ -1392,21 +1475,33 @@ class SSEStash():
     def get_prob_handler(self) -> DiscreteStateDependentProbabilityHandler:
         return self.prob_handler
 
-    def __str__(self):
+    def __str__(self) -> str:
+        return self.str_representation
+
+    def __repr__(self) -> str:
         return self.str_representation
 
 
 class StateIntoPatternConverter:
     """
     Stash and machinery for checking and converting character
-    compound-states into bit patterns, and vice-versa
+    compound-states into bit patterns, and vice-versa.
 
     For example, if we are thinking about regions as characters,
     then compound-state means different ranges (e.g., "A", "AB"),
-    while "state" is the number of different values a single
+    while 'state' is the number of different values a single
     character can take. In the case of 1-character-1-region, then
     the number of states is 2, because a species is either present
     or not in a region.
+
+    Attributes:
+        n_char (int): Number of characters.
+        n_states_per_char (int): Number of states per character.
+        n_states (int): Total number of states.
+        int2set_dict (dict of str: str): Dictionary for converting a
+            state coded as an integer into a bit set.
+        set2int_dict (dict of str: str): Dictionary for converting a
+            state coded as a bit set into an integer.
     """
 
     # e.g., for 2 states
@@ -1424,26 +1519,34 @@ class StateIntoPatternConverter:
     n_char: int
     n_states_per_char: int
     n_states: int
-    int2set_dict: ty.Dict[str, str] = dict()
-    set2int_dict: ty.Dict[str, str] = dict()
+    int2set_dict: ty.Dict[str, str]
+    set2int_dict: ty.Dict[str, str]
 
     def __init__(self, n_characters: int, n_states_per_char: int) -> None:
         self.n_char = n_characters
         self.n_states_per_char = n_states_per_char
         self.n_states = int(n_states_per_char ** n_characters)
 
-        # side-effect
-        self.populate_dicts()
+        self.int2set_dict = dict()
+        self.set2int_dict = dict()
 
-    def populate_dicts(self) -> None:
-        """
-        Non-recursively generate all bit patterns for a given number
-        of characters and states per characters
+        # side-effect: initializes
+        #     (i)  self.int2set_dict
+        #     (ii) self.set2int_dict
+        self._initialize_dicts()
+
+    def _initialize_dicts(self) -> None:
+        """Initialize and populate conversion dictionary members.
+        
+        This method non-recursively generates all bit patterns for a
+        given number of characters and states per characters.
 
         Note that if we are thinking about regions as characters, then
         "compound state" means the range (e.g., "AB"), and state is the
         number of options per character (e.g., binary if present/absent
-        in a region)
+        in a region).
+
+        Dictionary members are initialized as a side-effect.
         """
 
         # non-recursive method

@@ -42,8 +42,10 @@ class IncorrectDimensionError(Exception):
 
 class DimensionalityError(Exception):
     dn_name: str
+    par_name: str
     message: str
-    def __init__(self, dn_name: str) -> None: ...
+    def __init__(self, dn_name: str, par_name: ty.Optional[str]="") -> None: ...
+    def __str__(self) -> str: ...
 
 class NodeInferenceDimensionalityError(Exception):
     node_name: str

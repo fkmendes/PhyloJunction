@@ -58,9 +58,9 @@ class CtFnTreeReader(pgm.ConstantFn):
                 self.total_tr_count > 1:
             self.n_samples = self.total_tr_count
 
-        self._check_sample_size()
+        self.init_check_vectorize_sample_size()
 
-    def _check_sample_size(self) -> None:
+    def init_check_vectorize_sample_size(self) -> None:
         """Check provided tree strings and count members match"""
 
         arg: str = "string" 

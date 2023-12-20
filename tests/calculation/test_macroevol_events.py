@@ -36,7 +36,6 @@ class TestMacroEvolEvent(unittest.TestCase):
         cls.bd_state_representation_dict = \
             { 0: ["nd3", "nd4", "nd5", "nd6"] }
 
-
         # BiSSE
         total_n_states = 2
         cls.bisse_rates_t0_s0 = [
@@ -116,37 +115,74 @@ class TestMacroEvolEvent(unittest.TestCase):
         """
         Test if birth-death total rates are correctly computed for single epoch
         """
+
         a_time = 0.0
 
-        total_rate_t0, state_total_rates = self.bd_event_handler.total_rate(a_time, self.bd_state_representation_dict)
-        total_rate_t100, state_total_rates = self.bd_event_handler.total_rate(a_time, self.bd_state_representation_dict) # should not matter what time
+        # should not matter what time
+        total_rate_t0, state_total_rates = \
+            self.bd_event_handler.total_rate(
+                a_time,
+                self.bd_state_representation_dict)
+        total_rate_t100, state_total_rates = \
+            self.bd_event_handler.total_rate(
+                a_time,
+                self.bd_state_representation_dict)
 
         # 4 * 1.5 = 6.0
-        self.assertEqual(total_rate_t0, 6.0, "Total rate at time 0.0 should be 6.0.")
-        self.assertEqual(total_rate_t100, 6.0, "Total rate at time 100.0 should be 6.0.")
+        self.assertEqual(
+            total_rate_t0,
+            6.0,
+            "Total rate at time 0.0 should be 6.0.")
+        self.assertEqual(
+            total_rate_t100,
+            6.0,
+            "Total rate at time 100.0 should be 6.0.")
 
 
     def test_total_rate_single_epoch_bisse(self):
         """
         Test if global and state-conditioned total rates are correctly calculated
         """
+
         a_time = 0.0
 
         # overall rate for drawing time to next event
-        total_rate_t0, state_total_rates = self.bisse_event_handler.total_rate(a_time, self.bisse_state_representation_dict)
-        total_rate_t100, state_total_rates = self.bisse_event_handler.total_rate(a_time, self.bisse_state_representation_dict) # should not matter what time
+        total_rate_t0, state_total_rates = \
+            self.bisse_event_handler.total_rate(
+                a_time,
+                self.bisse_state_representation_dict)
+        total_rate_t100, state_total_rates = \
+            self.bisse_event_handler.total_rate(
+                a_time,
+                self.bisse_state_representation_dict) # should not matter what time
 
         # 1 * (0.5 + 0.25 + 0.5) + 3 * (1.5 + 0.25 + 0.5) = 8.0
-        self.assertEqual(total_rate_t0, 8.0, "Total rate at time 0.0 should be 8.0.")
-        self.assertEqual(total_rate_t100, 8.0, "Total rate at time 100.0 should be 8.0.")
+        self.assertEqual(total_rate_t0,
+                         8.0,
+                         "Total rate at time 0.0 should be 8.0.")
+        self.assertEqual(total_rate_t100,
+                         8.0,
+                         "Total rate at time 100.0 should be 8.0.")
 
         # 0.5 + 0.25 + 0.5 = 1.25
-        self.assertEqual(state_total_rates[0], 1.25, "Total rate of state 0 at time 0.0 should be 1.25.")
-        self.assertEqual(state_total_rates[0], 1.25, "Total rate of state 0 at time 100.0 should be 1.25.")
+        self.assertEqual(
+            state_total_rates[0],
+            1.25,
+            "Total rate of state 0 at time 0.0 should be 1.25.")
+        self.assertEqual(
+            state_total_rates[0],
+            1.25,
+            "Total rate of state 0 at time 100.0 should be 1.25.")
 
         # 1.5 + 0.25 + 0.5 = 2.25
-        self.assertEqual(state_total_rates[1], 2.25, "Total rate of state 1 at time 0.0 should be 2.25.")
-        self.assertEqual(state_total_rates[1], 2.25, "Total rate of state 1 at time 100.0 should be 2.25.")
+        self.assertEqual(
+            state_total_rates[1],
+            2.25,
+            "Total rate of state 1 at time 0.0 should be 2.25.")
+        self.assertEqual(
+            state_total_rates[1],
+            2.25,
+            "Total rate of state 1 at time 100.0 should be 2.25.")
 
 
     def test_total_rate_two_epochs(self):
@@ -158,8 +194,10 @@ class TestMacroEvolEvent(unittest.TestCase):
 
     def test_event_sampling_bd(self):
         """
-        Test if birth/death events are being randomly drawn proportionally to their weights
+        Test if birth/death events are being randomly drawn
+        proportionally to their weights.
         """
+        
         a_time = 0.0
         n_events = n_samples = 10000
         event_outcomes = list()
@@ -174,7 +212,7 @@ class TestMacroEvolEvent(unittest.TestCase):
 
             event_outcomes.append(
                 self.bd_event_handler \
-                    .sample_event_atomic_parameter(
+                    .sample_event_sse_rate_param(
                     state_total_rates[0],
                     a_time,
                     [0])[0].event.value
@@ -207,26 +245,45 @@ class TestMacroEvolEvent(unittest.TestCase):
         n_events = n_samples = 10000
         seeds = [i for i in range(n_events)] # let's set the seed
         event_outcomes_s0, event_outcomes_s1 = list(), list()
-        total_rate, state_total_rates = self.bisse_event_handler.total_rate(a_time, self.bisse_state_representation_dict)
+        total_rate, state_total_rates = \
+            self.bisse_event_handler.total_rate(
+                a_time,
+                self.bisse_state_representation_dict)
         while n_samples > 0:
             i = n_events - n_samples
 
             n_samples -= 1
 
             event_outcomes_s0.append(
-                self.bisse_event_handler.sample_event_atomic_parameter(state_total_rates[0], a_time, [0], a_seed=seeds[i])[0].event.value
+                self.bisse_event_handler.\
+                    sample_event_sse_rate_param(
+                        state_total_rates[0],
+                        a_time,
+                        [0],
+                        a_seed=seeds[i])[0].event.value
             )
 
             event_outcomes_s1.append(
-                self.bisse_event_handler.sample_event_atomic_parameter(state_total_rates[1], a_time, [1], a_seed=seeds[i])[0].event.value
+                self.bisse_event_handler.\
+                    sample_event_sse_rate_param(
+                        state_total_rates[1],
+                        a_time, [1],
+                        a_seed=seeds[i])[0].event.value
             )
 
-        # first [0] indexing gets lambda parameter, second [0] gets the first item inside the vectorized value
-        expected_proportion_birth_s0 = self.bisse_rates_t0_s0[0].value[0] / state_total_rates[0]
-        obs_proportion_birth_s0 = sum(1 for v in event_outcomes_s0 if v == 0) / n_events # v = 0 is the value assigned to speciation (see tpsimulator_classes)
+        # first [0] indexing gets lambda parameter,
+        # second [0] gets the first item inside the vectorized value
+        expected_proportion_birth_s0 = \
+            self.bisse_rates_t0_s0[0].value[0] / state_total_rates[0]
+        obs_proportion_birth_s0 = \
+            sum(1 for v in event_outcomes_s0 if v == 0) / n_events
+        # v = 0 is the value assigned to speciation (see tpsimulator_classes)
 
-        expected_proportion_birth_s1 = self.bisse_rates_t0_s1[0].value[0] / state_total_rates[1]
-        obs_proportion_birth_s1 = sum(1 for v in event_outcomes_s1 if v == 0) / n_events # v = 0 is the value assigned to speciation
+        expected_proportion_birth_s1 = \
+            self.bisse_rates_t0_s1[0].value[0] / state_total_rates[1]
+        obs_proportion_birth_s1 = \
+            sum(1 for v in event_outcomes_s1 if v == 0) / n_events
+        # v = 0 is the value assigned to speciation
 
         # let's see events if really drawn proportional to weights
         # print(expected_proportion_birth_s0)
@@ -234,8 +291,16 @@ class TestMacroEvolEvent(unittest.TestCase):
         # print(expected_proportion_birth_s1)
         # print(obs_proportion_birth_s1) # pretty good!
         
-        self.assertAlmostEqual(obs_proportion_birth_s0, expected_proportion_birth_s0, msg="Proportion of event is off by more than 0.01", delta=0.01)
-        self.assertAlmostEqual(obs_proportion_birth_s1, expected_proportion_birth_s1, msg="Proportion of event is off by more than 0.01", delta=0.01)
+        self.assertAlmostEqual(
+            obs_proportion_birth_s0,
+            expected_proportion_birth_s0,
+            msg="Proportion of event is off by more than 0.01",
+            delta=0.01)
+        self.assertAlmostEqual(
+            obs_proportion_birth_s1,
+            expected_proportion_birth_s1,
+            msg="Proportion of event is off by more than 0.01",
+            delta=0.01)
 
 
     def test_sampling_probability_bisse(self):

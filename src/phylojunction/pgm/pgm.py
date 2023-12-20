@@ -155,7 +155,7 @@ class ValueGenerator(ABC):
         pass
 
     @abstractmethod
-    def _check_sample_size(
+    def init_check_vectorize_sample_size(
         self,
         param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:

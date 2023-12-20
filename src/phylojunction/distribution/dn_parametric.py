@@ -83,7 +83,7 @@ class DnLogNormal(pgm.DistributionPGM):
 
         # one element per parameter
         check_sample_size_return = \
-            self._check_sample_size([self.ln_mean_arg,
+            self.init_check_vectorize_sample_size([self.ln_mean_arg,
                                      self.ln_sd_arg])
 
         if isinstance(check_sample_size_return, list):
@@ -138,7 +138,7 @@ class DnLogNormal(pgm.DistributionPGM):
                 self.DN_NAME,
                 "A \'mean_param\' and \'sd_param\' must be specified.")
 
-    def _check_sample_size(
+    def init_check_vectorize_sample_size(
             self,
             param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
@@ -212,7 +212,7 @@ class DnNormal(pgm.DistributionPGM):
 
         # one element per parameter
         check_sample_size_return = \
-            self._check_sample_size([self.norm_mean_param_arg,
+            self.init_check_vectorize_sample_size([self.norm_mean_param_arg,
                                      self.norm_sd_param_arg])
         if isinstance(check_sample_size_return, list):
             self.vectorized_params = check_sample_size_return
@@ -279,7 +279,7 @@ class DnNormal(pgm.DistributionPGM):
                 ("A \'norm_mean_param\' and \'norm_sd_param\' "
                  "must be specified."))
 
-    def _check_sample_size(
+    def init_check_vectorize_sample_size(
             self,
             param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
@@ -361,7 +361,7 @@ class DnExponential(pgm.DistributionPGM):
         #
         # must convert to list because of method signature
         check_sample_size_return = \
-            self._check_sample_size(
+            self.init_check_vectorize_sample_size(
                 [self.exp_scale_or_rate_param_arg])
 
         if isinstance(check_sample_size_return, list):
@@ -429,7 +429,7 @@ class DnExponential(pgm.DistributionPGM):
                 ("A \'scale_or_rate_param\' and \'rate_parameterization\' "
                  "must be specified."))
 
-    def _check_sample_size(self, param_list: ty.List[ty.Any] = []) \
+    def init_check_vectorize_sample_size(self, param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
         return pjh.verify_or_convert2_vector(
             param_list,
@@ -518,7 +518,7 @@ class DnGamma(pgm.DistributionPGM):
         #
         # one element per parameter
         check_sample_size_return = \
-            self._check_sample_size(
+            self.init_check_vectorize_sample_size(
                 [self.gamma_shape_param_arg,
                  self.gamma_scale_or_rate_param_arg])
         if isinstance(check_sample_size_return, list):
@@ -596,7 +596,7 @@ class DnGamma(pgm.DistributionPGM):
                 ("A \'shape_param\' and \'scale_or_rate_param\' "
                  "must be specified."))
 
-    def _check_sample_size(
+    def init_check_vectorize_sample_size(
         self,
         param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:
@@ -671,7 +671,7 @@ class DnUnif(pgm.DistributionPGM):
         #
         # one element per parameter
         check_sample_size_return = \
-            self._check_sample_size([self.min_param_arg, self.max_param_arg])
+            self.init_check_vectorize_sample_size([self.min_param_arg, self.max_param_arg])
 
         if isinstance(check_sample_size_return, list):
             self.vectorized_params = check_sample_size_return
@@ -741,7 +741,7 @@ class DnUnif(pgm.DistributionPGM):
                 ("A \'min_param\' and \'max_param\' must be specified. "
                  "Exiting..."))
 
-    def _check_sample_size(
+    def init_check_vectorize_sample_size(
         self,
         param_list: ty.List[ty.Any] = []) \
             -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]:

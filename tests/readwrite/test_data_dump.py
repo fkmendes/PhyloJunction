@@ -567,6 +567,6 @@ if __name__ == "__main__":
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.readwrite.test_data_dump.TestDataDump.test_bisse_data_dump
+    # $ python3.9 -m unittest tests.readwrite.test_data_dump.TestDataDump.test_bisse_data_dump_file_names
 
     unittest.main()
