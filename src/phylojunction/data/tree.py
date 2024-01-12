@@ -25,32 +25,41 @@ __email__ = "f.mendes@wustl.edu"
 
 class AnnotatedTree(dp.Tree):
 
-    with_origin: bool
-    origin_node: ty.Optional[dp.Node]  # can be None
-    origin_age: ty.Optional[float]  # can be None
-    root_node: ty.Optional[dp.Node]  # can be None
-    brosc_node: ty.Optional[dp.Node]  # can be None
-    root_age: ty.Optional[float]  # can be None
-    tree_read_as_newick_by_dendropy: bool
     tree: dp.Tree
-    state_count: int
-    seed_age: float
-    max_age: ty.Optional[float]
-    epsilon: float
+    tree_reconstructed: dp.Tree
+
+    # tree members #
+    origin_node: ty.Optional[dp.Node]
+    root_node: ty.Optional[dp.Node]
+    brosc_node: ty.Optional[dp.Node]
+
+    # flags
+    with_origin: bool
+    tree_read_as_newick_by_dendropy: bool
+    condition_on_obs_both_sides_root: bool  # applicable to rec tree
     tree_died: ty.Optional[bool]
     tree_invalid: ty.Optional[bool]
-    no_event: bool
+
+    # age related #
+    seed_age: float
+    max_age: ty.Optional[float]
+    origin_age: ty.Optional[float]
+    root_age: ty.Optional[float]  # can be None
+    node_heights_dict: ty.Dict[str, float]
+    node_ages_dict: ty.Dict[str, float]
+    slice_t_ends: ty.Optional[ty.List[float]]
+    slice_age_ends: ty.Optional[ty.List[float]]
+
+    # state related #
+    state_count: int
     state_count_dict: ty.Dict[int, int]
     alive_state_count_dict: ty.Dict[int, int]
     alive_sampled_state_count_dict: ty.Dict[int, int]
     dead_state_count_dict: ty.Dict[int, int]
     obs_count_dict: ty.Dict[int, int]
-    node_heights_dict: ty.Dict[str, float]
-    node_ages_dict: ty.Dict[str, float]
     # { node_name: { attr: value }}
+
     node_attr_dict: ty.Dict[str, ty.Dict[str, ty.Any]]
-    slice_t_ends: ty.List[ty.Optional[float]]
-    slice_age_ends: ty.Optional[ty.List[float]]  # can be None
     n_extant_terminal_nodes: int
     n_extinct_terminal_nodes: int
     n_extant_sampled_terminal_nodes: int
@@ -69,9 +78,8 @@ class AnnotatedTree(dp.Tree):
         ty.Optional[ty.Dict[
             str, ty.List[pjat.AttributeTransition]]]  # can be None
 
-    # rec tree #
-    tree_reconstructed: dp.Tree
-    condition_on_obs_both_sides_root: bool
+    # to deal with effectively zero floats
+    epsilon: float
 
     def __init__(
             self,
@@ -93,19 +101,45 @@ class AnnotatedTree(dp.Tree):
             read_as_newick_string: bool = False,
             epsilon: float = 1e-12):
 
+        # trees
+        self.tree = a_tree
+        self.tree_reconstructed = None
+
+        # check if simulated, or specified by user
+        self.tree_read_as_newick_by_dendropy = read_as_newick_string
+        # but if simulated, nodes must have .alive member, if not,
+        # we update flag member
+        if hasattr(self.tree.seed_node, "alive"):
+            self.tree.seed_node.alive
+
+        else:
+            self.tree_read_as_newick_by_dendropy = True
+        
+        # initializing tree members
         self.origin_node = None
         self.root_node = None
         self.brosc_node = None
-        self.tree_read_as_newick_by_dendropy = read_as_newick_string
-        self.no_event = True
 
-        # some initial tree specs
-        self.tree = a_tree
-        self.tree_reconstructed = None
+        # flags
         self.with_origin = start_at_origin
         self.tree_died = tree_died
+        self.condition_on_obs_both_sides_root = \
+            condition_on_obs_both_sides_root
+        # rejection sampling when stop condition is age
+        self.tree_invalid = tree_invalid
+        if not isinstance(self.tree_invalid, bool):
+            # (if flag not passed, we assume tree is valid)
+            self.tree_invalid = False
 
-        # state-related
+        # age related
+        self.seed_age = self.tree.max_distance_from_root()
+        self.max_age = max_age
+        self.node_heights_dict = dict()
+        self.node_ages_dict = dict()
+        self.slice_t_ends = slice_t_ends
+        self.slice_age_ends = slice_age_ends
+
+        # state related
         self.state_count = total_state_count
         self.state_count_dict = \
             dict((int(s), 0) for s in range(self.state_count))
@@ -132,42 +166,12 @@ class AnnotatedTree(dp.Tree):
             collections.defaultdict(
                 pjh.create_str_defaultdict)  # this one can be pickled
 
-        # age related
-        self.seed_age = self.tree.max_distance_from_root()
-        self.max_age = max_age
-        self.node_heights_dict: ty.Dict[str, float] = dict()
-        self.node_ages_dict: ty.Dict[str, float] = dict()
-        self.slice_t_ends = slice_t_ends
-        self.slice_age_ends = slice_age_ends
-
-        # reconstructed tree
-        self.condition_on_obs_both_sides_root = condition_on_obs_both_sides_root
-
-        # rejection sampling when stop condition
-        # is age
-        self.tree_invalid = tree_invalid
-        if not isinstance(self.tree_invalid, bool):
-            # (if flag not passed, we assume tree is valid)
-            self.tree_invalid = False
-
         # for plotting
         self.sa_lineage_dict = sa_lineage_dict
         self.at_dict = at_dict
-        
-        # debugging
-        # will print info about events and their timing
-        # if self.at_dict is not None:
-        #     for nd, at_list in self.at_dict.items():
-        #         print(nd + "\n    " + "\n".join(str(at) for at in at_list))
 
         # other
         self.epsilon = epsilon
-
-        if hasattr(self.tree.seed_node, "alive"):
-            self.tree.seed_node.alive
-
-        else:
-            self.tree_read_as_newick_by_dendropy = True
 
         #           Initializing important class members            #
         # (1) origin_age                                            #
@@ -219,8 +223,6 @@ class AnnotatedTree(dp.Tree):
             # Case (b): at least one event took place (root may or not have been born)
             # and tree may or not have died
             elif len(origin_children) > 1:
-                self.no_event = False
-
                 # Case (b.1) There is a root
                 #
                 # [origin] --- [root + children] ............. [stop condition] (died)

@@ -1248,7 +1248,7 @@ class DiscreteStateDependentProbabilityHandler():
     n_time_slices: int
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
-    slice_t_ends: ty.List[ty.Optional[float]]
+    slice_t_ends: ty.Optional[ty.List[float]]
     str_representation: str
 
     def __init__(

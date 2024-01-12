@@ -196,7 +196,7 @@ def make_discrete_SSE_dn(
 
     # making sure essential parameters of distribution have been specified
     if not any(stash.get_meh()
-               .state_dep_rate_manager
+               .sse_rate_manager
                .matrix_state_dep_params):
         raise ec.ParseMissingArgumentError("stash")
 
