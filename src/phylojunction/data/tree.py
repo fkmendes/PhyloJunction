@@ -1247,9 +1247,6 @@ class AnnotatedTree(dp.Tree):
                     if att in attrs_of_interest_list:
                         self.node_attr_dict[nd.label][att] = att_val
 
-
-        # self.node_attr_dict
-
     def __str__(self) -> str:
         return self.tree.as_string(
             schema="newick",
@@ -1258,7 +1255,7 @@ class AnnotatedTree(dp.Tree):
 
     def plot_node(self,
                   axes: plt.Axes,
-                  node_attr: ty.Optional[str] = None,
+                  node_attr: str = "state",
                   **kwargs) -> None:
 
         if not node_attr:
@@ -1467,12 +1464,16 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                   axes: plt.Axes,
                   use_age: bool = False,
                   start_at_origin: bool = False,
-                  attr_of_interest: str = None,
+                  attr_of_interest: str = "state",
                   sa_along_branches: bool = True) -> None:
 
     color_map: ty.Dict[int, str]
-    if attr_of_interest not in ann_tr.node_attr_dict:
+    attr_found: bool = True
+    if attr_of_interest not in \
+        ann_tr.node_attr_dict[ann_tr.tree.seed_node.label]:
         color_map = get_color_map(1)
+        attr_found = False
+
     else:
         color_map = get_color_map(ann_tr.state_count)
 
@@ -1799,10 +1800,9 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     # call #
     ########
     color = "black"
-    if attr_of_interest and \
-        attr_of_interest in \
-            ann_tr.node_attr_dict[ann_tr.tree.seed_node.label]:
-        attr_idx = ann_tr.node_attr_dict[ann_tr.tree.seed_node.label][attr_of_interest]
+    if attr_of_interest and attr_found:
+        attr_idx = ann_tr.node_attr_dict[ann_tr.tree.seed_node.label] \
+            [attr_of_interest]
         color = color_map[attr_idx]
 
     _draw_clade(ann_tr.tree.seed_node, 0, color, plt.rcParams["lines.linewidth"], use_age, start_at_origin)

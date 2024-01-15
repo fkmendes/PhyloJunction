@@ -539,7 +539,7 @@ class StochasticNodePGM(NodePGM):
                   sample_idx: ty.Optional[int] = None,
                   repl_idx: int = 0,
                   repl_size: int = 1,
-                  branch_attr: ty.Optional[str] = "state") -> None:
+                  branch_attr: str = "state") -> None:
         """_summary_
 
         Args:
