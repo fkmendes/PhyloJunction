@@ -713,27 +713,40 @@ class DAGCannotAddNodeError(Exception):
 
 
 # Tree exceptions #
-class AnnotatedTreeMisspec(Exception):
+class AnnotatedTreeNodeMisspecError(Exception):
     message: str
 
-    def __init__(self, message) -> None:
-        self.message = message
+    def __init__(self, message: str) -> None:
+        self.message = ("Could not initialize AnnotatedTree because one of "
+                        "its arguments was misspecified. ") + message
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "ERROR: Misspecified AnnotatedTree input. " + self.message
+        return self.message
 
 
-class AnnotatedTreeLineageMissannotation(Exception):
+class AnnotatedTreeIncorrectAnnotationError(Exception):
     message: str
 
-    def __init__(self, message) -> None:
-        self.message = message
+    def __init__(self, message: str) -> None:
+        self.message = ("Some aspect of the tree annotation was wrong. ") \
+            + message
         super().__init__(self.message)
 
     def __str__(self) -> str:
-        return "ERROR: AnnotatedTree cannot be annotated this way. " \
-            + self.message
+        return self.message
+
+
+class AnnotatedTreeNodeMissingAttrError(Exception):
+    message: str
+
+    def __init__(self, nd_name: str, attr_name: str, message: str) -> None:
+        self.message = "Node " + nd_name + " did not have attribute " \
+            + attr_name + ". " + message
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
 
 
 # Generation exceptions #

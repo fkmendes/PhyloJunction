@@ -5,11 +5,15 @@ from dendropy import Tree, Node, Taxon
 import phylojunction.data.tree as pjtr
 import phylojunction.data.sampled_ancestor as pjsa
 
+__author__ = "Fabio K. Mendes"
+__email__ = "f.mendes@wustl.edu"
+
+
 class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
     def test_node_counting_oneSA_no_spn_survives_max_age(self):
         """
-        Test counting of extant, extinct and SA nodes
+        Test counting of extant, extinct and SA nodes.
 
         Tree: origin + SA then survive until with and without max_age
         Note that the way "execute_sample_ancestor" is implemented, when this event happens before a
@@ -27,14 +31,20 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         To see it on icytree: ((sa1:0.0,brosc:1.0)dummy1:1.0)origin:0.0;
         """
         
-        origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node = Node(taxon=Taxon(label="origin"),
+                           label="origin",
+                           edge_length=0.0)
+        origin_node.state = 0
         origin_node.alive = False
         origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
-        dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
+        dummy_node = Node(taxon=Taxon(label="dummy1"),
+                          label="dummy1",
+                          edge_length=1.0)
+        dummy_node.state = 0
         dummy_node.alive = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
@@ -42,7 +52,10 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         origin_node.add_child(dummy_node)
         
         # right child of dummy_node
-        sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
+        sa_node = Node(taxon=Taxon(label="sa1"),
+                       label="sa1",
+                       edge_length=0.0)
+        sa_node.state = 0
         sa_node.alive = False
         sa_node.sampled = False
         sa_node.is_sa = True
@@ -50,7 +63,10 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         sa_node.is_sa_lineage = False
 
         # left child of dummy node
-        brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
+        brosc_node = Node(taxon=Taxon(label="brosc"),
+                          label="brosc",
+                          edge_length=1.0)
+        brosc_node.state = 0
         brosc_node.alive = True
         brosc_node.sampled = True
         brosc_node.is_sa = False
@@ -66,15 +82,15 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         tr_sa_no_spn_survives.taxon_namespace.add_taxon(sa_node.taxon)
         tr_sa_no_spn_survives.taxon_namespace.add_taxon(brosc_node.taxon)       
 
-        # debugging
-        # print("tr_sa_no_spn_survives.seed_age = " + str(tr_sa_no_spn_survives.max_distance_from_root()))
-        # print(tr_sa_no_spn_survives.as_string(schema="newick"))
-
         total_state_count = 1
 
         sa_global_time = 1.0
         time_to_sa_lineage_node = 1.0
-        sa = pjsa.SampledAncestor("sa1", "brosc", sa_global_time, time_to_lineage_node=time_to_sa_lineage_node)
+        sa = pjsa.SampledAncestor(
+            "sa1",
+            "brosc",
+            sa_global_time,
+            time_to_lineage_node=time_to_sa_lineage_node)
         sa_lineage_dict = { "brosc": [sa] }
         
         max_age = 2.0
@@ -87,16 +103,32 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_no_spn_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_survives_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
-        self.assertEqual(ann_tr_sa_no_spn_survives_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_survives_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_max_age.n_extant_terminal_nodes,
+            1,
+            "Count of terminal extant nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_max_age.n_extinct_terminal_nodes,
+            0,
+            "Count of terminal extinct nodes should be 0.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_max_age.n_sa_nodes,
+            1,
+            "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_max_age.origin_edge_length,
+            2.0,
+            "Length of origin edge should be 2.0.")
 
         tr_sa_no_spn_survives_no_max_age = Tree(seed_node=origin_node)
-        tr_sa_no_spn_survives_no_max_age.taxon_namespace.add_taxon(origin_node.taxon)
-        tr_sa_no_spn_survives_no_max_age.taxon_namespace.add_taxon(dummy_node.taxon)
-        tr_sa_no_spn_survives_no_max_age.taxon_namespace.add_taxon(sa_node.taxon)
-        tr_sa_no_spn_survives_no_max_age.taxon_namespace.add_taxon(brosc_node.taxon)
+        tr_sa_no_spn_survives_no_max_age.taxon_namespace.\
+            add_taxon(origin_node.taxon)
+        tr_sa_no_spn_survives_no_max_age.taxon_namespace.\
+            add_taxon(dummy_node.taxon)
+        tr_sa_no_spn_survives_no_max_age.taxon_namespace.\
+            add_taxon(sa_node.taxon)
+        tr_sa_no_spn_survives_no_max_age.taxon_namespace.\
+            add_taxon(brosc_node.taxon)
 
         ann_tr_sa_no_spn_survives_no_max_age = pjtr.AnnotatedTree(
             tr_sa_no_spn_survives_no_max_age,
@@ -105,10 +137,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
-        self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_survives_no_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_no_max_age.n_extant_terminal_nodes,
+            1,
+            "Count of terminal extant nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_no_max_age.n_extinct_terminal_nodes,
+            0,
+            "Count of terminal extinct nodes should be 0.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_no_max_age.n_sa_nodes,
+            1,
+            "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_survives_no_max_age.origin_edge_length,
+            2.0,
+            "Length of origin edge should be 2.0.")
 
 
     def test_node_counting_twoSAs_no_spn_survives(self):
@@ -135,6 +179,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         """
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.state = 0
         origin_node.alive = False
         origin_node.sampled = True
         origin_node.is_sa = False
@@ -142,6 +187,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         origin_node.is_sa_lineage = False
 
         dummy_node1 = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=0.5)
+        dummy_node1.state = 0
         dummy_node1.alive = False
         dummy_node1.sampled = False
         dummy_node1.is_sa = False
@@ -151,6 +197,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         # right child of dummy_node1 
         sa_node1 = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
+        sa_node1.state = 0
         sa_node1.alive = False
         sa_node1.sampled = False
         sa_node1.is_sa = True
@@ -159,6 +206,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         # left child of dummy_node1
         dummy_node2 = Node(taxon=Taxon(label="dummy2"), label="dummy2", edge_length=0.5)
+        dummy_node2.state = 0
         dummy_node2.alive = False
         dummy_node2.sampled = False
         dummy_node2.is_sa = False
@@ -169,6 +217,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         # right child of dummy_node2
         sa_node2 = Node(taxon=Taxon(label="sa2"), label="sa2", edge_length=0.0)
+        sa_node2.state = 0
         sa_node2.alive = False
         sa_node2.sampled = False
         sa_node2.is_sa = True
@@ -177,6 +226,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         # left child of dummy_node2
         brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
+        brosc_node.state = 0
         brosc_node.alive = True
         brosc_node.sampled = True
         brosc_node.is_sa = False
@@ -222,7 +272,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
-        self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
+        self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.n_sa_nodes, 2, "Count of sampled ancestor nodes should be 2.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
 
         tr_2sas_no_spn_survives_no_max_age = Tree(seed_node=origin_node)
@@ -242,7 +292,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_extinct_terminal_nodes, 0, "Count of terminal extinct nodes should be 0.")
-        self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
+        self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.n_sa_nodes, 2, "Count of sampled ancestor nodes should be 2.")
         self.assertEqual(ann_tr_2sas_no_spn_survives_no_max_age.origin_edge_length, 2.0, "Length of origin edge should be 2.0.")
 
 
@@ -269,13 +319,17 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         """
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.state = 0
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
+        dummy_node.state = 0
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         
@@ -283,14 +337,18 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
+        sa_node.state = 0
         sa_node.alive = False
+        sa_node.sampled = True
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
 
         # left child of dummy node
         brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=0.2)
+        brosc_node.state = 0
         brosc_node.alive = False
+        brosc_node.sampled = False
         brosc_node.is_sa = False
         brosc_node.is_sa_dummy_parent = False
         brosc_node.is_sa_lineage = True
@@ -312,7 +370,11 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         sa_global_time = 1.0
         time_to_sa_lineage_node = 0.2
-        sa = pjsa.SampledAncestor("sa1", "brosc", sa_global_time, time_to_lineage_node=time_to_sa_lineage_node)
+        sa = pjsa.SampledAncestor(
+            "sa1",
+            "brosc",
+            sa_global_time,
+            time_to_lineage_node=time_to_sa_lineage_node)
         sa_lineage_dict = { "brosc": [sa] }
         
         max_age = 2.0
@@ -325,10 +387,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_no_spn_dies_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
-        self.assertEqual(ann_tr_sa_no_spn_dies_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_dies_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_dies_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_max_age.n_extant_terminal_nodes,
+            0,
+            "Count of terminal extant nodes should be 0.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_max_age.n_extinct_terminal_nodes,
+            1,
+            "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_max_age.n_sa_nodes,
+            1,
+            "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_max_age.origin_edge_length,
+            1.2,
+            "Length of origin edge should be 1.2.")
 
         tr_sa_no_spn_dies_no_max_age = Tree(seed_node=origin_node)
         tr_sa_no_spn_dies_no_max_age.taxon_namespace.add_taxon(origin_node.taxon)
@@ -343,10 +417,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
-        self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-        self.assertEqual(ann_tr_sa_no_spn_dies_no_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_no_max_age.n_extant_terminal_nodes,
+            0,
+            "Count of terminal extant nodes should be 0.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_no_max_age.n_extinct_terminal_nodes,
+            1,
+            "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_no_max_age.n_sa_nodes,
+            1,
+            "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_no_spn_dies_no_max_age.origin_edge_length,
+            1.2,
+            "Length of origin edge should be 1.2.")
 
 
     def test_node_counting_twoSAs_no_spn_dies(self):
@@ -373,13 +459,17 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         """
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.state = 0
         origin_node.alive = False
+        origin_node.sampled = False
         origin_node.is_sa = False
         origin_node.is_sa_dummy_parent = False
         origin_node.is_sa_lineage = False
 
         dummy_node1 = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=0.5)
+        dummy_node1.state = 0
         dummy_node1.alive = False
+        dummy_node1.sampled = False
         dummy_node1.is_sa = False
         dummy_node1.is_sa_dummy_parent = True
         
@@ -387,14 +477,18 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         # right child of dummy_node1 
         sa_node1 = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
+        sa_node1.state = 0
         sa_node1.alive = False
+        sa_node1.sampled = True
         sa_node1.is_sa = True
         sa_node1.is_sa_dummy_parent = False
         sa_node1.is_sa_lineage = False
 
         # left child of dummy_node1
         dummy_node2 = Node(taxon=Taxon(label="dummy2"), label="dummy2", edge_length=0.5)
+        dummy_node2.state = 0
         dummy_node2.alive = False
+        dummy_node2.sampled = False
         dummy_node2.is_sa = False
         dummy_node2.is_sa_dummy_parent = True
 
@@ -403,14 +497,18 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         # right child of dummy_node2
         sa_node2 = Node(taxon=Taxon(label="sa2"), label="sa2", edge_length=0.0)
+        sa_node2.state = 0
         sa_node2.alive = False
+        sa_node2.sampled = True
         sa_node2.is_sa = True
         sa_node2.is_sa_dummy_parent = False
         sa_node2.is_sa_lineage = False
 
         # left child of dummy_node2
         brosc_node = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=0.2)
+        brosc_node.state = 0
         brosc_node.alive = False
+        brosc_node.sampled = False
         brosc_node.is_sa = False
         brosc_node.is_sa_dummy_parent = False
         brosc_node.is_sa_lineage = True
@@ -433,11 +531,19 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         sa1_global_time = 0.5
         time_to_sa1_lineage_node = 0.5
-        sa1 = pjsa.SampledAncestor("sa1", "dummy_node2", sa1_global_time, time_to_lineage_node=time_to_sa1_lineage_node)
+        sa1 = pjsa.SampledAncestor(
+            "sa1",
+            "dummy_node2",
+            sa1_global_time,
+            time_to_lineage_node=time_to_sa1_lineage_node)
 
         sa2_global_time = 1.0
         time_to_sa2_lineage_node = 0.5
-        sa2 = pjsa.SampledAncestor("sa2", "brosc", sa2_global_time, time_to_lineage_node=time_to_sa2_lineage_node)
+        sa2 = pjsa.SampledAncestor(
+            "sa2",
+            "brosc",
+            sa2_global_time,
+            time_to_lineage_node=time_to_sa2_lineage_node)
 
         sa_lineage_dict = { "brosc": [sa1, sa2] }
         
@@ -451,10 +557,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
-        self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
-        self.assertEqual(ann_tr_2sas_no_spn_dies_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_max_age.n_extant_terminal_nodes,
+            0,
+            "Count of terminal extant nodes should be 0.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_max_age.n_extinct_terminal_nodes,
+            1,
+            "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_max_age.n_sa_nodes,
+            2,
+            "Count of sampled ancestor nodes should be 2.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_max_age.origin_edge_length,
+            1.2,
+            "Length of origin edge should be 1.2.")
 
         tr_2sas_no_spn_dies_no_max_age = Tree(seed_node=origin_node)
         tr_2sas_no_spn_dies_no_max_age.taxon_namespace.add_taxon(origin_node.taxon)
@@ -470,10 +588,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.n_extant_terminal_nodes, 0, "Count of terminal extant nodes should be 0.")
-        self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.n_sa, 2, "Count of sampled ancestor nodes should be 2.")
-        self.assertEqual(ann_tr_2sas_no_spn_dies_no_max_age.origin_edge_length, 1.2, "Length of origin edge should be 1.2.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_no_max_age.n_extant_terminal_nodes,
+            0,
+            "Count of terminal extant nodes should be 0.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_no_max_age.n_extinct_terminal_nodes,
+            1,
+            "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_no_max_age.n_sa_nodes,
+            2,
+            "Count of sampled ancestor nodes should be 2.")
+        self.assertEqual(
+            ann_tr_2sas_no_spn_dies_no_max_age.origin_edge_length,
+            1.2,
+            "Length of origin edge should be 1.2.")
 
 
     def test_node_counting_oneSA_with_root_survives(self):
@@ -500,6 +630,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         """
         
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.state = 0
         origin_node.alive = False
         origin_node.sampled = False
         origin_node.is_sa = False
@@ -507,6 +638,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         origin_node.is_sa_lineage = False
 
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
+        dummy_node.state = 0
         dummy_node.alive = False
         dummy_node.sampled = False
         dummy_node.is_sa = False
@@ -516,6 +648,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
+        sa_node.state = 0
         sa_node.alive = False
         sa_node.sampled = False
         sa_node.is_sa = True
@@ -524,6 +657,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         # left child of dummy node
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.5)
+        root_node.state = 0
         root_node.alive = False
         root_node.sampled = False
         root_node.is_sa = False
@@ -535,6 +669,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.25)
+        extant_sp1.state = 0
         extant_sp1.alive = False
         extant_sp1.sampled = False
         extant_sp1.is_sa = False
@@ -543,6 +678,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
 
         # right child of root node
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=0.5)
+        extant_sp2.state = 0
         extant_sp2.alive = True
         extant_sp2.sampled = True
         extant_sp2.is_sa = False
@@ -570,7 +706,11 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
         time_to_sa_lineage_node = 0.5
         # TODO: when birth-event happens on brosc_node and it gets swapped with a root node,
         # we need to update the SAs older than the root to have "root" as their lineage nodes
-        sa = pjsa.SampledAncestor("sa1", "root", sa_global_time, time_to_lineage_node=time_to_sa_lineage_node)
+        sa = pjsa.SampledAncestor(
+            "sa1",
+            "root",
+            sa_global_time,
+            time_to_lineage_node=time_to_sa_lineage_node)
         sa_lineage_dict = { "root": [sa] }
         
         max_age = 2.0
@@ -583,10 +723,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
-        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(ann_tr_sa_with_root_survives_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-        self.assertEqual(ann_tr_sa_with_root_survives_max_age.origin_edge_length, 1.5, "Length of origin edge should be 1.5.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_max_age.n_extant_terminal_nodes,
+            1,
+            "Count of terminal extant nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_max_age.n_extinct_terminal_nodes,
+            1,
+            "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_max_age.n_sa_nodes,
+            1,
+            "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_max_age.origin_edge_length,
+            1.5,
+            "Length of origin edge should be 1.5.")
 
         tr_sa_with_root_survives_no_max_age = Tree(seed_node=origin_node)
         tr_sa_with_root_survives_no_max_age.taxon_namespace.add_taxon(origin_node.taxon)
@@ -603,10 +755,22 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
             sa_lineage_dict=sa_lineage_dict,
             epsilon=1e-12)
 
-        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extant_terminal_nodes, 1, "Count of terminal extant nodes should be 1.")
-        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_extinct_terminal_nodes, 1, "Count of terminal extinct nodes should be 1.")
-        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.n_sa, 1, "Count of sampled ancestor nodes should be 1.")
-        self.assertEqual(ann_tr_sa_with_root_survives_no_max_age.origin_edge_length, 1.5, "Length of origin edge should be 1.5.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_no_max_age.n_extant_terminal_nodes,
+            1,
+            "Count of terminal extant nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_no_max_age.n_extinct_terminal_nodes,
+            1,
+            "Count of terminal extinct nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_no_max_age.n_sa_nodes,
+            1,
+            "Count of sampled ancestor nodes should be 1.")
+        self.assertEqual(
+            ann_tr_sa_with_root_survives_no_max_age.origin_edge_length,
+            1.5,
+            "Length of origin edge should be 1.5.")
 
         
 

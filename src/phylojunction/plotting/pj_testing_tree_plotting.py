@@ -51,6 +51,8 @@ if __name__ == "__main__":
             dp.dataio.newickreader.NewickReader.NewickReaderDuplicateTaxonError) as e:
         print(e)
     
+    print("ann_tr1.tree_read_as_newick", ann_tr1.tree_read_as_newick)
+
     # we will overwrite ann_tr1 current at_dict, which
     # is an empty dictionary at the moment
     at_dict = \

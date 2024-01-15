@@ -266,10 +266,11 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
         # (1) seed node (origin and/or root)
         if nd is dp_tr.seed_node:
+            nd.state = 0
             nd.is_sa_dummy_parent = False
             nd.is_sa = False
             nd.alive = False
-            nd.state = 0
+            nd.sampled = False
             
             if not with_attribute:
                 nd_name = ("origin" if is_origin else "root")
@@ -289,10 +290,11 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             # internal node
             if not nd.is_leaf():
                 # initial values
+                nd.state = 0
                 nd.is_sa_dummy_parent = False
                 nd.is_sa = False
                 nd.alive = False
-                nd.state = 0
+                nd.sampled = False
 
                 # seeing if origin child is root
                 # or the dummy parent of a sampled ancestor
@@ -313,16 +315,20 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
             if abs(nd.edge_length) <= epsilon:
                 nd.is_sa_dummy_parent = False
                 nd.is_sa = True
+                nd.sampled = True
 
             else:
                 nd.is_sa = False
+                nd.sampled = False
         
             # annotate node as alive or not
             if abs(nd.distance_from_root() - root_height) <= epsilon:
                 nd.alive = True
+                nd.sampled = True
 
             else:
                 nd.alive = False
+                nd.sampled = False
 
             # annotate as sa_lineage
             if nd.parent_node.is_sa_dummy_parent:
@@ -340,6 +346,8 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                 dp_tr.taxon_namespace.add_taxon(nd.taxon)
 
             if nd.is_leaf():
+                nd.state = 0
+
                 # if node_names_attribute is passed,
                 # we rename all taxa, including leaves
                 if with_attribute:
@@ -348,8 +356,6 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                 
                 else:
                     nd.label = nd.taxon.label
-                
-                nd.state = 0
 
             # # internal and no name provided
             # elif nd.taxon is None:                
@@ -410,10 +416,10 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
 
         nd = ann_tr.tree.find_node_with_label(nd_name)
         # set the attribute value
-        nd.__setattr__(attr_name, int(nd_attr_val))
+        nd.__setattr__(attr_name, nd_attr_val)
 
     ann_tr.populate_nd_attr_dict([attr_name],
-                                 read_as_newick_str = False)
+                                 attr_added_separately_from_tree=False)
         
         
     

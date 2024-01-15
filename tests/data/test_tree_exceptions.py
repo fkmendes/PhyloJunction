@@ -17,6 +17,7 @@ class TestTreeExceptions(unittest.TestCase):
         root_node = Node(
             taxon=Taxon(label="root"), label="root", edge_length=0.0
         )
+        root_node.state = 0
         root_node.alive = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
@@ -27,6 +28,7 @@ class TestTreeExceptions(unittest.TestCase):
         dummy_node = Node(
             taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0
         )
+        dummy_node.state = 0
         dummy_node.alive = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
@@ -36,6 +38,7 @@ class TestTreeExceptions(unittest.TestCase):
         int_node = Node(
             taxon=Taxon(label="nd1"), label="nd1", edge_length=0.75
         )
+        int_node.state = 0
         int_node.alive = False
         int_node.is_sa = False
         int_node.is_sa_dummy_parent = False
@@ -44,6 +47,7 @@ class TestTreeExceptions(unittest.TestCase):
         extinct_sp2 = Node(
             taxon=Taxon(label="sp2"), label="sp2", edge_length=0.8
             )
+        extinct_sp2.state = 0
         extinct_sp2.alive = False
         extinct_sp2.is_sa = False
         extinct_sp2.is_sa_dummy_parent = False
@@ -52,6 +56,7 @@ class TestTreeExceptions(unittest.TestCase):
         extant_sp3 = Node(
             taxon=Taxon(label="sp3"), label="sp3", edge_length=0.8
         )
+        extant_sp3.state = 0
         extant_sp3.alive = False
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
@@ -64,6 +69,7 @@ class TestTreeExceptions(unittest.TestCase):
         sa_node = Node(
             taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0
         )
+        sa_node.state = 0
         sa_node.alive = False
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
@@ -74,6 +80,7 @@ class TestTreeExceptions(unittest.TestCase):
         extant_sp1 = Node(
             taxon=Taxon(label="sp1"), label="sp1", edge_length=0.5
         )
+        extant_sp1.state = 0
         extant_sp1.alive = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
@@ -104,7 +111,7 @@ class TestTreeExceptions(unittest.TestCase):
         
         max_age = 2.0
 
-        with self.assertRaises(ec.AnnotatedTreeLineageMissannotation) as exc:
+        with self.assertRaises(ec.AnnotatedTreeIncorrectAnnotationError) as exc:
             ann_tr = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
@@ -114,9 +121,9 @@ class TestTreeExceptions(unittest.TestCase):
             epsilon=1e-12)
         
         self.assertEqual(str(exc.exception),
-            "ERROR: AnnotatedTree cannot be annotated this way. " \
-            + "Taxon had non-maximal age, but had '.alive == True'. " \
-            + "This is not allowed. Exiting...")
+            ("Some aspect of the tree annotation was wrong. Taxon had "
+             "non-maximal age, but had '.alive == True'. This is not "
+             "allowed. Exiting..."))
 
 
 if __name__ == "__main__":

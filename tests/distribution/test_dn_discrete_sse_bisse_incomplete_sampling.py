@@ -154,9 +154,9 @@ class TestBiSSEIncompleteSamplingTrees(unittest.TestCase):
         n1_ci_width_sampled_complete_list = list()
         for i, batch in enumerate(sim_batches_complete):
             approx_n0s_sampled_complete = \
-                [ann_tr.alive_state_count_dict[0] * 0.25 for ann_tr in batch]
+                [ann_tr.extant_terminal_state_count_dict[0] * 0.25 for ann_tr in batch]
             approx_n1s_sampled_complete = \
-                [ann_tr.alive_state_count_dict[1] * 0.75 for ann_tr in batch]
+                [ann_tr.extant_terminal_state_count_dict[1] * 0.75 for ann_tr in batch]
             
             mean_n0_sampled_complete = \
                 statistics.mean(approx_n0s_sampled_complete)
@@ -226,9 +226,9 @@ class TestBiSSEIncompleteSamplingTrees(unittest.TestCase):
         global_mean_n1 = 0.0
         for i, batch in enumerate(sim_batches_incomplete):
             approx_n0s_sampled_incomplete = \
-                [ann_tr.alive_sampled_state_count_dict[0] for ann_tr in batch]
+                [ann_tr.extant_terminal_sampled_state_count_dict[0] for ann_tr in batch]
             approx_n1s_sampled_incomplete = \
-                [ann_tr.alive_sampled_state_count_dict[1] for ann_tr in batch]
+                [ann_tr.extant_terminal_sampled_state_count_dict[1] for ann_tr in batch]
             
             mean_n0_sampled_incomplete = \
                 statistics.mean(approx_n0s_sampled_incomplete)

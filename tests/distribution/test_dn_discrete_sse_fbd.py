@@ -245,7 +245,7 @@ class TestFBDTrees(unittest.TestCase):
         global_mean_sa = 0.0
         global_mean_root_age = 0.0
         for i, batch in enumerate(sim_batches):
-            n_sas = [ann_tr.n_sa for ann_tr in batch]
+            n_sas = [ann_tr.n_sa_nodes for ann_tr in batch]
             root_ages = [ann_tr.root_age for ann_tr in batch]
 
             mean_sa = statistics.mean(n_sas)

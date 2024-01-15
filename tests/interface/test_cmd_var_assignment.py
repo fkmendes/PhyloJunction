@@ -179,8 +179,8 @@ class TestVarAssignment(unittest.TestCase):
                                           cmd_line1)
 
         expected_exception_message1 = \
-            ("Could not initialize the object of \'CtFnTreeReader\'. "
-             "Incorrect dimension of container \'string\', which was of "
+            ("Could not initialize the object of CtFnTreeReader. "
+             "Incorrect dimension of container string, which was of "
              "size 1. The expected dimension was 2.")
 
         self.assertEqual(str(exc.exception),
@@ -195,7 +195,7 @@ class TestVarAssignment(unittest.TestCase):
             re.split(cmdu.assign_regex, cmd_line2)
 
         expected_exception_message2 = \
-            ("Argument file_path cannot be specified at the same time as \'string\'.")
+            ("Argument file_path cannot be specified at the same time as 'string'.")
 
         with self.assertRaises(ec.ParseMutuallyExclusiveParametersError) as exc:
             cmd.parse_variable_assignment(pgm_obj,
@@ -221,8 +221,8 @@ class TestVarAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
 
         expected_exception_message1 = \
-            ("Could not initialize the object of \'CtFnTreeReader\'. "
-             "Incorrect dimension of container \'file_path\', which was of "
+            ("Could not initialize the object of CtFnTreeReader. "
+             "Incorrect dimension of container file_path, which was of "
              "size 1. The expected dimension was 13.")
 
         with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc:

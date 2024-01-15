@@ -1024,11 +1024,12 @@ class DnSSE(pgm.DistributionPGM):
             brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
                                  label="brosc",
                                  edge_length=event_t)
+            brosc_node.state = chosen_node.state
             brosc_node.alive = False
+            brosc_node.sampled = False
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = False
-            brosc_node.state = chosen_node.state
             untargetable_node_set.add(brosc_node.label)
             chosen_node.add_child(brosc_node)
             tr_namespace.add_taxon(brosc_node.taxon)
@@ -1114,11 +1115,12 @@ class DnSSE(pgm.DistributionPGM):
             brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
                                  label="brosc",
                                  edge_length=event_t)
+            brosc_node.state = chosen_node.state
             brosc_node.alive = True
+            brosc_node.sampled = True
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = False
-            brosc_node.state = chosen_node.state
             tr_namespace.add_taxon(brosc_node.taxon)
 
             # origin cannot be selected anymore
@@ -1225,12 +1227,12 @@ class DnSSE(pgm.DistributionPGM):
             brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
                                  label="brosc",
                                  edge_length=event_t)
+            brosc_node.state = chosen_node.state
             brosc_node.alive = True
             brosc_node.sampled = True
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = True
-            brosc_node.state = chosen_node.state
             brosc_node.annotations.add_bound_attribute("state")
             # this node is alive and can be selected
             state_representation_dict[chosen_node.state].add(brosc_node.label)
@@ -1437,7 +1439,8 @@ class DnSSE(pgm.DistributionPGM):
             self,
             a_time: float,
             living_nodes: ty.List[dp.Node],
-            sample_idx: int) -> None:
+            sample_idx: int,
+            single_node: ty.Optional[dp.Node] = None) -> None:
         """
         Annotate each living node as sampled or not.
         
@@ -1463,13 +1466,21 @@ class DnSSE(pgm.DistributionPGM):
             sample_idx (int): Index of current sample.
         """
 
-        for living_nd in living_nodes:
-            st = living_nd.state
+        if single_node is None:
+            for living_nd in living_nodes:
+                st = living_nd.state
+                is_sampled = self.sse_stash.get_prob_handler() \
+                    .randomly_decide_taxon_sampling_at_time_at_state(
+                        a_time, st, sample_idx)
+
+                living_nd.sampled = is_sampled
+        
+        else:
+            st = single_node.state
             is_sampled = self.sse_stash.get_prob_handler() \
                 .randomly_decide_taxon_sampling_at_time_at_state(
-                    a_time, st, sample_idx)
-
-            living_nd.sampled = is_sampled
+                        a_time, st, sample_idx)
+            single_node.sampled = is_sampled
 
     ##########################
     # Main simulation method #
@@ -1666,7 +1677,12 @@ class DnSSE(pgm.DistributionPGM):
                             len(tr.seed_node.child_nodes()) == 0:
                         # we make origin edge length the max age of the tree
                         brosc_node.edge_length = t_stop
+                        brosc_node.state = tr.seed_node.state
                         brosc_node.alive = True  # .sampled=True upon init
+                        self._annotate_sampled(t_stop,
+                                               [],
+                                               sample_idx,
+                                               brosc_node)
                         tr.seed_node.add_child(brosc_node)
                         tr.taxon_namespace.add_taxon(brosc_node.taxon)
 
@@ -1712,7 +1728,12 @@ class DnSSE(pgm.DistributionPGM):
                     if self.with_origin and tr.seed_node.alive and \
                             len(tr.seed_node.child_nodes()) == 0:
                         brosc_node.edge_length = t_stop
+                        brosc_node.state = tr.seed_node.state
                         brosc_node.alive = True  # sampled=True upon init
+                        self._annotate_sampled(t_stop,
+                                               [],
+                                               sample_idx,
+                                               brosc_node)
                         tr.seed_node.add_child(brosc_node)
                         tr.taxon_namespace.add_taxon(brosc_node.taxon)
 

@@ -14,6 +14,7 @@ class TestTreePrinting(unittest.TestCase):
         """
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node.state = 0
         origin_node.alive = False
         origin_node.sampled = False
         origin_node.is_sa = False
@@ -21,6 +22,7 @@ class TestTreePrinting(unittest.TestCase):
         origin_node.is_sa_lineage = False
 
         dummy_node = Node(taxon=Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
+        dummy_node.state = 0
         dummy_node.alive = False
         dummy_node.sampled = False
         dummy_node.is_sa = False
@@ -30,6 +32,7 @@ class TestTreePrinting(unittest.TestCase):
         
         # right child of dummy_node
         sa_node = Node(taxon=Taxon(label="sa1"), label="sa1", edge_length=0.0)
+        sa_node.state = 0
         sa_node.alive = False
         sa_node.sampled = False
         sa_node.is_sa = True
@@ -38,6 +41,7 @@ class TestTreePrinting(unittest.TestCase):
 
         # left child of dummy node
         root_node = Node(taxon=Taxon(label="root"), label="root", edge_length=0.5)
+        root_node.state = 0
         root_node.alive = False
         root_node.sampled = False
         root_node.is_sa = False
@@ -49,6 +53,7 @@ class TestTreePrinting(unittest.TestCase):
 
         # left child of root node
         extant_sp1 = Node(taxon=Taxon(label="sp1"), label="sp1", edge_length=0.25)
+        extant_sp1.state = 0
         extant_sp1.alive = False
         extant_sp1.sampled = False
         extant_sp1.is_sa = False
@@ -57,6 +62,7 @@ class TestTreePrinting(unittest.TestCase):
 
         # right child of root node
         extant_sp2 = Node(taxon=Taxon(label="sp2"), label="sp2", edge_length=0.5)
+        extant_sp2.state = 0
         extant_sp2.alive = True
         extant_sp2.sampled = True
         extant_sp2.is_sa = False

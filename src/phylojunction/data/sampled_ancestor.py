@@ -11,6 +11,7 @@ class SampledAncestor():
     lineage_node_label: str
     # SA's (forward) occurrence time (i.e., origin or root = 0.0)
     global_time: float
+    state: int
 
     # time to lineage node (node defining the branch on which the
     # SA is placed); this class member is filled out (if unfilled)
@@ -23,11 +24,13 @@ class SampledAncestor():
                  label: str,
                  lineage_node_label: str,
                  global_time: float,
+                 state: int = 0,
                  time_to_lineage_node: float = -1.0) -> None:
 
         self.label = label
         self.lineage_node_label = lineage_node_label
         self.global_time = global_time
+        self.state = state
         self.time_to_lineage_node = time_to_lineage_node
         self.str_representation = \
             "Sampled ancestor \'" + label + "\':\n    Branch: \'" \
