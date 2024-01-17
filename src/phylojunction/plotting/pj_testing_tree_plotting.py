@@ -77,7 +77,7 @@ if __name__ == "__main__":
         }
 
     ann_tr1.at_dict = at_dict
-    ann_tr1.populate_nd_attr_dict(["state"], read_as_newick_str=True)
+    ann_tr1.populate_nd_attr_dict(["state"], attr_added_separately_from_tree=True)
     
     fig = matplotlib.pyplot.figure()
 
@@ -117,6 +117,8 @@ if __name__ == "__main__":
             dp.dataio.newickreader.NewickReader.NewickReaderDuplicateTaxonError) as e:
         print(e)
 
+    # TODO: this function should take the type of the attribute value
+    # e.g., "int" for discrete states (so type conversion can be carried out)
     pjr.read_node_attr_update_tree(
         "examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
         "state",
@@ -124,6 +126,9 @@ if __name__ == "__main__":
     
     # for nd in ann_tr2.tree.nodes():
     #     print(nd.state)
+
+    # TODO: should update state_count to 3 in read_node_attr_update_tree
+    # print(ann_tr2.state_count)
 
     pjt.plot_ann_tree(
         ann_tr2,

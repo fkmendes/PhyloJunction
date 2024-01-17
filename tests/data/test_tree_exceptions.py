@@ -19,6 +19,7 @@ class TestTreeExceptions(unittest.TestCase):
         )
         root_node.state = 0
         root_node.alive = False
+        root_node.sampled = False
         root_node.is_sa = False
         root_node.is_sa_dummy_parent = False
         root_node.is_sa_lineage = False
@@ -30,6 +31,7 @@ class TestTreeExceptions(unittest.TestCase):
         )
         dummy_node.state = 0
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         dummy_node.is_sa_lineage = False
@@ -40,6 +42,7 @@ class TestTreeExceptions(unittest.TestCase):
         )
         int_node.state = 0
         int_node.alive = False
+        int_node.sampled = False
         int_node.is_sa = False
         int_node.is_sa_dummy_parent = False
         int_node.is_sa_lineage = False
@@ -49,6 +52,7 @@ class TestTreeExceptions(unittest.TestCase):
             )
         extinct_sp2.state = 0
         extinct_sp2.alive = False
+        extinct_sp2.sampled = False
         extinct_sp2.is_sa = False
         extinct_sp2.is_sa_dummy_parent = False
         extinct_sp2.is_sa_lineage = False
@@ -58,6 +62,7 @@ class TestTreeExceptions(unittest.TestCase):
         )
         extant_sp3.state = 0
         extant_sp3.alive = False
+        extant_sp3.sampled = False
         extant_sp3.is_sa = False
         extant_sp3.is_sa_dummy_parent = False
         extant_sp3.is_sa_lineage = False
@@ -71,6 +76,7 @@ class TestTreeExceptions(unittest.TestCase):
         )
         sa_node.state = 0
         sa_node.alive = False
+        sa_node.sampled = True
         sa_node.is_sa = True
         sa_node.is_sa_dummy_parent = False
         sa_node.is_sa_lineage = False
@@ -82,6 +88,7 @@ class TestTreeExceptions(unittest.TestCase):
         )
         extant_sp1.state = 0
         extant_sp1.alive = True
+        extant_sp1.sampled = True
         extant_sp1.is_sa = False
         extant_sp1.is_sa_dummy_parent = False
         extant_sp1.is_sa_lineage = False
@@ -144,15 +151,15 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/data/test_tree_exceptions.py
+    # $ python3.9 tests/data/test_tree_exceptions.py
     # 
     # or
     #
-    # $ python3 -m tests.data.test_tree_exceptions
+    # $ python3.9 -m tests.data.test_tree_exceptions
     #
     # or 
     #
-    # $ python3 -m unittest tests.data.test_tree_exceptions.TestTreeExceptions.test_alive_annotation_exceptions
+    # $ python3.9 -m unittest tests.data.test_tree_exceptions.TestTreeExceptions.test_alive_annotation_exceptions
 
     unittest.main()
         

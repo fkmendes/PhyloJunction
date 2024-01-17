@@ -46,6 +46,7 @@ class TestAnnotateTreeWithSAsFromOrigin(unittest.TestCase):
                           edge_length=1.0)
         dummy_node.state = 0
         dummy_node.alive = False
+        dummy_node.sampled = False
         dummy_node.is_sa = False
         dummy_node.is_sa_dummy_parent = True
         

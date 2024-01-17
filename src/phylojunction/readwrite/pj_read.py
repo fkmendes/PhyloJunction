@@ -400,7 +400,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 def read_node_attr_update_tree(attr_tsv_fp: str,
                                attr_name: str,
                                ann_tr: AnnotatedTree) -> None:
-    
+
     node_name_attr_str_list = read_text_file(attr_tsv_fp)
     ann_tr_nd_names = \
         set([nd.label for nd in ann_tr.tree.taxon_namespace])
@@ -416,7 +416,7 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
 
         nd = ann_tr.tree.find_node_with_label(nd_name)
         # set the attribute value
-        nd.__setattr__(attr_name, nd_attr_val)
+        nd.__setattr__(attr_name, int(nd_attr_val))
 
     ann_tr.populate_nd_attr_dict([attr_name],
                                  attr_added_separately_from_tree=False)

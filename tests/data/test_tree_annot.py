@@ -26,10 +26,12 @@ class TestAnnotateTree(unittest.TestCase):
         #
         # TODO: replace this one with an origin node that is alive and no root
         origin_node1 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node1.state = 0
         origin_node1.alive = False
         origin_node1.sampled = False
         origin_node1.is_sa = False
         brosc_node1 = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=1.0)
+        brosc_node1.state = 0
         brosc_node1.alive = True
         brosc_node1.sampled = True
         brosc_node1.is_sa = False
@@ -43,10 +45,12 @@ class TestAnnotateTree(unittest.TestCase):
         # has an edge length < max age (need to add code that sets that edge length
         # correctly)
         origin_node2 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node2.state = 0
         origin_node2.alive = False
         origin_node2.sampled = False
         origin_node2.is_sa = False
         brosc_node2 = Node(taxon=Taxon(label="brosc"), label="brosc", edge_length=0.5)
+        brosc_node2.state = 0
         brosc_node2.alive = False
         brosc_node2.sampled = False
         brosc_node2.is_sa = False
@@ -66,27 +70,27 @@ class TestAnnotateTree(unittest.TestCase):
 
         # for testing the parsing of states into AnnotatedTree member dictionary
         origin_node3 = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
+        origin_node3.state = 0
         origin_node3.alive = False
         origin_node3.sampled = False
         origin_node3.is_sa = False
-        origin_node3.state = 0
         root_node3 = Node(taxon=Taxon(label="root"), label="root", edge_length=0.5)
+        root_node3.state = 0
         root_node3.alive = False
         root_node3.sampled = False
         root_node3.is_sa = False
-        root_node3.state = 0
         origin_node3.add_child(root_node3)
         child_left = Node(taxon=Taxon(label="nd1"), label="nd1", edge_length=1.0)
+        child_left.state = 0
         child_left.alive = True
         child_left.sampled = True
         child_left.is_sa = False
-        child_left.state = 0
         root_node3.add_child(child_left)
         child_right = Node(taxon=Taxon(label="nd2"), label="nd2", edge_length=1.0)
+        child_right.state = 1
         child_right.alive = True
         child_right.sampled = True
         child_right.is_sa = False
-        child_right.state = 1
         root_node3.add_child(child_right)
         bif_tr_two_states = Tree(seed_node=origin_node3)
 

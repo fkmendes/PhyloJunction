@@ -533,9 +533,9 @@ class TestGeoSSETrees(unittest.TestCase):
 
             # note that we're matching diversitree's state coding:
             # 0=AB, 1=A, 2=B
-            n3s = [ann_tr.extant_state_count_dict[0] for ann_tr in batch]
-            n1s = [ann_tr.extant_state_count_dict[1] for ann_tr in batch]
-            n2s = [ann_tr.extant_state_count_dict[2] for ann_tr in batch]
+            n3s = [ann_tr.extant_terminal_state_count_dict[0] for ann_tr in batch]
+            n1s = [ann_tr.extant_terminal_state_count_dict[1] for ann_tr in batch]
+            n2s = [ann_tr.extant_terminal_state_count_dict[2] for ann_tr in batch]
             rec_root_ages = list()
             for rec_tr in rec_trs:
                 rec_root_ages.append(rec_tr.max_distance_from_root())

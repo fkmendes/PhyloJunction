@@ -713,7 +713,7 @@ class DAGCannotAddNodeError(Exception):
 
 
 # Tree exceptions #
-class AnnotatedTreeNodeMisspecError(Exception):
+class AnnotatedTreeMisspecError(Exception):
     message: str
 
     def __init__(self, message: str) -> None:
@@ -745,6 +745,17 @@ class AnnotatedTreeNodeMissingAttrError(Exception):
             + attr_name + ". " + message
         super().__init__(self.message)
 
+    def __str__(self) -> str:
+        return self.message
+
+
+class AnnotatedTreeMissingNodeName(Exception):
+    message: str
+
+    def __init__(self) -> None:
+        self.message = "Could not find the name of a node."
+        super().__init__(self.message)
+    
     def __str__(self) -> str:
         return self.message
 

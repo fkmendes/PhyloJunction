@@ -463,13 +463,13 @@ def prep_data_df(
                     # conservative: should match n_extant + n_extinct!
                     tree_summary_df_dict[rv_name].at[idx, "n_total"] = \
                         len(replicate_tree.tree.leaf_nodes()) \
-                        - replicate_tree.n_sa
+                        - replicate_tree.n_sa_nodes
                     tree_summary_df_dict[rv_name].at[idx, "n_extant"] = \
                         replicate_tree.n_extant_terminal_nodes
                     tree_summary_df_dict[rv_name].at[idx, "n_extinct"] = \
                         replicate_tree.n_extinct_terminal_nodes
                     tree_summary_df_dict[rv_name].at[idx, "n_sa"] = \
-                        replicate_tree.n_sa
+                        replicate_tree.n_sa_nodes
 
                     # if we have more than one state, we will have counts
                     # for leaves in the different states

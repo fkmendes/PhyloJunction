@@ -1252,6 +1252,7 @@ class DnSSE(pgm.DistributionPGM):
 
         # doing lineage that remains alive
         parent_label = chosen_node.label  # (parent's label will change below)
+        parent_state = chosen_node.state
         left_child = dp.Node(taxon=dp.Taxon(label=parent_label),
                              label=parent_label,
                              edge_length=0.0)
@@ -1293,7 +1294,7 @@ class DnSSE(pgm.DistributionPGM):
         # to class member that stashes it, or initializing #
         # class member                                     #
         ####################################################
-        sa = SampledAncestor(right_label, parent_label, event_t)
+        sa = SampledAncestor(right_label, parent_label, event_t, parent_state)
         try:
             sa_lineage_dict[parent_label].append(sa)
 
