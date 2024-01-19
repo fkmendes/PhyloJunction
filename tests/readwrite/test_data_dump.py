@@ -173,7 +173,7 @@ class TestDataDump(unittest.TestCase):
         cls.tree_internal_nd_states_str_dict = cls.tree_output_stash 
 
     def test_bisse_data_dump_file_names(self):
-        """Test if file names are correct"""
+        """Test output file names."""
 
         self.assertEqual(
             [
@@ -209,7 +209,7 @@ class TestDataDump(unittest.TestCase):
         )
 
     def test_bisse_data_dump_scalar_val_table(self):
-        """Test if content of scalar variables value tables is correct"""
+        """Test scalar variables values."""
 
         # writing to file handle
         scalar_constant_df_outfile = io.StringIO()
@@ -241,7 +241,7 @@ class TestDataDump(unittest.TestCase):
         )
 
     def test_bisse_data_dump_scalar_summary_table(self):
-        """Test if content of scalar variables summary tables is correct"""
+        """Test scalar variables summary."""
 
         # writing to file handle
         scalar_repl_summary_df_outfile = io.StringIO()
@@ -263,7 +263,7 @@ class TestDataDump(unittest.TestCase):
         self.assertEqual(csvstring_dump_scalar_repl_summary_df_outfile, "")
 
     def test_bisse_data_dump_tree_val_table(self):
-        """Test if content of tree value tables is correct"""
+        """Test tree values."""
 
         # writing to file handle
         tree_value_df_dict_outfile = io.StringIO()
@@ -312,7 +312,7 @@ class TestDataDump(unittest.TestCase):
         )
        
     def test_bisse_data_dump_rec_tree_val_table(self):
-        """Test if content of reconstructed tree value tables is correct"""
+        """Test rec. tree values."""
 
         # writing to file handle
         tree_rec_value_df_dict_outfile = io.StringIO()
@@ -355,7 +355,7 @@ class TestDataDump(unittest.TestCase):
         )
 
     def test_bisse_data_dump_ann_tree_val_table(self):
-        """Test if content of annotated tree value tables is correct"""
+        """Test annotated tree values."""
 
         # writing to file handle
         tree_ann_value_df_dict_outfile = io.StringIO()
@@ -383,10 +383,7 @@ class TestDataDump(unittest.TestCase):
         )    
 
     def test_bisse_data_dump_rec_ann_tree_val_table(self):
-        """
-        Test if content of reconstructed annotated tree value tables
-        is correct
-        """
+        """Test rec. ann. tree values."""
 
         # writing to file handle
         tree_rec_ann_value_df_dict_outfile = io.StringIO()
@@ -417,7 +414,7 @@ class TestDataDump(unittest.TestCase):
         # print(csvstring_dump_tree_rec_ann_value_df_dict_list[0])
 
     def test_bisse_data_dump_tree_summary_table(self):
-        """Test if content of tree summary is correct"""
+        """Test tree summary."""
 
         # writing to file handle
         tree_summary_df_dict_outfile = io.StringIO()
@@ -445,7 +442,7 @@ class TestDataDump(unittest.TestCase):
         )
 
     def test_bisse_data_dump_tree_repl_summary_table(self):
-        """Test if content of tree replicate summary table is correct"""
+        """Test tree replicate summary."""
         
         # writing to file handle
         tree_repl_summary_df_dict_outfile = io.StringIO()
@@ -473,8 +470,7 @@ class TestDataDump(unittest.TestCase):
         )
 
     def test_bisse_data_dump_tree_nd_states_table(self):
-        """
-        """
+        """Test tree states summary."""
 
         tree_living_nd_states_str_dict_outfile = \
             io.StringIO(self

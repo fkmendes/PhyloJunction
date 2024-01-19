@@ -876,27 +876,24 @@ class AnnotatedTree(dp.Tree):
                 if not nd.is_leaf():
                     self.tree.taxon_namespace.remove_taxon(nd.taxon)
 
-    # TODO: add to .pyi
-    # TODO: this function is currently checking just extant nodes, not
-    # extant AND sampled nodes...
     def is_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
         """Verify one or more sampled nodes exist on both root sides.
 
         This method is called by extract_reconstructed_tree(), and
-        verifies that, if there is a root node, there is at least one
-        sampled node (direct sampled ancestor, or sampled extant) on
-        both sides of the root.
+        verifies that there is at least one sampled node (direct
+        sampled ancestor, or sampled extant) on both sides of the
+        root of the complete tree. A root node labeled 'root' should
+        be guaranteed to exist by this function's caller.
 
+        Args:
+            a_node (dendropy.Node): Node from which to start recurring
+                so as to find if there are sampled taxa on both sides
+                of root. E.g., the origin node.
 
-        Return True if there is at least one extant taxon or sampled ancestor
-        on both sides of the root of the complete tree
-
-        Note that if tree has an origin and sampled ancestors before the root,
-        the reconstructed tree will be re-rooted at the dummy node that serves
-        as the internal (parent) node of the sampled ancestor.
-        Still, what this method checks is relative to the complete tree root node
-        since a sampled ancestor does not have two sides as it is not a speciation
-        event
+        Returns:
+            (bool): Whether there is at least one or more sampled
+            (observed) taxon on both sides of the complete tree's
+            root node.
         """
 
         def _recur_find_extant_or_sa(
@@ -1007,19 +1004,35 @@ class AnnotatedTree(dp.Tree):
         else:
             return False
 
-
-    # returns reconstructed tree, but also
-    #
-    # side-effect:
-    # populates self.tree_reconstructed
-    #
-    # if rejection sampling happened, is_tr_ok() in
-    # dn_discrete_sse will populate it; otherwise
-    # population happens upon writing
     def extract_reconstructed_tree(
             self,
             require_obs_both_sides: ty.Optional[bool] = None) -> dp.Tree:
-        """Make deep copy of self.tree, then prune extinct taxa from copy"""
+        """Extract reconstructed tree from complete tree.
+
+        This method was designed to be called outside of
+        AnnotatedTree's initialization, and instead be prompted by
+        rejection sampling (when conditioning on both sides of the
+        root), and summarization and printing functions should the
+        user ask for it. This is to save running time.
+        
+        The method deep-copies self.tree, which is of type
+        dendropy.Tree, populates it appropriately and then returns it.
+
+        When populating the reconstructed tree, this method effectively
+        prunes extinct taxa, and re-roots the resulting tree at the 
+        MRCA of the sampled (observed) taxa. This includes all taxa
+        sampled at the present and direct ancestors.
+
+        Args:
+            require_obs_both_sides (bool, optional): Flag specifying
+                if sampled (observed) taxa are required on both sides
+                of the root.
+
+        Returns:
+            (dendropy.Tree): A tree instance containing the
+                reconstructed tree extracted from AnnotatedTree's
+                instance owning the method call.
+        """
 
         # if method called by someone other than Tree obj,
         # then require_obs_both_sides won't be None
@@ -1035,6 +1048,8 @@ class AnnotatedTree(dp.Tree):
         if self.tree_reconstructed:
             return self.tree_reconstructed
 
+        # taxon_name space of tree_reconstructed will not
+        # have labels and taxon labels for internal nodes!
         self.tree_reconstructed = copy.deepcopy(self.tree)
 
         # if tree went extinct, return empty new tree
@@ -1051,17 +1066,17 @@ class AnnotatedTree(dp.Tree):
             filter_fn, suppress_unifurcations=True)
 
         # getting all root information #
-        # root_node will be None if it does not exist
-        smallest_distance = 0.0
         root_node: dp.Node = dp.Node()
+        root_node_distance_from_seed = 0.0
+        smallest_distance = 0.0
+
         root_node = self.tree_reconstructed.find_node_with_label("root")
 
-        if not root_node:
+        # could not get node with label, try with taxon label
+        if root_node is None:
             root_node = \
                 self.tree_reconstructed.find_node_with_taxon_label("root")
-
-        root_node_distance_from_seed = 0.0
-
+            
         if root_node:
             root_node_distance_from_seed = \
                 root_node.distance_from_root()
@@ -1069,17 +1084,40 @@ class AnnotatedTree(dp.Tree):
 
         int_node_deeper_than_root: dp.Node = dp.Node()
 
-        for internal_nd in self.tree_reconstructed.internal_nodes():
+        # we will now grab the internal node that is deeper
+        # than the root, and also the furthest away from it
+        # (internal_nd_distance will be more and more negative)
+        for internal_nd in \
+            self.tree_reconstructed.preorder_internal_node_iter(
+                exclude_seed_node=False):
+
             internal_nd_distance = internal_nd.distance_from_root()
 
+            # double-checking we're looking at just internal
+            # nodes that are not the root
             if internal_nd.label not in ("root", "origin"):
-                # we set int_node_deeper_than_root if we haven't
-                # looked at any internal nodes yet, or if they are
-                # deeper than the last one we checked
+                # we set int_node_deeper_than_root if
+                # (i) we haven't looked at any internal nodes yet,
+                # i.e., smallest_distance == 0.0,
                 #
-                # we also only have an int_node_deeper_than_root
-                # if there is (i) a root in the first place, or
-                # (ii) if the root is not the seed_node
+                # OR
+                #
+                # (ii) they are deeper than the last one we checked,
+                # i.e., internal_nd_distance < smallest_distance
+                #
+                # AND
+                #
+                # we also only either
+                # (iii) not have a root at all, possibly because tree
+                # was read in as newick and nodes were unnamed (or maybe
+                # there was no root indeed), and by definition all
+                # internal nodes are deeper than the root, i.e., 
+                # not root_node
+                #
+                # OR
+                #
+                # (iv) have a root, and it is some distance away from
+                # the origin
                 if (smallest_distance == 0.0 or
                         internal_nd_distance < smallest_distance) and \
                         (root_node_distance_from_seed != 0.0 or
@@ -1087,29 +1125,29 @@ class AnnotatedTree(dp.Tree):
                     int_node_deeper_than_root = internal_nd
                     smallest_distance = internal_nd_distance
 
-        #################
-        # Special cases #
-        #################
+        ##############
+        # Re-rooting #
+        ##############
 
         if not require_obs_both_sides_root:
-            # no speciation happened, so complete tree has no root
-            if not root_node:
+            # no speciation happened, so complete tree has no root,
+            # or tree was read in as a Newick string with unnamed
+            # nodes; either way, we re-root at the node we found
+            # to be the deepest in the tree except for the origin
+            if root_node is None:
                 self.tree_reconstructed \
                     .reroot_at_node(int_node_deeper_than_root)
                 int_node_deeper_than_root.edge_length = 0.0
+            # so there must be a
+            # sampled ancestor before the root, so we need to re-root
+            # above complete tree's root
 
-                # if suppress_unifurcations set to False
-                # origin_node = self.tree_reconstructed.seed_node
-                # int_node_deeper_than_root.remove_child(origin_node)
-
-            # there is a root in the complete tree
+            # there is a root in the complete tree, and it may or not
+            # be the MRCA of all sampled taxa
             else:
-                # mrca seems to have side-effect (this shouldn't be the case...)
-                # so we do things on deep copy of tree, and use labels
-
-                # there must be an SA before the root
-                # so we need to reroot above complete
-                # tree's root
+                # if internal nodes in tree do not have a label because
+                # they were read in as Newick strings instead of simulated
+                # by PJ
                 if int_node_deeper_than_root.label == "None":
                     self.tree_reconstructed.reroot_at_node(
                         int_node_deeper_than_root)
@@ -1120,46 +1158,39 @@ class AnnotatedTree(dp.Tree):
                         origin_node_rec = self.tree_reconstructed. \
                             find_node_with_label("origin")
 
+                        # could not get origin node with label,
+                        # try with taxon label
                         if not origin_node_rec:
                             origin_node_rec = self.tree_reconstructed. \
                                 find_node_with_taxon_label("origin")
 
+                        # origin should be child because we re-rooted!
                         int_node_deeper_than_root.remove_child(origin_node_rec)
 
                     int_node_deeper_than_root.edge_length = 0.0
 
-                # root is the deepest internal node
+                # nodes in tree do have labels, so they were simulated in PJ;
+                # we now find the MRCA of sampled (observed) taxa (it may or
+                # not be the complete tree's root)
                 else:
+                    # DendroPy's mrca seems to have side-effect... ugh!
+                    # will do things on deep copy of tree instead, and 
+                    # look at labels
                     rec_tree_mrca_label = \
                         pj_get_name_mrca_obs_terminals(
                             self.tree_reconstructed.seed_node,
                             [leaf.label for leaf
                              in self.tree_reconstructed.leaf_node_iter()])
 
-                    # re-seed if necessary
+                    # re-root (re-seed in DendroPy) if necessary
+                    # if so, it is because there must be a sampled ancestor
+                    # before the root, so we need to re-root above complete
+                    # tree's root
                     if rec_tree_mrca_label != "root":
                         rec_mrca_node = \
                             self.tree_reconstructed \
                                 .find_node_with_label(rec_tree_mrca_label)
                         self.tree_reconstructed.reroot_at_node(rec_mrca_node)
-
-                        # if suppress_unifurcations is set to False
-                        #
-                        # if there is a root AND an origin
-                        # it is the origin that will dangle, so we
-                        # remove it
-                        # origin_node_rec: dp.Tree = dp.Tree()
-                        # if self.origin_node:
-                        #     origin_node_rec = self.tree_reconstructed.find_node_with_label("origin")
-
-                        #     if not origin_node_rec:
-                        #         origin_node_rec = self.tree_reconstructed.find_node_with_taxon_label("origin")
-
-                        #     rec_mrca_node.remove_child(origin_node_rec)
-
-                        # no origin! will delete dangling root
-                        # else:
-                        #     rec_mrca_node.remove_child(root_node)
 
                         rec_mrca_node.edge_length = 0.0
 
@@ -1167,7 +1198,7 @@ class AnnotatedTree(dp.Tree):
                     else:
                         root_node.edge_length = 0.0
 
-        # require observed taxa on both sides of root
+        # conditioning on sampled (observed) taxa on both sides of root
         else:
             # if we condition on sampled nodes on both sides of root,
             # then by definition the reconstructed tree is empty!
@@ -1198,24 +1229,19 @@ class AnnotatedTree(dp.Tree):
                     int_node_deeper_than_root.edge_length = 0.0
 
         return self.tree_reconstructed
-
-    def name_internal_nodes(self):
-        pass
-
-    
-
-    # self.node_attr_dict =
-    # { node label (str): { attribute (str): val (Any)... }, ... }
+   
     def populate_nd_attr_dict(self,
                               attrs_of_interest_list: ty.List[str],
                               attr_added_separately_from_tree:
-                                bool = False) -> None:
+                              bool = False) -> None:
         """Populate member nested dictionary with node attributes.
 
-        This method is called upon initialization of AnnotatedTree, but
-        also sometimes outside of this class. It takes the attribute
-        values (for one or more attributes) stored in a DendroPy.Tree,
-        and copies them into the member dictionary node_attr_dict.
+        This method is not called upon initialization of class,
+        but rather when information about nodes' states is required,
+        e.g., when get_taxon_states_str() is called. The method
+        takes the attribute values (for one or more attributes) stored
+        in a DendroPy.Tree, and copies them into the member dictionary
+        node_attr_dict.
 
         There is no return and only a side-effect.
 
@@ -1254,16 +1280,38 @@ class AnnotatedTree(dp.Tree):
                   axes: plt.Axes,
                   node_attr: str = "state",
                   **kwargs) -> None:
+        """Draw tree on provided Axes instance.
+
+        This method is required whenever the user asks for a DAG node
+        to be drawn.
+
+        Args:
+            axes (matplotlib.pyplot.Axes): Axes object where we are
+                drawing the tree.
+            node_attr (str): Name of the attribute according to which
+                one wants to color the AnnotatedTree's branches with.
+                Defaults to 'state'.
+        """
 
         if not node_attr:
-            return plot_ann_tree(self, axes)
+            plot_ann_tree(self, axes)
 
         else:
             self.populate_nd_attr_dict([node_attr])
 
-            return plot_ann_tree(self, axes, attr_of_interest=node_attr)
+            plot_ann_tree(self, axes, attr_of_interest=node_attr)
 
     def get_stats_dict(self) -> ty.Dict[str, ty.Union[int, float]]:
+        """Get dictionary with AnnotatedTree's summary stats.
+
+        This method is required whenever the user asks for a DAG node
+        to be summarized.
+
+        Returns:
+            (dict): Dictionary with summary statistic names as keys
+            and their values as values.
+        """
+
         ks = ["Origin age",
               "Root age",
               "Total taxon count",
@@ -1279,16 +1327,22 @@ class AnnotatedTree(dp.Tree):
 
         return dict((ks[i], str(vs[i])) for i in range(len(ks)))
 
-    # TODO: add to .pyi
-    def _get_taxon_states_dict(self) -> ty.Dict[str, int]:
-        """
-        Living nodes and their states
-        All internal nodes (complete tree!)
+    def _get_taxon_states_dict(self) -> ty.Tuple[ty.Dict[str, int], ...]:
+        """Collect and return non-extinct node states into dicts.
+
+        This method gets the value of attribute 'state' for all
+        non-extinct nodes in the tree, and returns terminal and
+        internal node states as two separate dictionaries.
+
+        Return:
+            (dict): A tuple of dictionaries containing the values of
+            the state attribute for terminal (first dictionary) and
+            internal nodes (second dictionary).
         """
 
         self.populate_nd_attr_dict(["state"])
 
-        living_node_states_dict: ty.Dict[str, int] = dict()
+        terminal_node_states_dict: ty.Dict[str, int] = dict()
         int_node_states_dict: ty.Dict[str, int] = dict()
         for taxon_name, attr_val_dict in self.node_attr_dict.items():
             a_node = self.tree.find_node_with_label(taxon_name)
@@ -1297,28 +1351,34 @@ class AnnotatedTree(dp.Tree):
             if a_node.is_internal():
                 int_node_states_dict[taxon_name] = attr_val_dict["state"]
 
-            # removing extinct taxa if tree was simulated with
-            # PJ (i.e., has .alive member)
-            try:
-                if not a_node.alive:
-                    continue
+            # ignoring extinct nodes (after internal nodes have been
+            # considered!)
+            if not a_node.alive:
+                continue
 
-            except Exception as e:
-                # print("Exception 8 inside tree.py: ", type(e).__name__, " - ", e)
-                pass
+            terminal_node_states_dict[taxon_name] = attr_val_dict["state"]
 
-            living_node_states_dict[taxon_name] = attr_val_dict["state"]
-
-        return living_node_states_dict, int_node_states_dict
+        return terminal_node_states_dict, int_node_states_dict
 
     def get_taxon_states_str(self, nexus: bool = False) -> str:
-        living_node_state_dict, int_node_states_dict = \
+        """Get states for all nodes in tree as single string.
+        
+        Args:
+            nexus (bool): Flag specifying whether states are being
+                collected for Nexus printing ('True' if so). Defaults
+                to 'False'.
+
+        Returns:
+            (str): String containing the states of all nodes in tree.
+        """
+
+        terminal_node_state_dict, int_node_states_dict = \
             self._get_taxon_states_dict()
 
-        living_node_states_str = ""
+        terminal_node_states_str = ""
 
-        for taxon_name, taxon_state in living_node_state_dict.items():
-            living_node_states_str += \
+        for taxon_name, taxon_state in terminal_node_state_dict.items():
+            terminal_node_states_str += \
                 taxon_name + "\t" + str(taxon_state) + "\n"
 
         # only care about internal nodes in the reconstructed tree
@@ -1336,7 +1396,7 @@ class AnnotatedTree(dp.Tree):
                     int_node_states_str += \
                         taxon_name + "\t" + str(taxon_state) + "\n"
 
-        # not sure if I should be adding self.n_sa here, because
+        # not sure if I should be adding self.n_sa_nodes here, because
         # I ignore dead taxa in _get_taxon_states_dict()
         if nexus:
             nexus_header = \
@@ -1346,11 +1406,11 @@ class AnnotatedTree(dp.Tree):
                 "".join(str(i) for i in range(self.state_count)) + \
                 "\" missing=? gap=-;\nMatrix\n"
 
-            nexus_str = nexus_header + living_node_states_str + ";\nEnd;\n"
+            nexus_str = nexus_header + terminal_node_states_str + ";\nEnd;\n"
 
             return nexus_str
 
-        return living_node_states_str, int_node_states_str
+        return terminal_node_states_str, int_node_states_str
 
 
 ###########################
@@ -2048,52 +2108,52 @@ def get_color_map(n_states: int) -> ty.Dict[int, str]:
 ##########################
 
 def pj_get_name_mrca_obs_terminals(nd: dp.Node,
-                                       nd_label_list: ty.List[str]) -> str:
-        """Get name of the MRCA of specified observed terminal nodes.
+                                   nd_label_list: ty.List[str]) -> str:
+    """Get name of the MRCA of specified observed terminal nodes.
 
-        This method recursively finds the most recent common ancestor
-        of the terminal nodes whose names are specified as input.
-        These nodes must be observed, i.e., be either direct (sampled)
-        ancestors, or sampled extant terminal nodes.
+    This method recursively finds the most recent common ancestor
+    of the terminal nodes whose names are specified as input.
+    These nodes must be observed, i.e., be either direct (sampled)
+    ancestors, or sampled extant terminal nodes.
 
-        Args:
-            nd (dendropy.Node): Node to recur and grab the name of.
-            nd_label_list (str): List of node names whose MRCA's name
-                is being searched.
+    Args:
+        nd (dendropy.Node): Node to recur and grab the name of.
+        nd_label_list (str): List of node names whose MRCA's name
+            is being searched.
 
-        Returns:
-            (str): Name of MRCA node
-        """
+    Returns:
+        (str): Name of MRCA node
+    """
 
-        # side-effect recursion
-        def recur_node(nd, nd_label_list: ty.List[str], mrca_node_label: str):
-            """Populate visited_obs_terminals (side-effect)"""
+    # side-effect recursion
+    def recur_node(nd, nd_label_list: ty.List[str], mrca_node_label: str):
+        """Populate visited_obs_terminals (side-effect)"""
 
-            # not done: if tip, get label
-            if nd.is_leaf() and (nd.is_sa or nd.sampled):
-                return [nd.label], ""
+        # not done: if tip, get label
+        if nd.is_leaf() and (nd.is_sa or nd.sampled):
+            return [nd.label], ""
 
-            # not done: if internal node, we recur
-            else:
-                visited_obs_terminals: ty.List[str] = []
+        # not done: if internal node, we recur
+        else:
+            visited_obs_terminals: ty.List[str] = []
 
-                for ch_node in nd.child_node_iter():
-                    # recur
-                    vot, mrca_node_label = recur_node(ch_node, nd_label_list, mrca_node_label)
-                    visited_obs_terminals += vot
+            for ch_node in nd.child_node_iter():
+                # recur
+                vot, mrca_node_label = recur_node(ch_node, nd_label_list, mrca_node_label)
+                visited_obs_terminals += vot
 
-                # we are actually done
-                if set(visited_obs_terminals) == set(nd_label_list) and not mrca_node_label:
-                    mrca_node_label = nd.label
+            # we are actually done
+            if set(visited_obs_terminals) == set(nd_label_list) and not mrca_node_label:
+                mrca_node_label = nd.label
 
-            return visited_obs_terminals, mrca_node_label
+        return visited_obs_terminals, mrca_node_label
 
-        mrca_node_label: str = ""
+    mrca_node_label: str = ""
 
-        # mrca node
-        _, mrca_node_label = recur_node(nd, nd_label_list, mrca_node_label)
+    # mrca node
+    _, mrca_node_label = recur_node(nd, nd_label_list, mrca_node_label)
 
-        return mrca_node_label
+    return mrca_node_label
 
 
 if __name__ == "__main__":
