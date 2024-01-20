@@ -13,82 +13,76 @@ __email__ = "f.mendes@wustl.edu"
 
 class PJDnGrammar():
 
-    dn_grammar_dict: ty.Dict[str, ty.Tuple[str, ...]]
-
     ################################
     #  All available distributions #
     ################################
-    dn_grammar_dict = {
-        "lognormal":
+
+    dn_grammar_dict: ty.Dict[str, ty.Tuple[str, ...]] = \
+        {
+            "lognormal":
             tuple(["n", "nr", "mean", "sd", "log_space"]),
-        "normal":
+            "normal":
             tuple(["n", "nr", "mean", "sd"]),
-        "exponential":
+            "exponential":
             tuple(["n", "nr", "rate", "rate_parameterization"]),
-        "gamma":
+            "gamma":
             tuple(["n", "nr", "shape", "scale", "rate_parameterization"]),
-        "unif":
+            "unif":
             tuple(["n", "nr", "min", "max"]),
-        "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin",
-                               "stash", "start_state", "eps", "runtime_limit",
-                               "cond_spn", "cond_surv"])
-    }
+            "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin",
+                                   "stash", "start_state", "eps", "runtime_limit",
+                                   "cond_spn", "cond_surv"])
+        }
 
     def __init__(self) -> None:
         pass
 
     @classmethod
     def grammar_check(cls, dn_id: str, dn_param: str) -> bool:
-        # we ignore the clamp parameter-arg pair; they are handled by cmd_parse()
+        "Check if specified distribution is supported."
+
+        # we ignore the clamp parameter-arg pair;
+        # they are handled by cmd_parse()
         if dn_param in cls.dn_grammar_dict[dn_id] or dn_param == "clamp":
             return True
+
         return False
 
     @classmethod
-    def init_return_discrete_SSE_dn(
-        cls,
-        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
-            -> pgm.DistributionPGM:
-
-        if not dn_param_dict:
-            raise ec.ParseMissingSpecificationError("discrete_sse")
-
-        return make_dnsse.make_discrete_SSE_dn("discrete_sse", dn_param_dict)
-
-    @classmethod
-    def create_dn_obj(
+    def init_return_parametric_dn(
         cls,
         dn_id: str,
         dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
             -> pgm.DistributionPGM:
-        """Build and return sampling distribution object
+        """Create and return parametric distributions for sampling.
 
         Args:
-            dn_id (str): Name of the sampling distribution to create
-            dn_param_dict (dict): Dictionary containing distribution
-                parameter names (str) as keys and lists (of either
-                strings or StochasticNodePGMs) as values
+            dn_id (str): Name of parametric distribution.
+            dn_param_dict (dict): Dictionary with distribution
+                parameter names as keys, and their values as values.
 
         Returns:
-            DistributionPGM: a DistributionPGM instance
+            DistributionDAG: a DistributionDAG instance.
         """
 
-        extracted_val: ty.List[str]
+        n_samples: int = 1
+        n_repl: int = 1
+        extracted_val_list: ty.List[str] = list()
 
-        #############################
-        #  Parametric distributions #
-        #############################
+        # key: parameter name
+        # value: paramenter's parent (DAG node) name
+        # e.g., { lambda: node_pgm1_name }
+        parent_node_tracker: ty.Dict[str, str] = dict()
+
+        if not dn_param_dict:
+            raise ec.ParseMissingSpecificationError(dn_id)
+
+        # Default values inside each if block! #
 
         if dn_id == "lognormal":
-            #############################
-            # IMPORTANT: Default values #
-            #############################
-            ln_n_samples: int = 1
-            ln_n_repl: int = 1
-            ln_mean: ty.List[float] = []
-            ln_sd: ty.List[float] = []
+            ln_mean: ty.List[float] = list()
+            ln_sd: ty.List[float] = list()
             ln_log_space: bool = True
-            parent_node_tracker = dict()
 
             # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
             if dn_param_dict:
@@ -102,32 +96,32 @@ class PJDnGrammar():
 
                     # if element in val is string, it remains unchanged,
                     # if NodePGM, we get its string-fied value
-                    extracted_val = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("lognormal", arg):
                         raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnLogNormal.DN_NAME, arg)
 
                         # only one element always
                         try:
-                            ln_n_samples = int(extracted_val[0])
+                            n_samples = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "nr":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnLogNormal.DN_NAME, arg)
 
                         # only one element always
                         try:
-                            ln_n_repl = int(extracted_val[0])
+                            n_repl = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -135,7 +129,7 @@ class PJDnGrammar():
 
                     elif arg == "mean":
                         try:
-                            ln_mean = [float(v) for v in extracted_val]
+                            ln_mean = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
@@ -143,18 +137,18 @@ class PJDnGrammar():
 
                     elif arg == "sd":
                         try:
-                            ln_sd = [float(v) for v in extracted_val]
+                            ln_sd = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "log_space":
-                        if extracted_val[0] in ("\"true\"", "\"T\"", "\"True\""):
+                        if extracted_val_list[0] in ("\"true\"", "\"T\"", "\"True\""):
                             # pars[4] = True
                             ln_log_space = True
 
-                        elif extracted_val[0] in ("\"false\"", "\"F\"", "\"False\""):
+                        elif extracted_val_list[0] in ("\"false\"", "\"F\"", "\"False\""):
                             # pars[4] = False
                             ln_log_space = False
 
@@ -165,22 +159,16 @@ class PJDnGrammar():
 
             # return dnpar.DnLogNormal(pars, parent_node_tracker)
             return dnpar.DnLogNormal(
-                ln_n_samples,
-                ln_n_repl,
+                n_samples,
+                n_repl,
                 ln_mean,
                 ln_sd,
                 ln_log_space,
                 parent_node_tracker)
 
         elif dn_id == "normal":
-            #############################
-            # IMPORTANT: Default values #
-            #############################
-            norm_n_samples: int = 1
-            norm_n_repl: int = 1
-            norm_mean: ty.List[float] = []
-            norm_sd: ty.List[float] = []
-            parent_node_tracker = dict()
+            norm_mean: ty.List[float] = list()
+            norm_sd: ty.List[float] = list()
 
             # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
             if dn_param_dict:
@@ -191,30 +179,30 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("normal", arg):
                         raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                         try:
-                            norm_n_samples = int(extracted_val[0])
+                            n_samples = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                     elif arg == "nr":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
                         try:
-                            norm_n_repl = int(extracted_val[0])
+                            n_repl = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -222,7 +210,7 @@ class PJDnGrammar():
 
                     elif arg == "mean":
                         try:
-                            norm_mean = [float(v) for v in extracted_val]
+                            norm_mean = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
@@ -230,7 +218,7 @@ class PJDnGrammar():
 
                     elif arg == "sd":
                         try:
-                            norm_sd = [float(v) for v in extracted_val]
+                            norm_sd = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
@@ -243,21 +231,15 @@ class PJDnGrammar():
 
             # return dnpar.DnNormal(pars, parent_node_tracker)
             return dnpar.DnNormal(
-                norm_n_samples,
-                norm_n_repl,
+                n_samples,
+                n_repl,
                 norm_mean,
                 norm_sd,
                 parent_node_tracker)
 
         elif dn_id == "exponential":
-            #############################
-            # IMPORTANT: Default values #
-            #############################
-            exp_n_samples: int = 1
-            exp_n_repl: int = 1
-            exp_scale_or_rate: ty.List[float] = []
+            exp_scale_or_rate: ty.List[float] = list()
             exp_rate_parameterization: bool = True
-            parent_node_tracker = dict()  # { lambda: node_pgm1_name }
 
             if dn_param_dict:
                 # val is list
@@ -268,35 +250,33 @@ class PJDnGrammar():
                         # needed for building inference specifications
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("exponential", arg):
                         raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnExponential.DN_NAME, arg)
-                        # pars[0] = int(_extracted_val[0])
-                        exp_n_samples = int(extracted_val[0])
+                        n_samples = int(extracted_val_list[0])
 
                     elif arg == "nr":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnExponential.DN_NAME, arg)
-                        # pars[1] = int(_extracted_val[0])
-                        exp_n_repl = int(extracted_val[0])
+                        n_repl = int(extracted_val_list[0])
 
                     elif arg == "rate":
                         # pars[2] = [float(v) for v in _extracted_val]
-                        exp_scale_or_rate = [float(v) for v in extracted_val]
+                        exp_scale_or_rate = [float(v) for v in extracted_val_list]
 
                     elif arg == "rate_parameterization":
-                        if extracted_val[0] in ("\"true\"", "\"T\"", "\"True\""):
+                        if extracted_val_list[0] in ("\"true\"", "\"T\"", "\"True\""):
                             # pars[3] = True
                             exp_rate_parameterization = True
 
-                        elif extracted_val[0] in ("\"false\"", "\"F\"", "\"False\""):
+                        elif extracted_val_list[0] in ("\"false\"", "\"F\"", "\"False\""):
                             # pars[3] = False
                             exp_rate_parameterization = False
 
@@ -306,22 +286,16 @@ class PJDnGrammar():
 
             # return dnpar.DnExponential(pars, parent_node_tracker)
             return dnpar.DnExponential(
-                exp_n_samples,
-                exp_n_repl,
+                n_samples,
+                n_repl,
                 exp_scale_or_rate,
                 exp_rate_parameterization,
                 parent_node_tracker)
 
         elif dn_id == "gamma":
-            #############################
-            # IMPORTANT: Default values #
-            #############################
-            gamma_n_samples: int = 1
-            gamma_n_repl: int = 1
             gamma_shape: ty.List[float] = []
             gamma_scale_or_rate: ty.List[float] = []
             gamma_rate_parameterization: bool = False
-            parent_node_tracker = dict()
 
             # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
             if dn_param_dict:
@@ -332,30 +306,30 @@ class PJDnGrammar():
                     if isinstance(val[0], pgm.StochasticNodePGM):
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("gamma", arg):
                         raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnGamma.DN_NAME, arg)
 
                         try:
-                            gamma_n_samples = int(extracted_val[0])
+                            n_samples = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
                                 dnpar.DnGamma.DN_NAME, arg)
 
                     elif arg == "nr":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnGamma.DN_NAME, arg)
                         
                         try:
-                            gamma_n_repl = int(extracted_val[0])
+                            n_repl = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -363,7 +337,7 @@ class PJDnGrammar():
 
                     elif arg == "shape":
                         try:
-                            gamma_shape = [float(v) for v in extracted_val]
+                            gamma_shape = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
@@ -372,18 +346,18 @@ class PJDnGrammar():
                     elif arg == "scale":
                         try:
                             gamma_scale_or_rate = \
-                                [float(v) for v in extracted_val]
+                                [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
                                 dnpar.DN_NAME, arg)
 
                     elif arg == "rate_parameterization":
-                        if extracted_val[0] in \
+                        if extracted_val_list[0] in \
                             ("\"true\"", "\"T\"", "\"True\""):
                             gamma_rate_parameterization = True
 
-                        elif extracted_val[0] in \
+                        elif extracted_val_list[0] in \
                             ("\"false\"", "\"F\"", "\"False\""):
                             gamma_rate_parameterization = False
 
@@ -395,22 +369,16 @@ class PJDnGrammar():
 
             # return dnpar.DnGamma(pars, parent_node_tracker)
             return dnpar.DnGamma(
-                gamma_n_samples,
-                gamma_n_repl,
+                n_samples,
+                n_repl,
                 gamma_shape,
                 gamma_scale_or_rate,
                 gamma_rate_parameterization,
                 parent_node_tracker)
 
         elif dn_id == "unif":
-            #############################
-            # IMPORTANT: Default values #
-            #############################
-            unif_n_samples: int = 1
-            unif_n_repl: int = 1
             unif_min: ty.List[float] = []
             unif_max: ty.List[float] = []
-            parent_node_tracker = dict()
 
             # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
             if dn_param_dict:
@@ -420,30 +388,30 @@ class PJDnGrammar():
                         # needed for building inference specifications
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
 
                     if not cls.grammar_check("unif", arg):
                         raise ec.ParseNotAParameterError(arg)
 
                     elif arg == "n":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnUnif.DN_NAME, arg)
 
                         try:
-                            unif_n_samples = int(extracted_val[0])
+                            n_samples = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
                                 dnpar.DnUnif.DN_NAME, arg)
 
                     elif arg == "nr":
-                        if len(extracted_val) > 1:
+                        if len(extracted_val_list) > 1:
                             raise ec.ParseRequireSingleValueError(
                                 dnpar.DnUnif.DN_NAME, arg)
                         
                         try:
-                            unif_n_repl = int(extracted_val[0])
+                            n_repl = int(extracted_val_list[0])
 
                         except ValueError:
                             raise ec.ParseRequireIntegerError(
@@ -451,7 +419,7 @@ class PJDnGrammar():
 
                     elif arg == "min":
                         try:
-                            unif_min = [float(v) for v in extracted_val]
+                            unif_min = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
@@ -459,7 +427,7 @@ class PJDnGrammar():
 
                     elif arg == "max":
                         try:
-                            unif_max = [float(v) for v in extracted_val]
+                            unif_max = [float(v) for v in extracted_val_list]
 
                         except ValueError:
                             raise ec.ParseRequireNumericError(
@@ -471,20 +439,67 @@ class PJDnGrammar():
                 if not par_obj:
                     raise ec.ParseMissingParameterError(par_name)
 
-            # return dnpar.DnUnif(pars, parent_node_tracker)
             return dnpar.DnUnif(
-                unif_n_samples,
-                unif_n_repl,
+                n_samples,
+                n_repl,
                 unif_min,
                 unif_max,
                 parent_node_tracker)
+    
+    @classmethod
+    def init_return_discrete_SSE_dn(
+        cls,
+        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            -> pgm.DistributionPGM:
+        """Create and return SSE distribution for sampling.
+
+        Args:
+            dn_param_dict (dict): Dictionary with distribution
+                parameter names as keys, and their values as values.
+
+        Returns:
+            DistributionDAG: a DistributionDAG instance.
+        """
+
+        if not dn_param_dict:
+            raise ec.ParseMissingSpecificationError("discrete_sse")
+
+        return make_dnsse.make_discrete_SSE_dn("discrete_sse", dn_param_dict)
+
+    @classmethod
+    def create_dn_obj(
+        cls,
+        dn_id: str,
+        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            -> pgm.DistributionPGM:
+        """Create and return prob. distribution (for sampling) object.
+
+        Args:
+            dn_id (str): Name of the sampling distribution to create.
+            dn_param_dict (dict): Dictionary containing distribution
+                parameter names (str) as keys and lists (of either
+                strings or StochasticNodeDAGs) as values.
+
+        Returns:
+            DistributionDAG: a DistributionDAG instance.
+        """
+
+        #############################
+        #  Parametric distributions #
+        #############################
+
+        if dn_id in ("lognormal",
+                     "normal",
+                     "exponential",
+                     "gamma",
+                     "unif"):
+            return cls.init_return_parametric_dn(dn_id, dn_param_dict)
 
         #################################
         #  Non-parametric distributions #
         #################################
 
         # discrete_sse
-        # elif dn_id == "discrete_sse": (switch to this one when there's a new one)
-        else:
+        elif dn_id == "discrete_sse":
             # dn_param_dict is validated inside
             return cls.init_return_discrete_SSE_dn(dn_param_dict)

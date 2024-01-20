@@ -40,24 +40,21 @@ def read_text_file(fp_string: str) -> ty.List[str]:
     return cmd_line_list
 
 
-def read_serialized_pgm(fp_string: str) -> pgm.ProbabilisticGraphicalModel:
+def read_serialized_pgm(fp_string: str) -> pgm.DirectedAcyclicGraph:
     """Read binary file storing PGM from a previous PJ session.
 
     Args:
-        fp_string (str): String containing file path to binary file storing
-            PGM from previous PJ session
+        fp_string (str): String containing file path to binary file
+            storing DAG from previous PJ session.
 
     Returns:
-        pgm.ProbabilisticGraphicalModel: Probabilistic graphical model
-            object to be initialized and returned
+        (DirectedAcyclicGraph): DAG object to be initialized.
     """
 
-    pgm_obj: pgm.ProbabilisticGraphicalModel
-
     with open(fp_string, "rb") as picklefile:
-        pgm_obj = pickle.load(picklefile)
+        dag_obj: pgm.DirectedAcyclicGraph = pickle.load(picklefile)
 
-    return pgm_obj
+    return dag_obj
 
 
 def read_csv_into_dataframe(fp_string: str) -> pd.DataFrame:

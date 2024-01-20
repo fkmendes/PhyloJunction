@@ -113,7 +113,7 @@ class TestDataDump(unittest.TestCase):
         ####################
         # Initializing PGM #
         ####################
-        cls.bisse_pgm = pgm.ProbabilisticGraphicalModel()
+        cls.bisse_pgm = pgm.DirectedAcyclicGraph()
 
         # rv
         cls.bisse_pgm.add_node(
@@ -144,7 +144,7 @@ class TestDataDump(unittest.TestCase):
             )
         )
 
-        # sorted_node_pgm_list = bisse_pgm.get_sorted_node_pgm_list()
+        # sorted_node_pgm_list = bisse_pgm.get_sorted_node_dag_list()
 
         ###################
         # Output handling #
@@ -524,7 +524,7 @@ class TestDataDump(unittest.TestCase):
         csvstring_dump_tree_internal_nd_states_str_dict_list = \
             csvstring_dump_tree_internal_nd_states_str_dict.split("\n")
 
-        trs_node = self.bisse_pgm.get_node_pgm_by_name("trs")
+        trs_node = self.bisse_pgm.get_node_dag_by_name("trs")
         last_rec_tr = trs_node.value[9].tree_reconstructed
         last_rec_tr_seed_node_label = last_rec_tr.seed_node.label
 

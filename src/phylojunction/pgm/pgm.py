@@ -35,27 +35,26 @@ def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
     return ty.cast(R, _obj)
 
 
-class ProbabilisticGraphicalModel():
-    node_dict: ty.Dict[NodePGM, ty.Any]
-    node_name_val_dict: ty.Dict[str, NodePGM]
+class DirectedAcyclicGraph():
+    node_val_dict: ty.Dict[NodePGM, ty.Any]
+    name_node_dict: ty.Dict[str, NodePGM]
     n_nodes: int
     sample_size: int
 
-    def __init__(self):
+    def __init__(self) -> None:
         # keys are proper PGM nodes, values are their values
-        self.node_dict = dict()
+        self.node_val_dict = dict()
 
-        # keys are StochasticNodePGM names
-        # vals are StochasticNodePGM objects
-        self.node_name_val_dict = dict()
+        # keys are NodePGM names, vals are NodePGM instances
+        self.name_node_dict = dict()
 
         self.n_nodes = 0
         self.sample_size = 0  # how many simulations will be run
 
-    def add_node(self, node_pgm: NodePGM) -> None:
+    def add_node(self, node_dag: NodePGM) -> None:
         # check that nodes carry the right number of values
         # (the number of simulations)
-        if isinstance(node_pgm, StochasticNodePGM):
+        if isinstance(node_dag, StochasticNodePGM):
             #############
             # Important #
             #############
@@ -64,58 +63,55 @@ class ProbabilisticGraphicalModel():
             # the sample size of a PGM object; this means we let the users
             # fool around with nodes with assigned (fixed, clamped) values
             # through '<-'
-            if node_pgm.is_sampled:
+            if node_dag.is_sampled:
                 # if the pgm's sample size is still 0,
                 # or if we started off with a scalar node but then
                 # added sampled node, we update the pgm's sample size
                 if not self.sample_size or \
-                        (self.sample_size == 1 and node_pgm.sample_size > 1):
-                    self.sample_size = node_pgm.sample_size
+                        (self.sample_size == 1 and node_dag.sample_size > 1):
+                    self.sample_size = node_dag.sample_size
 
                 # if the number of values in a node is 1, it gets vectorized,
                 # so this is allowed; but if the node is sampled and the number
                 # of values is > 1 and < than that of other nodes, we have a
                 # problem
-                elif self.sample_size != node_pgm.sample_size and \
-                        node_pgm.sample_size > 1:
+                elif self.sample_size != node_dag.sample_size and \
+                        node_dag.sample_size > 1:
 
                     raise ec.DAGCannotAddNodeError(
-                        node_pgm.node_name,
+                        node_dag.node_name,
                         ("Specified number of simulations was both "
                          "> 1 and different from that in a previous "
                          "command."))
 
-        replacing_node = False
-        if node_pgm in self.node_dict:
+        # a DAG node has been specified, but it already was in the
+        # DAG, meaning we need to update the DAG
+        if node_dag in self.node_val_dict:
             # removes existing node with that node_name
-            call_order_idx = node_pgm.call_order_idx
-            del self.node_dict[node_pgm]
-            replacing_node = True
+            call_order_idx = node_dag.call_order_idx
+            del self.node_val_dict[node_dag]
+            node_dag.call_order_idx = call_order_idx
 
-        # maintaining call order
-        if replacing_node:
-            node_pgm.call_order_idx = call_order_idx
-
-        # new rv, add to call order
+        # new node (random variable), add to call order
         else:
             self.n_nodes += 1
-            node_pgm.call_order_idx = self.n_nodes
+            node_dag.call_order_idx = self.n_nodes
 
         # if node is not deterministic and has a value and node_name
         try:
-            self.node_dict[node_pgm] = node_pgm.value
+            self.node_val_dict[node_dag] = node_dag.value
 
         # have to double-check this can ever be a problem
         except AttributeError:
             print(("\n\n\nSomehow we could not grab a node's value."
                   "Come back to this line of code!"))
-            self.node_dict[node_pgm] = None
+            self.node_val_dict[node_dag] = None
 
-        self.node_name_val_dict[node_pgm.node_name] = node_pgm
+        self.name_node_dict[node_dag.node_name] = node_dag
 
-    def get_node_pgm_by_name(self, node_name):
-        if node_name in self.node_name_val_dict:
-            return self.node_name_val_dict[node_name]
+    def get_node_dag_by_name(self, node_name):
+        if node_name in self.name_node_dict:
+            return self.name_node_dict[node_name]
 
     def get_display_str_by_name(
             self,
@@ -123,17 +119,15 @@ class ProbabilisticGraphicalModel():
             sample_idx=None,
             repl_size=1):
 
-        if node_name in self.node_name_val_dict:
+        if node_name in self.name_node_dict:
             # calls __str__() of NodePGM
-            return str(self.node_name_val_dict[node_name])
+            return str(self.name_node_dict[node_name])
 
-    def get_sorted_node_pgm_list(self) -> ty.List[NodePGM]:
-        node_pgm_list: ty.List[NodePGM] = [node_pgm for node_pgm in self.node_dict]
-        node_pgm_list.sort()
+    def get_sorted_node_dag_list(self) -> ty.List[NodePGM]:
+        node_dag_list: ty.List[NodePGM] = [node_dag for node_dag in self.node_val_dict]
+        node_dag_list.sort()
 
-        return node_pgm_list
-
-##############################################################################
+        return node_dag_list
 
 
 class ValueGenerator(ABC):
@@ -212,7 +206,7 @@ class NodePGM(ABC):
         self.is_deterministic = deterministic
         self.is_clamped = clamped
         self.parent_nd_list = parent_nodes
-        # note that when the pgm_obj adds this to its list of nodes,
+        # note that when the dag_obj adds this to its list of nodes,
         # value will be None (value is populated when we call .sample()),
         # and self.length will be = 1; we nonetheless add this call here
         # for completion (useful in debugging and testing
@@ -526,7 +520,7 @@ class StochasticNodePGM(NodePGM):
             return self.constant_fn.generate()
 
         else:
-            raise RuntimeError("exiting...")
+             raise RuntimeError("exiting...")
 
     def __str__(self) -> str:
         return super().__str__()

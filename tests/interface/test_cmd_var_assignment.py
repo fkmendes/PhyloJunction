@@ -18,15 +18,15 @@ class TestVarAssignment(unittest.TestCase):
         and result in the right probabilistic graphical model
         """
 
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
         
         cmd_line1 = "a <- 1"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("a")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        a_node_pgm = dag_obj.get_node_dag_by_name("a")
         
-        self.assertEqual(1, pgm_obj.n_nodes)
+        self.assertEqual(1, dag_obj.n_nodes)
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value, ["1"])
@@ -36,10 +36,10 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line2 = "b <- [1, 2, 3]"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line2)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        b_node_pgm = pgm_obj.get_node_pgm_by_name("b")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        b_node_pgm = dag_obj.get_node_dag_by_name("b")
 
-        self.assertEqual(2, pgm_obj.n_nodes)
+        self.assertEqual(2, dag_obj.n_nodes)
         self.assertEqual(type(b_node_pgm.value), list)
         self.assertEqual(len(b_node_pgm.value), 3)
         self.assertEqual(b_node_pgm.value, ["1", "2", "3"])
@@ -49,10 +49,10 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line3 = "a <- [1]"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line3)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line3)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("a")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line3)
+        a_node_pgm = dag_obj.get_node_dag_by_name("a")
 
-        self.assertEqual(2, pgm_obj.n_nodes)
+        self.assertEqual(2, dag_obj.n_nodes)
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value, ["1"])
@@ -62,10 +62,10 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line4 = "c <- b"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line4)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line4)
-        c_node_pgm = pgm_obj.get_node_pgm_by_name("c")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line4)
+        c_node_pgm = dag_obj.get_node_dag_by_name("c")
 
-        self.assertEqual(3, pgm_obj.n_nodes)
+        self.assertEqual(3, dag_obj.n_nodes)
         self.assertEqual(type(c_node_pgm.value), list)
         self.assertEqual(len(c_node_pgm.value), 3)
         self.assertEqual(c_node_pgm.value, ["1", "2", "3"])
@@ -75,10 +75,10 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line5 = "d <- [c, 4, 5, 6]"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line5)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line5)
-        d_node_pgm = pgm_obj.get_node_pgm_by_name("d")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line5)
+        d_node_pgm = dag_obj.get_node_dag_by_name("d")
 
-        self.assertEqual(4, pgm_obj.n_nodes)
+        self.assertEqual(4, dag_obj.n_nodes)
         self.assertEqual(type(d_node_pgm.value), list)
         self.assertEqual(len(d_node_pgm.value), 6)
         self.assertEqual(d_node_pgm.value, ["1", "2", "3", "4", "5", "6"])
@@ -90,16 +90,16 @@ class TestVarAssignment(unittest.TestCase):
         graphical model
         """
 
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
 
         cmd_line1 = ('tr <- read_tree(string="((sp1[&index=1]:1.0,sp2[&index=2]:1.0)'
                      '[&index=4]:1.0,sp3[&index=3]:2.0)[&index=5];", node_name_attr="index")')
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("tr")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
 
-        self.assertEqual(1, pgm_obj.n_nodes)
+        self.assertEqual(1, dag_obj.n_nodes)
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
@@ -109,12 +109,12 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line2 = 'tr <- read_tree(string="((sp1:1.0,sp2:1.0):1.0,sp3:2.0);")'
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line2)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("tr")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
         
         # print(a_node_pgm.value[0])
 
-        self.assertEqual(1, pgm_obj.n_nodes)
+        self.assertEqual(1, dag_obj.n_nodes)
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
@@ -127,16 +127,16 @@ class TestVarAssignment(unittest.TestCase):
         graphical model
         """
 
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
 
         cmd_line1 = ('tr <- read_tree(file_path="examples/trees_maps_files'
                      '/tree_to_read.tre", node_name_attr="index")')
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("tr")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
 
-        self.assertEqual(1, pgm_obj.n_nodes)
+        self.assertEqual(1, dag_obj.n_nodes)
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 1)
         self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
@@ -147,10 +147,10 @@ class TestVarAssignment(unittest.TestCase):
                      '/trees_to_read.tre", node_name_attr="index")')
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line2)
-        cmd.parse_variable_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("tr")
+        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
 
-        self.assertEqual(1, pgm_obj.n_nodes)
+        self.assertEqual(1, dag_obj.n_nodes)
         self.assertEqual(type(a_node_pgm.value), list)
         self.assertEqual(len(a_node_pgm.value), 2)
         self.assertEqual(a_node_pgm.value[1].__str__().rstrip(),
@@ -163,7 +163,7 @@ class TestVarAssignment(unittest.TestCase):
         are handled correctly
         """
 
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
 
         cmd_line1 = ('tr <- read_tree(n=2, string="((sp1[&index=1]:1.0,'
                      'sp2[&index=2]:1.0)[&index=4]:1.0,sp3[&index=3]:2.0)'
@@ -173,7 +173,7 @@ class TestVarAssignment(unittest.TestCase):
             re.split(cmdu.assign_regex, cmd_line1)
         
         with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc:
-            cmd.parse_variable_assignment(pgm_obj,
+            cmd.parse_variable_assignment(dag_obj,
                                           stoch_node_name,
                                           stoch_node_spec,
                                           cmd_line1)
@@ -198,7 +198,7 @@ class TestVarAssignment(unittest.TestCase):
             ("Argument file_path cannot be specified at the same time as 'string'.")
 
         with self.assertRaises(ec.ParseMutuallyExclusiveParametersError) as exc:
-            cmd.parse_variable_assignment(pgm_obj,
+            cmd.parse_variable_assignment(dag_obj,
                                           stoch_node_name,
                                           stoch_node_spec,
                                           cmd_line2)
@@ -212,7 +212,7 @@ class TestVarAssignment(unittest.TestCase):
         are handled correctly
         """
 
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
 
         cmd_line1 = ('tr <- read_tree(nr=13, file_path="examples/'
                      'trees_maps_files/tree_to_read.tre", '
@@ -226,7 +226,7 @@ class TestVarAssignment(unittest.TestCase):
              "size 1. The expected dimension was 13.")
 
         with self.assertRaises(ec.ObjInitIncorrectDimensionError) as exc:
-            cmd.parse_variable_assignment(pgm_obj,
+            cmd.parse_variable_assignment(dag_obj,
                                           stoch_node_name,
                                           stoch_node_spec,
                                           cmd_line1)
@@ -246,7 +246,7 @@ class TestVarAssignment(unittest.TestCase):
              "The attribute for node names was not in the newick strings.")
         
         with self.assertRaises(ec.ObjInitInvalidArgError) as exc:
-            cmd.parse_variable_assignment(pgm_obj,
+            cmd.parse_variable_assignment(dag_obj,
                                             stoch_node_name,
                                             stoch_node_spec,
                                             cmd_line2)

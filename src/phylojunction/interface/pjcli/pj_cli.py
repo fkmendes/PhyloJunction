@@ -29,19 +29,19 @@ def execute_pj_script(
     """
 
     # Reading model #
-    pgm_obj: pgm.ProbabilisticGraphicalModel = \
-        pgm.ProbabilisticGraphicalModel()
+    dag_obj: pgm.DirectedAcyclicGraph = \
+        pgm.DirectedAcyclicGraph()
 
     print("Reading script " + model)
-    pgm_obj = cmd.script2pgm(model, in_pj_file=True)
+    dag_obj = cmd.script2dag(model, in_pj_file=True)
     print("    ... done!")
 
-    n_samples = pgm_obj.sample_size
+    n_samples = dag_obj.sample_size
 
     fig_obj, fig_axes = cliplt.start_fig_and_axes()
 
     # making sure the PGM has at least a note in it #
-    if pgm_obj.n_nodes > 0:
+    if dag_obj.n_nodes > 0:
 
         ########################################
         # Sorting out and creating directories #
@@ -54,7 +54,7 @@ def execute_pj_script(
             os.mkdir(output_dir)
 
         # debugging (looking at model)
-        # for node_name, node_pgm in pgm_obj.node_name_val_dict.items():
+        # for node_name, node_pgm in dag_obj.name_node_dict.items():
         #     print("\nnode name = " + node_name)
         #     print(node_pgm.value)
 
@@ -67,7 +67,7 @@ def execute_pj_script(
 
             pjw.dump_pgm_data(
                 data_dir,
-                pgm_obj,
+                dag_obj,
                 prefix,
                 write_nex_states)
 
@@ -82,7 +82,7 @@ def execute_pj_script(
 
             cliplt.call_node_plot_cli(
                 fig_dir,
-                pgm_obj,
+                dag_obj,
                 n_samples,
                 node_range_dict,
                 fig_obj,

@@ -25,7 +25,7 @@ class TestDetFnDiscreteSSEErrors(unittest.TestCase):
              "seed_age=3.0, epoch_age_ends=[1.2, 0.7])")
 
         with self.assertRaises(ec.ParseDetFnInitFailError) as exc:
-            pgm_obj = cmd.script2pgm(yule_timehet_invalid_epoch, in_pj_file=False)
+            dag_obj = cmd.script2dag(yule_timehet_invalid_epoch, in_pj_file=False)
 
         self.assertEqual(
             str(exc.exception),
@@ -46,7 +46,7 @@ class TestDetFnDiscreteSSEErrors(unittest.TestCase):
              "seed_age=3.0, epoch_age_ends=[0.7])")
 
         with self.assertRaises(ec.ParseRequirePositiveIntegerError) as exc:
-            pgm_obj = cmd.script2pgm(yule_zero_index, in_pj_file=False)
+            dag_obj = cmd.script2dag(yule_zero_index, in_pj_file=False)
 
         self.assertEqual(
             str(exc.exception),

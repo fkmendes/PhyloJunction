@@ -1550,8 +1550,6 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
     # now take care of all internal nodes recursively
     recursively_calculate_height(ann_tr.tree.seed_node)
 
-    print(y_coords)
-
     return y_coords
 
 

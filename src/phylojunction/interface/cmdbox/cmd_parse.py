@@ -19,28 +19,32 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-def script2pgm(script_file_path_or_model_spec: str,
-               in_pj_file: bool = True) -> pgm.ProbabilisticGraphicalModel:
-    """Go through .pj lines and populate DAG
+def script2dag(script_file_path_or_model_spec: str,
+               in_pj_file: bool = True) -> pgm.DirectedAcyclicGraph:
+    """Go through .pj lines and populate and return DAG.
 
     Args:
         script_file_path_or_model_spec (str): Path to script .pj
             file or full string specifying model directly
+
+    Returns:
+        (DirectedAcyclicGraph): DAG object built from .pj commands.
     """
 
     def _execute_spec_lines(
             all_lines_list: ty.List[str],
-                pgm_obj: pgm.ProbabilisticGraphicalModel) -> None:
+            dag_obj: pgm.DirectedAcyclicGraph) -> None:
+
         for line in all_lines_list:
             # clear padding whitespaces
             line = line.lstrip().rstrip()
-            _ = cmdline2pgm(pgm_obj, line)
+            _ = cmdline2dag(dag_obj, line)
 
     # handle seed if specified
     np.random.seed(seed=123)
     random.seed(123)
 
-    dag = pgm.ProbabilisticGraphicalModel()
+    dag = pgm.DirectedAcyclicGraph()
 
     all_lines_list: ty.List[str] = []
 
@@ -58,7 +62,7 @@ def script2pgm(script_file_path_or_model_spec: str,
     # Debugging space #
     ###################
     # seeing trees in script strings in main()
-    # for node_name, node_pgm in pgm_obj.node_name_val_dict.items():
+    # for node_name, node_pgm in dag_obj.name_node_dict.items():
         # if node_name == "trs":
         # # note that pjgui uses matplotlib.figure.Figure
         # # (which is part of Matplotlib's OOP class library)
@@ -90,8 +94,8 @@ def script2pgm(script_file_path_or_model_spec: str,
 
     # as if we had clicked "See" in the inference tab
     # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = \
-    #     pjinf.pgm_obj_to_rev_inference_spec(
-    #         pgm_obj,
+    #     pjinf.dag_obj_to_rev_inference_spec(
+    #         dag_obj,
     #         "./inference_test/",
     #         mcmc_chain_length=1000,
     #         prefix="test")
@@ -112,18 +116,19 @@ def script2pgm(script_file_path_or_model_spec: str,
     return dag
 
 
-def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
+def cmdline2dag(dag_obj: pgm.DirectedAcyclicGraph,
                 cmd_line: str) -> str:
-    """Update PGM object with user-entered .pj command
+    """Update PGM object with user-entered .pj command.
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): Object that will hold
-            all stochastic nodes (random variables) created by user via commands.
+        dag_obj (DirectedAcyclicGraph): DAG object that will hold
+            all stochastic nodes (random variables) created by user via
+            commands.
         cmd_line (str): Command line string provided by user through
             static script or via GUI.
 
     Returns:
-        str: Command string if there was nothing wrong with it
+        (str): Command string if there was nothing wrong with it.
     """
 
     # skip lines without useful commands
@@ -191,7 +196,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
 
         try:
             parse_variable_assignment(
-                pgm_obj,
+                dag_obj,
                 rv_name,
                 rv_spec,
                 cmd_line)
@@ -221,7 +226,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
 
         try:
             parse_samp_dn_assignment(
-                pgm_obj,
+                dag_obj,
                 rv_name,
                 rv_dn_spec,
                 cmd_line)
@@ -252,7 +257,7 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
 
         try:
             parse_deterministic_function_assignment(
-                pgm_obj,
+                dag_obj,
                 det_nd_name,
                 det_fn_spec,
                 cmd_line)
@@ -277,25 +282,23 @@ def cmdline2pgm(pgm_obj: pgm.ProbabilisticGraphicalModel,
 
 # function called by (1. variable assignment)
 def parse_variable_assignment(
-        pgm_obj: pgm.ProbabilisticGraphicalModel,
+        dag_obj: pgm.DirectedAcyclicGraph,
         stoch_node_name: str,
         stoch_node_spec: str,
         cmd_line: str) -> None:
-    """Create and add constant node to graphical model
+    """Create and add constant node to DAG.
 
-    Called when "<-" operator is used.
+    Called when '<-' operator is used.
     This node will not be sampled and is in practice a constant node.
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): Object that will hold
-            all nodes created by user via commands
-        stoch_node_name (str): Name of stochastic node being created
+        dag_obj (DirectedAcyclicGraph): Object that will hold all nodes
+            created by user via commands.
+        stoch_node_name (str): Name of stochastic node being created.
         stoch_node_spec (str): Stochastic node specification string
-            (whatever is right of "<-" operator in PJ command)
-        cmd_line (str): Command line string provided by user through static script or via GUI
-
-    Returns:
-        None
+            (whatever is right of '<-' operator in PJ command).
+        cmd_line (str): Command line string provided by user through
+            static script or via GUI.
     """
 
     def create_add_stoch_node_pgm(a_stoch_node_name: str,
@@ -315,7 +318,7 @@ def parse_variable_assignment(
             returned_from=a_ct_fn_obj,
             clamped=True)
 
-        pgm_obj.add_node(stoch_node)
+        dag_obj.add_node(stoch_node)
 
     #############
     # IMPORTANT #
@@ -351,7 +354,7 @@ def parse_variable_assignment(
 
         # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
         spec_dict, parent_pgm_nodes = \
-            cmdu.parse_spec(pgm_obj, constant_fn_spec, cmd_line)
+            cmdu.parse_spec(dag_obj, constant_fn_spec, cmd_line)
 
         ####################################################
         # Create the sampling distribution object          #
@@ -391,7 +394,7 @@ def parse_variable_assignment(
              "(e.g., \'read_tree\') and its specification (e.g., "
              "\'(file=\"examples/geosse_dummy_tree1\", node_name_attr=\"index\")\')."))
 
-    val_obj_list = cmdu.val_or_obj(pgm_obj, values_list)
+    val_obj_list = cmdu.val_or_obj(dag_obj, values_list)
     n_samples = len(val_obj_list)
 
     create_add_stoch_node_pgm(stoch_node_name,
@@ -402,27 +405,25 @@ def parse_variable_assignment(
 
 # function called by (2. sampling distribution assignment)
 def parse_samp_dn_assignment(
-        pgm_obj: pgm.ProbabilisticGraphicalModel,
+        dag_obj: pgm.DirectedAcyclicGraph,
         stoch_node_name: str,
         stoch_node_dn_spec: str,
-        cmd_line: str):
+        cmd_line: str) -> None:
     """Create and add stochastic node to graphical model
 
-    Called when "~" operator is used.
-    This node will be sampled from a distribution and is a random variable.
+    Called when '~' operator is used.
+    This node will be sampled from a distribution and is a random
+    variable.
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): Object that will hold
-            all nodes created by user via commands
+        dag_obj (DirectedAcyclicGraph): Object that will hold all nodes
+            created by user via commands.
         stoch_node_name (str): Name of stochastic node being created
         stoch_node_dn_spec (str): Specification string for distribution
             from which stochastic node will be sampled (whatever is
-            right of "~" operator in PJ command)
+            right of '~'' operator in PJ command)
         cmd_line (str): Command line string provided by user through
             static script or via GUI
-
-    Returns:
-        None
     """
 
     def create_add_rv_pgm(
@@ -442,7 +443,7 @@ def parse_samp_dn_assignment(
             parent_nodes=parent_pgm_nodes,
             clamped=clamped)
 
-        pgm_obj.add_node(stoch_node_pgm)
+        dag_obj.add_node(stoch_node_pgm)
 
 
     if re.search(cmdu.sampling_dn_spec_regex, stoch_node_dn_spec) is None:
@@ -468,7 +469,7 @@ def parse_samp_dn_assignment(
 
         # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
         spec_dict, parent_pgm_nodes = \
-            cmdu.parse_spec(pgm_obj, dn_spec, cmd_line)
+            cmdu.parse_spec(dag_obj, dn_spec, cmd_line)
 
         ####################################################
         # Create the sampling distribution object          #
@@ -587,28 +588,25 @@ def parse_samp_dn_assignment(
 
 # function called by (3. deterministic function assignment)
 def parse_deterministic_function_assignment(
-        pgm_obj: pgm.ProbabilisticGraphicalModel,
+        dag_obj: pgm.DirectedAcyclicGraph,
         det_nd_name: str,
         det_node_fn_spec: str,
         cmd_line: str) -> None:
     """
     Create DeterministicNodePGM instance from command string with
-    ":=" operator, then add it to ProbabilisticGraphiclModel
+    ':=' operator, then add it to ProbabilisticGraphiclModel
     instance. This node is not sampled (not a random variable) and is
     deterministically initialized via a deterministic function call.
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): Object that will hold all
-            nodes created by user via commands
+        dag_obj (DirectedAcyclicGraph): DAG object that will hold all
+            nodes created by user via commands.
         det_nd_name (str): Name of deterministic node being created
-        det_node_fn_spec (str): Specification string for deterministic function
-            that will specify the deterministic node (whatever is right of
-            ":=" operator in PJ command)
+        det_node_fn_spec (str): Specification string for deterministic
+            function that will specify the deterministic node (whatever
+            is right of ':=' operator in PJ command).
         cmd_line (str): Command line string provided by user through static
-            script or via GUI
-
-    Returns:
-        None
+            script or via GUI.
     """
 
     def create_add_det_nd_pgm(det_nd_name: str,
@@ -618,7 +616,7 @@ def parse_deterministic_function_assignment(
         det_nd_pgm = pgm.DeterministicNodePGM(det_nd_name,
                                               value=det_obj,
                                               parent_nodes=parent_pgm_nodes)
-        pgm_obj.add_node(det_nd_pgm)
+        dag_obj.add_node(det_nd_pgm)
 
         # deterministic node is of class DeterministicNodePGM, which
         # derives NodePGM -- we do not need to initialize NodePGM
@@ -631,7 +629,7 @@ def parse_deterministic_function_assignment(
         #     det_obj.node_name = det_nd_name
         #     det_obj.parent_nodes = parent_pgm_nodes
         #     det_nd_pgm = det_obj
-        #     pgm_obj.add_node(det_nd_pgm)
+        #     dag_obj.add_node(det_nd_pgm)
 
     if re.search(cmdu.sampling_dn_spec_regex, det_node_fn_spec) is None:
         raise ec.ScriptSyntaxError(
@@ -655,7 +653,7 @@ def parse_deterministic_function_assignment(
                      "specification. Distribution name not recognized."))
 
             # parses, e.g., "par1=arg1, par2=arg2" into { par1:arg1, par2:arg2 }
-            spec_dict, parent_pgm_nodes = cmdu.parse_spec(pgm_obj, det_fn_spec, cmd_line)
+            spec_dict, parent_pgm_nodes = cmdu.parse_spec(dag_obj, det_fn_spec, cmd_line)
 
             try:
                 # exists outside try!
@@ -903,11 +901,11 @@ if __name__ == "__main__":
 
     # file_handle_exception = io.StringIO(script_str36)
 
-    dag = script2pgm(script_str8, in_pj_file=False)
-    # dag = script2pgm("examples/geosse_timehet_6regions.pj", in_pj_file=True)
+    dag = script2dag(script_str8, in_pj_file=False)
+    # dag = script2dag("examples/geosse_timehet_6regions.pj", in_pj_file=True)
 
     # looking at dag nodes
-    for node_name, node_dag in dag.node_name_val_dict.items():
+    for node_name, node_dag in dag.name_node_dict.items():
         if isinstance(node_dag, pgm.StochasticNodePGM):
             if isinstance(node_dag.value[0], pjtr.AnnotatedTree):
                 print(node_dag.value[0].tree.as_string(schema="newick"))

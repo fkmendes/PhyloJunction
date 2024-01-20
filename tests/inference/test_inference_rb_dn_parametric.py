@@ -20,19 +20,14 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         and expected sampled values (from running RevBayes)
         """
         
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
         
         n_repl = 100000
         cmd_line = "u ~ unif(n=1, nr=" + str(n_repl) + ", min=-1.0, max=1.0)"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("u")
-
-        # rev_str_list = a_node_pgm.sampling_dn.get_rev_inference_spec_info()
-        # str_to_run_in_rb_for_unittest = "for (i in 1:" + str(n_repl) + ") {\n" + \
-        #     "    u[i] ~ " + rev_str_list[0] + "\n" + \
-        #     "}"
+        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line)
+        a_node_pgm = dag_obj.get_node_dag_by_name("u")
 
         rb_sample_mean = -0.002172273 # mean(u) in RB
         rb_sample_sd = 0.5781801 # stdev(u) in RB
@@ -54,14 +49,14 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         and expected sampled values (from running RevBayes)
         """
         
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
         
         n_repl = 100000
         cmd_line1 = "e1 ~ exponential(n=1, nr=" + str(n_repl) + ", rate=0.5, rate_parameterization=\"true\")" # default is true
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm1 = pgm_obj.get_node_pgm_by_name("e1")
+        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        a_node_pgm1 = dag_obj.get_node_dag_by_name("e1")
 
         # rev_str_list = a_node_pgm1.sampling_dn.get_rev_inference_spec_info()
         # str_to_run_in_rb_for_unittest1 = "for (i in 1:" + str(n_repl) + ") {\n" + \
@@ -77,8 +72,8 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         cmd_line2 = "e2 ~ exponential(n=1, nr=" + str(n_repl) + ", rate=0.5, rate_parameterization=\"false\")"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm2 = pgm_obj.get_node_pgm_by_name("e2")
+        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        a_node_pgm2 = dag_obj.get_node_dag_by_name("e2")
 
         # rev_str_list = a_node_pgm2.sampling_dn.get_rev_inference_spec_info()
         # str_to_run_in_rb_for_unittest2 = "for (i in 1:" + str(n_repl) + ") {\n" + \
@@ -113,20 +108,14 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         and expected sampled values (from running RevBayes)
         """
         
-        pgm_obj = pgm.ProbabilisticGraphicalModel()
+        dag_obj = pgm.DirectedAcyclicGraph()
         
         n_repl = 100000
         cmd_line = "n ~ normal(n=1, nr=" + str(n_repl) + ", mean=0.5, sd=0.1)"
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
-        cmdp.parse_samp_dn_assignment(pgm_obj, stoch_node_name, stoch_node_spec, cmd_line)
-        a_node_pgm = pgm_obj.get_node_pgm_by_name("n")
-
-        # rev_str_list = a_node_pgm.sampling_dn.get_rev_inference_spec_info()
-        # str_to_run_in_rb_for_unittest = "for (i in 1:" + str(n_repl) + ") {\n" + \
-        #     "    n[i] ~ " + rev_str_list[0] + "\n" + \
-        #     "}"
-        # print(str_to_run_in_rb_for_unittest)
+        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line)
+        a_node_pgm = dag_obj.get_node_dag_by_name("n")
 
         rb_sample_mean = 0.4998006 # mean(n) in RB
         rb_sample_sd = 0.09983804 # stdev(n) in RB
@@ -163,14 +152,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/inference/test_inference_rb_dn_parametric.py
+    # $ python3.9 tests/inference/test_inference_rb_dn_parametric.py
     # 
     # or
     #
-    # $ python3 -m tests.inference.test_inference_rb_dn_parametric
+    # $ python3.9 -m tests.inference.test_inference_rb_dn_parametric
     #
     # or 
     #
-    # $ python3 -m unittest tests.inference.test_inference_rb_dn_parametric.TestInferenceRevBayesParametricDn.test_pj2rb_uniform
+    # $ python3.9 -m unittest tests.inference.test_inference_rb_dn_parametric.TestInferenceRevBayesParametricDn.test_pj2rb_uniform
 
     unittest.main()

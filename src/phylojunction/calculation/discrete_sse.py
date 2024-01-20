@@ -905,10 +905,11 @@ class DiscreteStateDependentParameterManager:
 class MacroevolEventHandler():
     """Class for handling state-dependent rates.
 
-    Some of the methods in this class are vector-aware (through parameter
-    value_idx), because instances of this class will be directly called by
-    dn_sse.simulate() method, which in turn will try to access parameter values
-    stored in a #-simulations-sized list.
+    Some of the methods in this class are vector-aware (through
+    parameter value_idx), because instances of this class will
+    be directly called by dn_sse.simulate() method, which in turn
+    will try to access parameter values stored in a
+    #-simulations-sized list.
 
     Attributes:
         sse_rate_manager (DiscreteStateDependentParameterManager):
@@ -1382,7 +1383,13 @@ class DiscreteStateDependentProbabilityHandler():
 
 class SSEStash():
     """
-    Class for stashing state-dependent rate and probability handlers
+    Class for stashing state-dependent rate and probability handlers.
+
+    Attributes:
+        meh (MacroevolEventHandler): Instance of state-dependent rate
+            handler class.
+        prob_handler (DiscreteStateDependentProbabilityHandler):
+            Instance of state-dependent probability handler class.
     """
 
     meh: MacroevolEventHandler

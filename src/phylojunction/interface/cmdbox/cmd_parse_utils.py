@@ -39,9 +39,9 @@ sampling_dn_spec_regex = re.compile(r"([a-zA-Z]+_*[a-zA-Z]*)\((.+)\)")
 deterministic_regex = re.compile(r"\s*(:=)\s*")
 
 
-def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
+def val_or_obj(dag_obj: pgm.DirectedAcyclicGraph,
                val: ty.List[str]) -> ty.List[ty.Union[pgm.NodePGM, str]]:
-    """Return list of strings with values or node names
+    """Return list of strings with values or node names.
 
     Checks if provided values are directly accessible as values
     (e.g., 1.0, \"a_string_in_quotes\")) or if they are names of nodes
@@ -50,8 +50,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
     return
 
     Args:
-        pgm_obj (pgm.ProbabilisticGraphicalModel): Probabilistic
-            graphical model object.
+        dag_obj (DirectedAcyclicGraph): DAG object being interrogated.
         val (str): List of strings, one for each argument coming
             from a parsed command.
 
@@ -73,7 +72,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
                 # if it does find a node with that name, we add the node object
                 try:
                     # appending StochasticNodePGM
-                    val_or_obj_list.append(pgm_obj.node_name_val_dict[v])
+                    val_or_obj_list.append(dag_obj.name_node_dict[v])
 
                 except KeyError:
                     raise ec.InexistentVariableError(v)
@@ -87,7 +86,7 @@ def val_or_obj(pgm_obj: pgm.ProbabilisticGraphicalModel,
 
 
 def parse_spec(
-        pgm_obj: pgm.ProbabilisticGraphicalModel,
+        dag_obj: pgm.DirectedAcyclicGraph,
         fn_spec_str: str,
         cmd_line: str) \
         -> ty.Tuple[
@@ -120,7 +119,7 @@ def parse_spec(
             # print("\n\n parsing arg " + str(an_arg) + " as str")
             arg_list.append(an_arg)
 
-        val_obj_list = val_or_obj(pgm_obj, arg_list)
+        val_obj_list = val_or_obj(dag_obj, arg_list)
         spec_dict_return[param_name] = val_obj_list
         # { param_name_str:
         #       [ number_or_quoted_str_str1,

@@ -14,9 +14,12 @@ class TestParametricDns(unittest.TestCase):
         cls.dummy_parent_node_tracker = dict()
 
     def test_unif(self):
-        """Test uniform draws with non-vectorized input"""
-        # unif_rv = dnpar.DnUnif([100000, 1, [-1.0], [1.0]]).generate()
-        unif_rv = dnpar.DnUnif(100000, 1, [-1.0], [1.0], self.dummy_parent_node_tracker).generate()
+        """Test uniform draws with non-vectorized input."""
+
+        unif_rv = dnpar.DnUnif(100000,
+                               1,
+                               [-1.0],
+                               [1.0]).generate()
         self.assertAlmostEqual(0.0, mean(unif_rv), delta=1e-2)
         self.assertLessEqual(-1.0, min(unif_rv))
         self.assertGreater(1.0, max(unif_rv))
@@ -59,13 +62,22 @@ class TestParametricDns(unittest.TestCase):
         self.assertAlmostEqual(0.5, mean(normal_rv), delta=0.05)
 
     def test_lognormal(self):
-        """Test log-normal draws with non-vectorized input"""
-        # lognormal_rv1 = dnpar.DnLogNormal([100000, 1, [-3.25], [0.25], True]).generate() # log-space (True is default)
-        # lognormal_rv2 = dnpar.DnLogNormal([100000, 1, [math.exp(-3.25)], [math.exp(0.25)], False]).generate() # real space (log-space is False), R's default when "mean" and "sd" are used
-        lognormal_rv1 = dnpar.DnLogNormal(100000, 1, [-3.25], [0.25], True, self.dummy_parent_node_tracker).generate() # log-space (True is default)
-        lognormal_rv2 = dnpar.DnLogNormal(100000, 1, [math.exp(-3.25)], [math.exp(0.25)], False, self.dummy_parent_node_tracker).generate() # real space (log-space is False), R's default when "mean" and "sd" are used
+        """Test log-normal draws with non-vectorized input."""
+
+        lognormal_rv1 = dnpar.DnLogNormal(100000,
+                                          1,
+                                          [-3.25],
+                                          [0.25],
+                                          True).generate() # log-space (True is default)
+        # real space (log-space is False), R's default when "mean" and "sd" are used
+        lognormal_rv2 = dnpar.DnLogNormal(100000,
+                                          1,
+                                          [math.exp(-3.25)],
+                                          [math.exp(0.25)],
+                                          False).generate()
         self.assertAlmostEqual(2.37, mean(lognormal_rv1), delta=0.1)
         self.assertAlmostEqual(2.37, mean(lognormal_rv2), delta=0.1)
+
 
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder
@@ -85,14 +97,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/distribution/test_dn_parametric_object.py
+    # $ python3.9 tests/distribution/test_dn_parametric_object.py
     # 
     # or
     #
-    # $ python3 -m tests.distribution.test_dn_parametric_object
+    # $ python3.9 -m tests.distribution.test_dn_parametric_object
     #
     # or 
     #
-    # $ python3 -m unittest tests.distribution.test_dn_parametric_object.TestParametricDns.test_unif
+    # $ python3.9 -m unittest tests.distribution.test_dn_parametric_object.TestParametricDns.test_unif
     
     unittest.main()

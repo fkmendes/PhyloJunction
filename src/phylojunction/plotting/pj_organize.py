@@ -192,7 +192,7 @@ if __name__ == "__main__":
 
     # initializing model
     model_fp = "examples/multiple_scalar_tree_plated.pj"
-    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
+    dag_obj = cmdp.script2dag(model_fp, in_pj_file=True)
 
     # getting pj dataframes
     scalar_output_stash: \
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     tree_output_stash: ty.List[ty.Dict[str, pd.DataFrame]]
     output_df_list: ty.List[pd.DataFrame]
     scalar_output_stash, tree_output_stash = \
-        pjwrite.prep_data_df(pgm_obj)  # still prefixless
+        pjwrite.prep_data_df(dag_obj)  # still prefixless
     _, output_df_list = \
         pjwrite.prep_data_filepaths_dfs(
             scalar_output_stash,
@@ -267,10 +267,10 @@ if __name__ == "__main__":
 
     # initializing model
     model_fp = "examples/coverage_files/r_b_exp1.pj"
-    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
+    dag_obj = cmdp.script2dag(model_fp, in_pj_file=True)
 
     # reading true values
-    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(dag_obj)
     scalar_constant_df = scalar_output_stash[0]
 
     # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(),

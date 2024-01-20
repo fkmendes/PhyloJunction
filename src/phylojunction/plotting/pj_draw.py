@@ -159,10 +159,10 @@ if __name__ == "__main__":
 
     # initializing model
     model_fp = "examples/validate_files/r_b.pj"
-    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
+    dag_obj = cmdp.script2dag(model_fp, in_pj_file=True)
 
     # reading true values
-    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+    scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(dag_obj)
     scalar_constant_df = scalar_output_stash[0]
     # print(tabulate(scalar_constant_df, headers=scalar_constant_df.head(),
     #                tablefmt="pretty", showindex=False))

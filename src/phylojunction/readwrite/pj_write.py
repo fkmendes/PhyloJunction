@@ -167,25 +167,24 @@ def initialize_tree_dataframe(
 
 
 def prep_data_df(
-        pgm_obj: pgm.ProbabilisticGraphicalModel,
+        dag_obj: pgm.DirectedAcyclicGraph,
         write_nex_states: bool = False) -> \
     ty.Tuple[ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
              ty.List[ty.Dict[str, pd.DataFrame]]]:
-    """
-    Return two pandas DataFrame's, with scalar and tree random
-    variables
+    """Return two pandas DataFrame's, with scalar and tree random variables.
 
-    Arguments
-        pgm_obj (pgm.ProbabilisticGraphicalModel):
+    Args:
+        dag_obj (DirectedAcyclicGraph): DAG object holding the
+            simulated data to be tabulated.
         write_nex_states (bool): Whether to write .nex file with states
 
-    Returns
+    Returns:
         (tuple): Tuple with two lists as elements, one with file-suffix
                  strings, another with pandas.DataFrame's
     """
 
-    sample_size = pgm_obj.sample_size
-    node_pgm_list = pgm_obj.get_sorted_node_pgm_list()
+    sample_size = dag_obj.sample_size
+    node_pgm_list = dag_obj.get_sorted_node_dag_list()
 
     # tree nodes (one dataframe per different tree node)
 
@@ -779,16 +778,15 @@ def prep_data_filepaths_dfs(
 
 
 def dump_pgm_data(dir_string: str,
-                  pgm_obj: pgm.ProbabilisticGraphicalModel,
+                  dag_obj: pgm.DirectedAcyclicGraph,
                   prefix: str = "",
                   write_nex_states: bool = False) -> None:
     """Write stochastic-node sampled values in specified directory
 
     Args:
         dir_string (str): Where to save the files to be written
-        pgm_obj (pgm.ProbabilisticGraphicalModel): Probabilistic
-            graphical model instance whose sampled values we are
-            extracting and writing to file
+        dag_obj (DirectedAcyclicGraph): DAG object whose sampled
+            values we are extracting and writing to file.
         prefix (str): String to preceed file names
 
     Returns:
@@ -796,7 +794,7 @@ def dump_pgm_data(dir_string: str,
     """
 
     sorted_node_pgm_list: \
-        ty.List[pgm.NodePGM] = pgm_obj.get_sorted_node_pgm_list()
+        ty.List[pgm.NodePGM] = dag_obj.get_sorted_node_dag_list()
 
     # populating data stashes that will be dumped and their file names
     scalar_output_stash: \
@@ -807,7 +805,7 @@ def dump_pgm_data(dir_string: str,
 
     # still prefixless #
     scalar_output_stash, tree_output_stash = \
-        prep_data_df(pgm_obj, write_nex_states)
+        prep_data_df(dag_obj, write_nex_states)
 
     output_fp_list, output_df_str_list = \
         prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)
@@ -861,19 +859,17 @@ def dump_pgm_data(dir_string: str,
 
 def dump_serialized_pgm(
         file_name: str,
-        pgm_obj: pgm.ProbabilisticGraphicalModel,
+        dag_obj: pgm.DirectedAcyclicGraph,
         cmd_log_list: ty.List[str],
-        prefix: str = "", to_folder: bool = False) -> None:
-    """Write serialized PGM in specified directory
+        prefix: str = "",
+        to_folder: bool = False) -> None:
+    """Write serialized DAG in specified directory.
 
     Args:
         file_name (str): Serialized file name
-        pgm_obj (pgm.ProbabilisticGraphicalModel): Probabilistic
-            graphical model instance to be serialized and saved
-        prefix (str): String to preceed file name
-
-    Returns:
-        None
+        dag_obj (DirectedAcyclicGraph): DAG object to be serialized
+            and saved.
+        prefix (str): String to preceed file name.
     """
 
     if file_name:
@@ -886,7 +882,7 @@ def dump_serialized_pgm(
                 file_name += "/"
 
             with open(file_name + prefix + ".pickle", "wb") as picklefile:
-                pickle.dump((pgm_obj, cmd_log_list), picklefile)
+                pickle.dump((dag_obj, cmd_log_list), picklefile)
 
         # PySide6
         else:
@@ -895,7 +891,7 @@ def dump_serialized_pgm(
                 head += "/"
 
             with open(head + prefix + tail + ".pickle", "wb") as picklefile:
-                pickle.dump((pgm_obj, cmd_log_list), picklefile)
+                pickle.dump((dag_obj, cmd_log_list), picklefile)
 
 
 def get_write_inference_rev_scripts(
@@ -971,10 +967,10 @@ if __name__ == "__main__":
     # initializing model
     # model_fp = "examples/multiple_scalar_tree_plated.pj"
     model_fp = "examples/geosse.pj"
-    pgm_obj = cmdp.script2pgm(model_fp, in_pj_file=True)
+    dag_obj = cmdp.script2dag(model_fp, in_pj_file=True)
 
     # either: to see what's inside dataframes (uncomment debugging)
-    prep_data_df(pgm_obj)
+    prep_data_df(dag_obj)
 
     # or: to see file names and dataframes after organized (uncomment debugging)
-    # dump_pgm_data("./", pgm_obj, prefix="test")
+    # dump_pgm_data("./", dag_obj, prefix="test")

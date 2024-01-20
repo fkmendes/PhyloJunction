@@ -79,7 +79,7 @@ def call_gui():
             line = line.strip() # removing whitespaces from left and right
             
             try:
-                valid_cmd_line = cmdp.cmdline2pgm(a_pgm, line)
+                valid_cmd_line = cmdp.cmdline2dag(a_pgm, line)
         
             except Exception as e:
                 if not event == "Simulate":
@@ -93,9 +93,9 @@ def call_gui():
                 
                 cmd_line_hist.append(valid_cmd_line)
                 wdw["-HIST-"].update("\n".join(cmd_line_hist))
-                wdw["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
-                wdw["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
-                wdw["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
+                wdw["-PGM-NODES-"].update([node_name for node_name in dag_obj.name_node_dict])
+                wdw["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in dag_obj.get_sorted_node_dag_list() if nd.is_sampled])
+                wdw["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in dag_obj.get_sorted_node_dag_list() if not nd.is_deterministic])
 
 
     def initialize_axes(fig: Figure, disabled_yticks: bool=True) -> plt.Axes:
@@ -112,12 +112,12 @@ def call_gui():
         return ax
 
 
-    def clean_disable_everything(cmd_line_hist: str, msg: str) -> ty.Tuple[pgm.ProbabilisticGraphicalModel, plt.Axes, plt.Axes,  plt.Axes]:
+    def clean_disable_everything(cmd_line_hist: str, msg: str) -> ty.Tuple[pgm.DirectedAcyclicGraph, plt.Axes, plt.Axes,  plt.Axes]:
         """
         Destroy PGM object, reset all panels (except history panel).
         History panel is updated with 'reset PGM' line.
         """
-        pgm_obj = pgm.ProbabilisticGraphicalModel() # new PGM
+        dag_obj = pgm.DirectedAcyclicGraph() # new DAG
 
         window["-COPY-VALUE-"].update(disabled=True)
         window["-COPY-ALL-"].update(disabled=True)
@@ -148,15 +148,15 @@ def call_gui():
         validation_ax = initialize_axes(validation_fig)
         validation_fig.canvas.draw() # updates canvas
 
-        return pgm_obj, ax, comparison_ax, validation_ax
+        return dag_obj, ax, comparison_ax, validation_ax
 
 
     def draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
         return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
     
-    def selected_node_read(pgm_obj, node_name):
-        node_pgm = pgm_obj.get_node_pgm_by_name(node_name)
+    def selected_node_read(dag_obj, node_name):
+        node_pgm = dag_obj.get_node_dag_by_name(node_name)
         # display_node_pgm_value_str = pg.get_display_str_by_name(node_name)
         sample_size = len(node_pgm) # this is n_sim inside sampling distribution classes
         repl_size = node_pgm.repl_size
@@ -164,7 +164,7 @@ def call_gui():
         return node_pgm, sample_size, repl_size
 
     
-    def selected_node_display(wdw, pgm_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+    def selected_node_display(wdw, dag_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
         display_node_pgm_value_str = str()
         display_node_pgm_stat_str = str()
 
@@ -179,7 +179,7 @@ def call_gui():
         # we get all samples
         else:
             # just calling __str__
-            display_node_pgm_value_str = pgm_obj.get_display_str_by_name(node_pgm.node_name)
+            display_node_pgm_value_str = dag_obj.get_display_str_by_name(node_pgm.node_name)
             # getting all values
             display_node_pgm_stat_str = node_pgm.get_node_stats_str(0, len(node_pgm.value), repl_idx) # summary stats
         
@@ -209,12 +209,12 @@ def call_gui():
         fig_obj.canvas.draw()
 
     
-    def do_selected_node(pgm_obj, wdw, fig_obj, node_name, do_all_samples=True):
+    def do_selected_node(dag_obj, wdw, fig_obj, node_name, do_all_samples=True):
         """
         Given selected node name, display its string representation and
         plot it on canvas if possible
         """
-        node_pgm, sample_size, repl_size = selected_node_read(pgm_obj, node_name)
+        node_pgm, sample_size, repl_size = selected_node_read(dag_obj, node_name)
 
         # updates spin window with number of elements in this node_pgm
         # window["-ITH-VAL-"].update(values=[x for x in range(1, sample_size + 1)]) # can only select the number of values this node contains
@@ -232,7 +232,7 @@ def call_gui():
         repl_idx = int(wdw["-ITH-REPL-"].get()) - 1 # (offset)
 
         # updating node values on window happens inside
-        selected_node_display(wdw, pgm_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+        selected_node_display(wdw, dag_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
     
         # plotting to canvas happens inside
         selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
@@ -690,7 +690,7 @@ def call_gui():
     ##############
     # Event loop #
     ##############
-    pgm_obj: pgm.ProbabilisticGraphicalModel = pgm.ProbabilisticGraphicalModel()
+    dag_obj: pgm.DirectedAcyclicGraph = pgm.DirectedAcyclicGraph()
     cmd_history: ty.List[str] = []
     cmd_line: str = ""
     script_out_fp: str = ""
@@ -742,7 +742,7 @@ def call_gui():
             value_str = str()
             
             if values["-COPY-ALL-"]:
-                value_str = pgm_obj.get_display_str_by_name(node_pgm.node_name)
+                value_str = dag_obj.get_display_str_by_name(node_pgm.node_name)
             else:
                 value_str = values['-PGM-NODE-DISPLAY-']
             
@@ -756,9 +756,9 @@ def call_gui():
         # Destroying model #
         ####################
         elif event == "-DESTROY-PGM-":
-            # pgm_obj and node_display_fig_axes are overwritten with new clean objects
+            # dag_obj and node_display_fig_axes are overwritten with new clean objects
             # cmd_history is updated inside
-            pgm_obj, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
+            dag_obj, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Reset taking place at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
 
 
         ####################################
@@ -773,11 +773,11 @@ def call_gui():
 
                 # if selected node is tree, we do not want to show all trees on display by default
                 try:
-                    if isinstance(pgm_obj.get_node_pgm_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
+                    if isinstance(dag_obj.get_node_dag_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
                         do_all_samples = False
                 except: pass # the value of the node_pgm might be an DiscreteStateDependentRate, which is not subscriptable, so we pass
                 
-                node_pgm = do_selected_node(pgm_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_pgm = do_selected_node(dag_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
                 
                 # we enable value copying as soon as a node is clicked
                 window["-COPY-VALUE-"].update(disabled=False)
@@ -829,7 +829,7 @@ def call_gui():
             if values["-PGM-NODES-"]:
                 selected_node_pgm_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
-                node_pgm = do_selected_node(pgm_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_pgm = do_selected_node(dag_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
 
 
         #######################
@@ -849,7 +849,7 @@ def call_gui():
             if values["-PGM-NODES-"]:
                 selected_node_pgm_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
-                node_pgm = do_selected_node(pgm_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_pgm = do_selected_node(dag_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
 
 
         ##################
@@ -861,10 +861,10 @@ def call_gui():
             if script_in_fp:
                 _, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Loading script at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
                 cmd_lines = pjread.read_text_file(script_in_fp)
-                parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
+                parse_cmd_lines(cmd_lines, cmd_history, dag_obj, window)
 
                 # it model has at least one node, destroying is now a possibility
-                if pgm_obj.n_nodes >= 1:
+                if dag_obj.n_nodes >= 1:
                     window["-DESTROY-PGM-"].update(disabled=False)
             
             else: pass # event canceled by user
@@ -878,10 +878,10 @@ def call_gui():
             
             if model_in_fp:
                 _, node_display_fig_axes, comparison_fig_axes, validation_fig_axes = clean_disable_everything(cmd_history, "## Loading serialized model at this point. Previous model, if it existed, is now obliterated") # clean figure, reset axes
-                pgm_obj = pjread.read_serialized_pgm(model_in_fp)
-                window["-PGM-NODES-"].update([node_name for node_name in pgm_obj.node_name_val_dict])
-                window["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if nd.is_sampled])
-                window["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in pgm_obj.get_sorted_node_pgm_list() if not nd.is_deterministic])
+                dag_obj = pjread.read_serialized_pgm(model_in_fp)
+                window["-PGM-NODES-"].update([node_name for node_name in dag_obj.name_node_dict])
+                window["-COMPARISON-PGM-NODES-"].update([nd.node_name for nd in dag_obj.get_sorted_node_dag_list() if nd.is_sampled])
+                window["-VALIDATION-PGM-NODES-"].update([nd.node_name for nd in dag_obj.get_sorted_node_dag_list() if not nd.is_deterministic])
             
             else: pass # user canceled event
 
@@ -899,7 +899,7 @@ def call_gui():
                         
             # default value is "./"
             # if data_out_dir:
-            pjwrite.dump_pgm_data(data_out_dir, pgm_obj, prefix=prefix)
+            pjwrite.dump_pgm_data(data_out_dir, dag_obj, prefix=prefix)
 
 
         ###########################
@@ -914,7 +914,7 @@ def call_gui():
             prefix = values["-PREFIX-"]
             
             # pickling and saving PGM
-            pjwrite.dump_serialized_pgm(model_out_dir, pgm_obj, [""], prefix=prefix)
+            pjwrite.dump_serialized_pgm(model_out_dir, dag_obj, [""], prefix=prefix)
 
 
         ##################
@@ -952,7 +952,7 @@ def call_gui():
         # Generating inference spec #
         #############################
         elif event == "-GEN-INF-":
-            if pgm_obj.n_nodes >= 1:
+            if dag_obj.n_nodes >= 1:
                 try:
                     mcmc_chain_length = int(values["-CHAIN-"])
                 
@@ -961,7 +961,7 @@ def call_gui():
                 except ec.InvalidMCMCChainLength as e:
                     sg.popup_error("Invalid MCMC chain length")
 
-                all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(pgm_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length)
+                all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.dag_obj_to_rev_inference_spec(dag_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length)
 
                 all_sims_spec_strs_list = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, write2file=False)
 
@@ -1000,7 +1000,7 @@ def call_gui():
         #     except Exception as e:
         #         sg.popup_error("MCMC chain length must be a number")
 
-        #     all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.pgm_obj_to_rev_inference_spec(pgm_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
+        #     all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = pjinf.dag_obj_to_rev_inference_spec(dag_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
 
         #     _ = pjio.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
 
@@ -1024,7 +1024,7 @@ def call_gui():
             except Exception as e:
                 sg.popup_error("MCMC chain length must be a number")
 
-            all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.pgm_obj_to_rev_inference_spec(pgm_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
+            all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = rbinf.dag_obj_to_rev_inference_spec(dag_obj, inf_out_dir, mcmc_chain_length=mcmc_chain_length, prefix=prefix)
 
             _ = pjwrite.get_write_inference_rev_scripts(all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list, prefix=prefix, write2file=True)
             
@@ -1061,11 +1061,11 @@ def call_gui():
             
             if values["-COMPARISON-PGM-NODES-"]:
                 selected_node_name = values["-COMPARISON-PGM-NODES-"][0]
-                selected_node = pgm_obj.get_node_pgm_by_name(selected_node_name)
+                selected_node = dag_obj.get_node_dag_by_name(selected_node_name)
                 selected_node_repl_size = selected_node.repl_size
 
                 # could be more efficient, but this makes sure that stashes are always up-to-date
-                scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+                scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(dag_obj)
                 
                 _, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
                 
@@ -1199,11 +1199,11 @@ def call_gui():
             
             if values["-VALIDATION-PGM-NODES-"]:
                 selected_node_name = values["-VALIDATION-PGM-NODES-"][0]
-                selected_node = pgm_obj.get_node_pgm_by_name(selected_node_name)
+                selected_node = dag_obj.get_node_dag_by_name(selected_node_name)
                 selected_node_repl_size = selected_node.repl_size
 
                 # could be more efficient, but this makes sure that stashes are always up-to-date
-                scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(pgm_obj)
+                scalar_output_stash, tree_output_stash = pjwrite.prep_data_df(dag_obj)
                 scalar_constant_value_df, scalar_value_df_dict, scalar_repl_summary_df = scalar_output_stash
                 tree_value_df_dict, tree_ann_value_df_dict, tree_rec_value_df_dict, \
                 tree_rec_ann_value_df_dict, tree_summary_df_dict, tree_repl_summary_df_dict, \
@@ -1285,10 +1285,10 @@ def call_gui():
         else: 
             cmd_lines = [cl for cl in re.split("\n", cmd_line) if cl] # in case the user enters multiple lines, also ignores empty lines
 
-            parse_cmd_lines(cmd_lines, cmd_history, pgm_obj, window)
+            parse_cmd_lines(cmd_lines, cmd_history, dag_obj, window)
 
             # it model has at least one node, we can destroy it
-            if pgm_obj.n_nodes >= 1:
+            if dag_obj.n_nodes >= 1:
                 window["-DESTROY-PGM-"].update(disabled=False)
 
 

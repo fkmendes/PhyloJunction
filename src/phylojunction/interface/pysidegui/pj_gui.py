@@ -13,7 +13,7 @@ from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QTimer
 # pj imports #
 from phylojunction.interface.pysidegui.content_main_window \
     import ContentGUIMainWindow
-from phylojunction.pgm.pgm import ProbabilisticGraphicalModel
+from phylojunction.pgm.pgm import DirectedAcyclicGraph
 import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.plotting.pj_organize as pjorg
 import phylojunction.plotting.pj_draw as pjdraw
@@ -27,11 +27,11 @@ __email__ = "f.mendes@wustl.edu"
 
 class GUIModeling():
 
-    pgm_obj: ProbabilisticGraphicalModel
+    dag_obj: DirectedAcyclicGraph
     cmd_log_list: ty.List[str]
 
     def __init__(self):
-        self.pgm_obj = ProbabilisticGraphicalModel()
+        self.dag_obj = DirectedAcyclicGraph()
         self.cmd_log_list = []
 
     def parse_cmd_update_pgm(
@@ -53,9 +53,9 @@ class GUIModeling():
             line = line.strip()
             print("  " + line)
 
-            # side-effect in cmdline2pgm
+            # side-effect in cmdline2dag
             try:
-                valid_cmd_line = cmdp.cmdline2pgm(self.pgm_obj, line)
+                valid_cmd_line = cmdp.cmdline2dag(self.dag_obj, line)
 
             except Exception as e:
                 gui_main_window_obj.ui.bottom_label_left.setText("Warning produced")
@@ -88,7 +88,7 @@ class GUIModeling():
         return "\n".join(self.cmd_log_list) + "\n\n"
 
     def clear(self):
-        self.pgm_obj = ProbabilisticGraphicalModel()
+        self.dag_obj = DirectedAcyclicGraph()
 
 
 class GUIMainWindow(QMainWindow):
@@ -409,7 +409,7 @@ class GUIMainWindow(QMainWindow):
         else:
             # just calling __str__
             display_node_pgm_value_str = \
-                self.gui_modeling.pgm_obj \
+                self.gui_modeling.dag_obj \
                 .get_display_str_by_name(node_pgm.node_name)
 
             # getting all values
@@ -472,7 +472,7 @@ class GUIMainWindow(QMainWindow):
         fig_obj.canvas.draw()
 
     def selected_node_read(self, node_name: str):
-        node_pgm = self.gui_modeling.pgm_obj.get_node_pgm_by_name(node_name)
+        node_pgm = self.gui_modeling.dag_obj.get_node_dag_by_name(node_name)
         # this is n_sim inside sampling distribution classes
         sample_size = len(node_pgm)
         repl_size = node_pgm.repl_size
@@ -572,7 +572,7 @@ class GUIMainWindow(QMainWindow):
             # could be more efficient, but this
             # makes sure that stashes are always up-to-date
             scalar_output_stash, tree_output_stash = \
-                pjwrite.prep_data_df(self.gui_modeling.pgm_obj)
+                pjwrite.prep_data_df(self.gui_modeling.dag_obj)
 
             # collecting scalars #
             _, scalar_value_df_dict, scalar_repl_summary_df = \
@@ -649,7 +649,7 @@ class GUIMainWindow(QMainWindow):
             # could be more efficient, but this
             # makes sure that stashes are always up-to-date
             scalar_output_stash, tree_output_stash = \
-                pjwrite.prep_data_df(self.gui_modeling.pgm_obj)
+                pjwrite.prep_data_df(self.gui_modeling.dag_obj)
 
             # collecting scalars #
             scalar_constant_value_df, scalar_value_df_dict, scalar_repl_summary_df = \
@@ -716,20 +716,20 @@ class GUIMainWindow(QMainWindow):
             # pgm page node list
             self.ui.ui_pages.node_list.addItems(
                 [node_name for node_name in
-                 self.gui_modeling.pgm_obj.node_name_val_dict]
+                 self.gui_modeling.dag_obj.name_node_dict]
             )
 
             # compare page node list
             self.ui.ui_pages.compare_node_list.addItems(
                 [nd.node_name for nd in
-                 self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+                 self.gui_modeling.dag_obj.get_sorted_node_dag_list() if
                  nd.is_sampled]
             )
 
             # coverage page node list
             self.ui.ui_pages.coverage_node_list.addItems(
                 [nd.node_name for nd in
-                 self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+                 self.gui_modeling.dag_obj.get_sorted_node_dag_list() if
                  not nd.is_deterministic]
             )
 
@@ -805,7 +805,7 @@ class GUIMainWindow(QMainWindow):
         if model_fp:
             self.clean_disable_everything()
             self.ui.ui_pages.cmd_log_textbox.clear()
-            self.gui_modeling.pgm_obj, self.gui_modeling.cmd_log_list = pjread.read_serialized_pgm(model_fp)
+            self.gui_modeling.dag_obj, self.gui_modeling.cmd_log_list = pjread.read_serialized_pgm(model_fp)
             self.refresh_node_lists()
             self.ui.ui_pages.cmd_log_textbox.setText(self.gui_modeling.cmd_log())
 
@@ -853,7 +853,7 @@ class GUIMainWindow(QMainWindow):
         # pickling and saving PGM
         pjwrite.dump_serialized_pgm(
             pickle_fp,
-            self.gui_modeling.pgm_obj,
+            self.gui_modeling.dag_obj,
             self.gui_modeling.cmd_log_list,
             prefix=prefix)
 
@@ -869,7 +869,7 @@ class GUIMainWindow(QMainWindow):
         # different files
         pjwrite.dump_pgm_data(
             data_out_dir,
-            self.gui_modeling.pgm_obj,
+            self.gui_modeling.dag_obj,
             prefix=prefix)
 
     #################
@@ -1340,14 +1340,14 @@ class GUIMainWindow(QMainWindow):
         # pgm page node list #
         pgm_node_list = \
             [node_name for node_name in
-             self.gui_modeling.pgm_obj.node_name_val_dict]
+             self.gui_modeling.dag_obj.name_node_dict]
         self.ui.ui_pages.node_list.clear()  # clear first
         self.ui.ui_pages.node_list.addItems(pgm_node_list)
 
         # compare page node list
         compare_nodes_list = \
             [nd.node_name for nd in
-             self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+             self.gui_modeling.dag_obj.get_sorted_node_dag_list() if
              nd.is_sampled]
         self.ui.ui_pages.compare_node_list.clear()
         self.ui.ui_pages.compare_node_list.addItems(compare_nodes_list)
@@ -1355,7 +1355,7 @@ class GUIMainWindow(QMainWindow):
         # coverage page node list
         coverage_nodes_list = \
             [nd.node_name for nd in
-             self.gui_modeling.pgm_obj.get_sorted_node_pgm_list() if
+             self.gui_modeling.dag_obj.get_sorted_node_dag_list() if
              not nd.is_deterministic]
         self.ui.ui_pages.coverage_node_list.clear()
         self.ui.ui_pages.coverage_node_list.addItems(coverage_nodes_list)

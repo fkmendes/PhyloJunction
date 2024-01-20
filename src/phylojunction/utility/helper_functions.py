@@ -34,16 +34,26 @@ def create_str_defaultdict() -> defaultdict:
     return defaultdict(str)
 
 
-def verify_or_convert2_vector(
+def check_and_vectorize_if_must(
         param_list:
         ty.Union[int, float, str, ty.List[ty.Union[int, float, str]]],
-        dn_name: str, size_to_grow=1) \
-        -> ty.List[ty.List[ty.Union[int, float, str]]]:
-    """
+        dn_name: str,
+        size_to_grow: int = 1) -> ty.List[ty.List[ty.Union[int, float, str]]]:
+    """Check number of provided values and vectorize if necessary.
 
     Args:
-        size_to_grow (int): This will be the number of simulations
-            (n_samples inside a DistributionPGM object)
+        param_list (tuple): Parameter values (could be scalar
+        integers, floats, strings, or any of those in a list).
+        dn_name (str): Name of the distribution whose parameter values
+            we are checking.
+        size_to_grow (int): Number of values we need, which is the
+            specified number of simulations ('n_samples' in
+            DistributionDAG). Defaults to 1.
+
+    Returns:
+        (list): Two-dimensional list of potentially vectorized
+            parameter values. First dimension are samples
+            (simulations), second dimension are replicates.
     """
 
     # using numpy array as a hack to get nested-ness of param_list
@@ -53,11 +63,16 @@ def verify_or_convert2_vector(
     n_params = len(param_list_array.shape)
 
     vectorizable_param_list = param_list
-    vectorized_param_list: ty.List[ty.List[ty.Union[int, float, str]]] = []
+    vectorized_param_list: ty.List[ty.List[ty.Union[int, float, str]]] = \
+        list()
 
     one_scalar_provided: bool = False
     one_scalar_in_list_provided: bool = False
     one_par_right_value_count: bool = False
+
+    ##################################
+    # First we prepare the container #
+    ##################################
 
     # scalar provided by itself, e.g., rate = 1.0
     if isinstance(vectorizable_param_list, (int, float, str)):
@@ -83,6 +98,10 @@ def verify_or_convert2_vector(
             one_par_right_value_count = True
             vectorized_param_list.append([])
 
+    ######################
+    # Now we populate it #
+    ######################
+
     # each v here will be a different parameter (e.g., mean and sd)
     # in case there is more than one parameter
     if isinstance(vectorizable_param_list, list):
@@ -91,13 +110,13 @@ def verify_or_convert2_vector(
             # a single value was provided as scalar, either by itself, or
             # inside a list by itself
             if isinstance(v, (int, float, str)):
-                # param list is a single scalar, e.g., mean=1.0
+                # param list is a single scalar, e.g., mean=1.0, vectorize!
                 if one_scalar_provided:
                     vectorized_param_list.append(
                         [v for i in range(size_to_grow)])
 
                 # param list is a single scalar, by itself, inside a list,
-                # e.g., mean=[[1.0]]
+                # e.g., mean=[[1.0]], vectorize!
                 elif one_scalar_in_list_provided:
                     vectorized_param_list.append([v] * size_to_grow)
 
@@ -109,20 +128,23 @@ def verify_or_convert2_vector(
             elif isinstance(v, list):
                 n_val = len(v)
 
-                # more values than specified number of samples
+                # more values than specified number of samples,
+                # can't vectorize!
                 if n_val > size_to_grow:
                     raise ec.DimensionalityError(dn_name)
 
-                # don't know how to multiply if more than one element
+                # don't know how to multiply if more than one element,
+                # can't vectorize!
                 elif n_val > 1 and n_val < size_to_grow:
                     raise ec.DimensionalityError(dn_name)
 
-                # a single value was provided as list
+                # a single value was provided as list, vectorize!
                 elif n_val == 1:
                     vectorized_param_list.append(
                         [v[0] for i in range(size_to_grow)])
 
-                # more than 1 value, but same as specified number of samples
+                # more than 1 value, but same as specified number of samples,
+                # no need to vectorize!
                 else:
                     vectorized_param_list.append(v)
 

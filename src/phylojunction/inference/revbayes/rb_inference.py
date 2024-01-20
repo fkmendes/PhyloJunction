@@ -8,7 +8,13 @@ import phylojunction.inference.revbayes.rb_dn_parametric as rbpar
 import phylojunction.pgm.pgm as pgm
 import phylojunction.utility.exception_classes as ec
 
-def get_mcmc_logging_spec_list(a_node_pgm_name: str, moves_str: str, n_sim: int, mcmc_chain_length: int , prefix: str, results_dir: str) -> ty.List[str]:
+def get_mcmc_logging_spec_list(
+        a_node_pgm_name: str,
+        moves_str: str,
+        n_sim: int,
+        mcmc_chain_length: int,
+        prefix: str,
+        results_dir: str) -> ty.List[str]:
     """Generate list of strings where each element (one per simulation) will configure RevBayes' MCMC (moves) and logging inside a .Rev script
 
     Args:
@@ -39,22 +45,32 @@ def get_mcmc_logging_spec_list(a_node_pgm_name: str, moves_str: str, n_sim: int,
     return mcmc_logging_spec_list
 
 
-def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, inference_root_dir: str, mcmc_chain_length: int=1000, prefix: str="") -> ty.Tuple[ty.List[str], ty.List[str], ty.List[str]]:
-    """Prepare string to put in .Rev script, from model specified by user in PhyloJunction
+def dag_obj_to_rev_inference_spec(
+        dag_obj: pgm.DirectedAcyclicGraph,
+        inference_root_dir: str,
+        mcmc_chain_length: int=1000,
+        prefix: str = "") \
+            -> ty.Tuple[ty.List[str], ty.List[str], ty.List[str]]:
+    """Convert model string to put in .Rev script.
 
     Args:
-        pgm_obj (ProbabilisticGraphicalModel): PGM object created through script or commands typed by user
-        mcmc_chain_length (int): Number of MCMC iterations to carry out with RevBayes
-        inference_root_dir (str): Directory where scripts and results should be put, and from where RevBayes should be called
-        prefix (str): Prefix will be appended to directory and file names. Defaults to "".
+        dag_obj (DirectedAcyclicGraph): DAG object created
+            through script or commands typed by user.
+        mcmc_chain_length (int): Number of MCMC iterations to carry
+            out with RevBayes.
+        inference_root_dir (str): Directory where scripts and results
+            should be put, and from where RevBayes should be called.
+        prefix (str): Prefix will be appended to directory and file
+            names. Defaults to "".
 
     Returns:
-        tuple: Tuple containing three lists, with strings to be printed to files (2) and directory names (1)
+        (tuple): Tuple containing three lists, with strings to be
+            printed to files (2) and directory names (1).
     """
     
     all_nodes_all_sims_spec_list: ty.List[ty.List[str]] = []
     all_nodes_moves_str: str = str()
-    sorted_node_pgm_list: ty.List[pgm.NodePGM] = pgm_obj.get_sorted_node_pgm_list()
+    sorted_node_pgm_list: ty.List[pgm.NodePGM] = dag_obj.get_sorted_node_dag_list()
     node_name: str = str()
     n_sim = 0
 
@@ -140,7 +156,7 @@ def pgm_obj_to_rev_inference_spec(pgm_obj: pgm.ProbabilisticGraphicalModel, infe
             ############################
             else:
                 n_vals = len(node_pgm.value)
-                n_sim = pgm_obj.sample_size
+                n_sim = dag_obj.sample_size
 
                 # in case user enters clamped node first
                 # and immediately wants to see the rev script

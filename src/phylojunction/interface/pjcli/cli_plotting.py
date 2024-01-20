@@ -5,7 +5,7 @@ from matplotlib.axes import Axes  # type: ignore
 # pj imports #
 from phylojunction.interface.pysidegui.content_main_window \
     import ContentGUIMainWindow
-from phylojunction.pgm.pgm import ProbabilisticGraphicalModel
+from phylojunction.pgm.pgm import DirectedAcyclicGraph
 from phylojunction.pgm.pgm import NodePGM
 import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.plotting.pj_organize as pjorg
@@ -101,7 +101,7 @@ def selected_node_plot_cli(
 
 def call_node_plot_cli(
         fig_dir: str,
-        pgm_obj: ProbabilisticGraphicalModel,
+        dag_obj: DirectedAcyclicGraph,
         n_samples: int,
         node_range_dict: ty.Dict[str, ty.Tuple[int]],
         fig_obj: Figure,
@@ -111,8 +111,8 @@ def call_node_plot_cli(
     """
  
     for node_name, range_tup in node_range_dict.items():
-        if node_name in pgm_obj.node_name_val_dict:
-            node_pgm = pgm_obj.get_node_pgm_by_name(node_name)
+        if node_name in dag_obj.name_node_dict:
+            node_pgm = dag_obj.get_node_dag_by_name(node_name)
             repl_size = node_pgm.repl_size
             start_idx = 0
             end_idx = 1
