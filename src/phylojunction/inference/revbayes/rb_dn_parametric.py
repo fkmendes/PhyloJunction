@@ -56,7 +56,9 @@ def get_exponential_rev_inference_spec_info(n_samples: int, exp_scale_or_rate_li
 
             # if we can find a node that holds the value of the rate, we use it
             try:
-                ith_sim_str += parent_node_tracker["rate"] # key: arg in PJ syntax, value: NodePGM name passed as arg
+                # key: arg in PJ syntax, value: NodeDAG name passed as arg
+                ith_sim_str += parent_node_tracker["rate"]
+
             except:
                 ith_sim_str += str(scale_or_rate_list[ith_sim])
             ith_sim_str += ")"
@@ -84,9 +86,12 @@ def get_gamma_rev_inference_spec_info(n_samples: int, gamma_shape_param_list: ty
         for ith_sim in range(n_samples):
             ith_sim_str = "dnGamma("
 
-            # if we can find a node that holds the value of the shape parameter, we use it
+            # if we can find a node that holds the value of the shape
+            # parameter, we use it
             try:
-                ith_sim_str += parent_node_tracker["shape"] # returns NodePGM, and we grab its name
+                # returns NodeDAG, and we grab its name
+                ith_sim_str += parent_node_tracker["shape"]
+            
             except:
                 ith_sim_str += str(shape_list[ith_sim])
 
@@ -94,7 +99,9 @@ def get_gamma_rev_inference_spec_info(n_samples: int, gamma_shape_param_list: ty
 
             # if we can find a node that holds the value of the scale parameter, we use it
             try:
-                ith_sim_str += parent_node_tracker["scale"] # returns NodePGM, and we grab its name
+                # returns NodeDAG, and we grab its name
+                ith_sim_str += parent_node_tracker["scale"]
+
             except:
                 ith_sim_str += str(scale_or_rate_list[ith_sim])
             ith_sim_str += ")"
@@ -117,7 +124,7 @@ def get_normal_rev_inference_spec_info(n_samples: int, norm_mean_param_list: ty.
 
             # if we can find a node that holds the value of the mean, we use it
             try:
-                ith_sim_str += parent_node_tracker["mean"] # returns NodePGM, and we grab its name
+                ith_sim_str += parent_node_tracker["mean"] # returns NodeDAG, and we grab its name
             except:
                 ith_sim_str += str(real_mean_list[ith_sim])
 
@@ -125,7 +132,7 @@ def get_normal_rev_inference_spec_info(n_samples: int, norm_mean_param_list: ty.
 
             # if we can find a node that holds the value of the sd, we use it
             try:
-                ith_sim_str += parent_node_tracker["sd"] # returns NodePGM, and we grab its name
+                ith_sim_str += parent_node_tracker["sd"] # returns NodeDAG, and we grab its name
             except:
                 ith_sim_str += str(real_sd_list[ith_sim])
             ith_sim_str += ")"
@@ -153,7 +160,9 @@ def get_ln_rev_inference_spec_info(n_samples: int, ln_mean_list: ty.List[float],
 
             # if we can find a node that holds the value of the mean, we use it
             try:
-                ith_sim_str += parent_node_tracker["mean"] # returns NodePGM, and we grab its name
+                # returns NodePGM, and we grab its name
+                ith_sim_str += parent_node_tracker["mean"]
+
             except:
                 ith_sim_str += str(real_mean_list[ith_sim])
 
@@ -161,7 +170,9 @@ def get_ln_rev_inference_spec_info(n_samples: int, ln_mean_list: ty.List[float],
 
             # if we can find a node that holds the value of the sd, we use it
             try:
-                ith_sim_str += parent_node_tracker["sd"] # returns NodePGM, and we grab its name
+                # returns NodeDAG, and we grab its name
+                ith_sim_str += parent_node_tracker["sd"]
+
             except:
                 ith_sim_str += str(real_sd_list[ith_sim])
             ith_sim_str += ")"

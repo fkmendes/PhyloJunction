@@ -151,60 +151,60 @@ def call_gui():
         return dag_obj, ax, comparison_ax, validation_ax
 
 
-    def draw_node_pgm(axes, node_pgm, sample_idx=None, repl_idx=0, repl_size=1):
-        return node_pgm.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+    def draw_node_dag(axes, node_dag, sample_idx=None, repl_idx=0, repl_size=1):
+        return node_dag.plot_node(axes, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
     
     def selected_node_read(dag_obj, node_name):
-        node_pgm = dag_obj.get_node_dag_by_name(node_name)
-        # display_node_pgm_value_str = pg.get_display_str_by_name(node_name)
-        sample_size = len(node_pgm) # this is n_sim inside sampling distribution classes
-        repl_size = node_pgm.repl_size
+        node_dag = dag_obj.get_node_dag_by_name(node_name)
+        # display_node_dag_value_str = pg.get_display_str_by_name(node_name)
+        sample_size = len(node_dag) # this is n_sim inside sampling distribution classes
+        repl_size = node_dag.repl_size
         
-        return node_pgm, sample_size, repl_size
+        return node_dag, sample_size, repl_size
 
     
-    def selected_node_display(wdw, dag_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
-        display_node_pgm_value_str = str()
-        display_node_pgm_stat_str = str()
+    def selected_node_display(wdw, dag_obj, node_dag, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+        display_node_dag_value_str = str()
+        display_node_dag_stat_str = str()
 
         # first we do values
         # we care about a specific sample and maybe a specific replicate
         if not sample_idx == None and not do_all_samples:
             start = sample_idx * repl_size
             end = start + repl_size
-            display_node_pgm_value_str = node_pgm.get_start2end_str(start, end) # values
-            display_node_pgm_stat_str = node_pgm.get_node_stats_str(start, end, repl_idx) # summary stats
+            display_node_dag_value_str = node_dag.get_start2end_str(start, end) # values
+            display_node_dag_stat_str = node_dag.get_node_stats_str(start, end, repl_idx) # summary stats
         
         # we get all samples
         else:
             # just calling __str__
-            display_node_pgm_value_str = dag_obj.get_display_str_by_name(node_pgm.node_name)
+            display_node_dag_value_str = dag_obj.get_display_str_by_name(node_dag.node_name)
             # getting all values
-            display_node_pgm_stat_str = node_pgm.get_node_stats_str(0, len(node_pgm.value), repl_idx) # summary stats
+            display_node_dag_stat_str = node_dag.get_node_stats_str(0, len(node_dag.value), repl_idx) # summary stats
         
-        wdw["-PGM-NODE-DISPLAY-"].update(display_node_pgm_value_str)
-        wdw["-PGM-NODE-STAT-"].update(display_node_pgm_stat_str)
+        wdw["-PGM-NODE-DISPLAY-"].update(display_node_dag_value_str)
+        wdw["-PGM-NODE-STAT-"].update(display_node_dag_stat_str)
 
         
-    def selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
+    def selected_node_plot(fig_obj, node_dag, do_all_samples, sample_idx=None, repl_idx=0, repl_size=1):
         """
         Plot pgm node on 'node_display_fig_axes' (Axes object) scoped to 'call_gui()',
         then update canvas with new plot
         """
         try:
             # if a tree
-            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                draw_node_pgm(node_display_fig_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
+            if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
+                draw_node_dag(node_display_fig_axes, node_dag, sample_idx=sample_idx, repl_idx=repl_idx)
             # when not a tree
             else:
                 if do_all_samples: 
-                    draw_node_pgm(node_display_fig_axes, node_pgm, repl_size=repl_size)
+                    draw_node_dag(node_display_fig_axes, node_dag, repl_size=repl_size)
                 else:
-                    draw_node_pgm(node_display_fig_axes, node_pgm, sample_idx=sample_idx, repl_size=repl_size)
+                    draw_node_dag(node_display_fig_axes, node_dag, sample_idx=sample_idx, repl_size=repl_size)
         # when it's deterministic
         except:
-            draw_node_pgm(node_display_fig_axes, node_pgm)
+            draw_node_dag(node_display_fig_axes, node_dag)
 
         fig_obj.canvas.draw()
 
@@ -214,14 +214,15 @@ def call_gui():
         Given selected node name, display its string representation and
         plot it on canvas if possible
         """
-        node_pgm, sample_size, repl_size = selected_node_read(dag_obj, node_name)
 
-        # updates spin window with number of elements in this node_pgm
+        node_dag, sample_size, repl_size = selected_node_read(dag_obj, node_name)
+
+        # updates spin window with number of elements in this node_dag
         # window["-ITH-VAL-"].update(values=[x for x in range(1, sample_size + 1)]) # can only select the number of values this node contains
         wdw["-ITH-SAMPLE-"].update(values=[x for x in range(1, sample_size + 1)]) # can only select the number of values this node contains
 
-        if type(node_pgm.value) == list:
-            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+        if type(node_dag.value) == list:
+            if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
                 wdw["-ITH-REPL-"].update(values=[x for x in range(1, repl_size + 1)]) # can only select the number of values this node contains
             else:
                 wdw["-ITH-REPL-"].update(disabled=True)
@@ -232,12 +233,12 @@ def call_gui():
         repl_idx = int(wdw["-ITH-REPL-"].get()) - 1 # (offset)
 
         # updating node values on window happens inside
-        selected_node_display(wdw, dag_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+        selected_node_display(wdw, dag_obj, node_dag, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
     
         # plotting to canvas happens inside
-        selected_node_plot(fig_obj, node_pgm, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
+        selected_node_plot(fig_obj, node_dag, do_all_samples, sample_idx=sample_idx, repl_idx=repl_idx, repl_size=repl_size)
 
-        return node_pgm
+        return node_dag
 
     ###################### 
     # Development screen #
@@ -742,7 +743,8 @@ def call_gui():
             value_str = str()
             
             if values["-COPY-ALL-"]:
-                value_str = dag_obj.get_display_str_by_name(node_pgm.node_name)
+                value_str = dag_obj.get_display_str_by_name(node_dag.node_name)
+
             else:
                 value_str = values['-PGM-NODE-DISPLAY-']
             
@@ -768,27 +770,27 @@ def call_gui():
 
             # if nodes have been created and selected
             if values["-PGM-NODES-"]:
-                selected_node_pgm_name = values["-PGM-NODES-"][0]
+                selected_node_dag_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
 
                 # if selected node is tree, we do not want to show all trees on display by default
                 try:
-                    if isinstance(dag_obj.get_node_dag_by_name(selected_node_pgm_name).value[0], pjdt.AnnotatedTree):
+                    if isinstance(dag_obj.get_node_dag_by_name(selected_node_dag_name).value[0], pjdt.AnnotatedTree):
                         do_all_samples = False
-                except: pass # the value of the node_pgm might be an DiscreteStateDependentRate, which is not subscriptable, so we pass
+                except: pass # the value of the node_dag might be an DiscreteStateDependentRate, which is not subscriptable, so we pass
                 
-                node_pgm = do_selected_node(dag_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_dag = do_selected_node(dag_obj, window, node_display_fig, selected_node_dag_name, do_all_samples=do_all_samples)
                 
                 # we enable value copying as soon as a node is clicked
                 window["-COPY-VALUE-"].update(disabled=False)
                 window["-COPY-ALL-"].update(disabled=False)
 
                 # if there is a chance for replicates to exist, we enable the one-sample radio button
-                if node_pgm.is_sampled:
+                if node_dag.is_sampled:
                     window["-ONE-SAMPLE-"].update(disabled=False)
 
                     # cycling through trees can only be done with "one-sample" radio button
-                    if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+                    if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
                         window["-ALL-SAMPLES-"].update(disabled=True)
                         window["-ALL-SAMPLES-"].update(False)
                         window["-ONE-SAMPLE-"].update(True)
@@ -814,7 +816,7 @@ def call_gui():
                 window["-ITH-SAMPLE-"].update(disabled=False)
 
                 # if we are looking at trees, we can cycle through replicates
-                if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+                if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
                     window["-ITH-REPL-"].update(disabled=False)
                 # otherwise, all replicates will be visualized as histogram (no cycling allowed)
                 else:
@@ -827,9 +829,9 @@ def call_gui():
         elif event == "-ITH-SAMPLE-":
             # if nodes have been created and selected
             if values["-PGM-NODES-"]:
-                selected_node_pgm_name = values["-PGM-NODES-"][0]
+                selected_node_dag_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
-                node_pgm = do_selected_node(dag_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_dag = do_selected_node(dag_obj, window, node_display_fig, selected_node_dag_name, do_all_samples=do_all_samples)
 
 
         #######################
@@ -841,15 +843,15 @@ def call_gui():
             # repl_idx = values["-ITH-REPL-"] - 1 # (offset)
             
             # # only updates display if tree node is selected
-            # if isinstance(node_pgm.value[0], AnnotatedTree):
-            #     draw_node_pgm(node_display_fig_axes, node_pgm, sample_idx=sample_idx, repl_idx=repl_idx)
+            # if isinstance(node_dag.value[0], AnnotatedTree):
+            #     draw_node_dag(node_display_fig_axes, node_dag, sample_idx=sample_idx, repl_idx=repl_idx)
             #     node_display_fig.canvas.draw()
 
             # if nodes have been created and selected
             if values["-PGM-NODES-"]:
-                selected_node_pgm_name = values["-PGM-NODES-"][0]
+                selected_node_dag_name = values["-PGM-NODES-"][0]
                 do_all_samples = window["-ALL-SAMPLES-"].get() # True or False
-                node_pgm = do_selected_node(dag_obj, window, node_display_fig, selected_node_pgm_name, do_all_samples=do_all_samples)
+                node_dag = do_selected_node(dag_obj, window, node_display_fig, selected_node_dag_name, do_all_samples=do_all_samples)
 
 
         ##################

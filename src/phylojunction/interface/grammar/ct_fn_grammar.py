@@ -30,7 +30,7 @@ class PJCtFnGrammar():
     def init_return_ann_tr(
         cls,
         ct_fn_param_dict:
-            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> pgm.ConstantFn:
         
         if not ct_fn_param_dict:
@@ -49,7 +49,7 @@ class PJCtFnGrammar():
     def create_ct_fn_obj(
         cls,
         ct_fn_id: str,
-        ct_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        ct_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> ty.Optional[
                 # ty.Union[
                     pgm.ConstantFn
@@ -62,7 +62,7 @@ class PJCtFnGrammar():
             ct_fn_id (str): Name of constant function to being called
             ct_fn_param_dict (dict): Dictionary containing constant
                 function parameter names (str) as keys and lists (of either
-                strings or NodePGMs) as values
+                strings or NodeDAGs) as values
 
         Returns:
             Object: one of a variety of objects to be stored within a clamped

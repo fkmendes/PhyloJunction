@@ -62,7 +62,7 @@ def script2dag(script_file_path_or_model_spec: str,
     # Debugging space #
     ###################
     # seeing trees in script strings in main()
-    # for node_name, node_pgm in dag_obj.name_node_dict.items():
+    # for node_name, node_dag in dag_obj.name_node_dict.items():
         # if node_name == "trs":
         # # note that pjgui uses matplotlib.figure.Figure
         # # (which is part of Matplotlib's OOP class library)
@@ -78,10 +78,10 @@ def script2dag(script_file_path_or_model_spec: str,
         #     ax.spines['right'].set_visible(False)
         #     ax.spines['top'].set_visible(False)
 
-        #     print(node_pgm.value[0].tree.as_string(schema="newick"))
+        #     print(node_dag.value[0].tree.as_string(schema="newick"))
 
         #     pjtr.plot_ann_tree(
-        #         node_pgm.value[0],
+        #         node_dag.value[0],
         #         ax,
         #         use_age=False,
         #         start_at_origin=True,
@@ -90,7 +90,7 @@ def script2dag(script_file_path_or_model_spec: str,
 
         #     plt.show()
 
-        # print(node_pgm.get_node_stats_str(0, len(node_pgm.value), 0))
+        # print(node_dag.get_node_stats_str(0, len(node_dag.value), 0))
 
     # as if we had clicked "See" in the inference tab
     # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = \
@@ -301,7 +301,7 @@ def parse_variable_assignment(
             static script or via GUI.
     """
 
-    def create_add_stoch_node_pgm(a_stoch_node_name: str,
+    def create_add_stoch_node_dag(a_stoch_node_name: str,
                                   sample_size: int,
                                   a_val_obj_list: ty.List[ty.Any],
                                   a_ct_fn_obj: pgm.ConstantFn):
@@ -309,8 +309,8 @@ def parse_variable_assignment(
         replicate_size: int = 1
         if a_ct_fn_obj is not None:
             replicate_size = a_ct_fn_obj.n_repl
-        
-        stoch_node = pgm.StochasticNodePGM(
+
+        stoch_node = pgm.StochasticNodeDAG(
             a_stoch_node_name,
             sample_size=sample_size,
             replicate_size=replicate_size,
@@ -391,13 +391,13 @@ def parse_variable_assignment(
             stoch_node_spec,
             ("Something went wrong during variable assignment "
              "Could not find both the name of a function "
-             "(e.g., \'read_tree\') and its specification (e.g., "
-             "\'(file=\"examples/geosse_dummy_tree1\", node_name_attr=\"index\")\')."))
+             "(e.g., 'read_tree') and its specification (e.g., "
+             "'(file=\"examples/geosse_dummy_tree1\", node_name_attr=\"index\")')."))
 
     val_obj_list = cmdu.val_or_obj(dag_obj, values_list)
     n_samples = len(val_obj_list)
 
-    create_add_stoch_node_pgm(stoch_node_name,
+    create_add_stoch_node_dag(stoch_node_name,
                               n_samples,
                               val_obj_list,
                               ct_fn_obj)
@@ -431,11 +431,11 @@ def parse_samp_dn_assignment(
             sample_size: int,
             replicate_size: int,
             a_dn_obj: pgm.DistributionPGM,
-            parent_pgm_nodes: ty.List[pgm.NodePGM],
+            parent_pgm_nodes: ty.List[pgm.NodeDAG],
             clamped: bool):
 
         # set dn inside rv, then call .sample
-        stoch_node_pgm = pgm.StochasticNodePGM(
+        stoch_node_dag = pgm.StochasticNodeDAG(
             a_stoch_node_name,
             sample_size=sample_size,
             replicate_size=replicate_size,
@@ -443,7 +443,7 @@ def parse_samp_dn_assignment(
             parent_nodes=parent_pgm_nodes,
             clamped=clamped)
 
-        dag_obj.add_node(stoch_node_pgm)
+        dag_obj.add_node(stoch_node_dag)
 
 
     if re.search(cmdu.sampling_dn_spec_regex, stoch_node_dn_spec) is None:
@@ -528,7 +528,7 @@ def parse_samp_dn_assignment(
 
             # if user passes 'r' as a node,
             # e.g., 'n_sim <- 2', then 'normal(n=n_sim...)
-            elif isinstance(spec_dict["n"][0], pgm.StochasticNodePGM):
+            elif isinstance(spec_dict["n"][0], pgm.StochasticNodeDAG):
                 # this check and the try-except below were already done inside
                 # .create_dn_obj() above
                 #
@@ -557,7 +557,7 @@ def parse_samp_dn_assignment(
 
             # if user passes 'nr' as a node,
             # e.g., 'n_rep <- 2', then 'normal(...nr=n_rep...)
-            elif isinstance(spec_dict["nr"][0], pgm.StochasticNodePGM):
+            elif isinstance(spec_dict["nr"][0], pgm.StochasticNodeDAG):
                 # this check and the try-except below were already done inside
                 # .create_dn_obj() above
                 #
@@ -593,7 +593,7 @@ def parse_deterministic_function_assignment(
         det_node_fn_spec: str,
         cmd_line: str) -> None:
     """
-    Create DeterministicNodePGM instance from command string with
+    Create DeterministicNodeDAG instance from command string with
     ':=' operator, then add it to ProbabilisticGraphiclModel
     instance. This node is not sampled (not a random variable) and is
     deterministically initialized via a deterministic function call.
@@ -611,25 +611,25 @@ def parse_deterministic_function_assignment(
 
     def create_add_det_nd_pgm(det_nd_name: str,
                               det_obj: ty.Any,
-                              parent_pgm_nodes: ty.List[pgm.NodePGM]):
+                              parent_pgm_nodes: ty.List[pgm.NodeDAG]):
 
-        det_nd_pgm = pgm.DeterministicNodePGM(det_nd_name,
+        det_nd_pgm = pgm.DeterministicNodeDAG(det_nd_name,
                                               value=det_obj,
                                               parent_nodes=parent_pgm_nodes)
         dag_obj.add_node(det_nd_pgm)
 
-        # deterministic node is of class DeterministicNodePGM, which
-        # derives NodePGM -- we do not need to initialize NodePGM
-        # as when a new StochasticNodePGM is created (see above in
+        # deterministic node is of class DeterministicNodeDAG, which
+        # derives NodeDAG -- we do not need to initialize NodeDAG
+        # as when a new StochasticNodeDAG is created (see above in
         # create_add_rv_pgm())
         #
         # this check is just to make sure we are adding a class
-        # deriving from NodePGM
-        # if isinstance(det_obj, NodePGM):
+        # deriving from NodeDAG
+        # if isinstance(det_obj, NodeDAG):
         #     det_obj.node_name = det_nd_name
         #     det_obj.parent_nodes = parent_pgm_nodes
-        #     det_nd_pgm = det_obj
-        #     dag_obj.add_node(det_nd_pgm)
+        #     det_nd_dag = det_obj
+        #     dag_obj.add_node(det_nd_dag)
 
     if re.search(cmdu.sampling_dn_spec_regex, det_node_fn_spec) is None:
         raise ec.ScriptSyntaxError(
@@ -906,7 +906,7 @@ if __name__ == "__main__":
 
     # looking at dag nodes
     for node_name, node_dag in dag.name_node_dict.items():
-        if isinstance(node_dag, pgm.StochasticNodePGM):
+        if isinstance(node_dag, pgm.StochasticNodeDAG):
             if isinstance(node_dag.value[0], pjtr.AnnotatedTree):
                 print(node_dag.value[0].tree.as_string(schema="newick"))
 

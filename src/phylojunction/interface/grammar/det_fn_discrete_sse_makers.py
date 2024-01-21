@@ -9,12 +9,12 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-def extract_value_from_pgmnodes(pgm_node_list: ty.List[pgm.NodePGM]) \
+def extract_value_from_pgmnodes(dag_node_list: ty.List[pgm.NodeDAG]) \
         -> ty.List[float]:
     """_summary_
 
     Args:
-        pgm_node_list (NodePGM): List of NodePGM objects (typing includes str because of type-safety)
+        pgm_node_list (NodeDM): List of NodeDAG objects (typing includes str because of type-safety)
 
     Raises:
         ec.NoPlatingAllowedError: _description_
@@ -23,37 +23,37 @@ def extract_value_from_pgmnodes(pgm_node_list: ty.List[pgm.NodePGM]) \
     Returns:
         ty.List[ty.List[float]]: _description_
     """
-    many_nodes_pgm = len(pgm_node_list) > 1
+    many_nodes_dag = len(dag_node_list) > 1
     v_list: ty.List[float] = []
 
-    for node_pgm in pgm_node_list:
+    for node_dag in dag_node_list:
 
         # so mypy won't complain
-        if isinstance(node_pgm, pgm.NodePGM):
+        if isinstance(node_dag, pgm.NodeDAG):
 
             # no plating supported
-            if node_pgm.repl_size > 1:
+            if node_dag.repl_size > 1:
                 raise ec.NoPlatingAllowedError(
-                    "sse_rate", node_pgm.node_name)
+                    "sse_rate", node_dag.node_name)
 
-            v = node_pgm.value  # list (I think before I also
+            v = node_dag.value  # list (I think before I also
                                 # allowed numpy.ndarray, but not anymore)
 
             # so mypy won't complain
             if isinstance(v, list):
-                if len(v) > 1 and many_nodes_pgm:
+                if len(v) > 1 and many_nodes_dag:
                     raise ec.StateDependentParameterMisspec(
                         message=(
                             ("If many variables are passed as arguments "
                              "to initialize another variable, each of these "
                              "variables can contain only a single value")))
 
-                elif len(v) == 1 and many_nodes_pgm:
+                elif len(v) == 1 and many_nodes_dag:
                     # making list longer
                     # (v should be a list, which is why I don't use append)
                     v_list += v
 
-                elif len(v) >= 1 and not many_nodes_pgm:
+                elif len(v) >= 1 and not many_nodes_dag:
                     return v
 
     return v_list
@@ -62,7 +62,7 @@ def extract_value_from_pgmnodes(pgm_node_list: ty.List[pgm.NodePGM]) \
 def make_DiscreteStateDependentRate(
     det_fn_name: str,
     det_fn_param_dict:
-        ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> sseobj.DiscreteStateDependentRate:
     """
     Create and return DiscreteStateDependentRate as prompted by
@@ -71,7 +71,7 @@ def make_DiscreteStateDependentRate(
     Args:
         det_fn_name (str): Name of the function being called
         det_fn_param_dict (dict): dictionary containing parameter
-            strings as keys, and lists of either strings or NodePGMs
+            strings as keys, and lists of either strings or NodeDAGs
             as value(s)
 
     Returns:
@@ -100,10 +100,10 @@ def make_DiscreteStateDependentRate(
         if arg == "value":
             # val is a list of random variable objects
             # if type(val[0]) != str:
-            if isinstance(val[0], pgm.NodePGM):
+            if isinstance(val[0], pgm.NodeDAG):
                 # need to declare cast_val separately so mypy won't complain
-                cast_val1: ty.List[pgm.NodePGM] = \
-                    ty.cast(ty.List[pgm.NodePGM], val)
+                cast_val1: ty.List[pgm.NodeDAG] = \
+                    ty.cast(ty.List[pgm.NodeDAG], val)
                 value = extract_value_from_pgmnodes(cast_val1)
 
             # val is a list of strings
@@ -194,7 +194,7 @@ def make_DiscreteStateDependentRate(
 def make_DiscreteStateDependentProbability(
     det_fn_name: str,
     det_fn_param_dict:
-        ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> sseobj.DiscreteStateDependentProbability:
     """
     Create and return DiscreteStateDependentProbability as prompted by
@@ -203,7 +203,7 @@ def make_DiscreteStateDependentProbability(
     Args:
         det_fn_name (str): Name of the function being called
         det_fn_param_dict (dict): dictionary containing parameter
-            strings as keys, and lists of either strings or NodePGMs
+            strings as keys, and lists of either strings or NodeDAGs
             as value(s)
 
     Returns:
@@ -231,10 +231,10 @@ def make_DiscreteStateDependentProbability(
         if arg == "value":
             # val is a list of random variable objects
             # if type(val[0]) != str:
-            if isinstance(val[0], pgm.NodePGM):
+            if isinstance(val[0], pgm.NodeDAG):
                 # need to declare cast_val separately so mypy won't complain
-                cast_val1: ty.List[pgm.NodePGM] = \
-                    ty.cast(ty.List[pgm.NodePGM], val)
+                cast_val1: ty.List[pgm.NodeDAG] = \
+                    ty.cast(ty.List[pgm.NodeDAG], val)
                 value = extract_value_from_pgmnodes(cast_val1)
 
             # val is a list of strings
@@ -291,7 +291,7 @@ def make_DiscreteStateDependentProbability(
 def make_SSEStash(
     det_fn_name: str,
     det_fn_param_dict:
-        ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> sseobj.SSEStash:
     """
     Create SSEStash as prompted by deterministic function call
@@ -299,7 +299,7 @@ def make_SSEStash(
     Args:
         det_fn_name (str): Name of the function being called
         det_fn_param_dict (dict): dictionary containing parameter
-            strings as keys, and lists of either strings or NodePGMs
+            strings as keys, and lists of either strings or NodeDAGs
 
     Return:
         Object holding all discrete state-dependent rates and
@@ -310,8 +310,8 @@ def make_SSEStash(
     n_time_slices: int = 1
     time_slice_age_ends: ty.List[float] = []
     seed_age_for_time_slicing: ty.Optional[float] = None
-    flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodePGM] = []
-    flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodePGM] = []
+    flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodeDAG] = []
+    flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodeDAG] = []
 
     #############################################
     # Reading all arguments and checking health #
@@ -322,7 +322,7 @@ def make_SSEStash(
         first_element = val[0]
         extracted_value = first_element  # can be scalar or container
 
-        if isinstance(first_element, pgm.NodePGM) \
+        if isinstance(first_element, pgm.NodeDAG) \
                 and len(val) == 1:
             extracted_value = first_element.value
 
@@ -374,7 +374,7 @@ def make_SSEStash(
             if det_fn_param_dict["flat_prob_mat"]:
                 flat_state_dep_prob_mat = \
                     [v for v in det_fn_param_dict["flat_prob_mat"]
-                        if isinstance(v, pgm.DeterministicNodePGM)]
+                        if isinstance(v, pgm.DeterministicNodeDAG)]
 
             # total number of rates has to be divisible by number of slices
             # if len(flat_state_dep_prob_mat) % n_time_slices != 0:
@@ -383,10 +383,10 @@ def make_SSEStash(
 
         elif arg == "flat_rate_mat":
             if det_fn_param_dict["flat_rate_mat"]:
-                # list of NodePGM's
+                # list of NodeDAG's
                 flat_state_dep_rate_mat = \
                     [v for v in det_fn_param_dict["flat_rate_mat"]
-                        if isinstance(v, pgm.DeterministicNodePGM)]
+                        if isinstance(v, pgm.DeterministicNodeDAG)]
 
                 # total number of rates has to be divisible by number of slices
                 # if len(flat_state_dep_rate_mat) % n_time_slices != 0:

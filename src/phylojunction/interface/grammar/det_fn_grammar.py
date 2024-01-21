@@ -34,7 +34,7 @@ class PJDetFnGrammar():
     def init_return_state_dep_rate(
         cls,
         det_fn_param_dict:
-            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> sseobj.DiscreteStateDependentRate:
 
         if not det_fn_param_dict:
@@ -59,7 +59,7 @@ class PJDetFnGrammar():
     def init_return_state_dep_prob(
         cls,
         det_fn_param_dict:
-            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> sseobj.DiscreteStateDependentProbability:
 
         if not det_fn_param_dict:
@@ -83,7 +83,7 @@ class PJDetFnGrammar():
     def init_return_sse_stash(
         cls,
         det_fn_param_dict:
-            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> sseobj.SSEStash:
 
         if not det_fn_param_dict:
@@ -108,7 +108,7 @@ class PJDetFnGrammar():
     def create_det_fn_obj(
         cls,
         det_fn_id: str,
-        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        det_fn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> ty.Optional[
                 ty.Union[
                     sseobj.DiscreteStateDependentRate,
@@ -122,7 +122,7 @@ class PJDetFnGrammar():
             det_fn_id (str): Name of deterministic function being called
             det_fn_param_dict (dict): Dictionary containing deterministic
                 function parameter names (str) as keys and lists (of either
-                strings or NodePGMs) as values
+                strings or NodeDAGs) as values
 
         Returns:
             Object: one of a variety of objects containing information for

@@ -101,7 +101,7 @@ class DnLogNormal(pgm.DistributionPGM):
         self.ln_sd_list = ty.cast(ty.List[float], self.vectorized_params[1])
 
         # for inference, we need to keep track of parent node names
-        if isinstance(parent_node_tracker, pgm.DeterministicNodePGM):
+        if isinstance(parent_node_tracker, pgm.DeterministicNodeDAG):
             raise ec.ObjInitInvalidArgError(
                 self.DN_NAME,
                 ("One of the arguments is a deterministic node. "

@@ -166,20 +166,20 @@ class NodeInferenceDimensionalityError(Exception):
 class NoPlatingAllowedError(Exception):
     det_name: str
     message: str
-    node_pgm_name: str
+    node_dag_name: str
 
     def __init__(self,
                  det_name: str,
-                 problematic_node_pgm_name: str,
+                 problematic_node_dag_name: str,
                  message: str = "") -> None:
         self.det_name = det_name
         self.message = message
-        self.node_pgm_name = problematic_node_pgm_name
+        self.node_dag_name = problematic_node_dag_name
         super().__init__(self.message)
 
     def __str__(self) -> str:
         return "ERROR: When executing " + self.det_name + "(), replicates " \
-            + "were detected for argument " + self.node_pgm_name \
+            + "were detected for argument " + self.node_dag_name \
             + ". Plating is not supported for this deterministic function."
 
 
@@ -690,7 +690,7 @@ class ParseDetFnInitFailError(Exception):
 
 
 # PGM exceptions #
-class NodePGMNodeStatCantFloatError(Exception):
+class NodeDAGStatCantFloatError(Exception):
     message: str
 
     def __init__(self, node_name: str) -> None:

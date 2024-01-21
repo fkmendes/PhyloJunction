@@ -55,8 +55,8 @@ class NodeInferenceDimensionalityError(Exception):
 class NoPlatingAllowedError(Exception):
     det_name: str
     message: str
-    node_pgm_name: str
-    def __init__(self, det_name: str, problematic_node_pgm_name: str, message: str = ...) -> None: ...
+    node_dag_name: str
+    def __init__(self, det_name: str, problematic_node_dag_name: str, message: str = ...) -> None: ...
 
 class ObjInitRequireSameParameterTypeError(Exception):
     message: str
@@ -214,7 +214,7 @@ class ParseDetFnInitFailError(Exception):
     def __str__(self) -> str: ...
 
 # PGM exceptions #
-class NodePGMNodeStatCantFloatError(Exception):
+class NodeDAGNodeStatCantFloatError(Exception):
     message: str
     def __init__(self, node_name: str) -> None: ...
     def __str__(self) -> str: ...

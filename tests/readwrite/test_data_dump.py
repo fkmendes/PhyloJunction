@@ -117,41 +117,41 @@ class TestDataDump(unittest.TestCase):
 
         # rv
         cls.bisse_pgm.add_node(
-            pgm.StochasticNodePGM(
+            pgm.StochasticNodeDAG(
                 "l0", n_sim, value=l0, sampled_from="Log-normal"
             )
         )
         cls.bisse_pgm.add_node(
-            pgm.StochasticNodePGM(
+            pgm.StochasticNodeDAG(
                 "mu0", n_sim, value=mu0, sampled_from="Log-normal"
             )
         )
 
         # deterministic
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("l0r", value=l0rate))
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("mu0r", value=mu0rate))
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("q01r", value=q01rate))
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("l1r", value=l1rate))
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("mu1r", value=mu1rate))
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("q10r", value=q10rate))
-        cls.bisse_pgm.add_node(pgm.DeterministicNodePGM("meh", value=meh))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("l0r", value=l0rate))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("mu0r", value=mu0rate))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("q01r", value=q01rate))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("l1r", value=l1rate))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("mu1r", value=mu1rate))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("q10r", value=q10rate))
+        cls.bisse_pgm.add_node(pgm.DeterministicNodeDAG("meh", value=meh))
 
         # more rv
         cls.bisse_pgm.add_node(
-            pgm.StochasticNodePGM(
+            pgm.StochasticNodeDAG(
                 "trs", n_sim, value=trs, sampled_from="DnSSE",
                 replicate_size=n_repl
             )
         )
 
-        # sorted_node_pgm_list = bisse_pgm.get_sorted_node_dag_list()
+        # sorted_node_dag_list = bisse_pgm.get_sorted_node_dag_list()
 
         ###################
         # Output handling #
         ###################
         # populating dataframe to be dumped
         # data_df_names_list, data_df_list = \
-        #     pjwrite.prep_data_df(sorted_node_pgm_list)
+        #     pjwrite.prep_data_df(sorted_node_dag_list)
         cls.scalar_output_stash, cls.tree_output_stash = \
             pjwrite.prep_data_df(cls.bisse_pgm, write_nex_states=True)
 

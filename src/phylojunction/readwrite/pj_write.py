@@ -184,7 +184,7 @@ def prep_data_df(
     """
 
     sample_size = dag_obj.sample_size
-    node_pgm_list = dag_obj.get_sorted_node_dag_list()
+    node_dag_list = dag_obj.get_sorted_node_dag_list()
 
     # tree nodes (one dataframe per different tree node)
 
@@ -235,21 +235,21 @@ def prep_data_df(
     # stats; scalars always have only average and std. dev.
 
     # main loop: nodes!
-    for node_pgm in node_pgm_list:
-        rv_name = node_pgm.node_name
-        node_val = node_pgm.value  # list
-        n_repl = node_pgm.repl_size
+    for node_dag in node_dag_list:
+        rv_name = node_dag.node_name
+        node_val = node_dag.value  # list
+        n_repl = node_dag.repl_size
 
         # if stochastic node is constant and at least one value was indeed
         # saved in list
-        if isinstance(node_pgm, pgm.StochasticNodePGM) and node_val:
+        if isinstance(node_dag, pgm.StochasticNodeDAG) and node_val:
             ################################
             # Fixed-value stochastic nodes #
             ################################
 
             # scalar constants (no support for replication via 2D-lists yet)
             if isinstance(node_val[0], (str, int, float, np.float64)) \
-                    and not node_pgm.is_sampled:
+                    and not node_dag.is_sampled:
 
                 if scalar_constant_df.empty:
                     if sample_size == 0:
@@ -277,7 +277,7 @@ def prep_data_df(
             # Scalars #
             ###########
             if isinstance(node_val[0], (str, int, float, np.float64)) \
-                    and node_pgm.is_sampled:
+                    and node_dag.is_sampled:
 
                 ######################################################
                 # DataFrame holding scalar values (replicates if     #
@@ -793,8 +793,8 @@ def dump_pgm_data(dir_string: str,
         None
     """
 
-    sorted_node_pgm_list: \
-        ty.List[pgm.NodePGM] = dag_obj.get_sorted_node_dag_list()
+    sorted_node_dag_list: \
+        ty.List[pgm.NodeDAG] = dag_obj.get_sorted_node_dag_list()
 
     # populating data stashes that will be dumped and their file names
     scalar_output_stash: \

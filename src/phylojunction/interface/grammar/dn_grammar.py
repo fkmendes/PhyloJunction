@@ -52,7 +52,7 @@ class PJDnGrammar():
     def init_return_parametric_dn(
         cls,
         dn_id: str,
-        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> pgm.DistributionPGM:
         """Create and return parametric distributions for sampling.
 
@@ -71,7 +71,7 @@ class PJDnGrammar():
 
         # key: parameter name
         # value: paramenter's parent (DAG node) name
-        # e.g., { lambda: node_pgm1_name }
+        # e.g., { lambda: node_dag1_name }
         parent_node_tracker: ty.Dict[str, str] = dict()
 
         if not dn_param_dict:
@@ -84,19 +84,20 @@ class PJDnGrammar():
             ln_sd: ty.List[float] = list()
             ln_log_space: bool = True
 
-            # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
+            # { mean: node_dag1_name, sd: node_dag2_name, ... }
             if dn_param_dict:
                 # val is list
                 for arg, val in dn_param_dict.items():
                     # val = val[0] # TODO: deal with vectorization later
 
                     # needed for building inference specifications
-                    if isinstance(val[0], pgm.StochasticNodePGM):
+                    if isinstance(val[0], pgm.StochasticNodeDAG):
                         parent_node_tracker[arg] = val[0].node_name
 
                     # if element in val is string, it remains unchanged,
-                    # if NodePGM, we get its string-fied value
-                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
+                    # if NodeDAG, we get its string-fied value
+                    extracted_val_list = \
+                        pgm.extract_vals_as_str_from_node_dag(val)
 
                     if not cls.grammar_check("lognormal", arg):
                         raise ec.ParseNotAParameterError(arg)
@@ -170,16 +171,16 @@ class PJDnGrammar():
             norm_mean: ty.List[float] = list()
             norm_sd: ty.List[float] = list()
 
-            # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
+            # { mean: node_dag1_name, sd: node_dag2_name, ... }
             if dn_param_dict:
                 # val is list
                 for arg, val in dn_param_dict.items():
 
                     # needed for building inference specifications
-                    if isinstance(val[0], pgm.StochasticNodePGM):
+                    if isinstance(val[0], pgm.StochasticNodeDAG):
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_vals_as_str_from_node_dag(val)
 
                     if not cls.grammar_check("normal", arg):
                         raise ec.ParseNotAParameterError(arg)
@@ -246,11 +247,11 @@ class PJDnGrammar():
                 for arg, val in dn_param_dict.items():
 
                     # needed for building inference specifications
-                    if isinstance(val[0], pgm.StochasticNodePGM):
+                    if isinstance(val[0], pgm.StochasticNodeDAG):
                         # needed for building inference specifications
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_vals_as_str_from_node_dag(val)
 
                     if not cls.grammar_check("exponential", arg):
                         raise ec.ParseNotAParameterError(arg)
@@ -297,16 +298,16 @@ class PJDnGrammar():
             gamma_scale_or_rate: ty.List[float] = []
             gamma_rate_parameterization: bool = False
 
-            # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
+            # { mean: node_dag1_name, sd: node_dag2_name, ... }
             if dn_param_dict:
                 # val is list
                 for arg, val in dn_param_dict.items():
 
                     # needed for building inference specifications
-                    if isinstance(val[0], pgm.StochasticNodePGM):
+                    if isinstance(val[0], pgm.StochasticNodeDAG):
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_vals_as_str_from_node_dag(val)
 
                     if not cls.grammar_check("gamma", arg):
                         raise ec.ParseNotAParameterError(arg)
@@ -380,15 +381,15 @@ class PJDnGrammar():
             unif_min: ty.List[float] = []
             unif_max: ty.List[float] = []
 
-            # { mean: node_pgm1_name, sd: node_pgm2_name, ... }
+            # { mean: node_dag1_name, sd: node_dag2_name, ... }
             if dn_param_dict:
                 # val is list
                 for arg, val in dn_param_dict.items():
-                    if isinstance(val[0], pgm.StochasticNodePGM):
+                    if isinstance(val[0], pgm.StochasticNodeDAG):
                         # needed for building inference specifications
                         parent_node_tracker[arg] = val[0].node_name
 
-                    extracted_val_list = pgm.extract_value_from_nodepgm(val)
+                    extracted_val_list = pgm.extract_vals_as_str_from_node_dag(val)
 
                     if not cls.grammar_check("unif", arg):
                         raise ec.ParseNotAParameterError(arg)
@@ -449,7 +450,7 @@ class PJDnGrammar():
     @classmethod
     def init_return_discrete_SSE_dn(
         cls,
-        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> pgm.DistributionPGM:
         """Create and return SSE distribution for sampling.
 
@@ -470,7 +471,7 @@ class PJDnGrammar():
     def create_dn_obj(
         cls,
         dn_id: str,
-        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+        dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> pgm.DistributionPGM:
         """Create and return prob. distribution (for sampling) object.
 

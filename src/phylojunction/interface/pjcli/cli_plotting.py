@@ -6,7 +6,7 @@ from matplotlib.axes import Axes  # type: ignore
 from phylojunction.interface.pysidegui.content_main_window \
     import ContentGUIMainWindow
 from phylojunction.pgm.pgm import DirectedAcyclicGraph
-from phylojunction.pgm.pgm import NodePGM
+from phylojunction.pgm.pgm import NodeDAG
 import phylojunction.interface.cmdbox.cmd_parse as cmdp
 import phylojunction.plotting.pj_organize as pjorg
 import phylojunction.plotting.pj_draw as pjdraw
@@ -50,13 +50,13 @@ def selected_node_plot_cli(
         fig_dir: str,
         fig_obj: Figure,
         fig_axes: Axes,
-        node_pgm: NodePGM,
+        node_dag: NodeDAG,
         prefix: str = "",
         sample_idx: int = 0,
         repl_idx: int = 0,
         repl_size: int = 1) -> None:
     """
-    Plot pgm node on provided Axes object (fig_axes), intended
+    Plot DAG node on provided Axes object (fig_axes), intended
     to be scoped to pj_cli.execute_pj_script() 
     then update canvas with new plot
     """
@@ -66,16 +66,16 @@ def selected_node_plot_cli(
     if prefix:
         outfile_path += prefix + "_"
 
-    outfile_path += node_pgm.node_name + str(sample_idx + 1) \
+    outfile_path += node_dag.node_name + str(sample_idx + 1) \
         + "_" + str(repl_idx + 1)
     
     print("outfile_path = " + outfile_path)
     
     # if stochastic or constant, value will be list
-    if isinstance(node_pgm.value, list):
+    if isinstance(node_dag.value, list):
         # if a tree
-        if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-            node_pgm.plot_node(
+        if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
+            node_dag.plot_node(
                 fig_axes,
                 sample_idx=sample_idx,
                 repl_idx=repl_idx,
@@ -83,7 +83,7 @@ def selected_node_plot_cli(
 
         # when not a tree
         else:
-            node_pgm.plot_node(
+            node_dag.plot_node(
                 fig_axes,
                 sample_idx=sample_idx,
                 repl_size=repl_size)
@@ -96,7 +96,7 @@ def selected_node_plot_cli(
 
     # deterministic node, value is an Object
     # else:
-    #     print(type(node_pgm.value))
+    #     print(type(node_dag.value))
 
 
 def call_node_plot_cli(
@@ -112,8 +112,8 @@ def call_node_plot_cli(
  
     for node_name, range_tup in node_range_dict.items():
         if node_name in dag_obj.name_node_dict:
-            node_pgm = dag_obj.get_node_dag_by_name(node_name)
-            repl_size = node_pgm.repl_size
+            node_dag = dag_obj.get_node_dag_by_name(node_name)
+            repl_size = node_dag.repl_size
             start_idx = 0
             end_idx = 1
 
@@ -140,7 +140,7 @@ def call_node_plot_cli(
                             fig_dir,
                             fig_obj,
                             fig_axes,
-                            node_pgm,
+                            node_dag,
                             prefix=prefix,
                             sample_idx=sample_idx,
                             repl_idx=repl_idx,

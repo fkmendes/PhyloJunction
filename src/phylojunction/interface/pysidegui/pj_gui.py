@@ -178,7 +178,7 @@ class GUIMainWindow(QMainWindow):
         # which makes it so spin buttons are not properly
         # initialized
         self.ui.ui_pages.node_list.itemClicked.connect(
-            lambda do_node: self.do_selected_node_pgm_page(
+            lambda do_node: self.do_selected_node_dag_page(
                 spin_buttons_clicked=False))
 
         # radio button update #
@@ -364,19 +364,19 @@ class GUIMainWindow(QMainWindow):
 
     def selected_node_display(
             self,
-            node_pgm,
+            node_dag,
             do_all_samples,
             sample_idx=None,
             repl_idx=0,
             repl_size=1):
 
-        display_node_pgm_value_str = str()
-        display_node_pgm_stat_str = str()
+        display_node_dag_value_str = str()
+        display_node_dag_stat_str = str()
 
         is_tree = False
         # try:
-        if isinstance(node_pgm.value, list) and \
-                isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+        if isinstance(node_dag.value, list) and \
+                isinstance(node_dag.value[0], pjdt.AnnotatedTree):
             is_tree = True
 
         # if deterministic, not subscriptable
@@ -391,16 +391,16 @@ class GUIMainWindow(QMainWindow):
             end = start + repl_size
 
             # values
-            display_node_pgm_value_str = \
-                node_pgm.get_start2end_str(
+            display_node_dag_value_str = \
+                node_dag.get_start2end_str(
                     start,
                     end,
                     repl_idx=repl_idx,
                     is_tree=is_tree)
 
             # summary stats
-            display_node_pgm_stat_str = \
-                node_pgm.get_node_stats_str(
+            display_node_dag_stat_str = \
+                node_dag.get_node_stats_str(
                     start,
                     end,
                     repl_idx)
@@ -408,42 +408,42 @@ class GUIMainWindow(QMainWindow):
         # we get all samples
         else:
             # just calling __str__
-            display_node_pgm_value_str = \
+            display_node_dag_value_str = \
                 self.gui_modeling.dag_obj \
-                .get_display_str_by_name(node_pgm.node_name)
+                .get_display_str_by_name(node_dag.node_name)
 
             # getting all values
-            display_node_pgm_stat_str = \
-                node_pgm.get_node_stats_str(
-                    0, len(node_pgm.value), repl_idx)  # summary stats
+            display_node_dag_stat_str = \
+                node_dag.get_node_stats_str(
+                    0, len(node_dag.value), repl_idx)  # summary stats
 
-        # print("Set values_content QLineEdit widget with text: " + display_node_pgm_value_str)
-        # print("Set summary_content QLineEdit widget with text: " + display_node_pgm_stat_str)
-        self.ui.ui_pages.values_content.setText(display_node_pgm_value_str)
-        self.ui.ui_pages.summary_content.setText(display_node_pgm_stat_str)
+        # print("Set values_content QLineEdit widget with text: " + display_node_dag_value_str)
+        # print("Set summary_content QLineEdit widget with text: " + display_node_dag_stat_str)
+        self.ui.ui_pages.values_content.setText(display_node_dag_value_str)
+        self.ui.ui_pages.summary_content.setText(display_node_dag_stat_str)
 
     def selected_node_plot(
             self,
             fig_obj,
             fig_axes,
-            node_pgm,
+            node_dag,
             do_all_samples,
             sample_idx=None,
             repl_idx=0,
             repl_size=1):
         """
-        Plot pgm node on 'node_display_fig_axes' (Axes object) scoped to 'call_gui()',
+        Plot DAG node on 'node_display_fig_axes' (Axes object) scoped to 'call_gui()',
         then update canvas with new plot
         """
 
         # try:
 
         # if stochastic or constant, value will be list
-        if isinstance(node_pgm.value, list):
+        if isinstance(node_dag.value, list):
             # if a tree
-            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                self.draw_node_pgm(fig_axes,
-                                   node_pgm,
+            if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
+                self.draw_node_dag(fig_axes,
+                                   node_dag,
                                    sample_idx=sample_idx,
                                    repl_idx=repl_idx,
                                    repl_size=repl_size)
@@ -451,13 +451,13 @@ class GUIMainWindow(QMainWindow):
             # when not a tree
             else:
                 if do_all_samples:
-                    self.draw_node_pgm(fig_axes,
-                                       node_pgm,
+                    self.draw_node_dag(fig_axes,
+                                       node_dag,
                                        repl_size=repl_size)
 
                 else:
-                    self.draw_node_pgm(fig_axes,
-                                        node_pgm,
+                    self.draw_node_dag(fig_axes,
+                                        node_dag,
                                         sample_idx=sample_idx,
                                         repl_size=repl_size)
 
@@ -467,19 +467,19 @@ class GUIMainWindow(QMainWindow):
 
         # deterministic node
         else:
-            self.draw_node_pgm(fig_axes, node_pgm)
+            self.draw_node_dag(fig_axes, node_dag)
 
         fig_obj.canvas.draw()
 
     def selected_node_read(self, node_name: str):
-        node_pgm = self.gui_modeling.dag_obj.get_node_dag_by_name(node_name)
+        node_dag = self.gui_modeling.dag_obj.get_node_dag_by_name(node_name)
         # this is n_sim inside sampling distribution classes
-        sample_size = len(node_pgm)
-        repl_size = node_pgm.repl_size
+        sample_size = len(node_dag)
+        repl_size = node_dag.repl_size
 
-        return node_pgm, sample_size, repl_size
+        return node_dag, sample_size, repl_size
 
-    def do_selected_node_pgm_page(self, spin_buttons_clicked: bool = False):
+    def do_selected_node_dag_page(self, spin_buttons_clicked: bool = False):
         """
         Display selected node's string representation and
         plot it on canvas if possible, for pgm page
@@ -494,7 +494,7 @@ class GUIMainWindow(QMainWindow):
 
         if selected_node_name not in ("", None):
             # reading node information #
-            node_pgm, sample_size, repl_size = \
+            node_dag, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
 
             # spin boxes must be up-to-date #
@@ -513,7 +513,7 @@ class GUIMainWindow(QMainWindow):
             # if spin buttons were clicked, no need
             # to updated radio and spin buttons
             if not spin_buttons_clicked:
-                self.init_and_refresh_radio_spin(node_pgm, sample_size, repl_size)
+                self.init_and_refresh_radio_spin(node_dag, sample_size, repl_size)
 
             do_all_samples = \
                 self.ui.ui_pages.all_samples_radio.isChecked()
@@ -529,7 +529,7 @@ class GUIMainWindow(QMainWindow):
             # Now do node #
             ###############
 
-            self.selected_node_display(node_pgm,
+            self.selected_node_display(node_dag,
                                        do_all_samples,
                                        sample_idx=sample_idx,
                                        repl_idx=repl_idx,
@@ -537,7 +537,7 @@ class GUIMainWindow(QMainWindow):
 
             self.selected_node_plot(fig_obj,
                                     fig_axes,
-                                    node_pgm,
+                                    node_dag,
                                     do_all_samples,
                                     sample_idx=sample_idx,
                                     repl_idx=repl_idx,
@@ -566,7 +566,7 @@ class GUIMainWindow(QMainWindow):
         if selected_node_name not in ("", None):
 
             # reading node information #
-            selected_node_pgm, selected_node_sample_size, selected_node_repl_size = \
+            selected_node_dag, selected_node_sample_size, selected_node_repl_size = \
                 self.selected_node_read(selected_node_name)
 
             # could be more efficient, but this
@@ -599,7 +599,7 @@ class GUIMainWindow(QMainWindow):
                     .loc[:, "program"] = "PJ"
 
             # scalar was selected #
-            if isinstance(selected_node_pgm.value[0], (int, float, np.float64)):
+            if isinstance(selected_node_dag.value[0], (int, float, np.float64)):
                 self.ui.ui_pages.summary_stats_list.clear()
 
                 if not self.is_avg_repl_check:
@@ -612,7 +612,7 @@ class GUIMainWindow(QMainWindow):
                     self.pj_comparison_df = scalar_repl_summary_df
 
             # tree was selected #
-            elif isinstance(selected_node_pgm.value[0], pjdt.AnnotatedTree):
+            elif isinstance(selected_node_dag.value[0], pjdt.AnnotatedTree):
                 self.pj_comparison_df = tree_summary_df_dict[selected_node_name]
                 self.ui.ui_pages.summary_stats_list.clear()
                 self.ui.ui_pages.summary_stats_list.addItems(
@@ -643,7 +643,7 @@ class GUIMainWindow(QMainWindow):
         if selected_node_name not in ("", None):
 
             # reading node information #
-            selected_node_pgm, selected_node_sample_size, selected_node_repl_size = \
+            selected_node_dag, selected_node_sample_size, selected_node_repl_size = \
                 self.selected_node_read(selected_node_name)
 
             # could be more efficient, but this
@@ -662,12 +662,12 @@ class GUIMainWindow(QMainWindow):
                 tree_internal_nd_states_str_dict = tree_output_stash
 
             # str because could be constant set by hand
-            if isinstance(selected_node_pgm.value[0], (str, int, float, np.float64)):
+            if isinstance(selected_node_dag.value[0], (str, int, float, np.float64)):
                 if selected_node_repl_size <= 1:
                     self.ui.ui_pages.cov_summary_stats_list.clear()
 
                     # sampled, non-deterministic
-                    if selected_node_pgm.is_sampled:
+                    if selected_node_dag.is_sampled:
                         self.coverage_df = scalar_value_df_dict[selected_node_repl_size]
 
                     # constant, non-deterministic
@@ -877,14 +877,15 @@ class GUIMainWindow(QMainWindow):
     # drawing       #
     #################
 
-    def draw_node_pgm(
+    def draw_node_dag(
             self,
             axes,
-            node_pgm,
+            node_dag,
             sample_idx=None,
             repl_idx=0,
             repl_size=1) -> None:
-        return node_pgm.plot_node(
+
+        return node_dag.plot_node(
             axes,
             sample_idx=sample_idx,
             repl_idx=repl_idx,
@@ -908,14 +909,14 @@ class GUIMainWindow(QMainWindow):
 
         if selected_node_name not in ("", None):
             # reading node information #
-            node_pgm, sample_size, repl_size = \
+            node_dag, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
 
             if not self.pj_comparison_df.empty and \
                     not self.other_comparison_df.empty:
 
                 # scalar
-                if isinstance(node_pgm.value[0], (int, float, np.float64)):
+                if isinstance(node_dag.value[0], (int, float, np.float64)):
                     if not self.is_avg_repl_check:
                         thing_to_compare = selected_node_name
 
@@ -940,7 +941,7 @@ class GUIMainWindow(QMainWindow):
                             pass
 
                 # debugging
-                # print("node_pgm.is_sampled = " + str(node_pgm.is_sampled))
+                # print("node_dag.is_sampled = " + str(node_dag.is_sampled))
                 # print(tabulate(self.pj_comparison_df, self.pj_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
                 # print(tabulate(self.other_comparison_df, self.other_comparison_df.head(), tablefmt="pretty", showindex=False).lstrip())
 
@@ -952,7 +953,7 @@ class GUIMainWindow(QMainWindow):
 
                 # something went wrong,
                 # we clear comparison figure
-                if joint_dataframe.empty or not node_pgm.is_sampled:
+                if joint_dataframe.empty or not node_dag.is_sampled:
                     # node list should only contain
                     # sampled nodes already, but
                     # just being sure...
@@ -993,14 +994,14 @@ class GUIMainWindow(QMainWindow):
 
         if selected_node_name not in ("", None):
             # reading node information #
-            node_pgm, sample_size, repl_size = \
+            node_dag, sample_size, repl_size = \
                 self.selected_node_read(selected_node_name)
 
             if not self.coverage_df.empty and \
                     not self.hpd_df.empty:
 
                 # scalar
-                if isinstance(node_pgm.value[0], (str, int, float, np.float64)):
+                if isinstance(node_dag.value[0], (str, int, float, np.float64)):
                     thing_to_validate = selected_node_name
 
                 # debugging
@@ -1040,7 +1041,7 @@ class GUIMainWindow(QMainWindow):
     # checking          #
     #####################
 
-    def init_and_refresh_radio_spin(self, node_pgm, sample_size, repl_size):
+    def init_and_refresh_radio_spin(self, node_dag, sample_size, repl_size):
 
         def _prepare_for_tree(potential_repl: bool = False):
             # radio #
@@ -1106,9 +1107,9 @@ class GUIMainWindow(QMainWindow):
 
         # can we even circulate through something
         # (basically: non-deterministic nodes)
-        if isinstance(node_pgm.value, list):
-            if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
-                if node_pgm.repl_size > 1:
+        if isinstance(node_dag.value, list):
+            if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
+                if node_dag.repl_size > 1:
                     _prepare_for_tree(potential_repl=True)
 
                 else:
@@ -1118,7 +1119,7 @@ class GUIMainWindow(QMainWindow):
             else:
                 if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
                         not self.ui.ui_pages.one_sample_radio.isEnabled():
-                    if node_pgm.repl_size > 1:
+                    if node_dag.repl_size > 1:
                         _prepare_for_scalar(potential_repl=True)
                     
                     else:
@@ -1133,7 +1134,7 @@ class GUIMainWindow(QMainWindow):
                 # irrespective of all samples or one sample
                 # it should always be possible to check one
                 # sample if there are replicates
-                if node_pgm.repl_size > 1:
+                if node_dag.repl_size > 1:
                     # radio
                     self.ui.ui_pages.one_sample_radio.setEnabled(True)
                     self.ui.ui_pages.one_sample_radio.setCheckable(True)
@@ -1170,7 +1171,7 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.sample_idx_spin.blockSignals(False)
         self.ui.ui_pages.repl_idx_spin.blockSignals(False)
 
-    # def init_and_refresh_radio_spin_working(self, node_pgm, sample_size, repl_size):
+    # def init_and_refresh_radio_spin_working(self, node_dag, sample_size, repl_size):
 
     #     def _prepare_for_tree():
     #         # radio #
@@ -1201,9 +1202,9 @@ class GUIMainWindow(QMainWindow):
     #     # Stochastic node #
     #     ###################
 
-    #     if node_pgm.is_sampled:
+    #     if node_dag.is_sampled:
     #         # tree #
-    #         if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+    #         if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
     #             _prepare_for_tree()
 
     #         # non-tree
@@ -1271,9 +1272,9 @@ class GUIMainWindow(QMainWindow):
             
     #         # non-deterministic node because
     #         # .value will not be list if so
-    #         if isinstance(node_pgm.value, list):
+    #         if isinstance(node_dag.value, list):
     #             # tree #
-    #             if isinstance(node_pgm.value[0], pjdt.AnnotatedTree):
+    #             if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
     #                 _prepare_for_tree()
 
     #             # non-tree
@@ -1363,12 +1364,12 @@ class GUIMainWindow(QMainWindow):
     def refresh_selected_node_display_plot_radio(self):
         # if nodes have been created and selected #
         if self.ui.ui_pages.node_list.currentItem() is not None:
-            self.do_selected_node_pgm_page()
+            self.do_selected_node_dag_page()
 
     def refresh_selected_node_display_plot_spin(self):
         # if nodes have been created and selected #
         if self.ui.ui_pages.node_list.currentItem() is not None:
-            self.do_selected_node_pgm_page(spin_buttons_clicked=True)
+            self.do_selected_node_dag_page(spin_buttons_clicked=True)
 
     def refresh_cmd_history(self, user_reset=False):
         if user_reset:

@@ -14,95 +14,122 @@ __email__ = "f.mendes@wustl.edu"
 class TestVarAssignment(unittest.TestCase):
     def test_var_assignment(self):
         """
-        Test if a series of different variable assignments are correctly evaluated
-        and result in the right probabilistic graphical model
+        Test variable assignment.
+        
+        Test a series of different variable assignments produce the
+        right DAG.
         """
 
         dag_obj = pgm.DirectedAcyclicGraph()
         
         cmd_line1 = "a <- 1"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm = dag_obj.get_node_dag_by_name("a")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line1)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
+        a_node_dag = dag_obj.get_node_dag_by_name("a")
         
         self.assertEqual(1, dag_obj.n_nodes)
-        self.assertEqual(type(a_node_pgm.value), list)
-        self.assertEqual(len(a_node_pgm.value), 1)
-        self.assertEqual(a_node_pgm.value, ["1"])
+        self.assertEqual(type(a_node_dag.value), list)
+        self.assertEqual(len(a_node_dag.value), 1)
+        self.assertEqual(a_node_dag.value, ["1"])
         
         # --- #
 
         cmd_line2 = "b <- [1, 2, 3]"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line2)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        b_node_pgm = dag_obj.get_node_dag_by_name("b")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line2)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line2)
+        b_node_dag = dag_obj.get_node_dag_by_name("b")
 
         self.assertEqual(2, dag_obj.n_nodes)
-        self.assertEqual(type(b_node_pgm.value), list)
-        self.assertEqual(len(b_node_pgm.value), 3)
-        self.assertEqual(b_node_pgm.value, ["1", "2", "3"])
+        self.assertEqual(type(b_node_dag.value), list)
+        self.assertEqual(len(b_node_dag.value), 3)
+        self.assertEqual(b_node_dag.value, ["1", "2", "3"])
         
         # --- #
         
         cmd_line3 = "a <- [1]"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line3)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line3)
-        a_node_pgm = dag_obj.get_node_dag_by_name("a")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line3)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line3)
+        a_node_dag = dag_obj.get_node_dag_by_name("a")
 
         self.assertEqual(2, dag_obj.n_nodes)
-        self.assertEqual(type(a_node_pgm.value), list)
-        self.assertEqual(len(a_node_pgm.value), 1)
-        self.assertEqual(a_node_pgm.value, ["1"])
+        self.assertEqual(type(a_node_dag.value), list)
+        self.assertEqual(len(a_node_dag.value), 1)
+        self.assertEqual(a_node_dag.value, ["1"])
 
         # --- #
         
         cmd_line4 = "c <- b"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line4)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line4)
-        c_node_pgm = dag_obj.get_node_dag_by_name("c")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line4)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line4)
+        c_node_dag = dag_obj.get_node_dag_by_name("c")
 
         self.assertEqual(3, dag_obj.n_nodes)
-        self.assertEqual(type(c_node_pgm.value), list)
-        self.assertEqual(len(c_node_pgm.value), 3)
-        self.assertEqual(c_node_pgm.value, ["1", "2", "3"])
+        self.assertEqual(type(c_node_dag.value), list)
+        self.assertEqual(len(c_node_dag.value), 3)
+        self.assertEqual(c_node_dag.value, ["1", "2", "3"])
 
         # --- # 
 
         cmd_line5 = "d <- [c, 4, 5, 6]"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line5)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line5)
-        d_node_pgm = dag_obj.get_node_dag_by_name("d")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line5)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line5)
+        d_node_dag = dag_obj.get_node_dag_by_name("d")
 
         self.assertEqual(4, dag_obj.n_nodes)
-        self.assertEqual(type(d_node_pgm.value), list)
-        self.assertEqual(len(d_node_pgm.value), 6)
-        self.assertEqual(d_node_pgm.value, ["1", "2", "3", "4", "5", "6"])
+        self.assertEqual(type(d_node_dag.value), list)
+        self.assertEqual(len(d_node_dag.value), 6)
+        self.assertEqual(d_node_dag.value, ["1", "2", "3", "4", "5", "6"])
 
     def test_var_assignment_read_tree_string(self):
-        """
-        Test if read_tree() calls using newick strings directly
-        are correctly evaluated and result in the right probabilistic
-        graphical model
+        """Test read_tree() from string.
+        
+        Test read_tree()calls using Newick strings directly produce
+        the right DAG.
         """
 
         dag_obj = pgm.DirectedAcyclicGraph()
 
-        cmd_line1 = ('tr <- read_tree(string="((sp1[&index=1]:1.0,sp2[&index=2]:1.0)'
-                     '[&index=4]:1.0,sp3[&index=3]:2.0)[&index=5];", node_name_attr="index")')
+        cmd_line1 = ('tr <- read_tree(string="((sp1[&index=1]:1.0,sp2'
+                     '[&index=2]:1.0)[&index=4]:1.0,sp3[&index=3]:2.0)'
+                     '[&index=5];", node_name_attr="index")')
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line1)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
+        a_node_dag = dag_obj.get_node_dag_by_name("tr")
 
         self.assertEqual(1, dag_obj.n_nodes)
-        self.assertEqual(type(a_node_pgm.value), list)
-        self.assertEqual(len(a_node_pgm.value), 1)
-        self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
+        self.assertEqual(type(a_node_dag.value), list)
+        self.assertEqual(len(a_node_dag.value), 1)
+        self.assertEqual(a_node_dag.value[0].__str__().rstrip(),
                          ('((nd1:1.0[&index=1],nd2:1.0[&index=2])nd4:1.0'
                           '[&index=4],nd3:2.0[&index=3])nd5[&index=5];'))
         
@@ -110,21 +137,19 @@ class TestVarAssignment(unittest.TestCase):
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line2)
         cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
-        
-        # print(a_node_pgm.value[0])
+        a_node_dag = dag_obj.get_node_dag_by_name("tr")
 
         self.assertEqual(1, dag_obj.n_nodes)
-        self.assertEqual(type(a_node_pgm.value), list)
-        self.assertEqual(len(a_node_pgm.value), 1)
-        self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
+        self.assertEqual(type(a_node_dag.value), list)
+        self.assertEqual(len(a_node_dag.value), 1)
+        self.assertEqual(a_node_dag.value[0].__str__().rstrip(),
                          ('((sp1:1.0,sp2:1.0)nd1:1.0,sp3:2.0)root;'))
         
     def test_var_assignment_read_tree_from_file(self):
-        """
-        Test if read_tree() calls using tree files are correctly
-        evaluated and result in the right probabilistic
-        graphical model
+        """Test read_tree() from file.
+        
+        Test read_tree()calls using tree files containing Newick
+        strings directly produce the right DAG.
         """
 
         dag_obj = pgm.DirectedAcyclicGraph()
@@ -132,14 +157,18 @@ class TestVarAssignment(unittest.TestCase):
         cmd_line1 = ('tr <- read_tree(file_path="examples/trees_maps_files'
                      '/tree_to_read.tre", node_name_attr="index")')
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line1)
-        cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.assign_regex, cmd_line1)
+        cmd.parse_variable_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
+        a_node_dag = dag_obj.get_node_dag_by_name("tr")
 
         self.assertEqual(1, dag_obj.n_nodes)
-        self.assertEqual(type(a_node_pgm.value), list)
-        self.assertEqual(len(a_node_pgm.value), 1)
-        self.assertEqual(a_node_pgm.value[0].__str__().rstrip(),
+        self.assertEqual(type(a_node_dag.value), list)
+        self.assertEqual(len(a_node_dag.value), 1)
+        self.assertEqual(a_node_dag.value[0].__str__().rstrip(),
                          ('((nd1:1.0[&index=1],nd2:1.0[&index=2])nd4:1.0'
                           '[&index=4],nd3:2.0[&index=3])nd5[&index=5];'))
         
@@ -148,20 +177,17 @@ class TestVarAssignment(unittest.TestCase):
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.assign_regex, cmd_line2)
         cmd.parse_variable_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm = dag_obj.get_node_dag_by_name("tr")
+        a_node_dag = dag_obj.get_node_dag_by_name("tr")
 
         self.assertEqual(1, dag_obj.n_nodes)
-        self.assertEqual(type(a_node_pgm.value), list)
-        self.assertEqual(len(a_node_pgm.value), 2)
-        self.assertEqual(a_node_pgm.value[1].__str__().rstrip(),
+        self.assertEqual(type(a_node_dag.value), list)
+        self.assertEqual(len(a_node_dag.value), 2)
+        self.assertEqual(a_node_dag.value[1].__str__().rstrip(),
                          ('((nd1:0.1[&index=1],nd2:0.1[&index=2])nd4:1.9'
                           '[&index=4],nd3:2.0[&index=3])nd5[&index=5];'))
 
     def test_var_assignment_read_tree_string_exceptions(self):
-        """
-        Test if errors with read_tree() calls using newick strings
-        are handled correctly
-        """
+        """Test read_tree() from string raised exceptions."""
 
         dag_obj = pgm.DirectedAcyclicGraph()
 
@@ -207,10 +233,7 @@ class TestVarAssignment(unittest.TestCase):
                          expected_exception_message2)
         
     def test_var_assignment_read_tree_file_exceptions(self):
-        """
-        Test if errors with read_tree() calls using tree files
-        are handled correctly
-        """
+        """Test read_tree() from file raised exceptions."""
 
         dag_obj = pgm.DirectedAcyclicGraph()
 
@@ -247,9 +270,9 @@ class TestVarAssignment(unittest.TestCase):
         
         with self.assertRaises(ec.ObjInitInvalidArgError) as exc:
             cmd.parse_variable_assignment(dag_obj,
-                                            stoch_node_name,
-                                            stoch_node_spec,
-                                            cmd_line2)
+                                          stoch_node_name,
+                                          stoch_node_spec,
+                                          cmd_line2)
 
         self.assertEqual(str(exc.exception),
                          expected_exception_message2)

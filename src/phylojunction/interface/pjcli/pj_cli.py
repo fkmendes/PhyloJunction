@@ -54,9 +54,9 @@ def execute_pj_script(
             os.mkdir(output_dir)
 
         # debugging (looking at model)
-        # for node_name, node_pgm in dag_obj.name_node_dict.items():
+        # for node_name, node_dag in dag_obj.name_node_dict.items():
         #     print("\nnode name = " + node_name)
-        #     print(node_pgm.value)
+        #     print(node_dag.value)
 
         # Writing data #
         if write_data:

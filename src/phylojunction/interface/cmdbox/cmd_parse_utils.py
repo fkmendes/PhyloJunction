@@ -40,7 +40,7 @@ deterministic_regex = re.compile(r"\s*(:=)\s*")
 
 
 def val_or_obj(dag_obj: pgm.DirectedAcyclicGraph,
-               val: ty.List[str]) -> ty.List[ty.Union[pgm.NodePGM, str]]:
+               val: ty.List[str]) -> ty.List[ty.Union[pgm.NodeDAG, str]]:
     """Return list of strings with values or node names.
 
     Checks if provided values are directly accessible as values
@@ -62,16 +62,17 @@ def val_or_obj(dag_obj: pgm.DirectedAcyclicGraph,
             strings) and/or stochastic node objects.
     """
 
-    val_or_obj_list: ty.List[ty.Union[pgm.NodePGM, str]] = []
+    val_or_obj_list: ty.List[ty.Union[pgm.NodeDAG, str]] = list()
 
     for v in val:
         if isinstance(v, str):
             # checking if string could potentially be a node object that
             # has a name
             if re.match(character_value_regex, v):
+
                 # if it does find a node with that name, we add the node object
                 try:
-                    # appending StochasticNodePGM
+                    # appending StochasticNodeDAG
                     val_or_obj_list.append(dag_obj.name_node_dict[v])
 
                 except KeyError:
@@ -90,18 +91,15 @@ def parse_spec(
         fn_spec_str: str,
         cmd_line: str) \
         -> ty.Tuple[
-            ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]],
-            ty.List[pgm.NodePGM]]:
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]],
+            ty.List[pgm.NodeDAG]]:
 
     spec_dict: ty.Dict[str, str] = tokenize_fn_spec(fn_spec_str, cmd_line)
     
-    # debugging
-    # print("spec_dict = ", spec_dict)
-    
     spec_dict_return: \
-        ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
+        ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]] = dict()
 
-    parent_pgm_nodes: ty.List[pgm.NodePGM] = []
+    parent_pgm_nodes: ty.List[pgm.NodeDAG] = []
     for param_name, an_arg in spec_dict.items():
 
         #############
@@ -112,28 +110,27 @@ def parse_spec(
 
         # if argument is a list
         if re.match(vector_value_regex, an_arg):
-            # print("\n\n parsing arg " + str(an_arg) + " as vector")
             arg_list = parse_val_vector(an_arg)
+
         # if scalar variable
         else:
-            # print("\n\n parsing arg " + str(an_arg) + " as str")
             arg_list.append(an_arg)
 
         val_obj_list = val_or_obj(dag_obj, arg_list)
         spec_dict_return[param_name] = val_obj_list
         # { param_name_str:
         #       [ number_or_quoted_str_str1,
-        #         a_NodePGM1,
+        #         a_NodeDAG1,
         #         number_or_quoted_str_str2,
-        #         aNodePGM2
+        #         aNodeDAG2
         #       ]
         # }
 
         for vo in val_obj_list:
-            if isinstance(vo, pgm.NodePGM):
+            if isinstance(vo, pgm.NodeDAG):
                 parent_pgm_nodes.append(vo)
 
-    # values in spec_dict will be lists of strings or lists of NodePGMs
+    # values in spec_dict will be lists of strings or lists of NodeDAGs
     return spec_dict_return, parent_pgm_nodes
 
 

@@ -27,14 +27,14 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
         cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line)
-        a_node_pgm = dag_obj.get_node_dag_by_name("u")
+        a_node_dag = dag_obj.get_node_dag_by_name("u")
 
         rb_sample_mean = -0.002172273 # mean(u) in RB
         rb_sample_sd = 0.5781801 # stdev(u) in RB
         rb_sample_min = -0.9999855 # min(u) in RB
         rb_sample_max = 0.9999579 # max(u) in RB
 
-        pj_unif_values = a_node_pgm.value # 100000 floats in list
+        pj_unif_values = a_node_dag.value # 100000 floats in list
 
         self.assertAlmostEqual(rb_sample_mean, mean(pj_unif_values), delta=1e-2)
         self.assertAlmostEqual(rb_sample_sd, stdev(pj_unif_values), delta=1e-2)
@@ -52,13 +52,18 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         dag_obj = pgm.DirectedAcyclicGraph()
         
         n_repl = 100000
-        cmd_line1 = "e1 ~ exponential(n=1, nr=" + str(n_repl) + ", rate=0.5, rate_parameterization=\"true\")" # default is true
+        cmd_line1 = "e1 ~ exponential(n=1, nr=" + str(n_repl) \
+            + ", rate=0.5, rate_parameterization=\"true\")" # default is true
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line1)
-        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
-        a_node_pgm1 = dag_obj.get_node_dag_by_name("e1")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line1)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
+        a_node_dag1 = dag_obj.get_node_dag_by_name("e1")
 
-        # rev_str_list = a_node_pgm1.sampling_dn.get_rev_inference_spec_info()
+        # rev_str_list = a_node_dag1.sampling_dn.get_rev_inference_spec_info()
         # str_to_run_in_rb_for_unittest1 = "for (i in 1:" + str(n_repl) + ") {\n" + \
         #     "    e1[i] ~ " + rev_str_list[0] + "\n" + \
         #     "}"
@@ -67,15 +72,20 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         rb_sample_mean1 = 2.013223 # mean(e1) in RB
         rb_sample_sd1 = 2.017317 # stdev(e1) in RB
 
-        pj_exponential_values1 = a_node_pgm1.value # 100000 floats in list
+        pj_exponential_values1 = a_node_dag1.value # 100000 floats in list
 
-        cmd_line2 = "e2 ~ exponential(n=1, nr=" + str(n_repl) + ", rate=0.5, rate_parameterization=\"false\")"
+        cmd_line2 = "e2 ~ exponential(n=1, nr=" + str(n_repl) \
+            + ", rate=0.5, rate_parameterization=\"false\")"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
-        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm2 = dag_obj.get_node_dag_by_name("e2")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line2)
+        a_node_dag2 = dag_obj.get_node_dag_by_name("e2")
 
-        # rev_str_list = a_node_pgm2.sampling_dn.get_rev_inference_spec_info()
+        # rev_str_list = a_node_dag2.sampling_dn.get_rev_inference_spec_info()
         # str_to_run_in_rb_for_unittest2 = "for (i in 1:" + str(n_repl) + ") {\n" + \
         #     "    e2[i] ~ " + rev_str_list[0] + "\n" + \
         #     "}"
@@ -84,12 +94,20 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         rb_sample_mean2 = 0.50126 # mean(e2) in RB
         rb_sample_sd2 = 0.5042986 # stdev(e2) in RB
 
-        pj_exponential_values2 = a_node_pgm2.value # 100000 floats in list
+        pj_exponential_values2 = a_node_dag2.value # 100000 floats in list
 
-        self.assertAlmostEqual(rb_sample_mean1, mean(pj_exponential_values1), delta=1e-1)
-        self.assertAlmostEqual(rb_sample_sd1, stdev(pj_exponential_values1), delta=1e-1)
-        self.assertAlmostEqual(rb_sample_mean2, mean(pj_exponential_values2), delta=1e-1)
-        self.assertAlmostEqual(rb_sample_sd2, stdev(pj_exponential_values2), delta=1e-1)
+        self.assertAlmostEqual(rb_sample_mean1,
+                               mean(pj_exponential_values1),
+                               delta=1e-1)
+        self.assertAlmostEqual(rb_sample_sd1,
+                               stdev(pj_exponential_values1),
+                               delta=1e-1)
+        self.assertAlmostEqual(rb_sample_mean2,
+                               mean(pj_exponential_values2),
+                               delta=1e-1)
+        self.assertAlmostEqual(rb_sample_sd2,
+                               stdev(pj_exponential_values2),
+                               delta=1e-1)
 
 
     def test_pj2rb_gamma(self):
@@ -113,14 +131,18 @@ class TestInferenceRevBayesParametricDn(unittest.TestCase):
         n_repl = 100000
         cmd_line = "n ~ normal(n=1, nr=" + str(n_repl) + ", mean=0.5, sd=0.1)"
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
-        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line)
-        a_node_pgm = dag_obj.get_node_dag_by_name("n")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line)
+        a_node_dag = dag_obj.get_node_dag_by_name("n")
 
         rb_sample_mean = 0.4998006 # mean(n) in RB
         rb_sample_sd = 0.09983804 # stdev(n) in RB
 
-        pj_normal_values = a_node_pgm.value # 1000 floats in list
+        pj_normal_values = a_node_dag.value # 1000 floats in list
 
         self.assertAlmostEqual(rb_sample_mean, mean(pj_normal_values), delta=1e-2)
         self.assertAlmostEqual(rb_sample_sd, stdev(pj_normal_values), delta=1e-2)

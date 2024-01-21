@@ -12,7 +12,7 @@ __email__ = "f.mendes@wustl.edu"
 
 def make_tree_reader(ct_fn_name: str,
                      ct_fn_param_dict: \
-                        ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+                        ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> pgm.ConstantFn:
     #############################
     # IMPORTANT: Default values #
@@ -26,9 +26,9 @@ def make_tree_reader(ct_fn_name: str,
     # args were already grammar-checked in constant_fn_grammar
     for arg, val in ct_fn_param_dict.items():
         # if element in val is string, it remains unchanged,
-        # if NodePGM, we get its string-fied value
+        # if NodeDAG, we get its string-fied value
         extracted_val: ty.List[str] = \
-            pgm.extract_value_from_nodepgm(val)
+            pgm.extract_vals_as_str_from_node_dag(val)
 
         if True:
             if arg == "n":

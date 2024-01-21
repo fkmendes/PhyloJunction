@@ -13,7 +13,7 @@ __email__ = "f.mendes@wustl.edu"
 
 def make_discrete_SSE_dn(
     dn_name: str,
-    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]]) \
+    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> pgm.DistributionPGM:
 
     #############################
@@ -67,33 +67,33 @@ def make_discrete_SSE_dn(
 
             # if element in val is string: remains unchanged
             #
-            # if StochasticNodePGM: we get its string-fied value
-            extracted_val = pgm.extract_value_from_nodepgm(val)
+            # if StochasticNodeDAG: we get its string-fied value
+            extracted_val = pgm.extract_vals_as_str_from_node_dag(val)
 
             ############################
             # Non-vectorized arguments #
             ############################
 
             # ... thus using only the first value!
-            first_val: ty.Union[str, pgm.NodePGM]
+            first_val: ty.Union[str, pgm.NodeDAG]
 
             if len(extracted_val) >= 1:
                 first_val = extracted_val[0]
 
-            # if DeterministicNodePGM is in val
-            # e.g., val = [pgm.DeterministicNodePGM]
+            # if DeterministicNodeDAG is in val
+            # e.g., val = [pgm.DeterministicNodeDAG]
             else:
                 first_val = val[0]
 
-            if arg == "stash" and isinstance(first_val, pgm.NodePGM):
-                nodepgm_val = first_val.value
+            if arg == "stash" and isinstance(first_val, pgm.NodeDAG):
+                node_dag_val = first_val.value
 
-                if isinstance(nodepgm_val, sseobj.SSEStash):
-                    stash = nodepgm_val
+                if isinstance(node_dag_val, sseobj.SSEStash):
+                    stash = node_dag_val
 
                     # SSEStash will return None if prob_handler
                     # wasn't created by user through script
-                    # prob_handler = nodepgm_val.get_prob_handler()
+                    # prob_handler = node_dag_val.get_prob_handler()
 
             elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa",
                          "max_rec_taxa", "abort_at_obs"):
@@ -284,14 +284,14 @@ if __name__ == "__main__":
 
     sse_stash = sseobj.SSEStash(event_handler)
 
-    # det_nd_pgm = pgm.DeterministicNodePGM(
+    # det_nd_dag = pgm.DeterministicNodeDAG(
         # "events", value=event_handler, parent_nodes=None)
-    det_nd_pgm = pgm.DeterministicNodePGM(
+    det_nd_pgm = pgm.DeterministicNodeDAG(
         "sse_stash",
         value=sse_stash,
         parent_nodes=None)
 
-    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodePGM]]] = dict()
+    dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]] = dict()
     dn_param_dict["n"] = ["1"]
     dn_param_dict["nr"] = ["1"]
     dn_param_dict["stash"] = [det_nd_pgm]

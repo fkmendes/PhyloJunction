@@ -26,13 +26,13 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line)
         cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line)
-        a_node_pgm = dag_obj.get_node_dag_by_name("u")
+        a_node_dag = dag_obj.get_node_dag_by_name("u")
   
-        self.assertTrue(isinstance(a_node_pgm.value, list))
-        self.assertEqual(len(a_node_pgm.value), 100000)
-        self.assertAlmostEqual(0.0, mean(a_node_pgm.value), delta=1e-2)
-        self.assertLessEqual(-1.0, min(a_node_pgm.value))
-        self.assertGreater(1.0, max(a_node_pgm.value))
+        self.assertTrue(isinstance(a_node_dag.value, list))
+        self.assertEqual(len(a_node_dag.value), 100000)
+        self.assertAlmostEqual(0.0, mean(a_node_dag.value), delta=1e-2)
+        self.assertLessEqual(-1.0, min(a_node_dag.value))
+        self.assertGreater(1.0, max(a_node_dag.value))
         self.assertEqual(1, dag_obj.n_nodes)
 
 
@@ -58,12 +58,12 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
         cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm = dag_obj.get_node_dag_by_name("u")
+        a_node_dag = dag_obj.get_node_dag_by_name("u")
   
-        self.assertTrue(isinstance(a_node_pgm.value, list))
+        self.assertTrue(isinstance(a_node_dag.value, list))
         for idx, tup in enumerate(tups):
-            self.assertTrue(tup[0] <= a_node_pgm.value[idx * 2] < tup[1])
-            self.assertTrue(tup[0] <= a_node_pgm.value[idx * 2 + 1] < tup[1])
+            self.assertTrue(tup[0] <= a_node_dag.value[idx * 2] < tup[1])
+            self.assertTrue(tup[0] <= a_node_dag.value[idx * 2 + 1] < tup[1])
         self.assertEqual(2, dag_obj.n_nodes)
         
 
@@ -84,28 +84,35 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
         
-        cmdp.parse_samp_dn_assignment(
-            dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
         
-        a_node_pgm1 = dag_obj.get_node_dag_by_name("e1")
+        a_node_dag1 = dag_obj.get_node_dag_by_name("e1")
 
-        self.assertTrue(isinstance(a_node_pgm1.value, list))
-        self.assertEqual(len(a_node_pgm1.value), 100000)
-        self.assertAlmostEqual(2.0, mean(a_node_pgm1.value), delta=0.05)
+        self.assertTrue(isinstance(a_node_dag1.value, list))
+        self.assertEqual(len(a_node_dag1.value), 100000)
+        self.assertAlmostEqual(2.0, mean(a_node_dag1.value), delta=0.05)
         self.assertEqual(1, dag_obj.n_nodes)
 
         #######################################
         # Exponential, scale parameterization #
         #######################################
-        cmd_line2 = "e2 ~ exponential(n=100000, nr=1, rate=0.5, rate_parameterization=\"false\")"
+        cmd_line2 = ('e2 ~ exponential(n=100000, nr=1, rate=0.5, '
+                     'rate_parameterization=\"false\")')
 
-        stoch_node_name, _, stoch_node_spec = re.split(cmdu.sampled_as_regex, cmd_line2)
-        cmdp.parse_samp_dn_assignment(dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
-        a_node_pgm2 = dag_obj.get_node_dag_by_name("e2")
+        stoch_node_name, _, stoch_node_spec = \
+            re.split(cmdu.sampled_as_regex, cmd_line2)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line2)
+        a_node_dag2 = dag_obj.get_node_dag_by_name("e2")
 
-        self.assertTrue(isinstance(a_node_pgm2.value, list))
-        self.assertEqual(len(a_node_pgm2.value), 100000)
-        self.assertAlmostEqual(0.5, mean(a_node_pgm2.value), delta=0.05)
+        self.assertTrue(isinstance(a_node_dag2.value, list))
+        self.assertEqual(len(a_node_dag2.value), 100000)
+        self.assertAlmostEqual(0.5, mean(a_node_dag2.value), delta=0.05)
         self.assertEqual(2, dag_obj.n_nodes)
 
 
@@ -125,14 +132,16 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
         
-        cmdp.parse_samp_dn_assignment(
-            dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
         
-        a_node_pgm1 = dag_obj.get_node_dag_by_name("g1")
+        a_node_dag1 = dag_obj.get_node_dag_by_name("g1")
         
-        self.assertTrue(isinstance(a_node_pgm1.value, list))
-        self.assertEqual(len(a_node_pgm1.value), 100000)
-        self.assertAlmostEqual(0.25, mean(a_node_pgm1.value), delta=0.05)
+        self.assertTrue(isinstance(a_node_dag1.value, list))
+        self.assertEqual(len(a_node_dag1.value), 100000)
+        self.assertAlmostEqual(0.25, mean(a_node_dag1.value), delta=0.05)
         self.assertEqual(1, dag_obj.n_nodes)
 
         ################################
@@ -144,14 +153,16 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line2)
 
-        cmdp.parse_samp_dn_assignment(
-            dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line2)
         
-        a_node_pgm2 = dag_obj.get_node_dag_by_name("g2")
+        a_node_dag2 = dag_obj.get_node_dag_by_name("g2")
 
-        self.assertTrue(isinstance(a_node_pgm2.value, list))
-        self.assertEqual(len(a_node_pgm2.value), 100000)
-        self.assertAlmostEqual(1.0, mean(a_node_pgm2.value), delta=0.05)
+        self.assertTrue(isinstance(a_node_dag2.value, list))
+        self.assertEqual(len(a_node_dag2.value), 100000)
+        self.assertAlmostEqual(1.0, mean(a_node_dag2.value), delta=0.05)
         self.assertEqual(2, dag_obj.n_nodes)
 
 
@@ -169,14 +180,16 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
         
-        cmdp.parse_samp_dn_assignment(
-            dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
         
-        a_node_pgm = dag_obj.get_node_dag_by_name("n")
+        a_node_dag = dag_obj.get_node_dag_by_name("n")
         
-        self.assertTrue(isinstance(a_node_pgm.value, list))
-        self.assertEqual(len(a_node_pgm.value), 100000)
-        self.assertAlmostEqual(0.5, mean(a_node_pgm.value), delta=0.1)
+        self.assertTrue(isinstance(a_node_dag.value, list))
+        self.assertEqual(len(a_node_dag.value), 100000)
+        self.assertAlmostEqual(0.5, mean(a_node_dag.value), delta=0.1)
         self.assertEqual(1, dag_obj.n_nodes)
 
 
@@ -197,14 +210,16 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
         
-        cmdp.parse_samp_dn_assignment(
-            dag_obj, stoch_node_name, stoch_node_spec, cmd_line1)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line1)
         
-        a_node_pgm = dag_obj.get_node_dag_by_name("ln1")
+        a_node_dag = dag_obj.get_node_dag_by_name("ln1")
         
-        self.assertTrue(isinstance(a_node_pgm.value, list))
-        self.assertEqual(len(a_node_pgm.value), 100000)
-        self.assertAlmostEqual(2.37, mean(a_node_pgm.value), delta=0.1)
+        self.assertTrue(isinstance(a_node_dag.value, list))
+        self.assertEqual(len(a_node_dag.value), 100000)
+        self.assertAlmostEqual(2.37, mean(a_node_dag.value), delta=0.1)
         self.assertEqual(1, dag_obj.n_nodes)
         
         ##########################
@@ -219,15 +234,17 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line2)
         
-        cmdp.parse_samp_dn_assignment(
-            dag_obj, stoch_node_name, stoch_node_spec, cmd_line2)
+        cmdp.parse_samp_dn_assignment(dag_obj,
+                                      stoch_node_name,
+                                      stoch_node_spec,
+                                      cmd_line2)
         
-        a_node_pgm = dag_obj.get_node_dag_by_name("ln2")
+        a_node_dag = dag_obj.get_node_dag_by_name("ln2")
 
-        self.assertTrue(isinstance(a_node_pgm.value, list))
-        # self.assertEqual(len(a_node_pgm.value), 100000)
-        # self.assertAlmostEqual(2.37, mean(a_node_pgm.value), delta=0.1)
-        # self.assertEqual(2, dag_obj.n_nodes)
+        self.assertTrue(isinstance(a_node_dag.value, list))
+        self.assertEqual(len(a_node_dag.value), 100000)
+        self.assertAlmostEqual(2.37, mean(a_node_dag.value), delta=0.1)
+        self.assertEqual(2, dag_obj.n_nodes)
 
 
     def test_unif_misspec(self):
