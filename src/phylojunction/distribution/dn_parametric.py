@@ -15,7 +15,7 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-class DnLogNormal(pgm.DistributionPGM):
+class DnLogNormal(pgm.DistrForSampling):
 
     DN_NAME = "Log-normal"
 
@@ -166,7 +166,7 @@ class DnLogNormal(pgm.DistributionPGM):
             self.parent_node_tracker)
 
 
-class DnNormal(pgm.DistributionPGM):
+class DnNormal(pgm.DistrForSampling):
 
     DN_NAME = "Normal"
 
@@ -302,7 +302,7 @@ class DnNormal(pgm.DistributionPGM):
             self.parent_node_tracker)
 
 
-class DnExponential(pgm.DistributionPGM):
+class DnExponential(pgm.DistrForSampling):
 
     DN_NAME = "Exponential"
 
@@ -424,7 +424,7 @@ class DnExponential(pgm.DistributionPGM):
             self.parent_node_tracker)
 
 
-class DnGamma(pgm.DistributionPGM):
+class DnGamma(pgm.DistrForSampling):
 
     DN_NAME = "Gamma"
 
@@ -565,7 +565,7 @@ class DnGamma(pgm.DistributionPGM):
             self.parent_node_tracker)
 
 
-class DnUnif(pgm.DistributionPGM):
+class DnUnif(pgm.DistrForSampling):
 
     DN_NAME = "Uniform"
 

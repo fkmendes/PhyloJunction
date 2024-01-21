@@ -6,7 +6,7 @@ import math
 # pj imports
 import phylojunction.pgm.pgm as pgm
 
-def get_rev_str_from_dn_parametric_obj(dn_obj: pgm.DistributionPGM) -> ty.Tuple[int, int, ty.List[str]]:
+def get_rev_str_from_dn_parametric_obj(dn_obj: pgm.DistrForSampling) -> ty.Tuple[int, int, ty.List[str]]:
     
     rev_str_list: ty.List[str]
     n_sim: int = dn_obj.n_samples

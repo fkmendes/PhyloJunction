@@ -430,7 +430,7 @@ def parse_samp_dn_assignment(
             a_stoch_node_name: str,
             sample_size: int,
             replicate_size: int,
-            a_dn_obj: pgm.DistributionPGM,
+            a_dn_obj: pgm.DistrForSampling,
             parent_pgm_nodes: ty.List[pgm.NodeDAG],
             clamped: bool):
 

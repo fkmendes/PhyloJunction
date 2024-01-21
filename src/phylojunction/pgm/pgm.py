@@ -150,7 +150,7 @@ class ValueGenerator(ABC):
         pass
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @abstractmethod
@@ -173,7 +173,7 @@ class ValueGenerator(ABC):
         pass
 
 
-class DistributionPGM(ValueGenerator):
+class DistrForSampling(ValueGenerator):
     """Class for randomly generating (i.e., sampling) values.
 
     An object of this class is required by stochastic DAG nodes so
@@ -426,7 +426,7 @@ class NodeDAG(ABC):
         pass
 
     @abstractmethod
-    def populate_operator_weight(self):
+    def populate_operator_weight(self) -> None:
         pass
 
     @abstractmethod
@@ -562,16 +562,23 @@ class StochasticNodeDAG(NodeDAG):
     This class is also used when a value is being specified by a user,
     or parsed from it. In other words, constant nodes in the graph
     are still stochastic DAG nodes under the hood.
+
+    Attributes:
+        sampling_dn (DistrForSampling): Distribution object for randomly
+            sampling values.
+        constant_fn (ConstantFn): Function object for obtaining
+            constant values modified from some user input.
+        operator_weight (float): Weight given to MCMC move.
     """
 
-    sampling_dn: ty.Optional[DistributionPGM]
-    constant_fn: ty.Optional[DistributionPGM]
+    sampling_dn: ty.Optional[DistrForSampling]
+    constant_fn: ty.Optional[ConstantFn]
     operator_weight: float
 
     def __init__(self,
                  node_name: str,
                  sample_size: int,
-                 sampled_from: ty.Optional[DistributionPGM] = None,
+                 sampled_from: ty.Optional[DistrForSampling] = None,
                  returned_from: ty.Optional[ConstantFn] = None,
                  value: ty.Optional[ty.List[ty.Any]] = None,
                  replicate_size: int = 1,
@@ -580,14 +587,13 @@ class StochasticNodeDAG(NodeDAG):
                  clamped: bool = False,
                  parent_nodes: ty.Optional[ty.List[ty.Any]] = None):
 
-        self.is_sampled = False
         self.sampling_dn = sampled_from  # dn object
         self.constant_fn = returned_from  # constant fn object
-        
+        self.is_sampled = False
         # not value checks for both [] and None
         generated_or_specified_value: ty.List[ty.Any] = \
             self.generate_value() if not value else value
-
+        
         super().__init__(node_name,
                          sample_size=sample_size,
                          value=generated_or_specified_value,
@@ -598,7 +604,7 @@ class StochasticNodeDAG(NodeDAG):
                          parent_nodes=parent_nodes)
 
         # used for MCMC #move/operator setup during inference
-        self.operator_weight = 0.0            
+        self.operator_weight = 0.0
 
         self.populate_operator_weight()
 
@@ -685,7 +691,7 @@ class StochasticNodeDAG(NodeDAG):
             # return
             plot_node_histogram(axes, [float(self.value)])
 
-    def populate_operator_weight(self):
+    def populate_operator_weight(self) -> None:
         if isinstance(self.value, (list, np.ndarray)):
             if isinstance(self.value[0], (int, float, str, np.float64)):
                 self.operator_weight = 1  # this is a scalar random variable
@@ -720,7 +726,7 @@ class DeterministicNodeDAG(NodeDAG):
                  value: ty.Optional[ty.List[ty.Any]] = None,
                  call_order_idx: ty.Optional[int] = None,
                  deterministic: bool = True,
-                 parent_nodes: ty.Optional[ty.List[NodeDAG]] = None):
+                 parent_nodes: ty.Optional[ty.List[NodeDAG]] = None) -> None:
 
         super().__init__(node_name,
                          sample_size=None,
@@ -844,14 +850,4 @@ def extract_vals_as_str_from_node_dag(
 
 
 if __name__ == "__main__":
-    # can be called from pgm/
-    # $ python3 pgm.py
-    #
-    # can also be called from phylojunction/
-    # $ python3 pgm/pgm.py
-    # or
-    # $ python3 -m pgm.pgm
-    #
-    # can also be called from VS Code, if open folder is phylojuction/
-
     pass

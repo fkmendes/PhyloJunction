@@ -11,7 +11,7 @@ from phylojunction.data.sampled_ancestor \
 from phylojunction.data.attribute_transition \
     import AttributeTransition  # type: ignore
 
-class DnSSE(pgm.DistributionPGM):
+class DnSSE(pgm.DistrForSampling):
     DN_NAME = "DnSSE"
     n_sim: int
     n_repl: int

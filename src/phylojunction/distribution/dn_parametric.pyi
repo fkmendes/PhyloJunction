@@ -4,7 +4,7 @@ import typing as ty
 # pj imports
 import phylojunction.pgm.pgm as pgm
 
-class DnLogNormal(pgm.DistributionPGM):
+class DnLogNormal(pgm.DistrForSampling):
     DN_NAME: str
     n_samples: int
     n_repl: int
@@ -18,7 +18,7 @@ class DnLogNormal(pgm.DistributionPGM):
     def init_check_vectorize_sample_size(self, param_list: ty.Optional[ty.List[ty.Any]]=None) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...
 
-class DnNormal(pgm.DistributionPGM):
+class DnNormal(pgm.DistrForSampling):
     DN_NAME: str
     n_samples: int
     n_repl: int
@@ -32,7 +32,7 @@ class DnNormal(pgm.DistributionPGM):
     def init_check_vectorize_sample_size(self, param_list: ty.Optional[ty.List[ty.Any]]=None) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...
 
-class DnExponential(pgm.DistributionPGM):
+class DnExponential(pgm.DistrForSampling):
     DN_NAME: str
     n_samples: int
     n_repl: int
@@ -46,7 +46,7 @@ class DnExponential(pgm.DistributionPGM):
     def init_check_vectorize_sample_size(self, param_list: ty.Optional[ty.List[ty.Any]]=None) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...
 
-class DnGamma(pgm.DistributionPGM):
+class DnGamma(pgm.DistrForSampling):
     DN_NAME: str
     n_samples: int
     n_repl: int
@@ -60,7 +60,7 @@ class DnGamma(pgm.DistributionPGM):
     def init_check_vectorize_sample_size(self, param_list: ty.Optional[ty.List[ty.Any]]=None) -> ty.Optional[ty.List[ty.List[ty.Union[int, float, str]]]]: ...
     def get_rev_inference_spec_info(self) -> ty.List[str]: ...
 
-class DnUnif(pgm.DistributionPGM):
+class DnUnif(pgm.DistrForSampling):
     DN_NAME: str
     n_samples: int
     n_repl: int

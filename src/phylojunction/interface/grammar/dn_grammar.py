@@ -53,7 +53,7 @@ class PJDnGrammar():
         cls,
         dn_id: str,
         dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
-            -> pgm.DistributionPGM:
+            -> pgm.DistrForSampling:
         """Create and return parametric distributions for sampling.
 
         Args:
@@ -451,7 +451,7 @@ class PJDnGrammar():
     def init_return_discrete_SSE_dn(
         cls,
         dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
-            -> pgm.DistributionPGM:
+            -> pgm.DistrForSampling:
         """Create and return SSE distribution for sampling.
 
         Args:
@@ -472,7 +472,7 @@ class PJDnGrammar():
         cls,
         dn_id: str,
         dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
-            -> pgm.DistributionPGM:
+            -> pgm.DistrForSampling:
         """Create and return prob. distribution (for sampling) object.
 
         Args:

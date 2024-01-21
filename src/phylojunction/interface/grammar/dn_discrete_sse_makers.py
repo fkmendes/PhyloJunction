@@ -14,7 +14,7 @@ __email__ = "f.mendes@wustl.edu"
 def make_discrete_SSE_dn(
     dn_name: str,
     dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
-        -> pgm.DistributionPGM:
+        -> pgm.DistrForSampling:
 
     #############################
     # IMPORTANT: Default values #

@@ -20,7 +20,7 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-class DnSSE(pgm.DistributionPGM):
+class DnSSE(pgm.DistrForSampling):
     """Discrete SSE distribution.
 
     Class for the discrete state-dependent speciation and extinction
