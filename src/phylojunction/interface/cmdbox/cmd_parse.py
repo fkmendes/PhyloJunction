@@ -20,15 +20,19 @@ __email__ = "f.mendes@wustl.edu"
 
 
 def script2dag(script_file_path_or_model_spec: str,
-               in_pj_file: bool = True) -> pgm.DirectedAcyclicGraph:
+               in_pj_file: bool = True,
+               random_seed: ty.Optional[int] = None) -> pgm.DirectedAcyclicGraph:
     """Go through .pj lines and populate and return DAG.
 
     Args:
         script_file_path_or_model_spec (str): Path to script .pj
-            file or full string specifying model directly
+            file or full string specifying model directly.
+        random_seed (int): Random seed (integer) for simulation.
+            Defaults to None.
 
     Returns:
-        (DirectedAcyclicGraph): DAG object built from .pj commands.
+        (DirectedAcyclicGraph): DAG object (model) built from .pj
+            script commands.
     """
 
     def _execute_spec_lines(
@@ -40,14 +44,13 @@ def script2dag(script_file_path_or_model_spec: str,
             line = line.lstrip().rstrip()
             _ = cmdline2dag(dag_obj, line)
 
-    # handle seed if specified
-    np.random.seed(seed=123)
-    random.seed(123)
-
+    # initialize model DAG
     dag = pgm.DirectedAcyclicGraph()
+    if random_seed is not None:
+        dag.random_seed = random_seed
 
-    all_lines_list: ty.List[str] = []
-
+    # get script strings
+    all_lines_list: ty.List[str] = list()
     if in_pj_file:
         with open(script_file_path_or_model_spec, "r") as infile:
             all_lines_list = infile.readlines()

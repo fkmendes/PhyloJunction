@@ -20,20 +20,25 @@ def execute_pj_script(
         write_data: bool = False,
         write_figures: str = "",
         write_inference: bool = False,
-        write_nex_states: bool = False) -> None:
+        write_nex_states: bool = False,
+        a_random_seed: ty.Optional[int] = None) -> None:
     """
-    Execute .pj script
+    Execute .pj script.
 
     This is called by application 'pjcli' from the terminal,
     but can also be called from a .py script importing phylojunction
     """
 
     # Reading model #
-    dag_obj: pgm.DirectedAcyclicGraph = \
-        pgm.DirectedAcyclicGraph()
+    random_seed: int = None
+    if a_random_seed is not None:
+        random_seed = int(a_random_seed)
 
     print("Reading script " + model)
-    dag_obj = cmd.script2dag(model, in_pj_file=True)
+    dag_obj: pgm.DirectedAcyclicGraph \
+        = cmd.script2dag(model,
+                        in_pj_file=True,
+                        random_seed=random_seed)
     print("    ... done!")
 
     n_samples = dag_obj.sample_size
@@ -135,8 +140,8 @@ def call_cli() -> None:
         dest="out_dir",
         type=str,
         default="./",
-        help=("Path to project root directory, where automatic "
-              "subdirectories will be created"))
+        help=("Path to project root directory, where subdirectories "
+              "will be automatically created"))
     parser.add_argument(
         "-p",
         "--prefix",
@@ -150,6 +155,12 @@ def call_cli() -> None:
         action="store_true",
         default=False,
         help="Toggle states nexus file output")
+    parser.add_argument(
+        "-r", "--random-seed",
+        dest="random_seed",
+        action="store",
+        default=None,
+        help="Random seed (integer)")
 
     args = parser.parse_args()
 
@@ -160,7 +171,8 @@ def call_cli() -> None:
         write_data=args.write_data,
         write_figures=args.write_figures,
         write_inference=args.write_inference,
-        write_nex_states=args.write_nex_states
+        write_nex_states=args.write_nex_states,
+        a_random_seed=args.random_seed
     )
 
 # if one wants to run pj_cli.py for some reason

@@ -1,6 +1,7 @@
 from __future__ import annotations
 import typing as ty
 import numpy as np
+import random
 import matplotlib.pyplot as plt  # type: ignore
 import matplotlib.ticker as mticker  # type: ignore
 import statistics as stat  # type: ignore
@@ -50,16 +51,35 @@ class DirectedAcyclicGraph():
     name_node_dict: ty.Dict[str, NodeDAG]
     n_nodes: int
     sample_size: int
+    _random_seed: int
 
     def __init__(self) -> None:
         # keys are proper DAG nodes, values are their values
         self.node_val_dict = dict()
-
         # keys are DAG node names, vals are NodeDAG instances
         self.name_node_dict = dict()
-
         self.n_nodes = 0
         self.sample_size = 0  # how many simulations will be run
+        self._random_seed = None
+
+    @property
+    def random_seed(self) -> int:
+        return self._random_seed
+    
+    @random_seed.setter
+    def random_seed(self, a_seed) -> None:
+        # handle seed if not None, not empty string, and is integer
+        if a_seed and isinstance(a_seed, int):
+            self._random_seed = a_seed
+            
+            # now we execute the seed (for two random number generators)!
+            np.random.seed(seed=a_seed)
+            random.seed(a_seed)
+
+        else:
+            raise ec.DAGCannotInitialize(
+                "seed was 'None'. It must be an integer.")
+    
 
     def add_node(self, node_dag: NodeDAG) -> None:
         # check that nodes carry the right number of values
@@ -358,7 +378,7 @@ class NodeDAG(ABC):
                         return "\n".join(
                             str(v) for v in self._value[start:end])
 
-                # not a tree
+                # tree, and repl_idx is always 0
                 else:
                     return str(self._value[start + repl_idx])
 

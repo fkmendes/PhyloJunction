@@ -701,6 +701,16 @@ class NodeDAGStatCantFloatError(Exception):
         return self.message
 
 
+class DAGCannotInitialize(Exception):
+    message: str
+
+    def __init__(self, message: str) -> None:
+        self.message = "ERROR: When initializing DAG object, " + message
+
+    def __str__(self) -> str:
+        return self.message
+    
+
 class DAGCannotAddNodeError(Exception):
     message: str
 

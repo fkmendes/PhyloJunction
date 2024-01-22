@@ -34,11 +34,15 @@ class GUIModeling():
         self.dag_obj = DirectedAcyclicGraph()
         self.cmd_log_list = []
 
+    def update_dag_random_seed(self, a_random_seed: int):
+        self.dag_obj.random_seed = a_random_seed
+
     def parse_cmd_update_pgm(
             self,
             cmd_line_list,
             gui_main_window_obj,
             clear_cmd_log_list: bool = False):
+        
         # in case we read two scripts
         # consecutively, we want to clear
         # the comand line history list
@@ -52,6 +56,17 @@ class GUIModeling():
             # removing whitespaces from left and right
             line = line.strip()
             print("  " + line)
+
+            # will set random seed once if DAG does not already have one
+            if not isinstance(self.dag_obj.random_seed, int):
+                a_random_seed: str = \
+                    gui_main_window_obj.ui.ui_pages. \
+                        random_seed_prefix_textbox.toPlainText()
+                
+                # random seed is not None and not empty string
+                if a_random_seed:
+                    random_seed: int = int(a_random_seed)
+                    self.dag_obj.random_seed = random_seed
 
             # side-effect in cmdline2dag
             try:
@@ -317,7 +332,7 @@ class GUIMainWindow(QMainWindow):
     def show_coverage_page(self):
         self.reset_selection()
         self.ui.pages.setCurrentWidget(self.ui.ui_pages.coverage_page)
-        self.ui.compare_button.set_active(True)
+        self.ui.covg_button.set_active(True)
         self.ui.top_label_left.setText("COVERAGE VALIDATION")
 
     def show_cmd_log_page(self):
@@ -704,6 +719,14 @@ class GUIMainWindow(QMainWindow):
             # reset everything #
             self.clean_disable_everything()
 
+            # set seed
+            a_random_seed = self.ui.ui_pages.random_seed_prefix_textbox.toPlainText()
+            # is not None and is not an empty string
+            if a_random_seed:
+                random_seed: int = int(a_random_seed)
+                self.gui_modeling.update_dag_random_seed(random_seed)
+
+            # read all command line strings
             cmd_line_list = pjread.read_text_file(script_fp)
 
             # (side-effect: gui_modeling stores cmd hist) #
@@ -800,12 +823,17 @@ class GUIMainWindow(QMainWindow):
 
     def load_model(self):
         # read file path #
-        model_fp, filter = QFileDialog.getOpenFileName(parent=self, caption="Load model", dir=".", filter="*.pickle")
+        model_fp, filter = QFileDialog.getOpenFileName(
+            parent=self,
+            caption="Load model",
+            dir=".",
+            filter="*.pickle")
 
         if model_fp:
             self.clean_disable_everything()
             self.ui.ui_pages.cmd_log_textbox.clear()
-            self.gui_modeling.dag_obj, self.gui_modeling.cmd_log_list = pjread.read_serialized_pgm(model_fp)
+            self.gui_modeling.dag_obj, self.gui_modeling.cmd_log_list = \
+                pjread.read_serialized_pgm(model_fp)
             self.refresh_node_lists()
             self.ui.ui_pages.cmd_log_textbox.setText(self.gui_modeling.cmd_log())
 
@@ -1059,10 +1087,10 @@ class GUIMainWindow(QMainWindow):
             self.ui.ui_pages.sample_idx_spin.setMinimum(1)
             self.ui.ui_pages.sample_idx_spin.setValue(1)
 
+            self.ui.ui_pages.repl_idx_spin.setMinimum(1)
+            self.ui.ui_pages.repl_idx_spin.setValue(1)
             if potential_repl:
                 self.ui.ui_pages.repl_idx_spin.setEnabled(True)
-                self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-                self.ui.ui_pages.repl_idx_spin.setValue(1)
 
         def _prepare_for_scalar(potential_repl: bool = False):
             # radio #
@@ -1109,7 +1137,7 @@ class GUIMainWindow(QMainWindow):
         # (basically: non-deterministic nodes)
         if isinstance(node_dag.value, list):
             if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
-                if node_dag.repl_size > 1:
+                if node_dag.repl_size >= 2:
                     _prepare_for_tree(potential_repl=True)
 
                 else:
