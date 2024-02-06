@@ -56,7 +56,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#graphical-user-interface-gui">Graphical user interface (GUI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#graphical-user-interface-gui">Graphical user interface (GUI)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#compare">Compare</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coverage">Coverage</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#command-line-interface-cli">Command-line interface (CLI)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lexicon">Lexicon</a><ul class="simple">
 </ul>
@@ -93,21 +97,25 @@
 <h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
-<li><a class="reference internal" href="#overview" id="id10">Overview</a><ul>
-<li><a class="reference internal" href="#origins-and-design" id="id11">Origins and design</a></li>
-<li><a class="reference internal" href="#graphical-models" id="id12">Graphical models</a><ul>
-<li><a class="reference internal" href="#how-to-read-a-dag" id="id13">How to read a DAG?</a></li>
+<li><a class="reference internal" href="#overview" id="id12">Overview</a><ul>
+<li><a class="reference internal" href="#origins-and-design" id="id13">Origins and design</a></li>
+<li><a class="reference internal" href="#graphical-models" id="id14">Graphical models</a><ul>
+<li><a class="reference internal" href="#how-to-read-a-dag" id="id15">How to read a DAG?</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#specifying-a-model-an-example" id="id14">Specifying a model (an example)</a><ul>
-<li><a class="reference internal" href="#multiple-samples-and-replicates" id="id15">Multiple samples and replicates</a></li>
+<li><a class="reference internal" href="#specifying-a-model-an-example" id="id16">Specifying a model (an example)</a><ul>
+<li><a class="reference internal" href="#multiple-samples-and-replicates" id="id17">Multiple samples and replicates</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#graphical-user-interface-gui" id="id16">Graphical user interface (GUI)</a></li>
-<li><a class="reference internal" href="#command-line-interface-cli" id="id17">Command-line interface (CLI)</a></li>
-<li><a class="reference internal" href="#lexicon" id="id18">Lexicon</a></li>
+<li><a class="reference internal" href="#graphical-user-interface-gui" id="id18">Graphical user interface (GUI)</a><ul>
+<li><a class="reference internal" href="#compare" id="id19">Compare</a></li>
+<li><a class="reference internal" href="#coverage" id="id20">Coverage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#command-line-interface-cli" id="id21">Command-line interface (CLI)</a></li>
+<li><a class="reference internal" href="#lexicon" id="id22">Lexicon</a></li>
 </ul>
 </div>
 <div class="section" id="overview">
@@ -273,9 +281,75 @@ Errors will be thrown only if such nodes are used as input for a function, and t
 </div>
 <div class="section" id="graphical-user-interface-gui">
 <h2>Graphical user interface (GUI)<a class="headerlink" href="#graphical-user-interface-gui" title="Permalink to this heading"></a></h2>
+<p>PhyloJunction comes with a (simple!) graphical user interface (GUI; see Fig. 3) that allows users to incrementally build a model while simultaneously inspecting any simulation output (among other things).</p>
 <div class="figure align-center" id="id9" style="width: 100%">
 <img alt="../_images/pjgui_model.png" src="../_images/pjgui_model.png" />
-<p class="caption"><span class="caption-text"><strong>Figure 3.</strong> Test.</span><a class="headerlink" href="#id9" title="Permalink to this image"></a></p>
+<p class="caption"><span class="caption-text"><strong>Figure 3.</strong> PhyloJunction’s GUI main window.</span><a class="headerlink" href="#id9" title="Permalink to this image"></a></p>
+</div>
+<p>Like any modern computer application, PhyloJunction’s GUI exposes its features to users via a menu (Fi. 3, number 2).
+On the main tab (“Model”), one can navigate the DAG being built and see its node values as a plot, text string, or both (Fig. 3, numbers 3 and 4).
+Users can also cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
+Node-value summaries include the mean and standard deviation for scalar variables, and statistics like the root age and number of tips for phylogenetic trees.</p>
+<div class="section" id="compare">
+<h3>Compare<a class="headerlink" href="#compare" title="Permalink to this heading"></a></h3>
+<p>The “Compare” tab (under “Model”) streamlines the comparison of PhyloJunction’s simulations with those from an external simulator, with respect to a summary statistic.
+There are two main moments when carrying out this type of comparison may be useful or required.
+The first is when a model is being first implemented in PhyloJunction, and there happens to exist an independent implementation elsewhere.
+This latter implementation can be used to provide a baseline expectation for PhyloJunction.</p>
+<p>Beyond model development within the platform, the “Compare” tab was further designed to expedite activities related to teaching.
+Students in an evolutionary modeling course may be asked to code their own Yule model, for example, in whatever programming language.
+After Yule trees are obtained, all they need to do is collect summary statistics that are also monitored by PhyloJunction (e.g., the root age), and upload them into the “Compare” tab.
+PhyloJunction then automatically plots the two distributions (one from the student, one from PhyloJunction itself) side by side, revealing if implementations behave similarly.</p>
+<p>In order to use the functionalities exposed by the “Compare” tab, first one must to build a model in PhyloJunction.
+We can start with the simple model in <a class="reference external" href="https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/multiple_scalar_tree_plated.pj" rel="noopener noreferrer" target="_blank">examples/multiple_scalar_tree_plated.pj</a>.
+As the name suggests, this model has a few different scalar and tree random variables, some of them plated.
+We can load it by clicking “File &gt; Read script” and selecting the aforementioned file.
+By navigating to the “Compare” tab, you will see that PhyloJunction has loaded the DAG nodes that could potentially be compared on the left-hand “Nodes to compare” menu.</p>
+<p>In the “Compare” tab, now click “Compare to .csv (…)”.
+This button allows user to input a .csv file containing summary statistics computed from external simulations.
+We will choose file <a class="reference external" href="https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/compare_files/comparison_multiple_scalar_tree_plated_rv5.csv" rel="noopener noreferrer" target="_blank">examples/compare_files/comparison_multiple_scalar_tree_plated_rv5.csv</a>.
+Once the .csv file is loaded, PhyloJunction should display the contents of it in the top window.</p>
+<div class="figure align-center" id="id10" style="width: 100%">
+<img alt="../_images/pjgui_compare.png" src="../_images/pjgui_compare.png" />
+<p class="caption"><span class="caption-text"><strong>Figure 4.</strong> PhyloJunction’s GUI “Compare” tab.</span><a class="headerlink" href="#id10" title="Permalink to this image"></a></p>
+</div>
+<p>Note the “rv5” column name at header of the table – these are the variable names that PhyloJunction will try to look up (and compare with) in its own model’s list of nodes.
+Accordingly, select “rv5” from the top-left “Node to compare” menu.
+Now we are ready to draw, click “Draw”.
+The produced graph (Fig. 4) should indicate that PhyloJunction and the external simulator behave similarly.</p>
+<p>Let us now try a different random variable, a tree this time: click on node “trs2” on the “Node to compare” menu.
+Because tree space is complicated (there are both a discrete and a continuous dimensions to it, the topology and branch lengths, respectively), we will need to look at tree summary statistics.
+Different tree statistics should have been listed in the bottom-left “Summary statistics” menu.
+Choose one of them, “root age”, for example.</p>
+<p>Now we must then load a different .csv file, <a class="reference external" href="https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/compare_files/comparison_multiple_scalar_tree_plated_trs2.csv" rel="noopener noreferrer" target="_blank">examples/compare_files/comparison_multiple_scalar_tree_plated_trs2.csv</a>.
+This file contains tree summary statistics presumably produced by a different external simulator.
+Click “Draw”.
+Again, the produced graph suggests the model implemented in both simulators behave similarly.</p>
+</div>
+<div class="section" id="coverage">
+<h3>Coverage<a class="headerlink" href="#coverage" title="Permalink to this heading"></a></h3>
+<p>The “Coverage” tab was developed for automating coverage validation, a procedure for verifying the correctness of a model implemented within a Bayesian framework.
+Coverage validation in fact validates multiple things simultaneously: the generating (simulator) and inferential implementations of the model, and any machinery used in inference (e.g., MCMC proposals).
+For the sake of clarity and conciseness, we will assume in this section that we are validating a model’s inferential engine, and that all other involved code works as intended.</p>
+<p>The gist of coverage validation is straightforward: the <span class="math notranslate nohighlight">\(\alpha\)</span> %-HPD over a model parameter produced during Bayesian inference should contain the “true” (i.e., simulated) parameter value approximately <span class="math notranslate nohighlight">\(\alpha\)</span> % of the time.
+For example, if a stochastic node in the DAG is sampled 100 times (i.e., 100 i.i.d. random variables), then for approximately 95 of those simulations the 95%-HPD interval will contain the true sampled value.</p>
+<p>In order to carry out coverage validation with the GUI, first we must build a model in PhyloJunction.
+Click “File &gt; Read script” and select <a class="reference external" href="https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/coverage_files/r_b_exp.pj" rel="noopener noreferrer" target="_blank">examples/coverage_files/r_b_exp.pj</a>.
+In the loaded model, one hundred independent samples for a parameter <span class="math notranslate nohighlight">\(r_b\)</span> were assigned to a constant node <code class="docutils literal notranslate"><span class="pre">r_b</span></code> named after it.
+These 100 values were drawn from an exponential distribution implemented elsewhere, but could also have been sampled directly in PhyloJunction.</p>
+<p>In the “Coverage” tab, one can now load a .csv file containing a table with <span class="math notranslate nohighlight">\(r_b\)</span> ‘s posterior distribution’s mean value, and the lower and upper bounds of an HPD interval.
+(This posterior distribution came from a Bayesian analysis done with a different program.)
+The table headers must be <code class="docutils literal notranslate"><span class="pre">posterior_mean</span></code>, <code class="docutils literal notranslate"><span class="pre">lower_95hpd</span></code>, and <code class="docutils literal notranslate"><span class="pre">higher_95hpd</span></code>.
+Click “Read HPDs .csv (…)”, and select <a class="reference external" href="https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/coverage_files/r_b_exp.csv" rel="noopener noreferrer" target="_blank">examples/coverage_files/r_b_exp.csv</a>.
+The table should have been shown in the top middle window.</p>
+<div class="figure align-center" id="id11" style="width: 100%">
+<img alt="../_images/pjgui_coverage.png" src="../_images/pjgui_coverage.png" />
+<p class="caption"><span class="caption-text"><strong>Figure 5.</strong> PhyloJunction’s GUI “Coverage” tab.</span><a class="headerlink" href="#id11" title="Permalink to this image"></a></p>
+</div>
+<p>To inspect coverage, select “r_b” from the top-left menu “Non-det. nodes”, and then click “Draw”.
+The x- and y-axes in the plot (the main panel in Fig. 5) show to the true simulated values and the posterior means, respectively.
+Vertical bars denote the 95%-HPDs over <span class="math notranslate nohighlight">\(r_b\)</span>, with blue bars (95 of them) indicating intervals containing the true value, and red bars (5 of them) not containing it.
+In other words, one can deduce from the graph that coverage for <span class="math notranslate nohighlight">\(r_b\)</span> was 0.95 (though this is also shown in the top-right panel); this coverage is adequate and indicative of a correctly implemented model.</p>
 </div>
 </div>
 <div class="section" id="command-line-interface-cli">

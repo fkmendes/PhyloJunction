@@ -78,6 +78,9 @@
 <dt class="sig sig-object py" id="phylojunction.pgm.pgm.ConstantFn">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">ConstantFn</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.ConstantFn" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#phylojunction.pgm.pgm.ValueGenerator" title="phylojunction.pgm.pgm.ValueGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueGenerator</span></code></a></p>
+<p>Class for deterministically generating values.</p>
+<p>An object is class whenever user input must be parsed and modified
+before it can be stored in a DAG node.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="phylojunction.pgm.pgm.ConstantFn.CT_FN_NAME">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">CT_FN_NAME</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.ConstantFn.CT_FN_NAME" title="Permalink to this definition"></a></dt>
@@ -86,22 +89,167 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodePGM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">DeterministicNodePGM</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span></em>, <em><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">call_order_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">deterministic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">parent_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodePGM" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodePGM</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodePGM.get_node_stats_str">
-<code class="sig-name descname"><span class="pre">get_node_stats_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodePGM.get_node_stats_str" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">DeterministicNodeDAG</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">call_order_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">deterministic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">parent_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeDAG</span></code></a></p>
+<p>Derived DAG node that holds value dependent on another node’s.</p>
+<p>Deterministic node values depend deterministically on those from
+parent nodes. These nodes are used to modify and annotate
+stochastic node values.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.call_order_idx">
+<code class="sig-name descname"><span class="pre">call_order_idx</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.call_order_idx" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodePGM.plot_node">
-<code class="sig-name descname"><span class="pre">plot_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">branch_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'state'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodePGM.plot_node" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.get_node_stats_str">
+<code class="sig-name descname"><span class="pre">get_node_stats_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.get_node_stats_str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.is_clamped">
+<code class="sig-name descname"><span class="pre">is_clamped</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.is_clamped" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.is_deterministic">
+<code class="sig-name descname"><span class="pre">is_deterministic</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.is_deterministic" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.is_sampled">
+<code class="sig-name descname"><span class="pre">is_sampled</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.is_sampled" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.node_name">
+<code class="sig-name descname"><span class="pre">node_name</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.node_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.parent_nd_list">
+<code class="sig-name descname"><span class="pre">parent_nd_list</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.parent_nd_list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodePGM.populate_operator_weight">
-<code class="sig-name descname"><span class="pre">populate_operator_weight</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodePGM.populate_operator_weight" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.plot_node">
+<code class="sig-name descname"><span class="pre">plot_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">branch_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'state'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.plot_node" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DeterministicNodeDAG.populate_operator_weight">
+<code class="sig-name descname"><span class="pre">populate_operator_weight</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.DeterministicNodeDAG.populate_operator_weight" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">DirectedAcyclicGraph</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Directed acyclic graph (DAG) class defining the model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.node_val_dict">
+<code class="sig-name descname"><span class="pre">node_val_dict</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.node_val_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary with keys being DAG nodes, and
+values being the values stored in the nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.name_node_dict">
+<code class="sig-name descname"><span class="pre">name_node_dict</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.name_node_dict" title="Permalink to this definition"></a></dt>
+<dd><p>Dictionary with keys being DAG node
+names, and the DAG nodes themselves as values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.n_nodes">
+<code class="sig-name descname"><span class="pre">n_nodes</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.n_nodes" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of DAG nodes in the graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.sample_size">
+<code class="sig-name descname"><span class="pre">sample_size</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>How many samples (simulations) to be either
+drawn or specified in every DAG node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.add_node">
+<code class="sig-name descname"><span class="pre">add_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_dag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.add_node" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.get_display_str_by_name">
+<code class="sig-name descname"><span class="pre">get_display_str_by_name</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.get_display_str_by_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.get_node_dag_by_name">
+<code class="sig-name descname"><span class="pre">get_node_dag_by_name</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.get_node_dag_by_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.get_sorted_node_dag_list">
+<code class="sig-name descname"><span class="pre">get_sorted_node_dag_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.get_sorted_node_dag_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<code class="sig-name descname"><span class="pre">n_nodes</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<code class="sig-name descname"><span class="pre">name_node_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<code class="sig-name descname"><span class="pre">node_val_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.DirectedAcyclicGraph.random_seed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">random_seed</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DirectedAcyclicGraph.random_seed" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<code class="sig-name descname"><span class="pre">sample_size</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -110,117 +258,325 @@
 <dt class="sig sig-object py" id="phylojunction.pgm.pgm.DistrForSampling">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">DistrForSampling</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DistrForSampling" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#phylojunction.pgm.pgm.ValueGenerator" title="phylojunction.pgm.pgm.ValueGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueGenerator</span></code></a></p>
+<p>Class for randomly generating (i.e., sampling) values.</p>
+<p>An object of this class is required by stochastic DAG nodes so
+values can be sampled.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="phylojunction.pgm.pgm.DistrForSampling.DN_NAME">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">DN_NAME</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.DistrForSampling.DN_NAME" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">DN_NAME</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.DistrForSampling.DN_NAME" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodePGM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">NodePGM</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">replicate_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">call_order_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">sampled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">deterministic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">clamped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">parent_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.NodePGM" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">NodeDAG</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">replicate_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">call_order_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">sampled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">deterministic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">clamped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">parent_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodePGM.get_node_stats_str">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">get_node_stats_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodePGM.get_node_stats_str" title="Permalink to this definition"></a></dt>
+<p>Node class for building directed acyclic graphs (DAGs).</p>
+<p>This class has abstract methods, so it cannot be instantiated.
+It is derived by StochasticNodeDAG and DeterministicNodeDAG</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.node_name">
+<code class="sig-name descname"><span class="pre">node_name</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.node_name" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the node, e.g., ‘lambda’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.sample_size">
+<code class="sig-name descname"><span class="pre">sample_size</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>How many samples (simulations) to be either
+drawn or specified for the node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.replicate_size">
+<code class="sig-name descname"><span class="pre">replicate_size</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.replicate_size" title="Permalink to this definition"></a></dt>
+<dd><p>How many replicates (for each sample) to
+be drawn or specified the node. This is the size of a
+‘plate’ in graphical notation. Defaults to 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.value">
+<code class="sig-name descname"><span class="pre">value</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.value" title="Permalink to this definition"></a></dt>
+<dd><p>List of values associated to node. Defaults to
+None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.call_order_idx">
+<code class="sig-name descname"><span class="pre">call_order_idx</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.call_order_idx" title="Permalink to this definition"></a></dt>
+<dd><p>The order at which this node was added to
+DAG. If it is the first node of the DAG, for example, this
+value is 1. Defaults to None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.sampled">
+<code class="sig-name descname"><span class="pre">sampled</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.sampled" title="Permalink to this definition"></a></dt>
+<dd><p>Flag specifying if what the ‘value’ attribute</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<code class="sig-name descname"><span class="pre">stores</span> <span class="pre">are</span> <span class="pre">stochastic</span> <span class="pre">samples</span> <span class="pre">from</span> <span class="pre">a</span> <span class="pre">distribution.</span> <span class="pre">Defaults</span> <span class="pre">to</span></code></dt>
+<dd><p>‘False’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.deterministic">
+<code class="sig-name descname"><span class="pre">deterministic</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.deterministic" title="Permalink to this definition"></a></dt>
+<dd><p>Flag specifying if what the ‘value’
+attribute stores is the output of a deterministic function.
+Defaults to ‘False’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.clamped">
+<code class="sig-name descname"><span class="pre">clamped</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.clamped" title="Permalink to this definition"></a></dt>
+<dd><p>Flag specifying if what the ‘value’ attribute
+stores is observed (i.e., data). Defaults to ‘False’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.parent_nodes">
+<code class="sig-name descname"><span class="pre">parent_nodes</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.parent_nodes" title="Permalink to this definition"></a></dt>
+<dd><p>List of (parent) NodeDAG objects that
+are in the path between this node and the outermost layer
+in the DAG. Defaults to None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG">NodeDAG</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<code class="sig-name descname"><span class="pre">call_order_idx</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodePGM.get_start2end_str">
-<code class="sig-name descname"><span class="pre">get_start2end_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">is_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodePGM.get_start2end_str" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.get_node_stats_str">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">get_node_stats_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.get_node_stats_str" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodePGM.plot_node">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">plot_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">branch_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'state'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodePGM.plot_node" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.get_start2end_str">
+<code class="sig-name descname"><span class="pre">get_start2end_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">is_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.get_start2end_str" title="Permalink to this definition"></a></dt>
+<dd><p>Get string representation of values within specific range.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.is_clamped">
+<code class="sig-name descname"><span class="pre">is_clamped</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.is_clamped" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.is_deterministic">
+<code class="sig-name descname"><span class="pre">is_deterministic</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.is_deterministic" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.is_sampled">
+<code class="sig-name descname"><span class="pre">is_sampled</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.is_sampled" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<code class="sig-name descname"><span class="pre">node_name</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.parent_nd_list">
+<code class="sig-name descname"><span class="pre">parent_nd_list</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.parent_nd_list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodePGM.populate_operator_weight">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">populate_operator_weight</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.NodePGM.populate_operator_weight" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.plot_node">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">plot_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">branch_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'state'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.plot_node" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.populate_operator_weight">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">populate_operator_weight</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.populate_operator_weight" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.NodeDAG.repl_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">repl_size</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.NodeDAG.repl_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id6">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">sample_size</span></code><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="id7">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">value</span></code><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">ProbabilisticGraphicalModel</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.add_node">
-<code class="sig-name descname"><span class="pre">add_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_pgm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.add_node" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.get_display_str_by_name">
-<code class="sig-name descname"><span class="pre">get_display_str_by_name</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.get_display_str_by_name" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.get_node_pgm_by_name">
-<code class="sig-name descname"><span class="pre">get_node_pgm_by_name</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.get_node_pgm_by_name" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.get_sorted_node_pgm_list">
-<code class="sig-name descname"><span class="pre">get_sorted_node_pgm_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.get_sorted_node_pgm_list" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">StochasticNodeDAG</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">sampled_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">returned_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn"><span class="pre">ConstantFn</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">replicate_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">call_order_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">deterministic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">clamped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">parent_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeDAG</span></code></a></p>
+<p>Derived DAG node that can generate own value.</p>
+<p>This class is also used when a value is being specified by a user,
+or parsed from it. In other words, constant nodes in the graph
+are still stochastic DAG nodes under the hood.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.n_nodes">
-<code class="sig-name descname"><span class="pre">n_nodes</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.n_nodes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.node_dict">
-<code class="sig-name descname"><span class="pre">node_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.node_dict" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.node_name_val_dict">
-<code class="sig-name descname"><span class="pre">node_name_val_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.node_name_val_dict" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ProbabilisticGraphicalModel.sample_size">
-<code class="sig-name descname"><span class="pre">sample_size</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.pgm.pgm.ProbabilisticGraphicalModel.sample_size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.sampling_dn">
+<code class="sig-name descname"><span class="pre">sampling_dn</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.sampling_dn" title="Permalink to this definition"></a></dt>
+<dd><p>Distribution object for randomly
+sampling values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling">DistrForSampling</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodePGM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">StochasticNodePGM</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">sampled_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">returned_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn"><span class="pre">ConstantFn</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">replicate_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">call_order_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">deterministic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">clamped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">parent_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodePGM" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodePGM</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodePGM.get_node_stats_str">
-<code class="sig-name descname"><span class="pre">get_node_stats_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodePGM.get_node_stats_str" title="Permalink to this definition"></a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.constant_fn">
+<code class="sig-name descname"><span class="pre">constant_fn</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.constant_fn" title="Permalink to this definition"></a></dt>
+<dd><p>Function object for obtaining
+constant values modified from some user input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn">ConstantFn</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.operator_weight">
+<code class="sig-name descname"><span class="pre">operator_weight</span></code><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.operator_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Weight given to MCMC move.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<code class="sig-name descname"><span class="pre">constant_fn</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn"><span class="pre">ConstantFn</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodePGM.get_value">
-<code class="sig-name descname"><span class="pre">get_value</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodePGM.get_value" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.generate_value">
+<code class="sig-name descname"><span class="pre">generate_value</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.generate_value" title="Permalink to this definition"></a></dt>
+<dd><p>Generate value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.get_node_stats_str">
+<code class="sig-name descname"><span class="pre">get_node_stats_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.get_node_stats_str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<code class="sig-name descname"><span class="pre">operator_weight</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodePGM.plot_node">
-<code class="sig-name descname"><span class="pre">plot_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">branch_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'state'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodePGM.plot_node" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.plot_node">
+<code class="sig-name descname"><span class="pre">plot_node</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">axes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">repl_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">branch_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'state'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.plot_node" title="Permalink to this definition"></a></dt>
+<dd><p>Plot node (side-effect) on provided Axes object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>axes</strong> (<em>matplotlib.pyplot.Axes</em>) – _description_</li>
-<li><strong>sample_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – Which sample to plot.
-Defaults to 0.</li>
-<li><strong>repl_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – Which tree replicate to plot
-(one tree is plotted at a time). Defaults to 0.</li>
-<li><strong>repl_size</strong> (<em>int</em><em>, </em><em>optional</em>) – How many scalar random variables
+<li><strong>axes</strong> (<em>matplotlib.pyplot.Axes</em>) – Axes object where we are
+drawing the tree.</li>
+<li><strong>sample_idx</strong> (<em>int</em>) – Which sample to plot. Defaults to 0.</li>
+<li><strong>repl_idx</strong> (<em>int</em>) – Which replicate to plot (one
+replicated is plotted at a time). Defaults to 0.</li>
+<li><strong>repl_size</strong> (<em>int</em>) – How many scalar random variables
 to plot at a time. Defaults to 1.</li>
-<li><strong>branch_attr</strong> (<em>str</em><em>, </em><em>optional</em>) – Which discrete attribute
-associated to a branch length to color by. Defaults to “state”.</li>
+<li><strong>branch_attr</strong> (<em>str</em><em>, </em><em>optional</em>) – If tree, which branch attribute
+to color branch according to. Defaults to ‘state’.</li>
 </ul>
 </td>
 </tr>
@@ -229,13 +585,13 @@ associated to a branch length to color by. Defaults to “state”.</li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodePGM.populate_operator_weight">
-<code class="sig-name descname"><span class="pre">populate_operator_weight</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodePGM.populate_operator_weight" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodeDAG.populate_operator_weight">
+<code class="sig-name descname"><span class="pre">populate_operator_weight</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodeDAG.populate_operator_weight" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.StochasticNodePGM.random_value">
-<code class="sig-name descname"><span class="pre">random_value</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.pgm.pgm.StochasticNodePGM.random_value" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id10">
+<code class="sig-name descname"><span class="pre">sampling_dn</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -255,6 +611,13 @@ associated to a branch length to color by. Defaults to “state”.</li>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.ValueGenerator.init_check_vectorize_sample_size">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.ValueGenerator.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Check sample size against number of provided parameter values</p>
+<p>This is the function behind the vectorization functionality</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.pgm.pgm.ValueGenerator.n_repl">
 <code class="sig-name descname"><span class="pre">n_repl</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.pgm.pgm.ValueGenerator.n_repl" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -272,15 +635,26 @@ associated to a branch length to color by. Defaults to “state”.</li>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.pgm.pgm.extract_value_from_nodepgm">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">extract_value_from_nodepgm</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">val_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.extract_value_from_nodepgm" title="Permalink to this definition"></a></dt>
-<dd><p>Return list of values</p>
+<dt class="sig sig-object py" id="phylojunction.pgm.pgm.extract_vals_as_str_from_node_dag">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.pgm.pgm.</span></code><code class="sig-name descname"><span class="pre">extract_vals_as_str_from_node_dag</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">val_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.pgm.pgm.extract_vals_as_str_from_node_dag" title="Permalink to this definition"></a></dt>
+<dd><p>Get values from DAG node.</p>
 <p>If all elements are strings, returns copy of ‘val_list’.
-When elements are StochasticNodePGMs, replaces those objects
+When elements are StochasticNodeDAGs, replaces those objects
 by their values after casting to string (their values must be
 within a list).</p>
-<p>If StochasticNodePGMs objects do not have .value field or if
-they cannot be string-fied, raise exception.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableMisspec" title="phylojunction.utility.exception_classes.VariableMisspec"><strong>VariableMisspec</strong></a> – Is raised if DAG node does not have a value
+    or if it cannot be string-fied.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of values as strings.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(str)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="py function">

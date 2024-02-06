@@ -213,11 +213,96 @@ Errors will be thrown only if such nodes are used as input for a function, and t
 Graphical user interface (GUI)
 ------------------------------
 
+|pj| comes with a (simple!) graphical user interface (GUI; see Fig. 3) that allows users to incrementally build a model while simultaneously inspecting any simulation output (among other things).
+
 ..  figure:: ../images/pjgui_model.png
     :figwidth: 100%
     :align: center
 
-    **Figure 3.** Test.
+    **Figure 3.** |pj|'s GUI main window.
+
+Like any modern computer application, |pj|'s GUI exposes its features to users via a menu (Fi. 3, number 2).
+On the main tab ("Model"), one can navigate the DAG being built and see its node values as a plot, text string, or both (Fig. 3, numbers 3 and 4).
+Users can also cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
+Node-value summaries include the mean and standard deviation for scalar variables, and statistics like the root age and number of tips for phylogenetic trees.
+
+Implementation comparison
+=========================
+
+The "Compare" tab (under "Model") streamlines the comparison of |pj|'s simulations with those from an external simulator, with respect to a summary statistic.
+There are two main moments when carrying out this type of comparison may be useful or required.
+The first is when a model is being first implemented in |pj|, and there happens to exist an independent implementation elsewhere.
+This latter implementation can be used to provide a baseline expectation for |pj|.
+
+Beyond model development within the platform, the "Compare" tab was further designed to expedite activities related to teaching.
+Students in an evolutionary modeling course may be asked to code their own Yule model, for example, in whatever programming language.
+After Yule trees are obtained, all they need to do is collect summary statistics that are also monitored by |pj| (e.g., the root age), and upload them into the "Compare" tab.
+|pj| then automatically plots the two distributions (one from the student, one from |pj| itself) side by side, revealing if implementations behave similarly.
+
+In order to use the functionalities exposed by the "Compare" tab, first one must to build a model in |pj|.
+We can start with the simple model in `examples/multiple_scalar_tree_plated.pj <https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/multiple_scalar_tree_plated.pj>`_.
+As the name suggests, this model has a few different scalar and tree random variables, some of them plated.
+We can load it by clicking "File > Read script" and selecting the aforementioned file.
+By navigating to the "Compare" tab, you will see that |pj| has loaded the DAG nodes that could potentially be compared on the left-hand "Nodes to compare" menu.
+
+In the "Compare" tab, now click "Compare to .csv (...)".
+This button allows user to input a .csv file containing summary statistics computed from external simulations.
+We will choose file `examples/compare_files/comparison_multiple_scalar_tree_plated_rv5.csv <https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/compare_files/comparison_multiple_scalar_tree_plated_rv5.csv>`_.
+Once the .csv file is loaded, |pj| should display the contents of it in the top window.
+
+..  figure:: ../images/pjgui_compare.png
+    :figwidth: 100%
+    :align: center
+
+    **Figure 4.** |pj|'s GUI "Compare" tab.
+
+Note the "rv5" column name at header of the table -- these are the variable names that |pj| will try to look up (and compare with) in its own model's list of nodes.
+Accordingly, select "rv5" from the top-left "Node to compare" menu.
+Now we are ready to draw, click "Draw".
+The produced graph (Fig. 4) should indicate that |pj| and the external simulator behave similarly.
+
+Let us now try a different random variable, a tree this time: click on node "trs2" on the "Node to compare" menu.
+Because tree space is complicated (there are both a discrete and a continuous dimensions to it, the topology and branch lengths, respectively), we will need to look at tree summary statistics.
+Different tree statistics should have been listed in the bottom-left "Summary statistics" menu.
+Choose one of them, "root age", for example.
+
+Now we must then load a different .csv file, `examples/compare_files/comparison_multiple_scalar_tree_plated_trs2.csv <https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/compare_files/comparison_multiple_scalar_tree_plated_trs2.csv>`_.
+This file contains tree summary statistics presumably produced by a different external simulator.
+Click "Draw".
+Again, the produced graph suggests the model implemented in both simulators behave similarly.
+
+Coverage validation
+===================
+
+The "Coverage" tab was developed for automating coverage validation, a procedure for verifying the correctness of a model implemented within a Bayesian framework.
+Coverage validation in fact validates multiple things simultaneously: the generating (simulator) and inferential implementations of the model, and any machinery used in inference (e.g., MCMC proposals).
+For the sake of clarity and conciseness, we will assume in this section that we are validating a model's inferential engine, and that all other involved code works as intended.
+
+The gist of coverage validation is straightforward: the :math:`\alpha` %-HPD over a model parameter produced during Bayesian inference should contain the "true" (i.e., simulated) parameter value approximately :math:`\alpha` % of the time.
+For example, if a stochastic node in the DAG is sampled 100 times (i.e., 100 i.i.d. random variables), then for approximately 95 of those simulations the 95%-HPD interval will contain the true sampled value.
+
+In order to carry out coverage validation with the GUI, first we must build a model in |pj|.
+Click "File > Read script" and select `examples/coverage_files/r_b_exp.pj <https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/coverage_files/r_b_exp.pj>`_.
+In the loaded model, one hundred independent samples for a parameter :math:`r_b` were assigned to a constant node ``r_b`` named after it.
+These 100 values were drawn from an exponential distribution implemented elsewhere, but could also have been sampled directly in |pj|.
+
+In the "Coverage" tab, one can now load a .csv file containing a table with :math:`r_b` 's posterior distribution's mean value, and the lower and upper bounds of an HPD interval.
+(This posterior distribution came from a Bayesian analysis done with a different program.)
+The table headers must be ``posterior_mean``, ``lower_95hpd``, and ``higher_95hpd``.
+Click "Read HPDs .csv (...)", and select `examples/coverage_files/r_b_exp.csv <https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/examples/coverage_files/r_b_exp.csv>`_.
+The table should have been shown in the top middle window.
+
+..  figure:: ../images/pjgui_coverage.png
+    :figwidth: 100%
+    :align: center
+
+    **Figure 5.** |pj|'s GUI "Coverage" tab.
+
+To inspect coverage, select "r_b" from the top-left menu "Non-det. nodes", and then click "Draw".
+The x- and y-axes in the plot (the main panel in Fig. 5) show to the true simulated values and the posterior means, respectively.
+Vertical bars denote the 95%-HPDs over :math:`r_b`, with blue bars (95 of them) indicating intervals containing the true value, and red bars (5 of them) not containing it.
+In other words, one can deduce from the graph that coverage for :math:`r_b` was 0.95 (though this is also shown in the top-right panel); this coverage is adequate and indicative of a correctly implemented model.
+
 
 ----------------------------
 Command-line interface (CLI)

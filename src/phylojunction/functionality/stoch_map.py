@@ -19,7 +19,35 @@ __email__ = "f.mendes@wustl.edu"
 
 
 class StochMap():
-    """Parent class for stochastic map"""
+    """Parent class for a single stochastic map.
+    
+    Attributes:
+        n_regions (int): Number of (atomic) regions.
+        age (float): Age of stochastic map (0.0 at present).
+        time (float): Time of stochastic map (0.0 at origin or root).
+        from_state (int): Integer representation of source state (i.e.,
+            source biogeographic range).
+        from_state_bit_patt (str): Bit pattern representation of
+            source state (i.e., source biogeographic range).
+        to_state (int): Integer representation of target state (i.e.,
+            target biogeographic range).
+        to_state_bit_pattern (str): Bit pattern representation of
+            target state (i.e., target biogeographic range).
+        to_state2 (int): Integer representation of second target state
+            if stochastic map is cladogenetic (i.e., second target
+            biogeographic range).
+        to_state2_bit_pattern (str): Bit pattern representation of
+            second target state if stochastic map is cladogenetic
+            (i.e., second target biogeographic range).
+        focal_node_name (str): Name of the node subtending the branch
+            along which the stochastic map was placed.
+        parent_node_name (str): Name of the node parent to the focal
+            node.
+        child_node_name (str): Name of the first child node of the
+            focal node.
+        child2_node_name (str): Name of the second child node of the
+            focal node.
+    """
 
     n_regions: int
     age: float
@@ -68,9 +96,24 @@ class StochMap():
 
 
 class RangeExpansion(StochMap):
-    """Stochastic map class for dispersal
+    """Stochastic map class for (anagenetic) dispersal.
     
-    Range of lineage is incremented by one (region)
+    When a lineage disperses, its range is incremented by one region.
+
+    Attributes:
+        str_representation (str): String representation of stochastic
+            map for printing.
+        size_of_expanding_range (int): Size of starting range.
+        size_of_final_range (int): Size of resulting range after
+            dispersal.
+        region_gained_idx (int): Index of region that was added to the
+            starting range (index is the position of the region in the
+            bit pattern).
+        ancestral_over_barrier (bool): Flag specifying if dispersal
+            was over a barrier.
+        range_expansion_erased_by_extinction (bool): Flag specifying if
+            the expanded range contracted in the reverse direction
+            later on, due to extinction.
     """
 
     str_representation: str
@@ -135,9 +178,20 @@ class RangeExpansion(StochMap):
 
 
 class RangeContraction(StochMap):
-    """Stochastic map class for local extinction
+    """Stochastic map class for local (anagenetic) extinction.
     
-    Range of lineage contracts by one (region)
+    When a lineage goes locally extinct, its range contracts by
+    one region.
+
+    Attributes:
+        str_representation (str): String representation of stochastic
+            map for printing.
+        size_of_contracting_range (int): Size of starting range.
+        size_of_final_range (int): Size of resulting range after
+            dispersal.
+        region_lost_idx (int): Index of region that was added to the
+            starting range (index is the position of the region in the
+            bit pattern).
     """
 
     str_representation: str
@@ -193,15 +247,24 @@ class RangeContraction(StochMap):
 
 
 class RangeSplitOrBirth(StochMap):
-    """Stochastic class for cladogenetic event
+    """Stochastic map class for cladogenetic event.
     
     Range either splits between children, e.g., ABC -> AB, C 
     (upon b/w-region speciation)
     
     or
 
-    One-sized Range is born and inherited by one child, e.g., ABC -> ABC, A
-    (upon within-region speciation)
+    One-sized range is born and inherited by only one child,
+    e.g., ABC -> ABC, A (upon within-region speciation).
+
+    Attributes:
+        str_representation (str): String representation of stochastic
+            map for printing.
+        range_split (bool): Flag specifying if range split.
+        size_of_splitting_node_range (int): Size of parent's starting
+            range, before split.
+        size_of_child1_range (int): Size of first child range.
+        size_of_child2_range (int): Size of second child range.
     """
 
     str_representation: str
@@ -291,6 +354,51 @@ class RangeSplitOrBirth(StochMap):
 
 
 class StochMapsOnTree():
+    """Collection of stochastic maps on a single tree.
+
+    Attributes:
+        ann_tr (AnnotatedTree): AnnotatedTree object on which maps
+            are placed.
+        anagenetic_stoch_maps_dict (dict):
+        cladogenetic_stoch_maps_dict (dict):
+        identical_cladogenetic_stoch_maps_dict (dict):
+        iteration_idx (int): 
+        state2bit_lookup (State2BitLookup): Object of class for
+            converting between integer and bit pattern state
+            representations.
+        n_regions (int): Total number of atomic regions in the system.
+        maps_counts_dict (dict): Dictionary with two-sized string
+            tuples as keys (string are bit patterns for source and
+            target ranges), and counts as values. It keeps track of
+            how many stochastic maps of different kinds there are.
+        n_total_maps (int): Total count of stochastic maps.
+        n_anagenetic_maps (int): Count of stochastic maps consisting
+            of anagenetic range changes.
+        n_range_exp_maps (int): Count of range expansion stochastic
+            maps.
+        n_range_cont_maps (int): Count of range contraction stochastic
+            maps.
+        pctg_anagenetic_maps (float): Percentage of anagenetic
+            stochastic maps.
+        forbidden_higher_order_maps_counts_dict (dict): Dictionary with
+            two-sized string tuples as keys (string are bit patterns
+            for source and target ranges), and counts as values. This
+            dictionary keeps track of how many forbidden higher-order
+            (more than one region is gained/lost simultaneously) maps
+            there are.
+        n_forbidden_higher_order_anagenetic_maps (int): Count of
+            forbidden higher-order anagenetic stochastic maps. Higher-
+            order anagenetic changes happen when one or more regions
+            are gained or lost simultaneously.
+        pctg_forbidden_higher_order_anagenetic_maps (float): Percentage
+            of forbidden higher-order anagenetic stochastic maps.
+        n_different_clado_maps (int): Count of different cladogenetic
+            stochastic maps.
+        n_identical_clado_maps (int): Count of identical cladogenetic
+            stochastic maps.
+        str_representation (str): String representation of collection
+            of stochastic maps for printing.
+    """
 
     # class members
     ann_tr: AnnotatedTree
@@ -298,14 +406,16 @@ class StochMapsOnTree():
         ty.Dict[str, ty.List[StochMap]]  # node name as key
     cladogenetic_stoch_maps_dict: \
         ty.Dict[str, StochMap]  # node name as key
+    identical_cladogenetic_stoch_maps_dict: \
+        ty.Dict[str, ty.List[str]]  # iteration idx as key, node idxs as values
     iteration_idx: int
     str_representation: str
     state2bit_lookup: pjbio.State2BitLookup
     n_regions: int
 
     # for summary and printing
-    n_total_maps: int
     maps_counts_dict: ty.Dict[ty.Tuple[str], int]
+    n_total_maps: int
     n_anagenetic_maps: int
     n_range_exp_maps: int
     n_range_cont_maps: int
@@ -379,14 +489,27 @@ class StochMapsOnTree():
 
         # plt.show()
 
-    # updates
-    #     self.n_total_maps
-    #     self.anagenetic_stoch_maps_on_tree_dict
-    #     self.map_counts_dict
-    #     self.n_anagenetic_maps
-    #     self.forbidden_higher_order_maps_counts_dict
-    #     self.n_forbidden_higher_order_anagenetic_maps
     def add_map(self, stoch_map_str_list: ty.List[str]) -> None:
+        """Add new stochastic map to bookeeping class members.
+
+        This method reads a list of strings carrying information about
+        a stochastic map, and depending on what those strings are, the
+        appropriate stochastic map objects are created and stored.
+
+        Side-effects of this method populate:
+            (i)    self.n_total_maps
+            (ii)   self.n_anagenetic_maps
+            (iii)  self.n_identical_clado_maps
+            (iv)   self.n_different_clado_maps
+            (v)    self.n_range_exp_maps
+            (vi)   self.n_cont_exp_maps
+            (vii)  self.n_forbidden_higher_order_anagenetic_maps
+            (viii) self.anagenetic_stoch_maps_dict
+            (ix)   self.cladogenetic_stoch_maps_dict
+            (x)    self.identical_cladogenetic_stoch_maps_dict
+            (xi)   self.forbidden_higher_order_maps_counts_dict
+        """
+
         def _which_region_changed(from_state: int, to_state: int) \
                 -> ty.Tuple[bool, int]:
             pass
@@ -630,11 +753,31 @@ class StochMapsOnTree():
         return self.str_representation
 
 
-class StochMapCollection():
+class StochMapsOnTreeCollection():
+    """Collection of StochMapsOnTree objects.
 
+    This class reads through a table with (normally multiple)
+    iterations of logged stochastic maps, and maps them to
+    one or more annotated trees -- storing them as objects of
+    StochMapsOnTree. These are in turn stored in class members.
+
+    Attributes:
+        stoch_maps_tree_dict (dict): Dictionary with iteration
+            indices as keys, and StochMapsOnTree objects as values.
+        n_stoch_map_iterations (int): Total number of MCMC iterations
+            where stochastic maps were logged.
+        sorted_iteration_idxs (int): This is the sorted indices of
+            iterations for which stochastic maps were logged. Not
+            all iterations have maps, which is why we keep track of
+            those who do.
+        str_representation (str): String representation of class
+            instance for printing.
+    """
+
+    stoch_maps_tree_dict: \
+        ty.Dict[int, StochMapsOnTree]
     n_stoch_map_iterations: int
     sorted_iteration_idxs: ty.List[int]
-    stoch_maps_tree_dict: ty.Dict[int, StochMapsOnTree]  # key: iteration idx
     str_representation: str
 
     def __init__(self,
@@ -670,7 +813,15 @@ class StochMapCollection():
                               node_states_file_path: str,
                               stoch_map_attr_name: str,
                               ann_trs: ty.List[AnnotatedTree],
-                              state2bit_lookup: pjbio.State2BitLookup) -> None:
+                              state2bit_lookup: \
+                              pjbio.State2BitLookup) -> None:
+        """Read text file with stochastic maps and populate members.
+        
+        Side-effects of this method populate:
+            (i)    self.stoch_maps_tree_dict
+            (ii)   self.n_stoch_map_iterations
+            (iii)  self.sorted_iteration_idxs
+        """
 
         if not os.path.isfile(stoch_maps_file_path):
             exit("ERROR: Could not find " + stoch_maps_file_path + ". Exiting.")
@@ -925,7 +1076,7 @@ if __name__ == "__main__":
     #     print(k, v)
 
     stoch_mapcoll = \
-        StochMapCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
+        StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
                            tr,
                            state2bit_lookup,
                            node_states_file_path="examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",

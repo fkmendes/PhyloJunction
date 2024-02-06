@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'pjgui_pages.ui'
+# Form implementation generated from reading ui file 'src/phylojunction/interface/pysidegui/pjguipages/pjgui_pages.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -127,7 +127,7 @@ class Ui_PJGUIPages(object):
 "    color: #ec4a8a;\n"
 "}")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../images/icons/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.clear_model.setIcon(icon)
         self.clear_model.setIconSize(QtCore.QSize(20, 20))
         self.clear_model.setObjectName("clear_model")
@@ -605,7 +605,7 @@ class Ui_PJGUIPages(object):
 
         self.retranslateUi(PJGUIPages)
         PJGUIPages.setCurrentIndex(1)
-        self.node_content_tabs.setCurrentIndex(1)
+        self.node_content_tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(PJGUIPages)
 
     def retranslateUi(self, PJGUIPages):

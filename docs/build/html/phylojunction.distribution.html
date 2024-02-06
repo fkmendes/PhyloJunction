@@ -76,32 +76,27 @@
 <span id="phylojunction-distribution-dn-discrete-sse-module"></span><h2>phylojunction.distribution.dn_discrete_sse module<a class="headerlink" href="#module-phylojunction.distribution.dn_discrete_sse" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_discrete_sse.</span></code><code class="sig-name descname"><span class="pre">DnSSE</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">sse_stash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></span></em>, <em><span class="n"><span class="pre">stop_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">n_replicates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em><span class="n"><span class="pre">origin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">start_states_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em><span class="n"><span class="pre">condition_on_speciation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">condition_on_survival</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">condition_on_obs_both_sides_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">min_rec_taxa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">max_rec_taxa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000000000</span></span></em>, <em><span class="n"><span class="pre">abort_at_obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000000000</span></span></em>, <em><span class="n"><span class="pre">seeds_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em><span class="n"><span class="pre">runtime_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_discrete_sse.</span></code><code class="sig-name descname"><span class="pre">DnSSE</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">sse_stash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></span></em>, <em><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">n_replicates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">origin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">start_states_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em><span class="n"><span class="pre">stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em><span class="n"><span class="pre">stop_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em><span class="n"><span class="pre">condition_on_speciation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">condition_on_survival</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">condition_on_obs_both_sides_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">min_rec_taxa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">max_rec_taxa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000000000</span></span></em>, <em><span class="n"><span class="pre">abort_at_obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000000000000</span></span></em>, <em><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em><span class="n"><span class="pre">runtime_limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em><span class="n"><span class="pre">rng_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistrForSampling</span></code></a></p>
-<p>Distribution class for State-dependent Speciation and Extinction (birth-death) process</p>
-<p>The sampling method in this class is a “rising tide” simulator,
-where all living lineages grow together.</p>
-<p>At all times we know: (i) how many lineages are alive and dead, and (ii) all the character states represented by living lineages</p>
-<p>This is not a recursive simulator (in which each lineage would take care of
-growing only itself, and recur upon birth events).</p>
+<p>Discrete SSE distribution.</p>
+<p>Class for the discrete state-dependent speciation and extinction
+(SSE) distribution. Used for sampling phylogenetic trees annotated
+with discrete states.</p>
+<p>The simulate() method in this class is a ‘rising tide’ sampler,
+where all living lineages grow together. It is not a recursive
+sampler in which lineages take care of growing themselves and recur
+upon birth events.</p>
+<dl class="docutils">
+<dt>At all times we know:</dt><dd><ol class="lowerroman simple">
+<li>how many lineages are alive and dead</li>
+<li>all the character states represented by living lineages</li>
+</ol>
+</dd>
+</dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.sse_stash">
-<code class="sig-name descname"><span class="pre">sse_stash</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.sse_stash" title="Permalink to this definition"></a></dt>
-<dd><p>Object holding all state-dependent parameters we need to simulate.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash">SSEStash</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n">
-<code class="sig-name descname"><span class="pre">n</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n" title="Permalink to this definition"></a></dt>
-<dd><p>Number of simulations one wants.</p>
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n_sim">
+<code class="sig-name descname"><span class="pre">n_sim</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n_sim" title="Permalink to this definition"></a></dt>
+<dd><p>Number of trees to sample. Defaults to 1.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -113,9 +108,11 @@ growing only itself, and recur upon birth events).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n_replicates">
-<code class="sig-name descname"><span class="pre">n_replicates</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n_replicates" title="Permalink to this definition"></a></dt>
-<dd><p>Number of tree replicates per simulation.</p>
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n_repl">
+<code class="sig-name descname"><span class="pre">n_repl</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n_repl" title="Permalink to this definition"></a></dt>
+<dd><p>Number of tree replicates per sample. This
+is equivalent to the size of a plate in the DAG
+representation. Defaults to 1.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -127,37 +124,26 @@ growing only itself, and recur upon birth events).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.stop">
-<code class="sig-name descname"><span class="pre">stop</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.stop" title="Permalink to this definition"></a></dt>
-<dd><p>If “age”, stops when origin or root age is equal to ‘stop_condition_value’. If “size”, stops when tree has ‘stop_condition_value’ observable nodes.</p>
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.with_origin">
+<code class="sig-name descname"><span class="pre">with_origin</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.with_origin" title="Permalink to this definition"></a></dt>
+<dd><p>Flag for whether the process starts at the
+origin or not.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.stop_val">
-<code class="sig-name descname"><span class="pre">stop_val</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.stop_val" title="Permalink to this definition"></a></dt>
-<dd><p>Either maximum tree age, or maximum count of observable nodes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">float</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.start_at_origin">
-<code class="sig-name descname"><span class="pre">start_at_origin</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.start_at_origin" title="Permalink to this definition"></a></dt>
-<dd><p>Simulation starts at origin (i.e., seed == origin).</p>
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.root_is_born">
+<code class="sig-name descname"><span class="pre">root_is_born</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.root_is_born" title="Permalink to this definition"></a></dt>
+<dd><p>Attribute that records if root node was
+created and is in tree (for when it starts at the origin).
+‘True’ if process starts at the root.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -171,7 +157,8 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.start_states">
 <code class="sig-name descname"><span class="pre">start_states</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.start_states" title="Permalink to this definition"></a></dt>
-<dd><p>List of integer representing the starting states of all n_sim simulations.</p>
+<dd><p>List of integers representing the starting
+states of each of the ‘n_sim’ samples.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -183,42 +170,13 @@ growing only itself, and recur upon birth events).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.state_count">
-<code class="sig-name descname"><span class="pre">state_count</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.state_count" title="Permalink to this definition"></a></dt>
-<dd><p>Number of discrete states (obtained from ‘events’).</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.seed_age">
+<code class="sig-name descname"><span class="pre">seed_age</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.seed_age" title="Permalink to this definition"></a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n_time_slices">
-<code class="sig-name descname"><span class="pre">n_time_slices</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n_time_slices" title="Permalink to this definition"></a></dt>
-<dd><p>Number of time slices (obtained from ‘events’).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.slice_t_ends">
-<code class="sig-name descname"><span class="pre">slice_t_ends</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.slice_t_ends" title="Permalink to this definition"></a></dt>
-<dd><p>List of end times from time slices (obtained from ‘events’).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">float, optional</td>
 </tr>
 </tbody>
 </table>
@@ -227,7 +185,11 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_speciation">
 <code class="sig-name descname"><span class="pre">condition_on_speciation</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_speciation" title="Permalink to this definition"></a></dt>
-<dd><p>If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to False.</p>
+<dd><p>Flag for rejecting tree samples
+that do not go a single speciation event before ‘stop_val’
+is met. Note that this first speciation event may or not be
+what is canonically the reconstructed tree root node. If
+‘True’, rejects tree sample. Defaults to ‘False’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -241,7 +203,9 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_survival">
 <code class="sig-name descname"><span class="pre">condition_on_survival</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_survival" title="Permalink to this definition"></a></dt>
-<dd><p>If true, rejects trees that go extinct before reaching stop_condition_value. Defaults to True.</p>
+<dd><p>Flag for rejecting tree samples
+that go extinct before ‘stop_val’ is met. If ‘True’,
+rejects tree sample. Defaults to ‘True’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -255,7 +219,10 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_obs_both_sides_root">
 <code class="sig-name descname"><span class="pre">condition_on_obs_both_sides_root</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_obs_both_sides_root" title="Permalink to this definition"></a></dt>
-<dd><p>If true, rejects trees that do not have observed taxa on both sides of complete tree’s root. Defaults to False.</p>
+<dd><p>Flag for rejecting
+tree samples that do not have observed nodes on both sides
+of the complete tree’s root node. If ‘True’, rejects tree
+sample. Defaults to ‘False’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -267,9 +234,44 @@ growing only itself, and recur upon birth events).</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.stop">
+<code class="sig-name descname"><span class="pre">stop</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.stop" title="Permalink to this definition"></a></dt>
+<dd><p>Stop condition to end sampling (simulation)
+procedure and return tree. If ‘age’, stops when age of
+either origin or is equal to ‘stop_val’ (see below).
+If “size”, stops when tree has ‘stop_val’ observed nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.stop_val">
+<code class="sig-name descname"><span class="pre">stop_val</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.stop_val" title="Permalink to this definition"></a></dt>
+<dd><p>List of values used by ‘stop’ (see above) to
+end each of the ‘n_sim’ sampling (simulation) procedures
+and return tree. Either maximum age, or maximum count of
+observable nodes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.min_rec_taxa">
 <code class="sig-name descname"><span class="pre">min_rec_taxa</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.min_rec_taxa" title="Permalink to this definition"></a></dt>
-<dd><p>Required minimum number of observed taxa in reconstructed tree (at least or equal to). Defaults to zero.</p>
+<dd><p>Required minimum number of observed taxa in
+reconstructed tree. Defaults to 0.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -283,7 +285,8 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.max_rec_taxa">
 <code class="sig-name descname"><span class="pre">max_rec_taxa</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.max_rec_taxa" title="Permalink to this definition"></a></dt>
-<dd><p>Required maximum number of observed taxa in reconstructed tree (at most and equal to). Defaults to 1e12.</p>
+<dd><p>Required maximum number of observed taxa in
+reconstructed tree. Defaults to 1e12.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -295,14 +298,111 @@ growing only itself, and recur upon birth events).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.abort_at_obs">
-<code class="sig-name descname"><span class="pre">abort_at_obs</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.abort_at_obs" title="Permalink to this definition"></a></dt>
-<dd><p>If growing tree reaches this number of living taxa, we abort the sample (invalidate the tree). Defaults to 1e12.</p>
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.abort_at_living_count">
+<code class="sig-name descname"><span class="pre">abort_at_living_count</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.abort_at_living_count" title="Permalink to this definition"></a></dt>
+<dd><p>Number of living (not observed!)
+nodes at which point sample is rejected. This parameter is
+used to abort samples whose SSE parameters cause trees to
+grow too large. Defaults to 1e12.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.sse_stash">
+<code class="sig-name descname"><span class="pre">sse_stash</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.sse_stash" title="Permalink to this definition"></a></dt>
+<dd><p>Object holding all discrete
+state-dependent parameters we need to sample (i.e.,
+simulate). This object holds (i) the number of discrete
+states of the process, (ii) the number of time slices if
+process is time-heterogeneous, (iii) the end age of each
+time slice.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash">SSEStash</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.events">
+<code class="sig-name descname"><span class="pre">events</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.events" title="Permalink to this definition"></a></dt>
+<dd><p>Object that computes total
+rate values, and samples SSE events. It is a member of
+sse_stash.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="phylojunction.calculation.discrete_sse.MacroevolEventHandler">MacroevolEventHandler</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.state_count">
+<code class="sig-name descname"><span class="pre">state_count</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.state_count" title="Permalink to this definition"></a></dt>
+<dd><p>Number of states of SSE process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n_time_slices">
+<code class="sig-name descname"><span class="pre">n_time_slices</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n_time_slices" title="Permalink to this definition"></a></dt>
+<dd><p>Number of time slices (epochs).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.slice_t_ends">
+<code class="sig-name descname"><span class="pre">slice_t_ends</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.slice_t_ends" title="Permalink to this definition"></a></dt>
+<dd><p>List of floats with time slice
+time ends (forward!).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">float, optional</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.prob_handler">
+<code class="sig-name descname"><span class="pre">prob_handler</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.prob_handler" title="Permalink to this definition"></a></dt>
+<dd><p>Object
+that takes care of state-dependent taxon sampling across
+time slices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler">DiscreteStateDependentProbabilityHandler</a></td>
 </tr>
 </tbody>
 </table>
@@ -311,7 +411,11 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.epsilon">
 <code class="sig-name descname"><span class="pre">epsilon</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.epsilon" title="Permalink to this definition"></a></dt>
-<dd><p>Any values difference below this value is set to 0.0. Defaults to 1e-12.</p>
+<dd><p>Float threshold to determine if a
+tiny decimal number is to be considered 0.0 or not. In
+other words, if the difference between a tiny value ‘x’
+and 0.0 is smaller than epsilon, then ‘x’ is set to 0.0.
+Defaults to 1e-12.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -325,7 +429,27 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.runtime_limit">
 <code class="sig-name descname"><span class="pre">runtime_limit</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.runtime_limit" title="Permalink to this definition"></a></dt>
-<dd><p>Maximum number of minutes one is willing to wait until all ‘n_sim’ simulations are done. Defaults to 5.</p>
+<dd><p>Runtime ceiling (in minutes)
+for obtaining the ‘n’ tree samples. If this limit is met,
+the sampling procedure is aborted. Defaults to 5.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">int, optional</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.rng_seed">
+<code class="sig-name descname"><span class="pre">rng_seed</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.rng_seed" title="Permalink to this definition"></a></dt>
+<dd><p>Integer seed for the two random
+number generators used in this class. This seed is only
+ever used by user if bypassing the scripting language
+(otherwise random number generator seeds are handled in
+cmd_parse.py). Defaults to None.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -339,7 +463,8 @@ growing only itself, and recur upon birth events).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.debug">
 <code class="sig-name descname"><span class="pre">debug</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.debug" title="Permalink to this definition"></a></dt>
-<dd><p>Whether to print debugging messages</p>
+<dd><p>Flag for whether to print debugging
+messages during sampling procedure.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -350,7 +475,21 @@ growing only itself, and recur upon birth events).</p>
 </table>
 </dd></dl>
 
-<p>Methods</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.info">
+<code class="sig-name descname"><span class="pre">info</span></code><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.info" title="Permalink to this definition"></a></dt>
+<dd><p>Flag for whether to print information
+about running sampling procedure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool, optional</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.DN_NAME">
 <code class="sig-name descname"><span class="pre">DN_NAME</span></code><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DnSSE'</span></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.DN_NAME" title="Permalink to this definition"></a></dt>
@@ -358,7 +497,7 @@ growing only itself, and recur upon birth events).</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
-<code class="sig-name descname"><span class="pre">abort_at_obs</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<code class="sig-name descname"><span class="pre">abort_at_living_count</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -387,14 +526,30 @@ growing only itself, and recur upon birth events).</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.events">
-<code class="sig-name descname"><span class="pre">events</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="phylojunction.calculation.discrete_sse.MacroevolEventHandler"><span class="pre">MacroevolEventHandler</span></a></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.events" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id6">
+<code class="sig-name descname"><span class="pre">events</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler" title="phylojunction.calculation.discrete_sse.MacroevolEventHandler"><span class="pre">MacroevolEventHandler</span></a></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.generate">
 <code class="sig-name descname"><span class="pre">generate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.generate" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Generate samples according to distribution.</p>
+<p>The number of samples will be the specified number of samples
+times the number of replicates (per sample).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Valid simulated trees annotated with</dt><dd>discrete traits</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(<a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree">AnnotatedTree</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.get_rev_inference_spec_info">
@@ -402,69 +557,99 @@ growing only itself, and recur upon birth events).</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id6">
-<code class="sig-name descname"><span class="pre">max_rec_taxa</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id7">
-<code class="sig-name descname"><span class="pre">min_rec_taxa</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<code class="sig-name descname"><span class="pre">info</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.n_sim">
-<code class="sig-name descname"><span class="pre">n_sim</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.n_sim" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.init_check_vectorize_sample_size">
+<code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Vectorize SSE rates and probs, start values and stop values.</p>
+<p>This method is in the parent class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityError" title="phylojunction.utility.exception_classes.DimensionalityError"><strong>DimensionalityError</strong></a> – Is raised if (i) more than one SSE
+    rate value is provided, but that number is smaller
+    than the requested number of tree samples (because
+    then we do not know how to vectorize the values), (ii)
+    same as (i), but for SSE probabilities, (iii) same as
+    (i), but for starting states, (iv) same as (i), but
+    for stop values</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id8">
-<code class="sig-name descname"><span class="pre">n_time_slices</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.prob_handler">
-<code class="sig-name descname"><span class="pre">prob_handler</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler"><span class="pre">DiscreteStateDependentProbabilityHandler</span></a></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.prob_handler" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.root_is_born">
-<code class="sig-name descname"><span class="pre">root_is_born</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.root_is_born" title="Permalink to this definition"></a></dt>
+<code class="sig-name descname"><span class="pre">max_rec_taxa</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id9">
-<code class="sig-name descname"><span class="pre">runtime_limit</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
+<code class="sig-name descname"><span class="pre">min_rec_taxa</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.seed_age">
-<code class="sig-name descname"><span class="pre">seed_age</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.seed_age" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id10">
+<code class="sig-name descname"><span class="pre">n_sim</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.seeds">
-<code class="sig-name descname"><span class="pre">seeds</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.seeds" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id11">
+<code class="sig-name descname"><span class="pre">n_time_slices</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<code class="sig-name descname"><span class="pre">prob_handler</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler"><span class="pre">DiscreteStateDependentProbabilityHandler</span></a></em><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id13">
+<code class="sig-name descname"><span class="pre">rng_seed</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id14">
+<code class="sig-name descname"><span class="pre">root_is_born</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id15">
+<code class="sig-name descname"><span class="pre">runtime_limit</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id16">
+<code class="sig-name descname"><span class="pre">seed_age</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id16" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.simulate">
-<code class="sig-name descname"><span class="pre">simulate</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">a_start_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">a_stop_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em><span class="n"><span class="pre">a_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.simulate" title="Permalink to this definition"></a></dt>
-<dd><p>Sample (simulate) tree with states at its terminal nodes]</p>
+<code class="sig-name descname"><span class="pre">simulate</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">a_start_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">a_stop_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">sample_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.simulate" title="Permalink to this definition"></a></dt>
+<dd><p>Sample (simulate) discrete-SSE tree.</p>
+<p>The simulated tree may or not meet the conditions specified by
+the user. Conditioning is handled outside of this method (see
+documentation for .generate()).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>a_start_state</strong> (<em>int</em>) – State at seed node (origin or root)</li>
-<li><strong>a_stop_value</strong> (<em>float</em>) – Value to stop simulation with (number of tips or tree height)</li>
-<li><strong>sample_idx</strong> (<em>int</em>) – Sample index (i.e., simulation index)</li>
+<li><strong>a_start_state</strong> (<em>int</em>) – State at seed node (origin or root).</li>
+<li><strong>a_stop_value</strong> (<em>float</em>) – Value to stop simulation with (number
+of tips or tree height).</li>
+<li><strong>sample_idx</strong> (<em>int</em>) – Index of current sample.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">One simulated tree.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tree annotated with discrete states.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(dendropy.Tree)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(<a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree">AnnotatedTree</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -472,38 +657,38 @@ growing only itself, and recur upon birth events).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id10">
-<code class="sig-name descname"><span class="pre">slice_t_ends</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id17">
+<code class="sig-name descname"><span class="pre">slice_t_ends</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id17" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id11">
-<code class="sig-name descname"><span class="pre">sse_stash</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></em><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id18">
+<code class="sig-name descname"><span class="pre">sse_stash</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></em><a class="headerlink" href="#id18" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id12">
-<code class="sig-name descname"><span class="pre">start_states</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id19">
+<code class="sig-name descname"><span class="pre">start_states</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id19" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id13">
-<code class="sig-name descname"><span class="pre">state_count</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id20">
+<code class="sig-name descname"><span class="pre">state_count</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#id20" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id14">
-<code class="sig-name descname"><span class="pre">stop</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id21">
+<code class="sig-name descname"><span class="pre">stop</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id21" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id15">
-<code class="sig-name descname"><span class="pre">stop_val</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id22">
+<code class="sig-name descname"><span class="pre">stop_val</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id22" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phylojunction.distribution.dn_discrete_sse.DnSSE.with_origin">
-<code class="sig-name descname"><span class="pre">with_origin</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#phylojunction.distribution.dn_discrete_sse.DnSSE.with_origin" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="id23">
+<code class="sig-name descname"><span class="pre">with_origin</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id23" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -513,7 +698,7 @@ growing only itself, and recur upon birth events).</p>
 <span id="phylojunction-distribution-dn-parametric-module"></span><h2>phylojunction.distribution.dn_parametric module<a class="headerlink" href="#module-phylojunction.distribution.dn_parametric" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnExponential">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnExponential</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">scale_or_rate_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnExponential" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnExponential</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">scale_or_rate_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnExponential" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistrForSampling</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnExponential.DN_NAME">
@@ -533,14 +718,15 @@ growing only itself, and recur upon birth events).</p>
 <li><strong>scale_or_rate_param</strong> (<em>float</em>) – Scale (default) or rate of
 exponential distribution.</li>
 <li><strong>rate_parameterization</strong> (<em>bool</em><em>, </em><em>optional</em>) – Argument of
-‘scale_or_rate_param’ is rate instead of scale. Defaults to True.</li>
+‘scale_or_rate_param’ is rate instead of scale.
+Defaults to ‘True’.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Sample (list) from exponential distribution.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of floats sampled from exonential distribution.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(list)</p>
 </td>
 </tr>
 </tbody>
@@ -567,6 +753,13 @@ exponential distribution.</li>
 <code class="sig-name descname"><span class="pre">get_rev_inference_spec_info</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnExponential.get_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnExponential.init_check_vectorize_sample_size">
+<code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnExponential.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Check sample size against number of provided parameter values</p>
+<p>This is the function behind the vectorization functionality</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnExponential.param_dict">
 <code class="sig-name descname"><span class="pre">param_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnExponential.param_dict" title="Permalink to this definition"></a></dt>
@@ -586,7 +779,7 @@ exponential distribution.</li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnGamma">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnGamma</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">shape_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">scale_or_rate_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnGamma" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnGamma</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">shape_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">scale_or_rate_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnGamma" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistrForSampling</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnGamma.DN_NAME">
@@ -596,27 +789,27 @@ exponential distribution.</li>
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnGamma.draw_gamma">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">draw_gamma</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">shape_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em><span class="n"><span class="pre">scale_or_rate_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em><span class="n"><span class="pre">rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnGamma.draw_gamma" title="Permalink to this definition"></a></dt>
-<dd><p>Return sample from gamma distribution</p>
+<dd><p>Return sample from gamma distribution.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_samples</strong> (<em>int</em>) – Number of draws (sample size)</li>
+<li><strong>n_samples</strong> (<em>int</em>) – Number of draws (sample size).</li>
 <li><strong>shape_param</strong> (<em>float</em>) – Gamma distribution shape parameter
 (represented by alpha or kappa sometimes).</li>
 <li><strong>scale_or_rate_param</strong> (<em>float</em>) – Gamma distribution scale or
 rate parameter.</li>
 <li><strong>rate_parameterization</strong> (<em>bool</em><em>, </em><em>optional</em>) – Argument of
 ‘scale_or_rate_param’ is rate instead of scale.
-Defaults to False.</li>
+Defaults to ‘False’.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Sample (list) from gamma distribution</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of floats sampled from exonential distribution.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of floats(s)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(list)</p>
 </td>
 </tr>
 </tbody>
@@ -648,6 +841,13 @@ Defaults to False.</li>
 <code class="sig-name descname"><span class="pre">get_rev_inference_spec_info</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnGamma.get_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnGamma.init_check_vectorize_sample_size">
+<code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnGamma.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Check sample size against number of provided parameter values</p>
+<p>This is the function behind the vectorization functionality</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnGamma.param_dict">
 <code class="sig-name descname"><span class="pre">param_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnGamma.param_dict" title="Permalink to this definition"></a></dt>
@@ -667,7 +867,7 @@ Defaults to False.</li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnLogNormal">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnLogNormal</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">ln_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">ln_sd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">ln_log_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnLogNormal" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnLogNormal</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">ln_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">ln_sd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">ln_log_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnLogNormal" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistrForSampling</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnLogNormal.DN_NAME">
@@ -690,14 +890,14 @@ distribution in log-space.</li>
 <li><strong>scale</strong> (<em>float</em>) – Median (scale) of log-normal distribution in
 log-space. Defaults to 1.0.</li>
 <li><strong>log_space</strong> (<em>bool</em><em>, </em><em>optional</em>) – Mean and std. deviation are provided
-in natural space. Defaults to True.</li>
+in log-space. Defaults to ‘True’.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Sample (list) from log-normal distribution.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of floats sampled from log-normal distribution.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of float(s)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(list)</p>
 </td>
 </tr>
 </tbody>
@@ -713,6 +913,13 @@ in natural space. Defaults to True.</li>
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnLogNormal.get_rev_inference_spec_info">
 <code class="sig-name descname"><span class="pre">get_rev_inference_spec_info</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnLogNormal.get_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnLogNormal.init_check_vectorize_sample_size">
+<code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnLogNormal.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Check sample size against number of provided parameter values</p>
+<p>This is the function behind the vectorization functionality</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnLogNormal.ln_log_space">
@@ -736,7 +943,7 @@ in natural space. Defaults to True.</li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnLogNormal.parent_node_tracker">
-<code class="sig-name descname"><span class="pre">parent_node_tracker</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnLogNormal.parent_node_tracker" title="Permalink to this definition"></a></dt>
+<code class="sig-name descname"><span class="pre">parent_node_tracker</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnLogNormal.parent_node_tracker" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -758,22 +965,22 @@ in natural space. Defaults to True.</li>
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnNormal.draw_normal">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">draw_normal</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">mean_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em><span class="n"><span class="pre">sd_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnNormal.draw_normal" title="Permalink to this definition"></a></dt>
-<dd><p>Return sample from normal distribution</p>
+<dd><p>Return sample from normal distribution.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_samples</strong> (<em>int</em>) – Number of draws (sample size)</li>
-<li><strong>mean_param</strong> (<em>float</em>) – Mean (location) of normal distribution</li>
-<li><strong>sd_param</strong> (<em>float</em>) – Std. deviation (scale) of normal distribution</li>
+<li><strong>n_samples</strong> (<em>int</em>) – Number of draws (sample size).</li>
+<li><strong>mean_param</strong> (<em>float</em>) – Mean (location) of normal distribution.</li>
+<li><strong>sd_param</strong> (<em>float</em>) – Std. deviation (scale) of normal distribution.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Sample (list) from normal distribution</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of values sampled from normal distribution.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of floats(s)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(list)</p>
 </td>
 </tr>
 </tbody>
@@ -789,6 +996,13 @@ in natural space. Defaults to True.</li>
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnNormal.get_rev_inference_spec_info">
 <code class="sig-name descname"><span class="pre">get_rev_inference_spec_info</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnNormal.get_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnNormal.init_check_vectorize_sample_size">
+<code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnNormal.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Check sample size against number of provided parameter values</p>
+<p>This is the function behind the vectorization functionality</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnNormal.norm_mean_param_list">
@@ -819,7 +1033,7 @@ in natural space. Defaults to True.</li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnUnif">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnUnif</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">min_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">max_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnUnif" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.distribution.dn_parametric.</span></code><code class="sig-name descname"><span class="pre">DnUnif</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">min_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">max_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnUnif" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">DistrForSampling</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnUnif.DN_NAME">
@@ -829,22 +1043,22 @@ in natural space. Defaults to True.</li>
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnUnif.draw_unif">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">draw_unif</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">min_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em><span class="n"><span class="pre">max_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnUnif.draw_unif" title="Permalink to this definition"></a></dt>
-<dd><p>Return sample from log-normal distribution</p>
+<dd><p>Return sample from uniform distribution.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_samples</strong> (<em>int</em>) – Number of draws (sample size)</li>
-<li><strong>min_param</strong> (<em>float</em>) – Minimum value</li>
-<li><strong>max_param</strong> (<em>float</em>) – Maximum value</li>
+<li><strong>n_samples</strong> (<em>int</em>) – Number of draws (sample size).</li>
+<li><strong>min_param</strong> (<em>float</em>) – Minimum value.</li>
+<li><strong>max_param</strong> (<em>float</em>) – Maximum value.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Sample (list) from uniform distribution</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of floats sampled from exonential distribution.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of float(s)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(list)</p>
 </td>
 </tr>
 </tbody>
@@ -860,6 +1074,13 @@ in natural space. Defaults to True.</li>
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnUnif.get_rev_inference_spec_info">
 <code class="sig-name descname"><span class="pre">get_rev_inference_spec_info</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnUnif.get_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnUnif.init_check_vectorize_sample_size">
+<code class="sig-name descname"><span class="pre">init_check_vectorize_sample_size</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.distribution.dn_parametric.DnUnif.init_check_vectorize_sample_size" title="Permalink to this definition"></a></dt>
+<dd><p>Check sample size against number of provided parameter values</p>
+<p>This is the function behind the vectorization functionality</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.distribution.dn_parametric.DnUnif.max_param_list">

@@ -4,7 +4,9 @@ import typing as ty
 import phylojunction.calculation.discrete_sse as sseobj
 import phylojunction.utility.exception_classes as ec
 import phylojunction.interface.grammar.det_fn_discrete_sse_makers as detsse
+import phylojunction.interface.grammar.det_fn_map_attribute as detmap
 import phylojunction.pgm.pgm as pgm
+import phylojunction.data.tree as pjtr
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -21,7 +23,8 @@ class PJDetFnGrammar():
         "sse_prob": set(["name", "value", "state", "epoch"]),
         "sse_rate": set(["name", "value", "event", "states", "epoch"]),
         "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states",
-                          "seed_age", "epoch_age_ends", "n_epochs"])
+                          "seed_age", "epoch_age_ends", "n_epochs"]),
+        "map_attribute": set(["tree", "maps_file_path", "attr_name"])
     }
 
     @classmethod
@@ -36,13 +39,6 @@ class PJDetFnGrammar():
         det_fn_param_dict:
             ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> sseobj.DiscreteStateDependentRate:
-
-        if not det_fn_param_dict:
-            raise ec.ParseMissingSpecificationError("sse_rate")
-
-        for arg in det_fn_param_dict:
-            if not cls.grammar_check("sse_rate", arg):
-                raise ec.ParseNotAParameterError(arg)
 
         try:
             return detsse.make_DiscreteStateDependentRate(
@@ -62,13 +58,6 @@ class PJDetFnGrammar():
             ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> sseobj.DiscreteStateDependentProbability:
 
-        if not det_fn_param_dict:
-            raise ec.ParseMissingSpecificationError("sse_prob")
-
-        for arg in det_fn_param_dict:
-            if not cls.grammar_check("sse_prob", arg):
-                raise ec.ParseNotAParameterError(arg)
-
         try:
             return detsse.make_DiscreteStateDependentProbability(
                 "sse_prob",
@@ -86,13 +75,6 @@ class PJDetFnGrammar():
             ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
             -> sseobj.SSEStash:
 
-        if not det_fn_param_dict:
-            raise ec.ParseMissingSpecificationError("sse_stash")
-
-        for arg in det_fn_param_dict:
-            if not cls.grammar_check("sse_stash", arg):
-                raise ec.ParseNotAParameterError(arg)
-
         try:
             return detsse.make_SSEStash("sse_stash", det_fn_param_dict)
 
@@ -103,6 +85,15 @@ class PJDetFnGrammar():
                 ec.ParseMissingParameterError,
                 ec.ParseInvalidArgumentError) as e:
             raise ec.ParseDetFnInitFailError("sse_stash", e.message)
+
+    @classmethod
+    def init_return_tree_mapped_with_attr(
+        cls,
+        det_fn_param_dict: \
+            ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
+                -> pjtr.AnnotatedTree:
+        
+        return detmap.make_mapped_ann_tree()
 
     @classmethod
     def create_det_fn_obj(
@@ -129,6 +120,13 @@ class PJDetFnGrammar():
                 later building a sampling distribution
         """
 
+        if not det_fn_param_dict:
+            raise ec.ParseMissingSpecificationError(det_fn_id)
+
+        for arg in det_fn_param_dict:
+            if not cls.grammar_check(det_fn_id, arg):
+                raise ec.ParseNotAParameterError(arg)
+            
         # validate input
         if det_fn_id == "sse_rate":
             # health checks inside
@@ -140,6 +138,9 @@ class PJDetFnGrammar():
 
         if det_fn_id == "sse_stash":
             return cls.init_return_sse_stash(det_fn_param_dict)
+        
+        if det_fn_id == "map_attribute":
+            return cls.init_return_tree_mapped_with_attr(det_fn_param_dict)
 
         return None
 

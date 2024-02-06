@@ -308,7 +308,7 @@ def make_SSEStash(
 
     n_states: int = 1
     n_time_slices: int = 1
-    time_slice_age_ends: ty.List[float] = []
+    time_slice_age_ends: ty.List[float] = list()
     seed_age_for_time_slicing: ty.Optional[float] = None
     flat_state_dep_rate_mat: ty.List[pgm.DeterministicNodeDAG] = []
     flat_state_dep_prob_mat: ty.List[pgm.DeterministicNodeDAG] = []

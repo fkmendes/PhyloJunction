@@ -75,25 +75,26 @@
 <div class="section" id="module-phylojunction.interface.cmdbox.cmd_parse">
 <span id="phylojunction-interface-cmdbox-cmd-parse-module"></span><h2>phylojunction.interface.cmdbox.cmd_parse module<a class="headerlink" href="#module-phylojunction.interface.cmdbox.cmd_parse" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.cmdline2pgm">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">cmdline2pgm</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.cmdline2pgm" title="Permalink to this definition"></a></dt>
-<dd><p>Update PGM object with user-entered .pj command</p>
+<dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.cmdline2dag">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">cmdline2dag</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.cmdline2dag" title="Permalink to this definition"></a></dt>
+<dd><p>Update PGM object with user-entered .pj command.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pgm_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><em>ProbabilisticGraphicalModel</em></a>) – Object that will hold
-all stochastic nodes (random variables) created by user via commands.</li>
+<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object that will hold
+all stochastic nodes (random variables) created by user via
+commands.</li>
 <li><strong>cmd_line</strong> (<em>str</em>) – Command line string provided by user through
 static script or via GUI.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Command string if there was nothing wrong with it</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Command string if there was nothing wrong with it.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(str)</p>
 </td>
 </tr>
 </tbody>
@@ -102,28 +103,25 @@ static script or via GUI.</li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.parse_deterministic_function_assignment">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">parse_deterministic_function_assignment</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">det_nd_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">det_node_fn_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_deterministic_function_assignment" title="Permalink to this definition"></a></dt>
-<dd><p>Create DeterministicNodePGM instance from command string with
-“:=” operator, then add it to ProbabilisticGraphiclModel
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">parse_deterministic_function_assignment</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">det_nd_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">det_node_fn_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_deterministic_function_assignment" title="Permalink to this definition"></a></dt>
+<dd><p>Create DeterministicNodeDAG instance from command string with
+‘:=’ operator, then add it to ProbabilisticGraphiclModel
 instance. This node is not sampled (not a random variable) and is
 deterministically initialized via a deterministic function call.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pgm_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><em>ProbabilisticGraphicalModel</em></a>) – Object that will hold all
-nodes created by user via commands</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object that will hold all
+nodes created by user via commands.</li>
 <li><strong>det_nd_name</strong> (<em>str</em>) – Name of deterministic node being created</li>
-<li><strong>det_node_fn_spec</strong> (<em>str</em>) – Specification string for deterministic function
-that will specify the deterministic node (whatever is right of
-“:=” operator in PJ command)</li>
+<li><strong>det_node_fn_spec</strong> (<em>str</em>) – Specification string for deterministic
+function that will specify the deterministic node (whatever
+is right of ‘:=’ operator in PJ command).</li>
 <li><strong>cmd_line</strong> (<em>str</em>) – Command line string provided by user through static
-script or via GUI</li>
+script or via GUI.</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -132,27 +130,25 @@ script or via GUI</li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.parse_samp_dn_assignment">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">parse_samp_dn_assignment</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">stoch_node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">stoch_node_dn_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_samp_dn_assignment" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">parse_samp_dn_assignment</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">stoch_node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">stoch_node_dn_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_samp_dn_assignment" title="Permalink to this definition"></a></dt>
 <dd><p>Create and add stochastic node to graphical model</p>
-<p>Called when “~” operator is used.
-This node will be sampled from a distribution and is a random variable.</p>
+<p>Called when ‘~’ operator is used.
+This node will be sampled from a distribution and is a random
+variable.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pgm_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><em>ProbabilisticGraphicalModel</em></a>) – Object that will hold
-all nodes created by user via commands</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – Object that will hold all nodes
+created by user via commands.</li>
 <li><strong>stoch_node_name</strong> (<em>str</em>) – Name of stochastic node being created</li>
 <li><strong>stoch_node_dn_spec</strong> (<em>str</em>) – Specification string for distribution
 from which stochastic node will be sampled (whatever is
-right of “~” operator in PJ command)</li>
+right of ‘~’’ operator in PJ command)</li>
 <li><strong>cmd_line</strong> (<em>str</em>) – Command line string provided by user through
 static script or via GUI</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -161,25 +157,23 @@ static script or via GUI</li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.parse_variable_assignment">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">parse_variable_assignment</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">stoch_node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">stoch_node_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_variable_assignment" title="Permalink to this definition"></a></dt>
-<dd><p>Create and add constant node to graphical model</p>
-<p>Called when “&lt;-” operator is used.
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">parse_variable_assignment</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">stoch_node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">stoch_node_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_variable_assignment" title="Permalink to this definition"></a></dt>
+<dd><p>Create and add constant node to DAG.</p>
+<p>Called when ‘&lt;-’ operator is used.
 This node will not be sampled and is in practice a constant node.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pgm_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><em>ProbabilisticGraphicalModel</em></a>) – Object that will hold
-all nodes created by user via commands</li>
-<li><strong>stoch_node_name</strong> (<em>str</em>) – Name of stochastic node being created</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – Object that will hold all nodes
+created by user via commands.</li>
+<li><strong>stoch_node_name</strong> (<em>str</em>) – Name of stochastic node being created.</li>
 <li><strong>stoch_node_spec</strong> (<em>str</em>) – Stochastic node specification string
-(whatever is right of “&lt;-” operator in PJ command)</li>
-<li><strong>cmd_line</strong> (<em>str</em>) – Command line string provided by user through static script or via GUI</li>
+(whatever is right of ‘&lt;-’ operator in PJ command).</li>
+<li><strong>cmd_line</strong> (<em>str</em>) – Command line string provided by user through
+static script or via GUI.</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -187,15 +181,30 @@ all nodes created by user via commands</li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.script2pgm">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">script2pgm</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">script_file_path_or_model_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">in_pj_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.script2pgm" title="Permalink to this definition"></a></dt>
-<dd><p>Go through .pj lines and populate graphical model</p>
+<dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.script2dag">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></code><code class="sig-name descname"><span class="pre">script2dag</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">script_file_path_or_model_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">in_pj_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.script2dag" title="Permalink to this definition"></a></dt>
+<dd><p>Go through .pj lines and populate and return DAG.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>script_file_path_or_model_spec</strong> (<em>str</em>) – Path to script .pj
-file or full string specifying model directly</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>script_file_path_or_model_spec</strong> (<em>str</em>) – Path to script .pj
+file or full string specifying model directly.</li>
+<li><strong>random_seed</strong> (<em>int</em>) – Random seed (integer) for simulation.
+Defaults to None.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>DAG object (model) built from .pj</dt><dd><p>script commands.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph">DirectedAcyclicGraph</a>)</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -206,7 +215,7 @@ file or full string specifying model directly</td>
 <span id="phylojunction-interface-cmdbox-cmd-parse-utils-module"></span><h2>phylojunction.interface.cmdbox.cmd_parse_utils module<a class="headerlink" href="#module-phylojunction.interface.cmdbox.cmd_parse_utils" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse_utils.parse_spec">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse_utils.</span></code><code class="sig-name descname"><span class="pre">parse_spec</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">fn_spec_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse_utils.parse_spec" title="Permalink to this definition"></a></dt>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse_utils.</span></code><code class="sig-name descname"><span class="pre">parse_spec</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">fn_spec_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse_utils.parse_spec" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -257,8 +266,8 @@ file or full string specifying model directly</td>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse_utils.val_or_obj">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse_utils.</span></code><code class="sig-name descname"><span class="pre">val_or_obj</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodePGM" title="phylojunction.pgm.pgm.NodePGM"><span class="pre">NodePGM</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse_utils.val_or_obj" title="Permalink to this definition"></a></dt>
-<dd><p>Return list of strings with values or node names</p>
+<code class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse_utils.</span></code><code class="sig-name descname"><span class="pre">val_or_obj</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse_utils.val_or_obj" title="Permalink to this definition"></a></dt>
+<dd><p>Return list of strings with values or node names.</p>
 <p>Checks if provided values are directly accessible as values
 (e.g., 1.0, “a_string_in_quotes”)) or if they are names of nodes
 potentially in the graphical model. If the latter, check if they
@@ -269,8 +278,7 @@ return</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pgm_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><em>pgm.ProbabilisticGraphicalModel</em></a>) – Probabilistic
-graphical model object.</li>
+<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object being interrogated.</li>
 <li><strong>val</strong> (<em>str</em>) – List of strings, one for each argument coming
 from a parsed command.</li>
 </ul>

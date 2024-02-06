@@ -108,26 +108,33 @@
 <div class="section" id="module-phylojunction.inference.revbayes.rb_inference">
 <span id="phylojunction-inference-revbayes-rb-inference-module"></span><h2>phylojunction.inference.revbayes.rb_inference module<a class="headerlink" href="#module-phylojunction.inference.revbayes.rb_inference" title="Permalink to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></code><code class="sig-name descname"><span class="pre">get_mcmc_logging_spec_list</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">a_node_pgm_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">moves_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">n_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list" title="Permalink to this definition"></a></dt>
-<dd><p>Generate list of strings where each element (one per simulation) will configure RevBayes’ MCMC (moves) and logging inside a .Rev script</p>
+<dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_inference.dag_obj_to_rev_inference_spec">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></code><code class="sig-name descname"><span class="pre">dag_obj_to_rev_inference_spec</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">inference_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.dag_obj_to_rev_inference_spec" title="Permalink to this definition"></a></dt>
+<dd><p>Convert model string to put in .Rev script.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>a_node_pgm_name</strong> (<em>str</em>) – One of the probabilistic graphical model nodes, required to set the model object</li>
-<li><strong>moves_str</strong> (<em>str</em>) – All moves to be carried out during MCMC, as a string containing new line characters</li>
-<li><strong>n_sim</strong> (<em>int</em>) – Number of simulations</li>
-<li><strong>prefix</strong> (<em>str</em>) – Prefix to preceed MCMC result .log file names</li>
-<li><strong>results_dir</strong> (<em>str</em>) – String specifying directory where MCMC result .log files shall be put by RevBayes</li>
+<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object created
+through script or commands typed by user.</li>
+<li><strong>mcmc_chain_length</strong> (<em>int</em>) – Number of MCMC iterations to carry
+out with RevBayes.</li>
+<li><strong>inference_root_dir</strong> (<em>str</em>) – Directory where scripts and results
+should be put, and from where RevBayes should be called.</li>
+<li><strong>prefix</strong> (<em>str</em>) – Prefix will be appended to directory and file
+names. Defaults to “”.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of strings (one per simulation), each will configure RevBayes’ MCMC (moves) and logging inside a .Rev script</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Tuple containing three lists, with strings to be</dt><dd><p>printed to files (2) and directory names (1).</p>
+</dd>
+</dl>
+</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(str)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(tuple)</p>
 </td>
 </tr>
 </tbody>
@@ -135,25 +142,36 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_inference.pgm_obj_to_rev_inference_spec">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></code><code class="sig-name descname"><span class="pre">pgm_obj_to_rev_inference_spec</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">pgm_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><span class="pre">ProbabilisticGraphicalModel</span></a></span></em>, <em><span class="n"><span class="pre">inference_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.pgm_obj_to_rev_inference_spec" title="Permalink to this definition"></a></dt>
-<dd><p>Prepare string to put in .Rev script, from model specified by user in PhyloJunction</p>
+<dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></code><code class="sig-name descname"><span class="pre">get_mcmc_logging_spec_list</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">a_node_dag_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">moves_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list" title="Permalink to this definition"></a></dt>
+<dd><p>Generate MCMC move strings for .Rev script.</p>
+<p>This method will produce a list of strings where each element
+(one per sample) will configure RevBayes’ MCMC (moves) and
+logging inside a .Rev script</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pgm_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ProbabilisticGraphicalModel" title="phylojunction.pgm.pgm.ProbabilisticGraphicalModel"><em>ProbabilisticGraphicalModel</em></a>) – PGM object created through script or commands typed by user</li>
-<li><strong>mcmc_chain_length</strong> (<em>int</em>) – Number of MCMC iterations to carry out with RevBayes</li>
-<li><strong>inference_root_dir</strong> (<em>str</em>) – Directory where scripts and results should be put, and from where RevBayes should be called</li>
-<li><strong>prefix</strong> (<em>str</em>) – Prefix will be appended to directory and file names. Defaults to “”.</li>
+<li><strong>a_node_dag_name</strong> (<em>str</em>) – One of the probabilistic graphical model
+nodes, required to set the model object.</li>
+<li><strong>moves_str</strong> (<em>str</em>) – All moves to be carried out during MCMC, as a
+string containing new line characters.</li>
+<li><strong>n_samples</strong> (<em>int</em>) – Number of samples (simulations).</li>
+<li><strong>prefix</strong> (<em>str</em>) – Prefix to preceed MCMC result .log file names.</li>
+<li><strong>results_dir</strong> (<em>str</em>) – String specifying directory where MCMC result
+.log files shall be put by RevBayes.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Tuple containing three lists, with strings to be printed to files (2) and directory names (1)</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>List of strings (one per sample), each will configure</dt><dd><p>RevBayes’ MCMC (moves) and logging inside a .Rev script.</p>
+</dd>
+</dl>
+</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(str)</p>
 </td>
 </tr>
 </tbody>

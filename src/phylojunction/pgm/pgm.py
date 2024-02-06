@@ -694,7 +694,7 @@ class StochasticNodeDAG(NodeDAG):
                 hist_vals = [ty.cast(float, v) for v in self.value]
 
                 # one sample
-                if sample_idx is not None and self._sampling_dn:
+                if sample_idx is not None and self.sampling_dn:
                     plot_node_histogram(axes,
                                         hist_vals,
                                         sample_idx=sample_idx,
