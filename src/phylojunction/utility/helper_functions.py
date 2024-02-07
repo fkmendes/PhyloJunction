@@ -2,6 +2,7 @@ import sys
 import time
 import typing as ty
 import numpy as np  # type: ignore
+import pandas as pd
 from collections import defaultdict
 
 # pj imports
@@ -172,7 +173,7 @@ def is_val_in_interval(
         val: ty.Union[int, float, np.float64],
         lower: ty.Union[int, float, np.float64],
         upper: ty.Union[int, float, np.float64]) -> bool:
-    """Return True/False if numerical value is in (lower, upper]
+    """Return True/False if numerical value is in (lower, upper].
 
     Args:
         val (ty.Union[int, float, np.float64]t): Numerical value
@@ -182,10 +183,37 @@ def is_val_in_interval(
     Returns:
         bool: Whether val is in (lower, upper]
     """
+
     if lower < val and val <= upper:
         return True
     else:
         return False
+
+
+def get_covg(full_cov_df: pd.DataFrame, par_name: str) -> float:
+    """Return coverage from 'within_hpd' column in DataFrame.
+    
+    Args:
+        full_cov_df (pandas.DataFrame): DataFrame object containing
+            column named 'within_hpd' with 0's or 1's for parameters
+            outside and inside an HPD, respectively.
+        par_name (str): Name of the focal parameter for error
+            printing.
+            
+    Returns:
+        float: Bayesian coverage for the parameter
+    """
+
+    if "within_hpd" not in list(full_cov_df):
+        raise ec.MissingColumnName("within_hpd",
+                                   "Could not compute coverage for " + \
+                                    par_name)
+
+    int_list_in_phd = full_cov_df.loc[:, 'within_hpd']
+
+    return \
+        float(sum(i for i in int_list_in_phd)) \
+            / float(int_list_in_phd.size)
 
 
 def symmetric_difference(

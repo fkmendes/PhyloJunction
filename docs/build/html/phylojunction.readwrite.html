@@ -94,6 +94,11 @@ read</td>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.is_tsv">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">is_tsv</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.is_tsv" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.parse_cli_str_write_fig">
 <code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">parse_cli_str_write_fig</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">str_write_fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.parse_cli_str_write_fig" title="Permalink to this definition"></a></dt>
 <dd><p>Parse command-line string argument for generating node plots.</p>
@@ -114,22 +119,30 @@ interface -f parameter (e.g., ‘tr;0-10’)</td>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_csv_into_dataframe">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_csv_into_dataframe</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_csv_into_dataframe" title="Permalink to this definition"></a></dt>
-<dd><p>Read .csv file into a pandas DataFrame.</p>
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_csv_tsv_into_dataframe">
+<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_csv_tsv_into_dataframe</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">is_file_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_csv_tsv_into_dataframe" title="Permalink to this definition"></a></dt>
+<dd><p>Read .csv/.tsv file into a pandas DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
-read</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>pandas DataFrame object (empty DataFrame if not</dt><dd>CSV)</dd>
-</dl>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
+read</li>
+<li><strong>is_csv</strong> (<em>bool</em>) – Flag specifying if file is .csv (otherwise it is)
+a .tsv.</li>
+</ul>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>pandas DataFrame object (empty DataFrame if not</dt><dd><p>CSV nor TSV)</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -208,250 +221,8 @@ read</td>
 </dd></dl>
 
 </div>
-<div class="section" id="module-phylojunction.readwrite.pj_write">
-<span id="phylojunction-readwrite-pj-write-module"></span><h2>phylojunction.readwrite.pj_write module<a class="headerlink" href="#module-phylojunction.readwrite.pj_write" title="Permalink to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.dump_pgm_data">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">dump_pgm_data</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dir_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em><span class="n"><span class="pre">write_nex_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.dump_pgm_data" title="Permalink to this definition"></a></dt>
-<dd><p>Write stochastic-node sampled values in specified directory</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dir_string</strong> (<em>str</em>) – Where to save the files to be written</li>
-<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object whose sampled
-values we are extracting and writing to file.</li>
-<li><strong>prefix</strong> (<em>str</em>) – String to preceed file names</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.dump_serialized_pgm">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">dump_serialized_pgm</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">cmd_log_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em><span class="n"><span class="pre">to_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.dump_serialized_pgm" title="Permalink to this definition"></a></dt>
-<dd><p>Write serialized DAG in specified directory.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>file_name</strong> (<em>str</em>) – Serialized file name</li>
-<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object to be serialized
-and saved.</li>
-<li><strong>prefix</strong> (<em>str</em>) – String to preceed file name.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.get_write_inference_rev_scripts">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">get_write_inference_rev_scripts</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">all_sims_model_spec_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">all_sims_mcmc_logging_spec_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">dir_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em><span class="n"><span class="pre">write2file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.get_write_inference_rev_scripts" title="Permalink to this definition"></a></dt>
-<dd><p>Get and/or write full inference .Rev scripts</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>all_sims_model_spec_list</strong> (<em>str</em>) – List of strings specifying
-just the model part of a .Rev script, one element per simulation</li>
-<li><strong>all_sims_mcmc_logging_spec_list</strong> (<em>str</em>) – List of strings
-specifying just the MCMC and logging part of a .Rev script,
-one element per simulation</li>
-<li><strong>dir_list</strong> (<em>str</em>) – List of three string specifying directories
-(inference root, scripts, results)</li>
-<li><strong>prefix</strong> (<em>str</em>) – String prefix to place before the name of files being
-written</li>
-<li><strong>write2file</strong> (<em>bool</em>) – If ‘True’, function writes to file.
-Defaults to ‘False’.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>A list of full .Rev script string specifications,</dt><dd><p>one per simulation</p>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of str(s)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.initialize_scalar_dataframe">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">initialize_scalar_dataframe</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">summaries_avg_over_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.initialize_scalar_dataframe" title="Permalink to this definition"></a></dt>
-<dd><p>_summary_</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sample_size</strong> (<em>int</em>) – Number of samples (i.e., independent full
-model simulations)</li>
-<li><strong>n_repl</strong> (<em>int</em><em>, </em><em>optional</em>) – How many times the scalar variable
-is replicated. Defaults to 1.</li>
-<li><strong>summaries_avg_over_repl</strong> (<em>bool</em><em>, </em><em>optional</em>) – Dataframe will hold
-statistics (avg., st. dev.) summarized over replicates.
-Defaults to False.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DataFrame with certain columns holding 0 or 0.0 values</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.initialize_tree_dataframe">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">initialize_tree_dataframe</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em><span class="n"><span class="pre">summaries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em><span class="n"><span class="pre">summaries_avg_over_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.initialize_tree_dataframe" title="Permalink to this definition"></a></dt>
-<dd><p>Initialize pandas DataFrame to hold tree information</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sample_size</strong> (<em>int</em>) – Number of samples (i.e., independent full
-model simulations)</li>
-<li><strong>n_repl</strong> (<em>int</em><em>, </em><em>optional</em>) – How many times the tree is replicated.
-Defaults to 1.</li>
-<li><strong>summaries</strong> (<em>bool</em><em>, </em><em>optional</em>) – Dataframe will hold individual-tree
-statistics. Defaults to False.</li>
-<li><strong>summaries_avg_over_repl</strong> (<em>bool</em><em>, </em><em>optional</em>) – Dataframe will hold
-statistics summarized over replicates. Defaults to False.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>DataFrame with certain columns holding 0 or</dt><dd><p>0.0 values</p>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.prep_data_df">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">prep_data_df</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">write_nex_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_data_df" title="Permalink to this definition"></a></dt>
-<dd><p>Return two pandas DataFrame’s, with scalar and tree random variables.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object holding the
-simulated data to be tabulated.</li>
-<li><strong>write_nex_states</strong> (<em>bool</em>) – Whether to write .nex file with states</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>Tuple with two lists as elements, one with file-suffix</dt><dd><p>strings, another with pandas.DataFrame’s</p>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(tuple)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.prep_data_filepaths_dfs">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">prep_data_filepaths_dfs</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">scalar_output_stash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">tree_output_stash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_data_filepaths_dfs" title="Permalink to this definition"></a></dt>
-<dd><p>Prepare list of file paths and list of pandas DataFrames</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>(</strong><strong>ty.List</strong><strong>[</strong><strong>ty.Union</strong><strong>[</strong><strong>pd.DataFrame</strong> (<em>scalar_output_stash</em>) – ty.Dict[int, pd.DataFrame]]]): List of either pandas’
-dataframes, or dictionaries with number of replicates
-as keys, and pandas’ dataframes as values.
-These contain scalar simulated data.</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>:param<span class="classifier">ty.Dict[int, pd.DataFrame]]]): List of either pandas’</span></dt><dd>dataframes, or dictionaries with number of replicates
-as keys, and pandas’ dataframes as values.
-These contain scalar simulated data.</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>tree_output_stash</strong> (<em>ty.List</em><em>[</em><em>ty.Dict</em><em>[</em><em>str</em><em>, </em><em>pd.DataFrame</em><em>]</em><em>]</em>) – List of dictionaries with tree node names as keys, and
-pandas’ dataframes as values.
-These contains tree simulated data.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of filepath strings and pandas’ dataframes to be written
-to disk</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_data_df">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">write_data_df</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">outfile_handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IO</span></span></em>, <em><span class="n"><span class="pre">data_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_data_df" title="Permalink to this definition"></a></dt>
-<dd><p>Write a pandas DataFrame to output file stream</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>outfile_handle</strong> (<em>file</em>) – Output file object to write to</li>
-<li><strong>data_df</strong> (<em>pandas.DataFrame</em>) – A data frame containing random
-variable values to print to file</li>
-<li><strong>format</strong> (<em>str</em>) – Extension for output file</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_fig_to_file">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">write_fig_to_file</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">outfile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">fig_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_fig_to_file" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_str_list">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></code><code class="sig-name descname"><span class="pre">write_str_list</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">outfile_handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IO</span></span></em>, <em><span class="n"><span class="pre">content_string_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_str_list" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<div class="section" id="phylojunction-readwrite-pj-write-module">
+<h2>phylojunction.readwrite.pj_write module<a class="headerlink" href="#phylojunction-readwrite-pj-write-module" title="Permalink to this heading"></a></h2>
 </div>
 <div class="section" id="module-phylojunction.readwrite">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.readwrite" title="Permalink to this heading"></a></h2>

@@ -16,10 +16,10 @@ On this page you will find instructions on how to:
 Requirements and dependencies
 -----------------------------
 
-For the most part, |pj| has been developed and tested on an M1-chip Apple machine (running macOS Big Sur), though it is periodically tested on Linux (Ubuntu).
+For the most part, |pj| has been developed and tested on an M1-chip Apple machine (running macOS Sonoma), though it is periodically tested on Linux (Ubuntu).
 There is no support for Microsoft Windows.
 
-|pj| currently runs under Python 3.9 (support for 3.1X will be added soon) and has various Python library dependencies.
+|pj| currently runs under Python 3.11 and has various Python library dependencies.
 Fortunately those are automatically managed by the pip_ package manager, as shown below.
 
 -------------------------
@@ -61,12 +61,12 @@ The editable install is carried out from |pj|'s root folder, ``PhyloJunction/``,
 
 .. code-block:: bash
 
-    python3.9 -m pip install -e .
+    python3.11 -m pip install -e .
 
 With this command, ``pip`` will place |pj|'s entry-point executables (``pjcli`` and ``pjgui``) into the ``bin/`` directory of wherever you Python 3.9 lives.
-If Python 3.9 was installed with `Homebrew <https://brew.sh/>`_, for example, that could be ``/opt/homebrew/opt/python@3.9/Frameworks/Python.framework/Versions/3.9/bin``.
+If Python 3.11 was installed with `Homebrew <https://brew.sh/>`_, for example, that could be ``/opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/bin``.
 
-The ``-e`` flag tells ``pip`` to do an editable install, which further writes the path to |pj| modules to ``/opt/homebrew/opt/python@3.9/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/__editable__.phylojunction-0.0.1.pth``.
+The ``-e`` flag tells ``pip`` to do an editable install, which further writes the path to |pj| modules to ``/opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/__editable__.phylojunction-0.0.1.pth``.
 
 The last argument ``.`` tells ``pip`` where the local project directory is (where it can find file ``setup.py``).
 
@@ -74,25 +74,25 @@ If file system access is denied, you can add the ``--user`` flag to the installa
 
 .. code-block:: bash
 
-    python3.9 -m pip install --user -e .
+    python3.11 -m pip install --user -e .
 
-Here, ``pip`` will put the executables in a different, standard location, ``/Users/user_name/Library/Python/3.9/bin/``.
-Paths to |pj|'s modules will be written to ``/Users/user_name/Library/Python/3.9/lib/python/site-packages/__editable__.phylojunction-0.0.1.pth``
+Here, ``pip`` will put the executables in a different, standard location, ``/Users/user_name/Library/Python/3.11/bin/``.
+Paths to |pj|'s modules will be written to ``/Users/user_name/Library/Python/3.11/lib/python/site-packages/__editable__.phylojunction-0.0.1.pth``
 (Note that above, ``user_name`` will be whichever **your** user name is.)
 
 A third option that works as an alternative to using the ``--user`` flag is to run the following command:
 
 .. code-block:: bash
 
-    python3.9 -m pip install --prefix ~/.local -e .
+    python3.11 -m pip install --prefix ~/.local -e .
 
 This option works well for those who like to keep software binaries (or symbolic links to them) all in the hidden directory ``~/.local/bin``.
 This command will create ``bin/`` inside ``~/.local`` if it does not exist, and place |pj|'s executables in there.
-Lastly, paths to |pj|'s modules will be written to ``~/.local/lib/python3.9/site-packages/__editable__.phylojunction-0.0.1.pth``
+Lastly, paths to |pj|'s modules will be written to ``~/.local/lib/python3.11/site-packages/__editable__.phylojunction-0.0.1.pth``
 
 .. note::
    After running these commands, do not forget to tell your operating system where to look for |pj|'s executables, ``pjcli`` and ``pjgui``.
-   For example, assuming you installed |pj| with the ``--user`` flag, you can then add path ``/Users/user_name/Library/Python/3.9/bin/`` to your environment ``PATH`` variable.
+   For example, assuming you installed |pj| with the ``--user`` flag, you can then add path ``/Users/user_name/Library/Python/3.11/bin/`` to your environment ``PATH`` variable.
    This variable is normally defined in a hidden file in your root directory that gets executed by the Terminal app.
    On macOS, that file is ``~/.bash_profile`` (depending on your setup, you could also use ``~/.bashrc``).
    
@@ -100,7 +100,7 @@ Lastly, paths to |pj|'s modules will be written to ``~/.local/lib/python3.9/site
 
    .. code-block:: bash
         
-        PATH=$PATH:/Users/user_name/Library/Python/3.9/bin/
+        PATH=$PATH:/Users/user_name/Library/Python/3.11/bin/
         export PATH
 
    Should you still want to use your current, active Terminal session, you must source ``~/.bash_profile`` after saving and closing that file.

@@ -298,11 +298,19 @@ The table should have been shown in the top middle window.
 
     **Figure 5.** |pj|'s GUI "Coverage" tab.
 
-To inspect coverage, select "r_b" from the top-left menu "Non-det. nodes", and then click "Draw".
+To inspect coverage, select "r_b" from the top-left menu "Non-det. nodes", and then click on "Draw".
 The x- and y-axes in the plot (the main panel in Fig. 5) show to the true simulated values and the posterior means, respectively.
 Vertical bars denote the 95%-HPDs over :math:`r_b`, with blue bars (95 of them) indicating intervals containing the true value, and red bars (5 of them) not containing it.
-In other words, one can deduce from the graph that coverage for :math:`r_b` was 0.95 (though this is also shown in the top-right panel); this coverage is adequate and indicative of a correctly implemented model.
+In other words, one can deduce from the graph that coverage for :math:`r_b` was 0.95 (though this is also shown in the top-right panel; Fig. 5); this coverage is adequate and indicative of a correctly implemented model.
 
+In addition to loading a .csv file with pre-calculated posterior distribution summaries, users can also tell |pj| the path of a directory containing MCMC output .log files.
+After loading the same model as before and clicking on "r_b" in the top-left menu, click on "Directory to .log's (...)", and choose `examples/coverage_files/logfiles/`.
+If in the .log files the node being examined were to be named something different from "r_b", users can tell |pj| what to look for by entering the alternative name in "Parameter name in .log".
+For example, one could type "r_b" in "Parameter name in .log" (in this case it is not necessary).
+
+Now click on "Draw".
+An almost identical plot should have been produced, and coverage is again appropriate (0.94).
+(The difference of 1 in coverage has to do with the behavior of different libraries when computing HPD boundaries.)
 
 ----------------------------
 Command-line interface (CLI)

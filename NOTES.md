@@ -167,7 +167,7 @@ This is an attractive option if you normally already have `~/.local/bin` as part
 
 Add a shell variable for PYTHONPATH to your bash profile, for example
 ```
-PYTHONPATH="/Users/mlandis/projects/PhyloJunction/src"
+PYTHONPATH="/Users/[username]/projects/PhyloJunction/src"
 ```
 (Note: the file path associated with this `PYTHONPATH` variable ends with the `src` directory, not `src/phylojunction` -- i.e., irrespective of "env" variable in your `launch.json` file in VS Code).
 

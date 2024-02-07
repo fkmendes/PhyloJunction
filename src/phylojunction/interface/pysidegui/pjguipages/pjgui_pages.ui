@@ -1043,7 +1043,7 @@ QPushButton:pressed{
       <x>10</x>
       <y>10</y>
       <width>963</width>
-      <height>681</height>
+      <height>684</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="coverage_page_grid_layout">
@@ -1109,15 +1109,50 @@ QPushButton:pressed{
 }</string>
            </property>
            <property name="text">
-            <string>Read .log file (...)</string>
+            <string>Directory to .log's (...)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="node_name_label">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Parameter name in .log</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="log_node_name_lineedit">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>0</width>
+             <height>24</height>
+            </size>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QGridLayout" name="cov_csv_coverage_grid_layout">
-         <item row="0" column="0" alignment="Qt::AlignHCenter">
+        <layout class="QGridLayout" name="cov_grid_layout">
+         <item row="1" column="0">
           <widget class="QTextEdit" name="coverage_csv_textbox">
            <property name="minimumSize">
             <size>
@@ -1142,7 +1177,7 @@ font: 11pt &quot;Courier&quot;;</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" alignment="Qt::AlignHCenter">
+         <item row="1" column="1">
           <widget class="QListWidget" name="coverage_textbox">
            <property name="minimumSize">
             <size>
@@ -1163,9 +1198,16 @@ border-radius: 2px;</string>
            </property>
           </widget>
          </item>
+         <item row="0" column="1" alignment="Qt::AlignHCenter">
+          <widget class="QLabel" name="coverage_label">
+           <property name="text">
+            <string>Coverage</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
-       <item alignment="Qt::AlignHCenter">
+       <item>
         <widget class="MatplotlibWidget" name="coverage_page_matplotlib_widget" native="true">
          <property name="minimumSize">
           <size>

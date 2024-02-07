@@ -57,8 +57,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#graphical-user-interface-gui">Graphical user interface (GUI)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#compare">Compare</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#coverage">Coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implementation-comparison">Implementation comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coverage-validation">Coverage validation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#command-line-interface-cli">Command-line interface (CLI)</a></li>
@@ -110,8 +110,8 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#graphical-user-interface-gui" id="id18">Graphical user interface (GUI)</a><ul>
-<li><a class="reference internal" href="#compare" id="id19">Compare</a></li>
-<li><a class="reference internal" href="#coverage" id="id20">Coverage</a></li>
+<li><a class="reference internal" href="#implementation-comparison" id="id19">Implementation comparison</a></li>
+<li><a class="reference internal" href="#coverage-validation" id="id20">Coverage validation</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#command-line-interface-cli" id="id21">Command-line interface (CLI)</a></li>
@@ -290,8 +290,8 @@ Errors will be thrown only if such nodes are used as input for a function, and t
 On the main tab (“Model”), one can navigate the DAG being built and see its node values as a plot, text string, or both (Fig. 3, numbers 3 and 4).
 Users can also cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
 Node-value summaries include the mean and standard deviation for scalar variables, and statistics like the root age and number of tips for phylogenetic trees.</p>
-<div class="section" id="compare">
-<h3>Compare<a class="headerlink" href="#compare" title="Permalink to this heading"></a></h3>
+<div class="section" id="implementation-comparison">
+<h3>Implementation comparison<a class="headerlink" href="#implementation-comparison" title="Permalink to this heading"></a></h3>
 <p>The “Compare” tab (under “Model”) streamlines the comparison of PhyloJunction’s simulations with those from an external simulator, with respect to a summary statistic.
 There are two main moments when carrying out this type of comparison may be useful or required.
 The first is when a model is being first implemented in PhyloJunction, and there happens to exist an independent implementation elsewhere.
@@ -326,8 +326,8 @@ This file contains tree summary statistics presumably produced by a different ex
 Click “Draw”.
 Again, the produced graph suggests the model implemented in both simulators behave similarly.</p>
 </div>
-<div class="section" id="coverage">
-<h3>Coverage<a class="headerlink" href="#coverage" title="Permalink to this heading"></a></h3>
+<div class="section" id="coverage-validation">
+<h3>Coverage validation<a class="headerlink" href="#coverage-validation" title="Permalink to this heading"></a></h3>
 <p>The “Coverage” tab was developed for automating coverage validation, a procedure for verifying the correctness of a model implemented within a Bayesian framework.
 Coverage validation in fact validates multiple things simultaneously: the generating (simulator) and inferential implementations of the model, and any machinery used in inference (e.g., MCMC proposals).
 For the sake of clarity and conciseness, we will assume in this section that we are validating a model’s inferential engine, and that all other involved code works as intended.</p>
@@ -346,10 +346,17 @@ The table should have been shown in the top middle window.</p>
 <img alt="../_images/pjgui_coverage.png" src="../_images/pjgui_coverage.png" />
 <p class="caption"><span class="caption-text"><strong>Figure 5.</strong> PhyloJunction’s GUI “Coverage” tab.</span><a class="headerlink" href="#id11" title="Permalink to this image"></a></p>
 </div>
-<p>To inspect coverage, select “r_b” from the top-left menu “Non-det. nodes”, and then click “Draw”.
+<p>To inspect coverage, select “r_b” from the top-left menu “Non-det. nodes”, and then click on “Draw”.
 The x- and y-axes in the plot (the main panel in Fig. 5) show to the true simulated values and the posterior means, respectively.
 Vertical bars denote the 95%-HPDs over <span class="math notranslate nohighlight">\(r_b\)</span>, with blue bars (95 of them) indicating intervals containing the true value, and red bars (5 of them) not containing it.
-In other words, one can deduce from the graph that coverage for <span class="math notranslate nohighlight">\(r_b\)</span> was 0.95 (though this is also shown in the top-right panel); this coverage is adequate and indicative of a correctly implemented model.</p>
+In other words, one can deduce from the graph that coverage for <span class="math notranslate nohighlight">\(r_b\)</span> was 0.95 (though this is also shown in the top-right panel; Fig. 5); this coverage is adequate and indicative of a correctly implemented model.</p>
+<p>In addition to loading a .csv file with pre-calculated posterior distribution summaries, users can also tell PhyloJunction the path of a directory containing MCMC output .log files.
+After loading the same model as before and clicking on “r_b” in the top-left menu, click on “Directory to .log’s (…)”, and choose <cite>examples/coverage_files/logfiles/</cite>.
+If in the .log files the node being examined were to be named something different from “r_b”, users can tell PhyloJunction what to look for by entering the alternative name in “Parameter name in .log”.
+For example, one could type “r_b” in “Parameter name in .log” (in this case it is not necessary).</p>
+<p>Now click on “Draw”.
+An almost identical plot should have been produced, and coverage is again appropriate (0.94).
+(The difference of 1 in coverage has to do with the behavior of different libraries when computing HPD boundaries.)</p>
 </div>
 </div>
 <div class="section" id="command-line-interface-cli">

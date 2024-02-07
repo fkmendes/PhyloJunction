@@ -57,23 +57,33 @@ def read_serialized_pgm(fp_string: str) -> pgm.DirectedAcyclicGraph:
     return dag_obj
 
 
-def read_csv_into_dataframe(fp_string: str) -> pd.DataFrame:
-    """Read .csv file into a pandas DataFrame.
+def read_csv_tsv_into_dataframe(fp_string: str, is_file_csv: bool=True) -> pd.DataFrame:
+    """Read .csv/.tsv file into a pandas DataFrame.
 
     Args:
         fp_string (str): String containing file path to text file being
             read
+        is_csv (bool): Flag specifying if file is .csv (otherwise it is)
+            a .tsv.
 
     Returns:
         pd.DataFrame: pandas DataFrame object (empty DataFrame if not
-            CSV)
+            CSV nor TSV)
     """
 
-    if is_csv(fp_string):
-        return pd.read_csv(fp_string)
+    if is_file_csv:
+        if is_csv(fp_string):
+            return pd.read_csv(fp_string)
 
+        else:
+            return pd.DataFrame()
+        
     else:
-        return pd.DataFrame()
+        if is_tsv(fp_string):
+            return pd.read_csv(fp_string, delimiter="\t")
+
+        else:
+            return pd.DataFrame()    
 
 
 def is_csv(fp_string: str) -> bool:
@@ -109,6 +119,28 @@ def is_csv(fp_string: str) -> bool:
         # could not get a csv dialect -> probably not a csv.
         print(("Inside readwrite.pj_read.is_csv():\n    ERROR: Attempted to "
                "read CSV file, but it does not seem to be in CSV format."))
+
+        return False
+
+
+def is_tsv(fp_string: str) -> bool:
+    try:
+        with open(fp_string, "r") as file_in:
+            reader = csv.reader(file_in, delimiter="\t")
+            headers = next(reader)
+            column_count = len(headers)
+            
+            if column_count == 1:
+                raise ValueError("Column count is 1")
+            
+            for line in reader:
+                if len(line) != column_count:
+                    raise ValueError("Column count was variable")
+                
+            return True
+
+    except ValueError:
+        print(f"file \"{fp_string}\" is probably not a .tsv.")
 
         return False
 

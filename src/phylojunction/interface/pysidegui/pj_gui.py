@@ -4,6 +4,8 @@ import re
 import typing as ty
 import numpy as np
 import pandas as pd
+import arviz as az  # type: ignore
+from natsort import natsorted  # type: ignore
 from tabulate import tabulate  # type: ignore
 from PySide6.QtWidgets import \
     QApplication, QMainWindow, QPushButton, QFileDialog
@@ -19,6 +21,8 @@ import phylojunction.plotting.pj_organize as pjorg
 import phylojunction.plotting.pj_draw as pjdraw
 import phylojunction.readwrite.pj_read as pjread
 import phylojunction.readwrite.pj_write as pjwrite
+import phylojunction.utility.helper_functions as pjh
+import phylojunction.utility.exception_classes as ec
 import phylojunction.data.tree as pjdt
 
 __author__ = "Fabio K. Mendes"
@@ -239,6 +243,7 @@ class GUIMainWindow(QMainWindow):
         # Coverage page #
         #################
         self.ui.ui_pages.read_hpd_csv_button.clicked.connect(self.read_coverage_hpd_csv)
+        self.ui.ui_pages.read_logfile_button.clicked.connect(self.read_log_files_dir_build_hpd)
         self.ui.ui_pages.coverage_node_list.itemClicked.connect(self.do_selected_node_coverage_page)
 
         # side-effect: sets xticklabels in
@@ -802,7 +807,7 @@ class GUIMainWindow(QMainWindow):
 
             try:
                 self.hpd_df = \
-                    pjread.read_csv_into_dataframe(coverage_hpd_csv_fp)
+                    pjread.read_csv_tsv_into_dataframe(coverage_hpd_csv_fp)
 
                 coverage_df_str = \
                     tabulate(
@@ -817,6 +822,64 @@ class GUIMainWindow(QMainWindow):
                 print("Could not load .csv file into pandas DataFrame. Later write an Exception for this")
                 print("An error occurred: ", type(e).__name__)
                 pass
+
+        else:
+            pass  # event canceled by user
+
+    def read_log_files_dir_build_hpd(self):
+        
+        # read variable name #
+        log_par_name = self.ui.ui_pages.log_node_name_lineedit.text()
+        if not log_par_name:
+            # try selected node's name #
+            active_item = self.ui.ui_pages.coverage_node_list.currentItem()
+
+            if active_item:
+                log_par_name = active_item.text()
+        
+        # read directory path #
+        logs_dir = \
+            QFileDialog.getExistingDirectory(caption="Read .log directory",
+                                             dir=".")
+        
+        if not logs_dir.endswith("/"):
+            logs_dir += "/"
+
+        if os.path.isdir(logs_dir):
+            summary_dict = {"posterior_mean": [],
+                            "lower_95hpd": [],
+                            "higher_95hpd": []}
+            log_files = natsorted(
+                [f for f in os.listdir(logs_dir) if f.endswith(".log")])
+            n_logs = len(log_files)
+
+            if n_logs <= 1:
+                raise ec.PJIOFileDoesNotExistError("read_log_files_dir_build_hpd",
+                                                   ".log files inside " + logs_dir)
+            
+            for lf in log_files:
+                lf_fp = logs_dir + lf
+                log_df = pjread.read_csv_tsv_into_dataframe(lf_fp, is_file_csv=False)
+
+                # check if log_par_name is in the .log file
+                if log_par_name not in list(log_df.columns.values):
+                    raise ec.MissingColumnName(log_par_name,
+                                               "Could not parse .log file")
+
+                mcmc_samples_np_arr = log_df[log_par_name].to_numpy()
+                posterior_mean = mcmc_samples_np_arr.mean()
+                lower_95hpd, higher_95hpd = az.hdi(mcmc_samples_np_arr, hdi_prob=.95)
+
+                summary_dict["posterior_mean"].append(posterior_mean)
+                summary_dict["lower_95hpd"].append(lower_95hpd)
+                summary_dict["higher_95hpd"].append(higher_95hpd)
+                
+                # debugging
+                # print(list(log_df.columns.values))
+                # print(log_df[log_par_name])
+
+            self.hpd_df = pd.DataFrame(summary_dict)
+            # the rest is carried out by self.draw_cov()
 
         else:
             pass  # event canceled by user
@@ -1042,6 +1105,8 @@ class GUIMainWindow(QMainWindow):
                 # debugging
                 # print(tabulate(full_cov_df, full_cov_df.head(), tablefmt="plain", showindex=False).lstrip())
 
+                covg = pjh.get_covg(full_cov_df, selected_node_name)
+
                 # something went wrong, we clear validation figure
                 if full_cov_df.empty:
                     pass
@@ -1054,12 +1119,22 @@ class GUIMainWindow(QMainWindow):
                     fig_obj = self.ui.ui_pages.coverage_page_matplotlib_widget.fig
                     fig_axes = self.ui.ui_pages.coverage_page_matplotlib_widget.axes
 
+                    # print bars!
                     pjdraw.plot_intervals(fig_obj,
                                           fig_axes,
                                           full_cov_df,
                                           thing_to_validate,
                                           "posterior_mean",
                                           ylab="Posterior mean")
+                    
+                    # print coverage to top-right window if not already there
+                    covg_str = selected_node_name + "\t" + str(covg)
+                    qlist_widget = self.ui.ui_pages.coverage_textbox
+                    item_str_list = [qlist_widget.item(i).text() \
+                                     for i in range(qlist_widget.count())]
+
+                    if covg_str not in item_str_list:
+                        qlist_widget.addItem(selected_node_name + "\t" + str(covg))
 
     #####################
     # Events related to #

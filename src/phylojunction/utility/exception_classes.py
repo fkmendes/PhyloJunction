@@ -782,7 +782,18 @@ class GenerateFailError(Exception):
         return self.message
 
 
-# CLI exceptions #
+class MissingColumnName(Exception):
+    message: str
+
+    def __init__(self, col_name: str, message: str) -> None:
+        self.message = "ERROR: " + message + ". " + col_name + \
+            " was not found in DataFrame."
+
+    def __str__(self) -> str:
+        return self.message
+
+
+# CLI/GUI exceptions #
 class PJCLIInvalidInputError(Exception):
     par_name: str
     message: str
@@ -812,7 +823,7 @@ class PJCLISampleOutOfRangeError(Exception):
 class PJIOFileDoesNotExistError(Exception):
     def __init__(self, fn_name: str, file_path: str) -> None:
         self.message = "ERROR: When calling " + fn_name + ", could not " \
-            + "find file " + file_path + "."
+            + "find file/directory " + file_path + "."
 
         super().__init__(self.message)
 
