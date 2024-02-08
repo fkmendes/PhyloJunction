@@ -793,15 +793,15 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/data/test_tree_annot_with_sas_from_origin.py
+    # $ python3 tests/data/test_tree_annot_with_sas_from_origin.py
     # 
     # or
     #
-    # $ python3.9 -m tests.data.test_tree_annot_with_sas_from_origin
+    # $ python3 -m tests.data.test_tree_annot_with_sas_from_origin
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.data.test_tree_annot_with_sas_from_origin.TestAnnotateTreeWithSAsFromOrigin.test_node_counting_oneSA_no_spn_survives_max_age
+    # $ python3 -m unittest tests.data.test_tree_annot_with_sas_from_origin.TestAnnotateTreeWithSAsFromOrigin.test_node_counting_oneSA_no_spn_survives_max_age
 
     unittest.main()
 

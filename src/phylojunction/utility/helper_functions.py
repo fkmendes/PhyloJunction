@@ -236,12 +236,12 @@ def symmetric_difference(
 
 if __name__ == "__main__":
     # can be called from utility/
-    # $ python3.9 helper_functions.py
+    # $ python3 helper_functions.py
     #
     # can also be called from phylojunction/
-    # $ python3.9 utility/helper_functions.py
+    # $ python3 utility/helper_functions.py
     # or
-    # $ python3.9 -m utility.helper_functions
+    # $ python3 -m utility.helper_functions
     #
     # can also be called from VS Code, if open folder is phylojuction/
 

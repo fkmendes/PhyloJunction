@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>phylojunction.interface.grammar package &mdash; PhyloJunction 0.0.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/pj_custom.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="phylojunction.pgm package" href="phylojunction.pgm.html" />
+    <link rel="prev" title="phylojunction.interface.cmdbox package" href="phylojunction.interface.cmdbox.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +31,44 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Library API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="phylojunction.html">phylojunction package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="phylojunction.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html">phylojunction.calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html">phylojunction.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html">phylojunction.distribution package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.inference.html">phylojunction.inference package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="phylojunction.interface.html">phylojunction.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html">phylojunction.pgm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.plotting.html">phylojunction.plotting package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.readwrite.html">phylojunction.readwrite package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html">phylojunction.utility package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.html#module-phylojunction">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -56,8 +84,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>phylojunction.interface.grammar package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">phylojunction</a></li>
+          <li class="breadcrumb-item"><a href="phylojunction.html">phylojunction package</a></li>
+          <li class="breadcrumb-item"><a href="phylojunction.interface.html">phylojunction.interface package</a></li>
+      <li class="breadcrumb-item active">phylojunction.interface.grammar package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/phylojunction.interface.grammar.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -67,98 +98,346 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="phylojunction-interface-grammar-package">
-<h1>phylojunction.interface.grammar package<a class="headerlink" href="#phylojunction-interface-grammar-package" title="Permalink to this heading"></a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="phylojunction-interface-grammar-det-fn-discrete-sse-module">
-<h2>phylojunction.interface.grammar.det_fn_discrete_sse module<a class="headerlink" href="#phylojunction-interface-grammar-det-fn-discrete-sse-module" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="module-phylojunction.interface.grammar.det_fn_grammar">
-<span id="phylojunction-interface-grammar-det-fn-grammar-module"></span><h2>phylojunction.interface.grammar.det_fn_grammar module<a class="headerlink" href="#module-phylojunction.interface.grammar.det_fn_grammar" title="Permalink to this heading"></a></h2>
+  <section id="phylojunction-interface-grammar-package">
+<h1>phylojunction.interface.grammar package<a class="headerlink" href="#phylojunction-interface-grammar-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.interface.grammar.ct_fn_grammar">
+<span id="phylojunction-interface-grammar-ct-fn-grammar-module"></span><h2>phylojunction.interface.grammar.ct_fn_grammar module<a class="headerlink" href="#module-phylojunction.interface.grammar.ct_fn_grammar" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.ct_fn_grammar.</span></span><span class="sig-name descname"><span class="pre">PJCtFnGrammar</span></span><a class="headerlink" href="#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.create_ct_fn_obj">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_ct_fn_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_fn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn"><span class="pre">ConstantFn</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.create_ct_fn_obj" title="Link to this definition"></a></dt>
+<dd><p>Build and return constant function object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ct_fn_id</strong> (<em>str</em>) – Name of constant function to being called</p></li>
+<li><p><strong>ct_fn_param_dict</strong> (<em>dict</em>) – Dictionary containing constant
+function parameter names (str) as keys and lists (of either
+strings or NodeDAGs) as values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>one of a variety of objects to be stored within a clamped
+stochastic node</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.ct_fn_grammar_dict">
+<span class="sig-name descname"><span class="pre">ct_fn_grammar_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'read_tree':</span> <span class="pre">{'file_path',</span> <span class="pre">'n',</span> <span class="pre">'node_name_attr',</span> <span class="pre">'nr',</span> <span class="pre">'string'}}</span></em><a class="headerlink" href="#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.ct_fn_grammar_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.grammar_check">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grammar_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_fn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.grammar_check" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.init_return_ann_tr">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_ann_tr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn"><span class="pre">ConstantFn</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.init_return_ann_tr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.interface.grammar.ct_fn_treereader_makers">
+<span id="phylojunction-interface-grammar-ct-fn-treereader-makers-module"></span><h2>phylojunction.interface.grammar.ct_fn_treereader_makers module<a class="headerlink" href="#module-phylojunction.interface.grammar.ct_fn_treereader_makers" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.ct_fn_treereader_makers.make_tree_reader">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.ct_fn_treereader_makers.</span></span><span class="sig-name descname"><span class="pre">make_tree_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ConstantFn" title="phylojunction.pgm.pgm.ConstantFn"><span class="pre">ConstantFn</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.ct_fn_treereader_makers.make_tree_reader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-phylojunction.interface.grammar.det_fn_discrete_sse_makers">
+<span id="phylojunction-interface-grammar-det-fn-discrete-sse-makers-module"></span><h2>phylojunction.interface.grammar.det_fn_discrete_sse_makers module<a class="headerlink" href="#module-phylojunction.interface.grammar.det_fn_discrete_sse_makers" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_pgmnodes">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">extract_value_from_pgmnodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_node_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_pgmnodes" title="Link to this definition"></a></dt>
+<dd><p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pgm_node_list</strong> (<em>NodeDM</em>) – List of NodeDAG objects (typing includes str because of type-safety)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ec.NoPlatingAllowedError</strong> – _description_</p></li>
+<li><p><strong>ec.StateDependentParameterMisspec</strong> – _description_</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_description_</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ty.List[ty.List[float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentProbability">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">make_DiscreteStateDependentProbability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><span class="pre">DiscreteStateDependentProbability</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentProbability" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Create and return DiscreteStateDependentProbability as prompted by</dt><dd><p>deterministic function call</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>det_fn_name</strong> (<em>str</em>) – Name of the function being called</p></li>
+<li><p><strong>det_fn_param_dict</strong> (<em>dict</em>) – dictionary containing parameter
+strings as keys, and lists of either strings or NodeDAGs
+as value(s)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Object holding the info about a discrete state-dependent probability</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentRate">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">make_DiscreteStateDependentRate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate"><span class="pre">DiscreteStateDependentRate</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentRate" title="Link to this definition"></a></dt>
+<dd><p>Create and return DiscreteStateDependentRate as prompted by
+deterministic function call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>det_fn_name</strong> (<em>str</em>) – Name of the function being called</p></li>
+<li><p><strong>det_fn_param_dict</strong> (<em>dict</em>) – dictionary containing parameter
+strings as keys, and lists of either strings or NodeDAGs
+as value(s)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Object holding the info about a discrete state-dependent rate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_SSEStash">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">make_SSEStash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_SSEStash" title="Link to this definition"></a></dt>
+<dd><p>Create SSEStash as prompted by deterministic function call</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>det_fn_name</strong> (<em>str</em>) – Name of the function being called</p></li>
+<li><p><strong>det_fn_param_dict</strong> (<em>dict</em>) – dictionary containing parameter
+strings as keys, and lists of either strings or NodeDAGs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Object holding all discrete state-dependent rates and</dt><dd><p>probabilities</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.interface.grammar.det_fn_grammar">
+<span id="phylojunction-interface-grammar-det-fn-grammar-module"></span><h2>phylojunction.interface.grammar.det_fn_grammar module<a class="headerlink" href="#module-phylojunction.interface.grammar.det_fn_grammar" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><code class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_grammar.</span></code><code class="sig-name descname"><span class="pre">PJDetFnGrammar</span></code><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_grammar.</span></span><span class="sig-name descname"><span class="pre">PJDetFnGrammar</span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.create_det_fn_obj">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">create_det_fn_obj</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">det_fn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate"><span class="pre">DiscreteStateDependentRate</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><span class="pre">DiscreteStateDependentProbability</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.create_det_fn_obj" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_det_fn_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate"><span class="pre">DiscreteStateDependentRate</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><span class="pre">DiscreteStateDependentProbability</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.create_det_fn_obj" title="Link to this definition"></a></dt>
 <dd><p>Build and return deterministic function object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>det_fn_id</strong> (<em>str</em>) – Name of deterministic function being called</li>
-<li><strong>det_fn_param_dict</strong> (<em>dict</em>) – Dictionary containing deterministic
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>det_fn_id</strong> (<em>str</em>) – Name of deterministic function being called</p></li>
+<li><p><strong>det_fn_param_dict</strong> (<em>dict</em>) – Dictionary containing deterministic
 function parameter names (str) as keys and lists (of either
-strings or NodeDAGs) as values</li>
+strings or NodeDAGs) as values</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
 <dt>one of a variety of objects containing information for</dt><dd><p>later building a sampling distribution</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Object</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Object</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.det_fn_grammar_dict">
-<code class="sig-name descname"><span class="pre">det_fn_grammar_dict</span></code><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'map_attribute':</span> <span class="pre">{'attr_name',</span> <span class="pre">'maps_file_path',</span> <span class="pre">'tree'},</span> <span class="pre">'sse_prob':</span> <span class="pre">{'epoch',</span> <span class="pre">'name',</span> <span class="pre">'state',</span> <span class="pre">'value'},</span> <span class="pre">'sse_rate':</span> <span class="pre">{'epoch',</span> <span class="pre">'event',</span> <span class="pre">'name',</span> <span class="pre">'states',</span> <span class="pre">'value'},</span> <span class="pre">'sse_stash':</span> <span class="pre">{'epoch_age_ends',</span> <span class="pre">'flat_prob_mat',</span> <span class="pre">'flat_rate_mat',</span> <span class="pre">'n_epochs',</span> <span class="pre">'n_states',</span> <span class="pre">'seed_age'}}</span></em><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.det_fn_grammar_dict" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">det_fn_grammar_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'map_attribute':</span> <span class="pre">{'attr_name',</span> <span class="pre">'maps_file_path',</span> <span class="pre">'tree'},</span> <span class="pre">'sse_prob':</span> <span class="pre">{'epoch',</span> <span class="pre">'name',</span> <span class="pre">'state',</span> <span class="pre">'value'},</span> <span class="pre">'sse_rate':</span> <span class="pre">{'epoch',</span> <span class="pre">'event',</span> <span class="pre">'name',</span> <span class="pre">'states',</span> <span class="pre">'value'},</span> <span class="pre">'sse_stash':</span> <span class="pre">{'epoch_age_ends',</span> <span class="pre">'flat_prob_mat',</span> <span class="pre">'flat_rate_mat',</span> <span class="pre">'n_epochs',</span> <span class="pre">'n_states',</span> <span class="pre">'seed_age'}}</span></em><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.det_fn_grammar_dict" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.grammar_check">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">grammar_check</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">det_fn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">fn_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.grammar_check" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grammar_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.grammar_check" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_sse_stash">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">init_return_sse_stash</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_sse_stash" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_sse_stash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash" title="phylojunction.calculation.discrete_sse.SSEStash"><span class="pre">SSEStash</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_sse_stash" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_prob">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">init_return_state_dep_prob</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><span class="pre">DiscreteStateDependentProbability</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_prob" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_state_dep_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><span class="pre">DiscreteStateDependentProbability</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_prob" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_rate">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">init_return_state_dep_rate</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate"><span class="pre">DiscreteStateDependentRate</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_rate" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_state_dep_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentRate"><span class="pre">DiscreteStateDependentRate</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_rate" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_tree_mapped_with_attr">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><code class="sig-name descname"><span class="pre">init_return_tree_mapped_with_attr</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_tree_mapped_with_attr" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_tree_mapped_with_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_tree_mapped_with_attr" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="phylojunction-interface-grammar-dn-grammar-module">
-<h2>phylojunction.interface.grammar.dn_grammar module<a class="headerlink" href="#phylojunction-interface-grammar-dn-grammar-module" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="phylojunction-interface-grammar-make-dn-discrete-sse-module">
-<h2>phylojunction.interface.grammar.make_dn_discrete_sse module<a class="headerlink" href="#phylojunction-interface-grammar-make-dn-discrete-sse-module" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="module-phylojunction.interface.grammar">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.interface.grammar" title="Permalink to this heading"></a></h2>
-</div>
-</div>
+</section>
+<section id="module-phylojunction.interface.grammar.det_fn_map_attribute">
+<span id="phylojunction-interface-grammar-det-fn-map-attribute-module"></span><h2>phylojunction.interface.grammar.det_fn_map_attribute module<a class="headerlink" href="#module-phylojunction.interface.grammar.det_fn_map_attribute" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_map_attribute.make_mapped_ann_tree">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_map_attribute.</span></span><span class="sig-name descname"><span class="pre">make_mapped_ann_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_map_attribute.make_mapped_ann_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-phylojunction.interface.grammar.dn_discrete_sse_makers">
+<span id="phylojunction-interface-grammar-dn-discrete-sse-makers-module"></span><h2>phylojunction.interface.grammar.dn_discrete_sse_makers module<a class="headerlink" href="#module-phylojunction.interface.grammar.dn_discrete_sse_makers" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_discrete_sse_makers.make_discrete_SSE_dn">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.dn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">make_discrete_SSE_dn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.dn_discrete_sse_makers.make_discrete_SSE_dn" title="Link to this definition"></a></dt>
+<dd><p>Make discrete SSE distribution for sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dn_name</strong> (<em>str</em>) – Name of the distribution.</p></li>
+<li><p><strong>dn_param_dict</strong> (<em>dict</em>) – Dictionary with distribution
+parameter names as keys, and their values as values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DistrForSampling instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling">DistrForSampling</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.interface.grammar.dn_grammar">
+<span id="phylojunction-interface-grammar-dn-grammar-module"></span><h2>phylojunction.interface.grammar.dn_grammar module<a class="headerlink" href="#module-phylojunction.interface.grammar.dn_grammar" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.dn_grammar.</span></span><span class="sig-name descname"><span class="pre">PJDnGrammar</span></span><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar.create_dn_obj">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_dn_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.create_dn_obj" title="Link to this definition"></a></dt>
+<dd><p>Create and return prob. distribution (for sampling) object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dn_id</strong> (<em>str</em>) – Name of the sampling distribution to create.</p></li>
+<li><p><strong>dn_param_dict</strong> (<em>dict</em>) – Dictionary containing distribution
+parameter names (str) as keys and lists (of either
+strings or StochasticNodeDAGs) as values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a DistributionDAG instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DistributionDAG</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar.dn_grammar_dict">
+<span class="sig-name descname"><span class="pre">dn_grammar_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'discrete_sse':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'stop',</span> <span class="pre">'stop_value',</span> <span class="pre">'origin',</span> <span class="pre">'stash',</span> <span class="pre">'start_state',</span> <span class="pre">'eps',</span> <span class="pre">'runtime_limit',</span> <span class="pre">'cond_spn',</span> <span class="pre">'cond_surv'),</span> <span class="pre">'exponential':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'rate',</span> <span class="pre">'rate_parameterization'),</span> <span class="pre">'gamma':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'shape',</span> <span class="pre">'scale',</span> <span class="pre">'rate_parameterization'),</span> <span class="pre">'lognormal':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'mean',</span> <span class="pre">'sd',</span> <span class="pre">'log_space'),</span> <span class="pre">'normal':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'mean',</span> <span class="pre">'sd'),</span> <span class="pre">'unif':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'min',</span> <span class="pre">'max')}</span></em><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.dn_grammar_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar.grammar_check">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grammar_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dn_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.grammar_check" title="Link to this definition"></a></dt>
+<dd><p>Check if specified distribution is supported.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar.init_return_discrete_SSE_dn">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_discrete_SSE_dn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.init_return_discrete_SSE_dn" title="Link to this definition"></a></dt>
+<dd><p>Create and return SSE distribution for sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dn_param_dict</strong> (<em>dict</em>) – Dictionary with distribution
+parameter names as keys, and their values as values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a DistributionDAG instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DistributionDAG</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar.init_return_parametric_dn">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_return_parametric_dn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.init_return_parametric_dn" title="Link to this definition"></a></dt>
+<dd><p>Create and return parametric distributions for sampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dn_id</strong> (<em>str</em>) – Name of parametric distribution.</p></li>
+<li><p><strong>dn_param_dict</strong> (<em>dict</em>) – Dictionary with distribution
+parameter names as keys, and their values as values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DistrForSampling instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling">DistrForSampling</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.interface.grammar">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.interface.grammar" title="Link to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="phylojunction.interface.cmdbox.html" class="btn btn-neutral float-left" title="phylojunction.interface.cmdbox package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="phylojunction.pgm.html" class="btn btn-neutral float-right" title="phylojunction.pgm package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

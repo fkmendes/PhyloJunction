@@ -28,6 +28,14 @@ phylojunction.plotting.pj\_seeing\_colors module
    :undoc-members:
    :show-inheritance:
 
+phylojunction.plotting.pj\_testing\_tree\_plotting module
+---------------------------------------------------------
+
+.. automodule:: phylojunction.plotting.pj_testing_tree_plotting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

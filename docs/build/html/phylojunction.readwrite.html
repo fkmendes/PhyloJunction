@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>phylojunction.readwrite package &mdash; PhyloJunction 0.0.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/pj_custom.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="phylojunction.utility package" href="phylojunction.utility.html" />
+    <link rel="prev" title="phylojunction.plotting package" href="phylojunction.plotting.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +31,44 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Library API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="phylojunction.html">phylojunction package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="phylojunction.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html">phylojunction.calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html">phylojunction.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html">phylojunction.distribution package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.inference.html">phylojunction.inference package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.html">phylojunction.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html">phylojunction.pgm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.plotting.html">phylojunction.plotting package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">phylojunction.readwrite package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html">phylojunction.utility package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.html#module-phylojunction">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -56,8 +84,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>phylojunction.readwrite package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">phylojunction</a></li>
+          <li class="breadcrumb-item"><a href="phylojunction.html">phylojunction package</a></li>
+      <li class="breadcrumb-item active">phylojunction.readwrite package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/phylojunction.readwrite.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -67,172 +97,369 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="phylojunction-readwrite-package">
-<h1>phylojunction.readwrite package<a class="headerlink" href="#phylojunction-readwrite-package" title="Permalink to this heading"></a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="module-phylojunction.readwrite.pj_read">
-<span id="phylojunction-readwrite-pj-read-module"></span><h2>phylojunction.readwrite.pj_read module<a class="headerlink" href="#module-phylojunction.readwrite.pj_read" title="Permalink to this heading"></a></h2>
+  <section id="phylojunction-readwrite-package">
+<h1>phylojunction.readwrite package<a class="headerlink" href="#phylojunction-readwrite-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.readwrite.pj_read">
+<span id="phylojunction-readwrite-pj-read-module"></span><h2>phylojunction.readwrite.pj_read module<a class="headerlink" href="#module-phylojunction.readwrite.pj_read" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.is_csv">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">is_csv</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.is_csv" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">is_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.is_csv" title="Link to this definition"></a></dt>
 <dd><p>Check if file in provided path is in CSV format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
-read</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if file is in CSV format, False otherwise</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
+read</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if file is in CSV format, False otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.is_tsv">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">is_tsv</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.is_tsv" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">is_tsv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.is_tsv" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.parse_cli_str_write_fig">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">parse_cli_str_write_fig</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">str_write_fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.parse_cli_str_write_fig" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">parse_cli_str_write_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">str_write_fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.parse_cli_str_write_fig" title="Link to this definition"></a></dt>
 <dd><p>Parse command-line string argument for generating node plots.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>str_write_fig</strong> (<em>str</em>) – User-provided string as argument to command-line
-interface -f parameter (e.g., ‘tr;0-10’)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Dictionary with node names as keys (str), tuple with range start</dt><dd>(int, int)</dd>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>str_write_fig</strong> (<em>str</em>) – User-provided string as argument to command-line
+interface -f parameter (e.g., ‘tr;0-10’)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with node names as keys (str), tuple with range start</dt><dd><p>(int, int)</p>
+</dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_csv_tsv_into_dataframe">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_csv_tsv_into_dataframe</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">is_file_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_csv_tsv_into_dataframe" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">read_csv_tsv_into_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_file_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_csv_tsv_into_dataframe" title="Link to this definition"></a></dt>
 <dd><p>Read .csv/.tsv file into a pandas DataFrame.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
-read</li>
-<li><strong>is_csv</strong> (<em>bool</em>) – Flag specifying if file is .csv (otherwise it is)
-a .tsv.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
+read</p></li>
+<li><p><strong>is_csv</strong> (<em>bool</em>) – Flag specifying if file is .csv (otherwise it is)
+a .tsv.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
 <dt>pandas DataFrame object (empty DataFrame if not</dt><dd><p>CSV nor TSV)</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.DataFrame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_node_attr_update_tree">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_node_attr_update_tree</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">attr_tsv_fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">attr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">ann_tr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_node_attr_update_tree" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">read_node_attr_update_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr_tsv_fp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ann_tr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_node_attr_update_tree" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_nwk_tree_str">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_nwk_tree_str</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">nwk_tree_path_or_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'read_tree'</span></span></em>, <em><span class="n"><span class="pre">in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em><span class="n"><span class="pre">node_names_attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_nwk_tree_str" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">read_nwk_tree_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nwk_tree_path_or_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'read_tree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_names_attribute</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree" title="phylojunction.data.tree.AnnotatedTree"><span class="pre">AnnotatedTree</span></a></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_nwk_tree_str" title="Link to this definition"></a></dt>
 <dd><p>Read Newick tree string directly or in provided file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>nwk_tree_path_or_str</strong> (<em>str</em>) – Tree Newick string, or path to file
-containing single tree Newick string</li>
-<li><strong>in_file</strong> (<em>bool</em>) – If tree string is in a file being passed as argument
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nwk_tree_path_or_str</strong> (<em>str</em>) – Tree Newick string, or path to file
+containing single tree Newick string</p></li>
+<li><p><strong>in_file</strong> (<em>bool</em>) – If tree string is in a file being passed as argument
 (True) or if Newick string is being passed directly (False).
-Defaults to ‘True’.</li>
-<li><strong>node_names_attribute</strong> (<em>str</em>) – Defaults to empty string “”.</li>
+Defaults to ‘True’.</p></li>
+<li><p><strong>node_names_attribute</strong> (<em>str</em>) – Defaults to empty string “”.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><dl class="docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
 <dt>AnnotatedTree with populated attributes dictionary</dt><dd><p>(i.e., a dendropy.Tree that has been annotated)</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_serialized_pgm">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_serialized_pgm</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_serialized_pgm" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">read_serialized_pgm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_serialized_pgm" title="Link to this definition"></a></dt>
 <dd><p>Read binary file storing PGM from a previous PJ session.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp_string</strong> (<em>str</em>) – String containing file path to binary file
-storing DAG from previous PJ session.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">DAG object to be initialized.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph">DirectedAcyclicGraph</a>)</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp_string</strong> (<em>str</em>) – String containing file path to binary file
+storing DAG from previous PJ session.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DAG object to be initialized.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph">DirectedAcyclicGraph</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_read.read_text_file">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></code><code class="sig-name descname"><span class="pre">read_text_file</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_text_file" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_read.</span></span><span class="sig-name descname"><span class="pre">read_text_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_read.read_text_file" title="Link to this definition"></a></dt>
 <dd><p>Read and parse text file into list of strings (one per line).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
-read</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of strings, each being a line of the input text file</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp_string</strong> (<em>str</em>) – String containing file path to text file being
+read</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of strings, each being a line of the input text file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-</div>
-<div class="section" id="phylojunction-readwrite-pj-write-module">
-<h2>phylojunction.readwrite.pj_write module<a class="headerlink" href="#phylojunction-readwrite-pj-write-module" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="module-phylojunction.readwrite">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.readwrite" title="Permalink to this heading"></a></h2>
-</div>
-</div>
+</section>
+<section id="module-phylojunction.readwrite.pj_write">
+<span id="phylojunction-readwrite-pj-write-module"></span><h2>phylojunction.readwrite.pj_write module<a class="headerlink" href="#module-phylojunction.readwrite.pj_write" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.dump_pgm_data">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">dump_pgm_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_nex_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.dump_pgm_data" title="Link to this definition"></a></dt>
+<dd><p>Write stochastic-node sampled values in specified directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir_string</strong> (<em>str</em>) – Where to save the files to be written</p></li>
+<li><p><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object whose sampled
+values we are extracting and writing to file.</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – String to preceed file names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.dump_serialized_pgm">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">dump_serialized_pgm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_log_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.dump_serialized_pgm" title="Link to this definition"></a></dt>
+<dd><p>Write serialized DAG in specified directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – Serialized file name</p></li>
+<li><p><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object to be serialized
+and saved.</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – String to preceed file name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.get_write_inference_rev_scripts">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">get_write_inference_rev_scripts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_sims_model_spec_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_sims_mcmc_logging_spec_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write2file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.get_write_inference_rev_scripts" title="Link to this definition"></a></dt>
+<dd><p>Get and/or write full inference .Rev scripts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all_sims_model_spec_list</strong> (<em>str</em>) – List of strings specifying
+just the model part of a .Rev script, one element per simulation</p></li>
+<li><p><strong>all_sims_mcmc_logging_spec_list</strong> (<em>str</em>) – List of strings
+specifying just the MCMC and logging part of a .Rev script,
+one element per simulation</p></li>
+<li><p><strong>dir_list</strong> (<em>str</em>) – List of three string specifying directories
+(inference root, scripts, results)</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – String prefix to place before the name of files being
+written</p></li>
+<li><p><strong>write2file</strong> (<em>bool</em>) – If ‘True’, function writes to file.
+Defaults to ‘False’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of full .Rev script string specifications,</dt><dd><p>one per simulation</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str(s)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.initialize_scalar_dataframe">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">initialize_scalar_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summaries_avg_over_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.initialize_scalar_dataframe" title="Link to this definition"></a></dt>
+<dd><p>_summary_</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_size</strong> (<em>int</em>) – Number of samples (i.e., independent full
+model simulations)</p></li>
+<li><p><strong>n_repl</strong> (<em>int</em><em>, </em><em>optional</em>) – How many times the scalar variable
+is replicated. Defaults to 1.</p></li>
+<li><p><strong>summaries_avg_over_repl</strong> (<em>bool</em><em>, </em><em>optional</em>) – Dataframe will hold
+statistics (avg., st. dev.) summarized over replicates.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame with certain columns holding 0 or 0.0 values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.initialize_tree_dataframe">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">initialize_tree_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summaries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summaries_avg_over_repl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.initialize_tree_dataframe" title="Link to this definition"></a></dt>
+<dd><p>Initialize pandas DataFrame to hold tree information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_size</strong> (<em>int</em>) – Number of samples (i.e., independent full
+model simulations)</p></li>
+<li><p><strong>n_repl</strong> (<em>int</em><em>, </em><em>optional</em>) – How many times the tree is replicated.
+Defaults to 1.</p></li>
+<li><p><strong>summaries</strong> (<em>bool</em><em>, </em><em>optional</em>) – Dataframe will hold individual-tree
+statistics. Defaults to False.</p></li>
+<li><p><strong>summaries_avg_over_repl</strong> (<em>bool</em><em>, </em><em>optional</em>) – Dataframe will hold
+statistics summarized over replicates. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>DataFrame with certain columns holding 0 or</dt><dd><p>0.0 values</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.prep_data_df">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">prep_data_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_nex_states</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_data_df" title="Link to this definition"></a></dt>
+<dd><p>Return two pandas DataFrame’s, with scalar and tree random variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object holding the
+simulated data to be tabulated.</p></li>
+<li><p><strong>write_nex_states</strong> (<em>bool</em>) – Whether to write .nex file with states</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Tuple with two lists as elements, one with file-suffix</dt><dd><p>strings, another with pandas.DataFrame’s</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.prep_data_filepaths_dfs">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">prep_data_filepaths_dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar_output_stash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree_output_stash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_data_filepaths_dfs" title="Link to this definition"></a></dt>
+<dd><p>Prepare list of file paths and list of pandas DataFrames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scalar_output_stash</strong> (<em>list</em>) – List of either pandas dataframes,
+or dictionaries with number of replicates as keys, and
+pandas dataframes as values. These contain scalar simulated
+data.</p></li>
+<li><p><strong>tree_output_stash</strong> (<em>ty.List</em><em>[</em><em>ty.Dict</em><em>[</em><em>str</em><em>, </em><em>pd.DataFrame</em><em>]</em><em>]</em>) – List of dictionaries with tree node names as keys, and
+pandas’ dataframes as values.
+These contains tree simulated data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List of filepath strings and and list of pandas</dt><dd><p>dataframes to be written to disk.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_data_df">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">write_data_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfile_handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_data_df" title="Link to this definition"></a></dt>
+<dd><p>Write a pandas DataFrame to output file stream</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outfile_handle</strong> (<em>file</em>) – Output file object to write to</p></li>
+<li><p><strong>data_df</strong> (<em>pandas.DataFrame</em>) – A data frame containing random
+variable values to print to file</p></li>
+<li><p><strong>format</strong> (<em>str</em>) – Extension for output file</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_fig_to_file">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">write_fig_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_fig_to_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_str_list">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">write_str_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfile_handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_string_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_str_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-phylojunction.readwrite">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.readwrite" title="Link to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="phylojunction.plotting.html" class="btn btn-neutral float-left" title="phylojunction.plotting package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="phylojunction.utility.html" class="btn btn-neutral float-right" title="phylojunction.utility package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

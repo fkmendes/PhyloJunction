@@ -71,14 +71,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/interface/test_cmd_det_fn_discrete_sse
+    # $ python3 tests/interface/test_cmd_det_fn_discrete_sse
     # 
     # or
     #
-    # $ python3.9 -m tests.interface.test_cmd_det_fn_discrete_sse
+    # $ python3 -m tests.interface.test_cmd_det_fn_discrete_sse
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.interface.test_cmd_det_fn_discrete_sse.TestDetFnDiscreteSSEErrors.test_rate_epoch_annotation_error
+    # $ python3 -m unittest tests.interface.test_cmd_det_fn_discrete_sse.TestDetFnDiscreteSSEErrors.test_rate_epoch_annotation_error
 
     unittest.main()

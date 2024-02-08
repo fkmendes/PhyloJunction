@@ -15,6 +15,8 @@ PhyloJunction
    Installation <installing.rst>
    Documentation <pjdoc/index.rst>
 
+   Library API Reference <modules.rst>
+
 |pj| (PJ) is a pure-|Python3| library designed as a framework for:
 
     (i) simulating evolutionary models;

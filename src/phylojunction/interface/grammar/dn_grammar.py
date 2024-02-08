@@ -62,7 +62,7 @@ class PJDnGrammar():
                 parameter names as keys, and their values as values.
 
         Returns:
-            DistributionDAG: a DistributionDAG instance.
+            DistrForSampling: A DistrForSampling instance.
         """
 
         n_samples: int = 1

@@ -39,34 +39,34 @@ class DnLogNormal(pgm.DistrForSampling):
 
         Args:
             n_samples (int): Number of draws (sample size).
-            mean_param (float): Mean (location) of log-normal in log-space.
+            mean_param (float): Mean (scale) of log-normal.
             sd_param (float): Std. deviation (shape) of log-normal
-                distribution in log-space.
-            scale (float): Median (scale) of log-normal distribution in
+                distribution.
+            scale (float): Mean (scale) of log-normal distribution in
                 log-space. Defaults to 1.0.
-            log_space (bool, optional): Mean and std. deviation are provided
-                in log-space. Defaults to 'True'.
+            log_space (bool, optional): Flag specifying if mean of
+                distribution is provided in log-space. Defaults to
+                'True'.
 
         Returns:
             (list): List of floats sampled from log-normal distribution.
         """
 
         if not log_space:
-            # debugging
-            # print("log-normal in natural space: mean = " + str(mean_param) + " sd = " + str(sd_param))
-
             # have to use scale if in natural space
             return lognorm.rvs(s=sd_param,
-                               scale=math.exp(mean_param),
+                               scale=mean_param,
+                               loc=0.0,
                                size=n_samples)
 
-        # debugging
-        # print("log-normal in log-space: mean = " + str(mean_param) + " sd = " + str(sd_param))
-
-        # have to use loc if in log-space
-        return lognorm.rvs(s=math.exp(sd_param),
-                           loc=math.exp(mean_param),
-                           scale=1.0,
+        # s is the shape parameter (std dev)
+        # scale is the mean 
+        #
+        # scipy assumes the scale is in natural space, so if the user passed
+        # it in log-scale (default), we need to exponentiate it
+        return lognorm.rvs(s=sd_param,
+                           scale=math.exp(mean_param),
+                           loc=0.0,
                            size=n_samples)
 
     # validation of pars happens in dn_grammar
@@ -309,7 +309,7 @@ class DnExponential(pgm.DistrForSampling):
     n_samples: int
     n_repl: int
     exp_scale_or_rate_list: ty.List[float]
-    exp_rate_parameterization: bool = True
+    exp_rate_parameterization: bool
     vectorized_params: ty.List[ty.List[ty.Union[int, float, str]]]
     param_dict: \
     ty.Dict[str, ty.Union[bool, ty.List[ty.Union[int, float, str]]]]

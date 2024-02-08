@@ -206,14 +206,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/distribution/test_dn_discrete_sse_yule.py
+    # $ python3 tests/distribution/test_dn_discrete_sse_yule.py
     # 
     # or
     #
-    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_yule
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_yule
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_yule.TestYuleTrees.test_expected_root_height_yule
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_yule.TestYuleTrees.test_expected_root_height_yule
 
     unittest.main()

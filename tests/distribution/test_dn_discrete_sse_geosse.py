@@ -979,14 +979,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/distribution/test_dn_discrete_sse_geosse.py
+    # $ python3 tests/distribution/test_dn_discrete_sse_geosse.py
     # 
     # or
     #
-    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_geosse
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_geosse
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_geosse.TestGeoSSETrees.test_tree_size_state_count_max_t_geosse
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_geosse.TestGeoSSETrees.test_tree_size_state_count_max_t_geosse
 
     unittest.main()

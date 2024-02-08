@@ -38,7 +38,7 @@ This design (used in the past, see below) would not only make |pj| a more flexib
 Graphical models
 ================
 
-|pj| follows the graphical model paradigm popularized in the last decade by programs like `RevBayes <https://revbayes.github.io/>`_, `BEAST <https://beast.community/>`_ and `BEAST 2 <https://www.beast2.org/>`_.
+|pj| follows the graphical model paradigm popularized in the last decade by programs like `RevBayes <https://revbayes.github.io/>`__, `BEAST <https://beast.community/>`__ and `BEAST 2 <https://www.beast2.org/>`__.
 In what follows, we shall offer just a brief refresher on what probabilistic graphical models are, and one simple example of their use in evolutionary modeling.
 Those interested in a more detailed exposition will find it in Höhna et al. (2014) and references therein (also, take a look `here <https://revbayes.github.io/tutorials/intro/graph_models.html>`_).
 
@@ -321,7 +321,7 @@ Command-line interface (CLI)
 Lexicon
 -------
 
-.. toctree::
-    :maxdepth: 2
+Parametric distributions
+========================
 
-    parametric.rst
+.. include:: parametric.rst

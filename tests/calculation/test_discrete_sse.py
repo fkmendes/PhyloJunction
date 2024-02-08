@@ -440,10 +440,10 @@ if __name__ == "__main__":
     # 
     # or
     #
-    # $ python3.9 -m tests.calculation.test_discrete_sse
+    # $ python3 -m tests.calculation.test_discrete_sse
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.calculation.test_discrete_sse.TestDiscreteSSE.test_state_dep_param_manager_init_error
+    # $ python3 -m unittest tests.calculation.test_discrete_sse.TestDiscreteSSE.test_state_dep_param_manager_init_error
 
     unittest.main()

@@ -151,15 +151,15 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/data/test_tree_exceptions.py
+    # $ python3 tests/data/test_tree_exceptions.py
     # 
     # or
     #
-    # $ python3.9 -m tests.data.test_tree_exceptions
+    # $ python3 -m tests.data.test_tree_exceptions
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.data.test_tree_exceptions.TestTreeExceptions.test_alive_annotation_exceptions
+    # $ python3 -m unittest tests.data.test_tree_exceptions.TestTreeExceptions.test_alive_annotation_exceptions
 
     unittest.main()
         

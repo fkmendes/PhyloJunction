@@ -15,6 +15,16 @@ def make_discrete_SSE_dn(
     dn_name: str,
     dn_param_dict: ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> pgm.DistrForSampling:
+    """Make discrete SSE distribution for sampling.
+
+    Args:
+        dn_name (str): Name of the distribution.
+        dn_param_dict (dict): Dictionary with distribution
+            parameter names as keys, and their values as values.
+
+    Returns:
+        DistrForSampling: A DistrForSampling instance. 
+    """
 
     #############################
     # IMPORTANT: Default values #
@@ -226,12 +236,12 @@ def make_discrete_SSE_dn(
 
 if __name__ == "__main__":
     # can be called from interface/grammar/
-    # $ python3.9 make_dn_discrete_sse.py
+    # $ python3 make_dn_discrete_sse.py
     #
     # can also be called from phylojunction/
-    # $ python3.9 interface/grammar/make_dn_discrete_sse.py
+    # $ python3 interface/grammar/make_dn_discrete_sse.py
     # or
-    # $ python3.9 -m interface.grammar.make_dn_discrete_sse
+    # $ python3 -m interface.grammar.make_dn_discrete_sse
     #
     # can also be called from VS Code, if open folder is phylojuction/
 

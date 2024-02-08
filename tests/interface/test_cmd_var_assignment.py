@@ -296,14 +296,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/interface/test_cmd_var_assignment
+    # $ python3 tests/interface/test_cmd_var_assignment
     # 
     # or
     #
-    # $ python3.9 -m tests.interface.test_cmd_var_assignment
+    # $ python3 -m tests.interface.test_cmd_var_assignment
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.interface.test_cmd_var_assignment.TestVarAssignment.test_var_assignment
+    # $ python3 -m unittest tests.interface.test_cmd_var_assignment.TestVarAssignment.test_var_assignment
 
     unittest.main()

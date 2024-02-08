@@ -123,11 +123,11 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 src/phylojunction/constant_function/ct_function_read_tree.py
+    # $ python3 src/phylojunction/constant_function/ct_function_read_tree.py
     # 
     # or
     #
-    # $ python3.9 -m phylojunction.constant_function.ct_function_read_tree
+    # $ python3 -m phylojunction.constant_function.ct_function_read_tree
 
     n_samples = 1
     n_repl = 1

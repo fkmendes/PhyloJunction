@@ -184,14 +184,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/data/test_tree_annot.py
+    # $ python3 tests/data/test_tree_annot.py
     # 
     # or
     #
-    # $ python3.9 -m tests.data.test_tree_annot
+    # $ python3 -m tests.data.test_tree_annot
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.data.test_tree_annot.TestAnnotateTree.test_root_origin_age_rootedge_length
+    # $ python3 -m unittest tests.data.test_tree_annot.TestAnnotateTree.test_root_origin_age_rootedge_length
 
     unittest.main()

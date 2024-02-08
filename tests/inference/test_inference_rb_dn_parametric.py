@@ -174,14 +174,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/inference/test_inference_rb_dn_parametric.py
+    # $ python3 tests/inference/test_inference_rb_dn_parametric.py
     # 
     # or
     #
-    # $ python3.9 -m tests.inference.test_inference_rb_dn_parametric
+    # $ python3 -m tests.inference.test_inference_rb_dn_parametric
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.inference.test_inference_rb_dn_parametric.TestInferenceRevBayesParametricDn.test_pj2rb_uniform
+    # $ python3 -m unittest tests.inference.test_inference_rb_dn_parametric.TestInferenceRevBayesParametricDn.test_pj2rb_uniform
 
     unittest.main()

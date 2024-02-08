@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>phylojunction.inference.revbayes package &mdash; PhyloJunction 0.0.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/pj_custom.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="phylojunction.interface package" href="phylojunction.interface.html" />
+    <link rel="prev" title="phylojunction.inference package" href="phylojunction.inference.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +31,44 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Library API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="phylojunction.html">phylojunction package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="phylojunction.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html">phylojunction.calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html">phylojunction.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html">phylojunction.distribution package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="phylojunction.inference.html">phylojunction.inference package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.html">phylojunction.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html">phylojunction.pgm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.plotting.html">phylojunction.plotting package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.readwrite.html">phylojunction.readwrite package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html">phylojunction.utility package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.html#module-phylojunction">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -56,8 +84,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>phylojunction.inference.revbayes package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">phylojunction</a></li>
+          <li class="breadcrumb-item"><a href="phylojunction.html">phylojunction package</a></li>
+          <li class="breadcrumb-item"><a href="phylojunction.inference.html">phylojunction.inference package</a></li>
+      <li class="breadcrumb-item active">phylojunction.inference.revbayes package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/phylojunction.inference.revbayes.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -67,127 +98,122 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="phylojunction-inference-revbayes-package">
-<h1>phylojunction.inference.revbayes package<a class="headerlink" href="#phylojunction-inference-revbayes-package" title="Permalink to this heading"></a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
-</div>
-<div class="section" id="module-phylojunction.inference.revbayes.rb_dn_parametric">
-<span id="phylojunction-inference-revbayes-rb-dn-parametric-module"></span><h2>phylojunction.inference.revbayes.rb_dn_parametric module<a class="headerlink" href="#module-phylojunction.inference.revbayes.rb_dn_parametric" title="Permalink to this heading"></a></h2>
+  <section id="phylojunction-inference-revbayes-package">
+<h1>phylojunction.inference.revbayes package<a class="headerlink" href="#phylojunction-inference-revbayes-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.inference.revbayes.rb_dn_parametric">
+<span id="phylojunction-inference-revbayes-rb-dn-parametric-module"></span><h2>phylojunction.inference.revbayes.rb_dn_parametric module<a class="headerlink" href="#module-phylojunction.inference.revbayes.rb_dn_parametric" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_dn_parametric.get_exponential_rev_inference_spec_info">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></code><code class="sig-name descname"><span class="pre">get_exponential_rev_inference_spec_info</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">exp_scale_or_rate_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">exp_rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_exponential_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></span><span class="sig-name descname"><span class="pre">get_exponential_rev_inference_spec_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_scale_or_rate_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_exponential_rev_inference_spec_info" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_dn_parametric.get_gamma_rev_inference_spec_info">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></code><code class="sig-name descname"><span class="pre">get_gamma_rev_inference_spec_info</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">gamma_shape_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">gamma_scale_or_rate_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">gamma_rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_gamma_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></span><span class="sig-name descname"><span class="pre">get_gamma_rev_inference_spec_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_shape_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_scale_or_rate_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_rate_parameterization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_gamma_rev_inference_spec_info" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_dn_parametric.get_ln_rev_inference_spec_info">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></code><code class="sig-name descname"><span class="pre">get_ln_rev_inference_spec_info</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">ln_mean_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">ln_sd_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_ln_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></span><span class="sig-name descname"><span class="pre">get_ln_rev_inference_spec_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ln_mean_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ln_sd_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_ln_rev_inference_spec_info" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_dn_parametric.get_normal_rev_inference_spec_info">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></code><code class="sig-name descname"><span class="pre">get_normal_rev_inference_spec_info</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">norm_mean_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">norm_sd_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_normal_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></span><span class="sig-name descname"><span class="pre">get_normal_rev_inference_spec_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_mean_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_sd_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_normal_rev_inference_spec_info" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_dn_parametric.get_rev_str_from_dn_parametric_obj">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></code><code class="sig-name descname"><span class="pre">get_rev_str_from_dn_parametric_obj</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dn_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_rev_str_from_dn_parametric_obj" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></span><span class="sig-name descname"><span class="pre">get_rev_str_from_dn_parametric_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dn_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling" title="phylojunction.pgm.pgm.DistrForSampling"><span class="pre">DistrForSampling</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_rev_str_from_dn_parametric_obj" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_dn_parametric.get_unif_rev_inference_spec_info">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></code><code class="sig-name descname"><span class="pre">get_unif_rev_inference_spec_info</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">min_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">max_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_unif_rev_inference_spec_info" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_dn_parametric.</span></span><span class="sig-name descname"><span class="pre">get_unif_rev_inference_spec_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_param_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_node_tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_dn_parametric.get_unif_rev_inference_spec_info" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-</div>
-<div class="section" id="module-phylojunction.inference.revbayes.rb_inference">
-<span id="phylojunction-inference-revbayes-rb-inference-module"></span><h2>phylojunction.inference.revbayes.rb_inference module<a class="headerlink" href="#module-phylojunction.inference.revbayes.rb_inference" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.inference.revbayes.rb_inference">
+<span id="phylojunction-inference-revbayes-rb-inference-module"></span><h2>phylojunction.inference.revbayes.rb_inference module<a class="headerlink" href="#module-phylojunction.inference.revbayes.rb_inference" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_inference.dag_obj_to_rev_inference_spec">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></code><code class="sig-name descname"><span class="pre">dag_obj_to_rev_inference_spec</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em><span class="n"><span class="pre">inference_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.dag_obj_to_rev_inference_spec" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></span><span class="sig-name descname"><span class="pre">dag_obj_to_rev_inference_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inference_root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.dag_obj_to_rev_inference_spec" title="Link to this definition"></a></dt>
 <dd><p>Convert model string to put in .Rev script.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object created
-through script or commands typed by user.</li>
-<li><strong>mcmc_chain_length</strong> (<em>int</em>) – Number of MCMC iterations to carry
-out with RevBayes.</li>
-<li><strong>inference_root_dir</strong> (<em>str</em>) – Directory where scripts and results
-should be put, and from where RevBayes should be called.</li>
-<li><strong>prefix</strong> (<em>str</em>) – Prefix will be appended to directory and file
-names. Defaults to “”.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – DAG object created
+through script or commands typed by user.</p></li>
+<li><p><strong>mcmc_chain_length</strong> (<em>int</em>) – Number of MCMC iterations to carry
+out with RevBayes.</p></li>
+<li><p><strong>inference_root_dir</strong> (<em>str</em>) – Directory where scripts and results
+should be put, and from where RevBayes should be called.</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – Prefix will be appended to directory and file
+names. Defaults to “”.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
 <dt>Tuple containing three lists, with strings to be</dt><dd><p>printed to files (2) and directory names (1).</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(tuple)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list">
-<code class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></code><code class="sig-name descname"><span class="pre">get_mcmc_logging_spec_list</span></code><span class="sig-paren">(</span><em><span class="n"><span class="pre">a_node_dag_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">moves_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.inference.revbayes.rb_inference.</span></span><span class="sig-name descname"><span class="pre">get_mcmc_logging_spec_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_node_dag_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moves_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcmc_chain_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.inference.revbayes.rb_inference.get_mcmc_logging_spec_list" title="Link to this definition"></a></dt>
 <dd><p>Generate MCMC move strings for .Rev script.</p>
 <p>This method will produce a list of strings where each element
 (one per sample) will configure RevBayes’ MCMC (moves) and
 logging inside a .Rev script</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>a_node_dag_name</strong> (<em>str</em>) – One of the probabilistic graphical model
-nodes, required to set the model object.</li>
-<li><strong>moves_str</strong> (<em>str</em>) – All moves to be carried out during MCMC, as a
-string containing new line characters.</li>
-<li><strong>n_samples</strong> (<em>int</em>) – Number of samples (simulations).</li>
-<li><strong>prefix</strong> (<em>str</em>) – Prefix to preceed MCMC result .log file names.</li>
-<li><strong>results_dir</strong> (<em>str</em>) – String specifying directory where MCMC result
-.log files shall be put by RevBayes.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a_node_dag_name</strong> (<em>str</em>) – One of the probabilistic graphical model
+nodes, required to set the model object.</p></li>
+<li><p><strong>moves_str</strong> (<em>str</em>) – All moves to be carried out during MCMC, as a
+string containing new line characters.</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – Number of samples (simulations).</p></li>
+<li><p><strong>prefix</strong> (<em>str</em>) – Prefix to preceed MCMC result .log file names.</p></li>
+<li><p><strong>results_dir</strong> (<em>str</em>) – String specifying directory where MCMC result
+.log files shall be put by RevBayes.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
 <dt>List of strings (one per sample), each will configure</dt><dd><p>RevBayes’ MCMC (moves) and logging inside a .Rev script.</p>
 </dd>
 </dl>
 </p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(str)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str)</p>
+</dd>
+</dl>
 </dd></dl>
 
-</div>
-<div class="section" id="module-phylojunction.inference.revbayes">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.inference.revbayes" title="Permalink to this heading"></a></h2>
-</div>
-</div>
+</section>
+<section id="module-phylojunction.inference.revbayes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.inference.revbayes" title="Link to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="phylojunction.inference.html" class="btn btn-neutral float-left" title="phylojunction.inference package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="phylojunction.interface.html" class="btn btn-neutral float-right" title="phylojunction.interface package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

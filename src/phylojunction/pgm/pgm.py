@@ -37,7 +37,7 @@ def abstract_attribute(obj: ty.Callable[[ty.Any], R] = None) -> R:
 class DirectedAcyclicGraph():
     """Directed acyclic graph (DAG) class defining the model.
     
-    Attributes:
+    Parameters:
         node_val_dict (dict): Dictionary with keys being DAG nodes, and
             values being the values stored in the nodes.
         name_node_dict (dict): Dictionary with keys being DAG node
@@ -226,7 +226,7 @@ class NodeDAG(ABC):
     This class has abstract methods, so it cannot be instantiated.
     It is derived by StochasticNodeDAG and DeterministicNodeDAG
 
-    Attributes:
+    Parameters:
         node_name (str): Name of the node, e.g., 'lambda'.
         sample_size (int): How many samples (simulations) to be either
             drawn or specified for the node.
@@ -583,7 +583,7 @@ class StochasticNodeDAG(NodeDAG):
     or parsed from it. In other words, constant nodes in the graph
     are still stochastic DAG nodes under the hood.
 
-    Attributes:
+    Parameters:
         sampling_dn (DistrForSampling): Distribution object for randomly
             sampling values.
         constant_fn (ConstantFn): Function object for obtaining

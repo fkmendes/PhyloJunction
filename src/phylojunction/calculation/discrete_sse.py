@@ -47,7 +47,7 @@ class DiscreteStateDependentParameter():
 
     Supports vectorization of values only.
 
-    Attributes:
+    Parameters:
         value (Union[int, float, str]): Either an integer, float or
             string, or a list of any of those.
         name (str): Name of SSE parameter.
@@ -124,7 +124,7 @@ class DiscreteStateDependentRate(DiscreteStateDependentParameter):
 
     Supports vectorization of values only.
 
-    Attributes:
+    Parameters:
         state_tuple (int): Tuple storing all states associated to SSE
             parameter.
         departing_state (int): State event is departing from.
@@ -259,7 +259,7 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
 
     Supports vectorization of values only.
 
-    Attributes:
+    Parameters:
         str_representation (str): The string that is put together
             upon initialization and printed when __str__() is called.
     """
@@ -324,7 +324,7 @@ class DiscreteStateDependentParameterManager:
     Currently there is no support for vectorization of seed ages nor
     of time slices.
 
-    Attributes:
+    Parameters:
         matrix_state_dep_params (DiscreteStateDependentParameter): 2D
             list, with first dimension being time slices, the second
             being SSE parameters.
@@ -911,7 +911,7 @@ class MacroevolEventHandler():
     will try to access parameter values stored in a
     #-simulations-sized list.
 
-    Attributes:
+    Parameters:
         sse_rate_manager (DiscreteStateDependentParameterManager):
             Object that checks, organizes and stores SSE rates.
         state_count (int): Number of states characterizing the SSE
@@ -1232,7 +1232,7 @@ class DiscreteStateDependentProbabilityHandler():
     This is the sister class to MacroevolEventHandler. Note that time
     slices do not have to be the same as those for SSE rates.
 
-    Attributes:
+    Parameters:
         state_dep_prob_manager (DiscreteStateDependentParameterManager):
             Object that checks, organizes and stores SSE probabilities.
         state_count (int): Number of states characterizing the SSE
@@ -1385,7 +1385,7 @@ class SSEStash():
     """
     Class for stashing state-dependent rate and probability handlers.
 
-    Attributes:
+    Parameters:
         meh (MacroevolEventHandler): Instance of state-dependent rate
             handler class.
         prob_handler (DiscreteStateDependentProbabilityHandler):
@@ -1501,7 +1501,7 @@ class StateIntoPatternConverter:
     the number of states is 2, because a species is either present
     or not in a region.
 
-    Attributes:
+    Parameters:
         n_char (int): Number of characters.
         n_states_per_char (int): Number of states per character.
         n_states (int): Total number of states.

@@ -36,7 +36,7 @@ class DnSSE(pgm.DistrForSampling):
         (i)  how many lineages are alive and dead
         (ii) all the character states represented by living lineages
 
-    Attributes:
+    Parameters:
         n_sim (int): Number of trees to sample. Defaults to 1.
         n_repl (int): Number of tree replicates per sample. This
             is equivalent to the size of a plate in the DAG

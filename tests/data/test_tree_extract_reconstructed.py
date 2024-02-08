@@ -1753,14 +1753,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/data/test_tree_extract_reconstructed.py
+    # $ python3 tests/data/test_tree_extract_reconstructed.py
     # 
     # or
     #
-    # $ python3.9 -m tests.data.test_tree_extract_reconstructed
+    # $ python3 -m tests.data.test_tree_extract_reconstructed
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.data.test_tree_extract_reconstructed.TestExtractReconstructedTree.test_extract_reconstructed_tree_origin_one_root_side_dies_three_survive_sa_before_root
+    # $ python3 -m unittest tests.data.test_tree_extract_reconstructed.TestExtractReconstructedTree.test_extract_reconstructed_tree_origin_one_root_side_dies_three_survive_sa_before_root
 
     unittest.main()

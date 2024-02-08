@@ -2,7 +2,7 @@ import sys
 sys.path.extend(["../", "../phylojunction"])
 import unittest
 import math
-from statistics import mean
+from statistics import mean, stdev
 
 # pj imports
 import phylojunction.distribution.dn_parametric as dnpar
@@ -64,19 +64,22 @@ class TestParametricDns(unittest.TestCase):
     def test_lognormal(self):
         """Test log-normal draws with non-vectorized input."""
 
-        lognormal_rv1 = dnpar.DnLogNormal(100000,
+        # log-space = True, same as R's default
+        lognormal_rv1 = dnpar.DnLogNormal(200000,
                                           1,
                                           [-3.25],
                                           [0.25],
-                                          True).generate() # log-space (True is default)
-        # real space (log-space is False), R's default when "mean" and "sd" are used
-        lognormal_rv2 = dnpar.DnLogNormal(100000,
+                                          True).generate()
+        # real space
+        lognormal_rv2 = dnpar.DnLogNormal(200000,
                                           1,
                                           [math.exp(-3.25)],
-                                          [math.exp(0.25)],
+                                          [0.25],
                                           False).generate()
-        self.assertAlmostEqual(2.37, mean(lognormal_rv1), delta=0.1)
-        self.assertAlmostEqual(2.37, mean(lognormal_rv2), delta=0.1)
+        self.assertAlmostEqual(0.04, mean(lognormal_rv1), delta=0.01)
+        self.assertAlmostEqual(0.04, mean(lognormal_rv2), delta=0.01)
+        self.assertAlmostEqual(0.01, stdev(lognormal_rv1), delta=0.01)
+        self.assertAlmostEqual(0.01, stdev(lognormal_rv2), delta=0.01)
 
 
 if __name__ == '__main__':
@@ -97,14 +100,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/distribution/test_dn_parametric_object.py
+    # $ python3 tests/distribution/test_dn_parametric_object.py
     # 
     # or
     #
-    # $ python3.9 -m tests.distribution.test_dn_parametric_object
+    # $ python3 -m tests.distribution.test_dn_parametric_object
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.distribution.test_dn_parametric_object.TestParametricDns.test_unif
+    # $ python3 -m unittest tests.distribution.test_dn_parametric_object.TestParametricDns.test_unif
     
     unittest.main()

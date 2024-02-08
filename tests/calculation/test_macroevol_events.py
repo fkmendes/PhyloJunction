@@ -326,14 +326,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/calculation/test_macroevol_events.py
+    # $ python3 tests/calculation/test_macroevol_events.py
     # 
     # or
     #
-    # $ python3.9 -m tests.calculation.test_macroevol_events
+    # $ python3 -m tests.calculation.test_macroevol_events
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.calculation.test_macroevol_events.TestMacroEvolEvent.test_total_rate_single_epoch_bd
+    # $ python3 -m unittest tests.calculation.test_macroevol_events.TestMacroEvolEvent.test_total_rate_single_epoch_bd
     
     unittest.main()

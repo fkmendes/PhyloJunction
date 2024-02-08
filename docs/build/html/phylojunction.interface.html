@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>phylojunction.interface package &mdash; PhyloJunction 0.0.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/pj_custom.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="phylojunction.interface.cmdbox package" href="phylojunction.interface.cmdbox.html" />
+    <link rel="prev" title="phylojunction.inference.revbayes package" href="phylojunction.inference.revbayes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +31,44 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Library API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="phylojunction.html">phylojunction package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="phylojunction.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html">phylojunction.calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html">phylojunction.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html">phylojunction.distribution package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.inference.html">phylojunction.inference package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">phylojunction.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html">phylojunction.pgm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.plotting.html">phylojunction.plotting package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.readwrite.html">phylojunction.readwrite package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html">phylojunction.utility package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.html#module-phylojunction">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -56,8 +84,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>phylojunction.interface package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">phylojunction</a></li>
+          <li class="breadcrumb-item"><a href="phylojunction.html">phylojunction package</a></li>
+      <li class="breadcrumb-item active">phylojunction.interface package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/phylojunction.interface.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -67,40 +97,119 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="phylojunction-interface-package">
-<h1>phylojunction.interface package<a class="headerlink" href="#phylojunction-interface-package" title="Permalink to this heading"></a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+  <section id="phylojunction-interface-package">
+<h1>phylojunction.interface package<a class="headerlink" href="#phylojunction-interface-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.interface.cmdbox.html">phylojunction.interface.cmdbox package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.cmdbox.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction-interface-cmdbox-cmd-parse-module">phylojunction.interface.cmdbox.cmd_parse module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox.cmd_parse_utils">phylojunction.interface.cmdbox.cmd_parse_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox.cmd_parse">phylojunction.interface.cmdbox.cmd_parse module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse.cmdline2dag"><code class="docutils literal notranslate"><span class="pre">cmdline2dag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse.parse_deterministic_function_assignment"><code class="docutils literal notranslate"><span class="pre">parse_deterministic_function_assignment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse.parse_samp_dn_assignment"><code class="docutils literal notranslate"><span class="pre">parse_samp_dn_assignment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse.parse_variable_assignment"><code class="docutils literal notranslate"><span class="pre">parse_variable_assignment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse.script2dag"><code class="docutils literal notranslate"><span class="pre">script2dag()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox.cmd_parse_utils">phylojunction.interface.cmdbox.cmd_parse_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse_utils.parse_spec"><code class="docutils literal notranslate"><span class="pre">parse_spec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse_utils.parse_val_vector"><code class="docutils literal notranslate"><span class="pre">parse_val_vector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse_utils.tokenize_fn_spec"><code class="docutils literal notranslate"><span class="pre">tokenize_fn_spec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction.interface.cmdbox.cmd_parse_utils.val_or_obj"><code class="docutils literal notranslate"><span class="pre">val_or_obj()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.interface.grammar.html">phylojunction.interface.grammar package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction-interface-grammar-det-fn-discrete-sse-module">phylojunction.interface.grammar.det_fn_discrete_sse module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_grammar">phylojunction.interface.grammar.det_fn_grammar module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction-interface-grammar-dn-grammar-module">phylojunction.interface.grammar.dn_grammar module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction-interface-grammar-make-dn-discrete-sse-module">phylojunction.interface.grammar.make_dn_discrete_sse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.ct_fn_grammar">phylojunction.interface.grammar.ct_fn_grammar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar"><code class="docutils literal notranslate"><span class="pre">PJCtFnGrammar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.create_ct_fn_obj"><code class="docutils literal notranslate"><span class="pre">PJCtFnGrammar.create_ct_fn_obj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.ct_fn_grammar_dict"><code class="docutils literal notranslate"><span class="pre">PJCtFnGrammar.ct_fn_grammar_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.grammar_check"><code class="docutils literal notranslate"><span class="pre">PJCtFnGrammar.grammar_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.ct_fn_grammar.PJCtFnGrammar.init_return_ann_tr"><code class="docutils literal notranslate"><span class="pre">PJCtFnGrammar.init_return_ann_tr()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.ct_fn_treereader_makers">phylojunction.interface.grammar.ct_fn_treereader_makers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.ct_fn_treereader_makers.make_tree_reader"><code class="docutils literal notranslate"><span class="pre">make_tree_reader()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_discrete_sse_makers">phylojunction.interface.grammar.det_fn_discrete_sse_makers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_pgmnodes"><code class="docutils literal notranslate"><span class="pre">extract_value_from_pgmnodes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentProbability"><code class="docutils literal notranslate"><span class="pre">make_DiscreteStateDependentProbability()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentRate"><code class="docutils literal notranslate"><span class="pre">make_DiscreteStateDependentRate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_SSEStash"><code class="docutils literal notranslate"><span class="pre">make_SSEStash()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_grammar">phylojunction.interface.grammar.det_fn_grammar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.create_det_fn_obj"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.create_det_fn_obj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.det_fn_grammar_dict"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.det_fn_grammar_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.grammar_check"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.grammar_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_sse_stash"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.init_return_sse_stash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_prob"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.init_return_state_dep_prob()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_state_dep_rate"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.init_return_state_dep_rate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_grammar.PJDetFnGrammar.init_return_tree_mapped_with_attr"><code class="docutils literal notranslate"><span class="pre">PJDetFnGrammar.init_return_tree_mapped_with_attr()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_map_attribute">phylojunction.interface.grammar.det_fn_map_attribute module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_map_attribute.make_mapped_ann_tree"><code class="docutils literal notranslate"><span class="pre">make_mapped_ann_tree()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.dn_discrete_sse_makers">phylojunction.interface.grammar.dn_discrete_sse_makers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_discrete_sse_makers.make_discrete_SSE_dn"><code class="docutils literal notranslate"><span class="pre">make_discrete_SSE_dn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.dn_grammar">phylojunction.interface.grammar.dn_grammar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_grammar.PJDnGrammar"><code class="docutils literal notranslate"><span class="pre">PJDnGrammar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.create_dn_obj"><code class="docutils literal notranslate"><span class="pre">PJDnGrammar.create_dn_obj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.dn_grammar_dict"><code class="docutils literal notranslate"><span class="pre">PJDnGrammar.dn_grammar_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.grammar_check"><code class="docutils literal notranslate"><span class="pre">PJDnGrammar.grammar_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.init_return_discrete_SSE_dn"><code class="docutils literal notranslate"><span class="pre">PJDnGrammar.init_return_discrete_SSE_dn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.init_return_parametric_dn"><code class="docutils literal notranslate"><span class="pre">PJDnGrammar.init_return_parametric_dn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="module-phylojunction.interface">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.interface" title="Permalink to this heading"></a></h2>
-</div>
-</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-phylojunction.interface.pj_explorer">
+<span id="phylojunction-interface-pj-explorer-module"></span><h2>phylojunction.interface.pj_explorer module<a class="headerlink" href="#module-phylojunction.interface.pj_explorer" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.pj_explorer.run_example1">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.pj_explorer.</span></span><span class="sig-name descname"><span class="pre">run_example1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.interface.pj_explorer.run_example1" title="Link to this definition"></a></dt>
+<dd><p>Run example 1.</p>
+<p>This example sets up a simple Yule model with two samples,
+and two Yule tree replicates per sample.</p>
+</dd></dl>
+
+</section>
+<section id="module-phylojunction.interface">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction.interface" title="Link to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="phylojunction.inference.revbayes.html" class="btn btn-neutral float-left" title="phylojunction.inference.revbayes package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="phylojunction.interface.cmdbox.html" class="btn btn-neutral float-right" title="phylojunction.interface.cmdbox package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

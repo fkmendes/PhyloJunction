@@ -150,7 +150,7 @@ If you are on an Apple machine that obstrusively curtails file system access, ru
 
 ```
 cd PhyloJunction/
-python3.9 -m pip install --user -e .
+python3 -m pip install --user -e .
 ```
 
 The `--user` flag is the way around said restrictions.
@@ -159,7 +159,7 @@ Remember to add this path to the PATH system variable if you want to call the ex
 Another option is to run the following command:
 
 ```
-python3.9 -m pip install --prefix ~/.local -e .
+python3 -m pip install --prefix ~/.local -e .
 ```
 
 Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.
@@ -178,7 +178,7 @@ pjgui
 ```
 
 Important notes:
-    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computer architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/bin/python3.9`)
+    (1) On Apple machines, sometimes when Homebrew updates itself and starts updating python3.X.Y, say, and depending on your computer architecture (e.g., M1 or M2 chips). Make sure you update your interpreter (command + shift + P, Python: Select Interpreter) to the newest version (e.g., `/opt/homebrew/Cellar/python@3.9/3.9.16/Frameworks/Python.framework/Versions/3.9/bin/python3`)
 
     (2) On Linux machines, depending on the python version (e.g., 3.9.7), the PySimpleGUI GUI will have its Helvetica fonts replaced by a Courier-like font and be all messed up. It might have to do with running the GUI within a conda environment though. The way around is to reinstall PJ (with `pip` as described above) with another Python version on the Terminal, by quitting the conda environment (`conda deactivate`) if necessary
 
@@ -295,7 +295,8 @@ pyuic5 or pyuic6 creates a .py from Qt Creator's ui, it will place import statem
 PhyloJunction is documented automatically with `sphinx`, so make sure you have this program installed:
 
 ```
-pip3 install sphinx
+python3.11 -m pip install sphinx
+python3.11 -m pip install sphinx-new-tab-link
 ```
 
 `sphinx` is a Python program that converts docstrings into .rst files, and then from those and other .rst files it creates it can produce .html files for online documentation.
@@ -351,7 +352,7 @@ We will use the "Read the Docs" (RTD) theme to document PJ, as it is straightfor
 First, install it:
 
 ```
-pip3 install sphinx-rtd-theme
+python3.11 -m pip install sphinx-rtd-theme
 ```
 
 And the following must be added to `conf.py`:
@@ -421,6 +422,10 @@ make clean && make html
 ```
 
 This command will need to be called every time we want to update the .html files once the .rst files are modified.
+
+If for some reason sphinx/autodoc starts to complain certain modules cannot be found, it may be that the .rst files sphinx produces automatically need a refresh (module may have been renamed).
+The refresh may not be happening because make things they do not need updating.
+Just delete all .rst files inside docs/source/, and call the doc generation commands again.
 
 ### Documentation website structure
 

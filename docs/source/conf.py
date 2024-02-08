@@ -25,7 +25,7 @@ extensions = ["sphinx.ext.napoleon", "sphinx_new_tab_link"]
 # (i) places equation numbers to their right, as opposed to the top
 #     of the equations (the default of sphinx)
 def setup(app):
-    app.add_stylesheet('css/pj_custom.css')
+    app.add_css_file('css/pj_custom.css')
 
 templates_path = ['_templates']
 exclude_patterns = []

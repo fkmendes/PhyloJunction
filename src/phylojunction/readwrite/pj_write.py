@@ -687,25 +687,23 @@ def prep_data_filepaths_dfs(
     scalar_output_stash:
         ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
     tree_output_stash:
-        ty.List[ty.Union[ty.Dict[str, pd.DataFrame], ty.Dict[str, str]]]) \
-        -> ty.Tuple[ty.List[str], ty.List[ty.Union[pd.DataFrame, str]]]:
-    """Prepare list of file paths and list of pandas DataFrames
-
+        ty.List[ty.Union[ty.Dict[str, pd.DataFrame], ty.Dict[str, str]]]) -> \
+            ty.Tuple[ty.List[str], ty.List[ty.Union[pd.DataFrame, str]]]:
+    """Prepare list of file paths and list of pandas DataFrames.
+    
     Args:
-        scalar_output_stash (ty.List[ty.Union[pd.DataFrame,
-            ty.Dict[int, pd.DataFrame]]]): List of either pandas'
-            dataframes, or dictionaries with number of replicates
-            as keys, and pandas' dataframes as values.
-            These contain scalar simulated data.
+        scalar_output_stash (list): List of either pandas dataframes,
+            or dictionaries with number of replicates as keys, and
+            pandas dataframes as values. These contain scalar simulated
+            data.
         tree_output_stash (ty.List[ty.Dict[str, pd.DataFrame]]):
             List of dictionaries with tree node names as keys, and
             pandas' dataframes as values.
             These contains tree simulated data.
 
     Returns:
-        ty.Tuple[ty.List[str], ty.List[pd.DataFrame]]:
-        List of filepath strings and pandas' dataframes to be written
-        to disk
+        (tuple): List of filepath strings and and list of pandas
+            dataframes to be written to disk.
     """
 
     output_fp_list: ty.List[str] = []

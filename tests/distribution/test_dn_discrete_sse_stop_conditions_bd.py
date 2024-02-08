@@ -287,14 +287,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/distribution/test_dn_discrete_sse_stop_conditions_bd.py
+    # $ python3 tests/distribution/test_dn_discrete_sse_stop_conditions_bd.py
     # 
     # or
     #
-    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_stop_conditions_bd
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_stop_conditions_bd
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_stop_conditions_bd.TestSSEStopConditionsBD.test_tree_size_stop_condition_origin
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_stop_conditions_bd.TestSSEStopConditionsBD.test_tree_size_stop_condition_origin
 
     unittest.main()

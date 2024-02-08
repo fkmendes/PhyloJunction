@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>phylojunction package &mdash; PhyloJunction 0.0.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/pj_custom.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="phylojunction.calculation package" href="phylojunction.calculation.html" />
+    <link rel="prev" title="phylojunction" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -26,21 +31,44 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/pj_logo_doc.svg" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Library API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">phylojunction package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html">phylojunction.calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html">phylojunction.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html">phylojunction.distribution package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.inference.html">phylojunction.inference package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.html">phylojunction.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html">phylojunction.pgm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.plotting.html">phylojunction.plotting package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.readwrite.html">phylojunction.readwrite package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html">phylojunction.utility package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-phylojunction">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -56,8 +84,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>phylojunction package</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">phylojunction</a></li>
+      <li class="breadcrumb-item active">phylojunction package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/phylojunction.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -67,31 +96,310 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="phylojunction-package">
-<h1>phylojunction package<a class="headerlink" href="#phylojunction-package" title="Permalink to this heading"></a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+  <section id="phylojunction-package">
+<h1>phylojunction package<a class="headerlink" href="#phylojunction-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.calculation.html">phylojunction.calculation package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.calculation.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.calculation.html#module-phylojunction.calculation.discrete_sse">phylojunction.calculation.discrete_sse module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.calculation.html#module-phylojunction.calculation.math_utils">phylojunction.calculation.math_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.calculation.html#module-phylojunction.calculation.discrete_sse">phylojunction.calculation.discrete_sse module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.epoch_idx"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter.epoch_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.name"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.state"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter.state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter.value"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameter.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.epsilon"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.epsilon</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.matrix_state_dep_params"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.matrix_state_dep_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.param_type"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.param_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.seed_age"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.seed_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.slice_age_ends"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.slice_age_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.slice_t_ends"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.slice_t_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.state_dep_params_at_time"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterManager.state_dep_params_at_time()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterType"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterType.PROBABILITY"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterType.PROBABILITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterType.RATE"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterType.RATE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterType.UNDEFINED"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentParameterType.UNDEFINED</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbability</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability.state_representation"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbability.state_representation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.n_time_slices"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.n_time_slices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.randomly_decide_taxon_sampling_at_time_at_state"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.randomly_decide_taxon_sampling_at_time_at_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.seed_age"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.seed_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.slice_age_ends"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.slice_age_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.slice_t_ends"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.slice_t_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.state_count"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.state_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.state_dep_prob_manager"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.state_dep_prob_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbabilityHandler.str_representation"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentProbabilityHandler.str_representation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentRate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.arriving_state"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentRate.arriving_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.departing_state"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentRate.departing_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.event"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentRate.event</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.state_tuple"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentRate.state_tuple</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentRate.str_representation"><code class="docutils literal notranslate"><span class="pre">DiscreteStateDependentRate.str_representation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent.ANAGENETIC_TRANSITION"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent.ANAGENETIC_TRANSITION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent.ANCESTOR_SAMPLING"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent.ANCESTOR_SAMPLING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent.ASYM_SPECIATION"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent.ASYM_SPECIATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent.BW_SPECIATION"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent.BW_SPECIATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent.EXTINCTION"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent.EXTINCTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEvent.W_SPECIATION"><code class="docutils literal notranslate"><span class="pre">MacroevolEvent.W_SPECIATION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.n_time_slices"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.n_time_slices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.sample_event_sse_rate_param"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.sample_event_sse_rate_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.seed_age"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.seed_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.slice_age_ends"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.slice_age_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.slice_t_ends"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.slice_t_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.sse_rate_manager"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.sse_rate_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.state_count"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.state_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.str_representation"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.str_representation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.MacroevolEventHandler.total_rate"><code class="docutils literal notranslate"><span class="pre">MacroevolEventHandler.total_rate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash"><code class="docutils literal notranslate"><span class="pre">SSEStash</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash.get_meh"><code class="docutils literal notranslate"><span class="pre">SSEStash.get_meh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash.get_prob_handler"><code class="docutils literal notranslate"><span class="pre">SSEStash.get_prob_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash.meh"><code class="docutils literal notranslate"><span class="pre">SSEStash.meh</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash.prob_handler"><code class="docutils literal notranslate"><span class="pre">SSEStash.prob_handler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.SSEStash.str_representation"><code class="docutils literal notranslate"><span class="pre">SSEStash.str_representation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.StateIntoPatternConverter"><code class="docutils literal notranslate"><span class="pre">StateIntoPatternConverter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.int2set_dict"><code class="docutils literal notranslate"><span class="pre">StateIntoPatternConverter.int2set_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_char"><code class="docutils literal notranslate"><span class="pre">StateIntoPatternConverter.n_char</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_states"><code class="docutils literal notranslate"><span class="pre">StateIntoPatternConverter.n_states</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.n_states_per_char"><code class="docutils literal notranslate"><span class="pre">StateIntoPatternConverter.n_states_per_char</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.StateIntoPatternConverter.set2int_dict"><code class="docutils literal notranslate"><span class="pre">StateIntoPatternConverter.set2int_dict</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.calculation.html#module-phylojunction.calculation.math_utils">phylojunction.calculation.math_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.BaseEnum"><code class="docutils literal notranslate"><span class="pre">BaseEnum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.MetaEnum"><code class="docutils literal notranslate"><span class="pre">MetaEnum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.ParametricDistribution"><code class="docutils literal notranslate"><span class="pre">ParametricDistribution</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.ParametricDistribution.EXPONENTIAL"><code class="docutils literal notranslate"><span class="pre">ParametricDistribution.EXPONENTIAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.ParametricDistribution.GAMMA"><code class="docutils literal notranslate"><span class="pre">ParametricDistribution.GAMMA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.ParametricDistribution.LOGNORMAL"><code class="docutils literal notranslate"><span class="pre">ParametricDistribution.LOGNORMAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.ParametricDistribution.NORMAL"><code class="docutils literal notranslate"><span class="pre">ParametricDistribution.NORMAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.ParametricDistribution.UNIFORM"><code class="docutils literal notranslate"><span class="pre">ParametricDistribution.UNIFORM</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.exp_extant_count_bd"><code class="docutils literal notranslate"><span class="pre">exp_extant_count_bd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.math_utils.exp_root_height_yule_ntaxa"><code class="docutils literal notranslate"><span class="pre">exp_root_height_yule_ntaxa()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.calculation.html#module-phylojunction.calculation">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.data.html">phylojunction.data package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data.attribute_transition">phylojunction.data.attribute_transition module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data.sampled_ancestor">phylojunction.data.sampled_ancestor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data.tree">phylojunction.data.tree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data.attribute_transition">phylojunction.data.attribute_transition module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition"><code class="docutils literal notranslate"><span class="pre">AttributeTransition</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.attr_label"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.attr_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.from_state"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.from_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.global_time"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.global_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.str_representation"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.str_representation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.subtending_node_label"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.subtending_node_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.to_state"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.to_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.attribute_transition.AttributeTransition.update_daughter_members"><code class="docutils literal notranslate"><span class="pre">AttributeTransition.update_daughter_members()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data.sampled_ancestor">phylojunction.data.sampled_ancestor module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor"><code class="docutils literal notranslate"><span class="pre">SampledAncestor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor.global_time"><code class="docutils literal notranslate"><span class="pre">SampledAncestor.global_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor.label"><code class="docutils literal notranslate"><span class="pre">SampledAncestor.label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor.lineage_node_label"><code class="docutils literal notranslate"><span class="pre">SampledAncestor.lineage_node_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor.state"><code class="docutils literal notranslate"><span class="pre">SampledAncestor.state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor.str_representation"><code class="docutils literal notranslate"><span class="pre">SampledAncestor.str_representation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.sampled_ancestor.SampledAncestor.time_to_lineage_node"><code class="docutils literal notranslate"><span class="pre">SampledAncestor.time_to_lineage_node</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data.tree">phylojunction.data.tree module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.at_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.at_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.brosc_node"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.brosc_node</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.condition_on_obs_both_sides_root"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.condition_on_obs_both_sides_root</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.epsilon"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.epsilon</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extant_sampled_terminal_nodes_labels"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extant_sampled_terminal_nodes_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extant_terminal_nodes_labels"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extant_terminal_nodes_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extant_terminal_sampled_state_count_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extant_terminal_sampled_state_count_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extant_terminal_state_count_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extant_terminal_state_count_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extinct_terminal_nodes_labels"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extinct_terminal_nodes_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extinct_terminal_state_count_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extinct_terminal_state_count_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.extract_reconstructed_tree"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.extract_reconstructed_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.get_stats_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.get_stats_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.get_taxon_states_str"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.get_taxon_states_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.is_extant_or_sa_on_both_sides_complete_tr_root"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.is_extant_or_sa_on_both_sides_complete_tr_root()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.max_age"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.max_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.n_extant_sampled_terminal_nodes"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.n_extant_sampled_terminal_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.n_extant_terminal_nodes"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.n_extant_terminal_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.n_extinct_sampled_terminal_nodes"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.n_extinct_sampled_terminal_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.n_extinct_terminal_nodes"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.n_extinct_terminal_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.n_sa_nodes"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.n_sa_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.node_ages_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.node_ages_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.node_attr_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.node_attr_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.node_heights_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.node_heights_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.origin_age"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.origin_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.origin_edge_length"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.origin_edge_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.origin_node"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.origin_node</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.plot_node"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.plot_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.populate_nd_attr_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.populate_nd_attr_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.root_age"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.root_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.root_node"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.root_node</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.sa_lineage_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.sa_lineage_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.sa_obs_nodes_labels"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.sa_obs_nodes_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.seed_age"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.seed_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.slice_age_ends"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.slice_age_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.slice_t_ends"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.slice_t_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.state_count"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.state_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.state_count_dict"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.state_count_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.tree"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.tree</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.tree_died"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.tree_died</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.tree_invalid"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.tree_invalid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.tree_read_as_newick"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.tree_read_as_newick</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.tree_reconstructed"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.tree_reconstructed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.AnnotatedTree.with_origin"><code class="docutils literal notranslate"><span class="pre">AnnotatedTree.with_origin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.get_color_map"><code class="docutils literal notranslate"><span class="pre">get_color_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.get_node_name"><code class="docutils literal notranslate"><span class="pre">get_node_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.get_x_coord_from_nd_heights"><code class="docutils literal notranslate"><span class="pre">get_x_coord_from_nd_heights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.get_y_coord_from_n_obs_nodes"><code class="docutils literal notranslate"><span class="pre">get_y_coord_from_n_obs_nodes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.pj_get_name_mrca_obs_terminals"><code class="docutils literal notranslate"><span class="pre">pj_get_name_mrca_obs_terminals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.data.html#phylojunction.data.tree.plot_ann_tree"><code class="docutils literal notranslate"><span class="pre">plot_ann_tree()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.data.html#module-phylojunction.data">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.distribution.html">phylojunction.distribution package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.distribution.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.distribution.html#phylojunction-distribution-dn-discrete-sse-module">phylojunction.distribution.dn_discrete_sse module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.distribution.html#phylojunction-distribution-dn-parametric-module">phylojunction.distribution.dn_parametric module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.distribution.html#module-phylojunction.distribution.dn_discrete_sse">phylojunction.distribution.dn_discrete_sse module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE"><code class="docutils literal notranslate"><span class="pre">DnSSE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DnSSE.DN_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.abort_at_living_count"><code class="docutils literal notranslate"><span class="pre">DnSSE.abort_at_living_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_obs_both_sides_root"><code class="docutils literal notranslate"><span class="pre">DnSSE.condition_on_obs_both_sides_root</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_speciation"><code class="docutils literal notranslate"><span class="pre">DnSSE.condition_on_speciation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.condition_on_survival"><code class="docutils literal notranslate"><span class="pre">DnSSE.condition_on_survival</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.debug"><code class="docutils literal notranslate"><span class="pre">DnSSE.debug</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.epsilon"><code class="docutils literal notranslate"><span class="pre">DnSSE.epsilon</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.events"><code class="docutils literal notranslate"><span class="pre">DnSSE.events</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.generate"><code class="docutils literal notranslate"><span class="pre">DnSSE.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">DnSSE.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.info"><code class="docutils literal notranslate"><span class="pre">DnSSE.info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">DnSSE.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.max_rec_taxa"><code class="docutils literal notranslate"><span class="pre">DnSSE.max_rec_taxa</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.min_rec_taxa"><code class="docutils literal notranslate"><span class="pre">DnSSE.min_rec_taxa</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.n_sim"><code class="docutils literal notranslate"><span class="pre">DnSSE.n_sim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.n_time_slices"><code class="docutils literal notranslate"><span class="pre">DnSSE.n_time_slices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.prob_handler"><code class="docutils literal notranslate"><span class="pre">DnSSE.prob_handler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.rng_seed"><code class="docutils literal notranslate"><span class="pre">DnSSE.rng_seed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.root_is_born"><code class="docutils literal notranslate"><span class="pre">DnSSE.root_is_born</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.runtime_limit"><code class="docutils literal notranslate"><span class="pre">DnSSE.runtime_limit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.seed_age"><code class="docutils literal notranslate"><span class="pre">DnSSE.seed_age</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.simulate"><code class="docutils literal notranslate"><span class="pre">DnSSE.simulate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.slice_t_ends"><code class="docutils literal notranslate"><span class="pre">DnSSE.slice_t_ends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.sse_stash"><code class="docutils literal notranslate"><span class="pre">DnSSE.sse_stash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.start_states"><code class="docutils literal notranslate"><span class="pre">DnSSE.start_states</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.state_count"><code class="docutils literal notranslate"><span class="pre">DnSSE.state_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.stop"><code class="docutils literal notranslate"><span class="pre">DnSSE.stop</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.stop_val"><code class="docutils literal notranslate"><span class="pre">DnSSE.stop_val</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_discrete_sse.DnSSE.with_origin"><code class="docutils literal notranslate"><span class="pre">DnSSE.with_origin</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.distribution.html#module-phylojunction.distribution.dn_parametric">phylojunction.distribution.dn_parametric module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential"><code class="docutils literal notranslate"><span class="pre">DnExponential</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DnExponential.DN_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.draw_exp"><code class="docutils literal notranslate"><span class="pre">DnExponential.draw_exp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.exp_rate_parameterization"><code class="docutils literal notranslate"><span class="pre">DnExponential.exp_rate_parameterization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.exp_scale_or_rate_list"><code class="docutils literal notranslate"><span class="pre">DnExponential.exp_scale_or_rate_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.generate"><code class="docutils literal notranslate"><span class="pre">DnExponential.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">DnExponential.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">DnExponential.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.param_dict"><code class="docutils literal notranslate"><span class="pre">DnExponential.param_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.parent_node_tracker"><code class="docutils literal notranslate"><span class="pre">DnExponential.parent_node_tracker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnExponential.vectorized_params"><code class="docutils literal notranslate"><span class="pre">DnExponential.vectorized_params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma"><code class="docutils literal notranslate"><span class="pre">DnGamma</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DnGamma.DN_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.draw_gamma"><code class="docutils literal notranslate"><span class="pre">DnGamma.draw_gamma()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.gamma_rate_parameterization"><code class="docutils literal notranslate"><span class="pre">DnGamma.gamma_rate_parameterization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.gamma_scale_or_rate_param_list"><code class="docutils literal notranslate"><span class="pre">DnGamma.gamma_scale_or_rate_param_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.gamma_shape_param_list"><code class="docutils literal notranslate"><span class="pre">DnGamma.gamma_shape_param_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.generate"><code class="docutils literal notranslate"><span class="pre">DnGamma.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">DnGamma.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">DnGamma.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.param_dict"><code class="docutils literal notranslate"><span class="pre">DnGamma.param_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.parent_node_tracker"><code class="docutils literal notranslate"><span class="pre">DnGamma.parent_node_tracker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnGamma.vectorized_params"><code class="docutils literal notranslate"><span class="pre">DnGamma.vectorized_params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal"><code class="docutils literal notranslate"><span class="pre">DnLogNormal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.DN_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.draw_ln"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.draw_ln()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.generate"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.ln_log_space"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.ln_log_space</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.ln_mean_list"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.ln_mean_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.ln_sd_list"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.ln_sd_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.param_dict"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.param_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.parent_node_tracker"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.parent_node_tracker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnLogNormal.vectorized_params"><code class="docutils literal notranslate"><span class="pre">DnLogNormal.vectorized_params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal"><code class="docutils literal notranslate"><span class="pre">DnNormal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DnNormal.DN_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.draw_normal"><code class="docutils literal notranslate"><span class="pre">DnNormal.draw_normal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.generate"><code class="docutils literal notranslate"><span class="pre">DnNormal.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">DnNormal.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">DnNormal.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.norm_mean_param_list"><code class="docutils literal notranslate"><span class="pre">DnNormal.norm_mean_param_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.norm_sd_param_list"><code class="docutils literal notranslate"><span class="pre">DnNormal.norm_sd_param_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.param_dict"><code class="docutils literal notranslate"><span class="pre">DnNormal.param_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.parent_node_tracker"><code class="docutils literal notranslate"><span class="pre">DnNormal.parent_node_tracker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnNormal.vectorized_params"><code class="docutils literal notranslate"><span class="pre">DnNormal.vectorized_params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif"><code class="docutils literal notranslate"><span class="pre">DnUnif</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DnUnif.DN_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.draw_unif"><code class="docutils literal notranslate"><span class="pre">DnUnif.draw_unif()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.generate"><code class="docutils literal notranslate"><span class="pre">DnUnif.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">DnUnif.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">DnUnif.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.max_param_list"><code class="docutils literal notranslate"><span class="pre">DnUnif.max_param_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.min_param_list"><code class="docutils literal notranslate"><span class="pre">DnUnif.min_param_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.param_dict"><code class="docutils literal notranslate"><span class="pre">DnUnif.param_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.parent_node_tracker"><code class="docutils literal notranslate"><span class="pre">DnUnif.parent_node_tracker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.distribution.html#phylojunction.distribution.dn_parametric.DnUnif.vectorized_params"><code class="docutils literal notranslate"><span class="pre">DnUnif.vectorized_params</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.distribution.html#module-phylojunction.distribution">Module contents</a></li>
 </ul>
 </li>
@@ -113,20 +421,28 @@
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.cmdbox.html">phylojunction.interface.cmdbox package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.cmdbox.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.cmdbox.html#phylojunction-interface-cmdbox-cmd-parse-module">phylojunction.interface.cmdbox.cmd_parse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox.cmd_parse">phylojunction.interface.cmdbox.cmd_parse module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox.cmd_parse_utils">phylojunction.interface.cmdbox.cmd_parse_utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.cmdbox.html#module-phylojunction.interface.cmdbox">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html">phylojunction.interface.grammar package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction-interface-grammar-det-fn-discrete-sse-module">phylojunction.interface.grammar.det_fn_discrete_sse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.ct_fn_grammar">phylojunction.interface.grammar.ct_fn_grammar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.ct_fn_treereader_makers">phylojunction.interface.grammar.ct_fn_treereader_makers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_discrete_sse_makers">phylojunction.interface.grammar.det_fn_discrete_sse_makers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_grammar">phylojunction.interface.grammar.det_fn_grammar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction-interface-grammar-dn-grammar-module">phylojunction.interface.grammar.dn_grammar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction-interface-grammar-make-dn-discrete-sse-module">phylojunction.interface.grammar.make_dn_discrete_sse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_map_attribute">phylojunction.interface.grammar.det_fn_map_attribute module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.dn_discrete_sse_makers">phylojunction.interface.grammar.dn_discrete_sse_makers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.dn_grammar">phylojunction.interface.grammar.dn_grammar module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar">Module contents</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.html#module-phylojunction.interface.pj_explorer">phylojunction.interface.pj_explorer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.html#phylojunction.interface.pj_explorer.run_example1"><code class="docutils literal notranslate"><span class="pre">run_example1()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.html#module-phylojunction.interface">Module contents</a></li>
@@ -134,44 +450,398 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.pgm.html">phylojunction.pgm package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.pgm.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.pgm.html#module-phylojunction.pgm.pgm">phylojunction.pgm.pgm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.pgm.html#module-phylojunction.pgm.pgm">phylojunction.pgm.pgm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ConstantFn"><code class="docutils literal notranslate"><span class="pre">ConstantFn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ConstantFn.CT_FN_NAME"><code class="docutils literal notranslate"><span class="pre">ConstantFn.CT_FN_NAME</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DeterministicNodeDAG"><code class="docutils literal notranslate"><span class="pre">DeterministicNodeDAG</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DeterministicNodeDAG.get_node_stats_str"><code class="docutils literal notranslate"><span class="pre">DeterministicNodeDAG.get_node_stats_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DeterministicNodeDAG.plot_node"><code class="docutils literal notranslate"><span class="pre">DeterministicNodeDAG.plot_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DeterministicNodeDAG.populate_operator_weight"><code class="docutils literal notranslate"><span class="pre">DeterministicNodeDAG.populate_operator_weight()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.add_node"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.add_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.get_display_str_by_name"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.get_display_str_by_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.get_node_dag_by_name"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.get_node_dag_by_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.get_sorted_node_dag_list"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.get_sorted_node_dag_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.n_nodes"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.n_nodes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.name_node_dict"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.name_node_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.node_val_dict"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.node_val_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.random_seed"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.random_seed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph.sample_size"><code class="docutils literal notranslate"><span class="pre">DirectedAcyclicGraph.sample_size</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling"><code class="docutils literal notranslate"><span class="pre">DistrForSampling</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DistrForSampling.DN_NAME"><code class="docutils literal notranslate"><span class="pre">DistrForSampling.DN_NAME</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG"><code class="docutils literal notranslate"><span class="pre">NodeDAG</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.call_order_idx"><code class="docutils literal notranslate"><span class="pre">NodeDAG.call_order_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.get_node_stats_str"><code class="docutils literal notranslate"><span class="pre">NodeDAG.get_node_stats_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.get_start2end_str"><code class="docutils literal notranslate"><span class="pre">NodeDAG.get_start2end_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.is_clamped"><code class="docutils literal notranslate"><span class="pre">NodeDAG.is_clamped</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.is_deterministic"><code class="docutils literal notranslate"><span class="pre">NodeDAG.is_deterministic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.is_sampled"><code class="docutils literal notranslate"><span class="pre">NodeDAG.is_sampled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.node_name"><code class="docutils literal notranslate"><span class="pre">NodeDAG.node_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.parent_nd_list"><code class="docutils literal notranslate"><span class="pre">NodeDAG.parent_nd_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.plot_node"><code class="docutils literal notranslate"><span class="pre">NodeDAG.plot_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.populate_operator_weight"><code class="docutils literal notranslate"><span class="pre">NodeDAG.populate_operator_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.repl_size"><code class="docutils literal notranslate"><span class="pre">NodeDAG.repl_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.sample_size"><code class="docutils literal notranslate"><span class="pre">NodeDAG.sample_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG.value"><code class="docutils literal notranslate"><span class="pre">NodeDAG.value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.constant_fn"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.constant_fn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.generate_value"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.generate_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.get_node_stats_str"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.get_node_stats_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.operator_weight"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.operator_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.plot_node"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.plot_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.populate_operator_weight"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.populate_operator_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.StochasticNodeDAG.sampling_dn"><code class="docutils literal notranslate"><span class="pre">StochasticNodeDAG.sampling_dn</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ValueGenerator"><code class="docutils literal notranslate"><span class="pre">ValueGenerator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ValueGenerator.generate"><code class="docutils literal notranslate"><span class="pre">ValueGenerator.generate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ValueGenerator.get_rev_inference_spec_info"><code class="docutils literal notranslate"><span class="pre">ValueGenerator.get_rev_inference_spec_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ValueGenerator.init_check_vectorize_sample_size"><code class="docutils literal notranslate"><span class="pre">ValueGenerator.init_check_vectorize_sample_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ValueGenerator.n_repl"><code class="docutils literal notranslate"><span class="pre">ValueGenerator.n_repl()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.ValueGenerator.n_samples"><code class="docutils literal notranslate"><span class="pre">ValueGenerator.n_samples()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.abstract_attribute"><code class="docutils literal notranslate"><span class="pre">abstract_attribute()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.extract_vals_as_str_from_node_dag"><code class="docutils literal notranslate"><span class="pre">extract_vals_as_str_from_node_dag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.plot_blank"><code class="docutils literal notranslate"><span class="pre">plot_blank()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.plot_node_histogram"><code class="docutils literal notranslate"><span class="pre">plot_node_histogram()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.pgm.html#module-phylojunction.pgm">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.plotting.html">phylojunction.plotting package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#phylojunction-plotting-pj-draw-module">phylojunction.plotting.pj_draw module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#phylojunction-plotting-pj-organize-module">phylojunction.plotting.pj_organize module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#module-phylojunction.plotting.pj_seeing_colors">phylojunction.plotting.pj_seeing_colors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#module-phylojunction.plotting.pj_draw">phylojunction.plotting.pj_draw module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.plotting.html#phylojunction.plotting.pj_draw.plot_intervals"><code class="docutils literal notranslate"><span class="pre">plot_intervals()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.plotting.html#phylojunction.plotting.pj_draw.plot_violins"><code class="docutils literal notranslate"><span class="pre">plot_violins()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#module-phylojunction.plotting.pj_organize">phylojunction.plotting.pj_organize module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.plotting.html#phylojunction.plotting.pj_organize.add_within_hpd_col"><code class="docutils literal notranslate"><span class="pre">add_within_hpd_col()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.plotting.html#phylojunction.plotting.pj_organize.join_dataframes"><code class="docutils literal notranslate"><span class="pre">join_dataframes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#module-phylojunction.plotting.pj_seeing_colors">phylojunction.plotting.pj_seeing_colors module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.plotting.html#phylojunction.plotting.pj_seeing_colors.truncate_colormap"><code class="docutils literal notranslate"><span class="pre">truncate_colormap()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#module-phylojunction.plotting.pj_testing_tree_plotting">phylojunction.plotting.pj_testing_tree_plotting module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.plotting.html#module-phylojunction.plotting">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.readwrite.html">phylojunction.readwrite package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.readwrite.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.readwrite.html#module-phylojunction.readwrite.pj_read">phylojunction.readwrite.pj_read module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction-readwrite-pj-write-module">phylojunction.readwrite.pj_write module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.readwrite.html#module-phylojunction.readwrite.pj_read">phylojunction.readwrite.pj_read module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.is_csv"><code class="docutils literal notranslate"><span class="pre">is_csv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.is_tsv"><code class="docutils literal notranslate"><span class="pre">is_tsv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.parse_cli_str_write_fig"><code class="docutils literal notranslate"><span class="pre">parse_cli_str_write_fig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.read_csv_tsv_into_dataframe"><code class="docutils literal notranslate"><span class="pre">read_csv_tsv_into_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.read_node_attr_update_tree"><code class="docutils literal notranslate"><span class="pre">read_node_attr_update_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.read_nwk_tree_str"><code class="docutils literal notranslate"><span class="pre">read_nwk_tree_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.read_serialized_pgm"><code class="docutils literal notranslate"><span class="pre">read_serialized_pgm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_read.read_text_file"><code class="docutils literal notranslate"><span class="pre">read_text_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.readwrite.html#module-phylojunction.readwrite.pj_write">phylojunction.readwrite.pj_write module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.dump_pgm_data"><code class="docutils literal notranslate"><span class="pre">dump_pgm_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.dump_serialized_pgm"><code class="docutils literal notranslate"><span class="pre">dump_serialized_pgm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.get_write_inference_rev_scripts"><code class="docutils literal notranslate"><span class="pre">get_write_inference_rev_scripts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.initialize_scalar_dataframe"><code class="docutils literal notranslate"><span class="pre">initialize_scalar_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.initialize_tree_dataframe"><code class="docutils literal notranslate"><span class="pre">initialize_tree_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.prep_data_df"><code class="docutils literal notranslate"><span class="pre">prep_data_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.prep_data_filepaths_dfs"><code class="docutils literal notranslate"><span class="pre">prep_data_filepaths_dfs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.write_data_df"><code class="docutils literal notranslate"><span class="pre">write_data_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.write_fig_to_file"><code class="docutils literal notranslate"><span class="pre">write_fig_to_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.readwrite.html#phylojunction.readwrite.pj_write.write_str_list"><code class="docutils literal notranslate"><span class="pre">write_str_list()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.readwrite.html#module-phylojunction.readwrite">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="phylojunction.utility.html">phylojunction.utility package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.utility.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.utility.html#module-phylojunction.utility.exception_classes">phylojunction.utility.exception_classes module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="phylojunction.utility.html#module-phylojunction.utility.helper_functions">phylojunction.utility.helper_functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.utility.html#module-phylojunction.utility.exception_classes">phylojunction.utility.exception_classes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeIncorrectAnnotationError"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeIncorrectAnnotationError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeIncorrectAnnotationError.message"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeIncorrectAnnotationError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeMissingNodeName"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeMissingNodeName</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeMissingNodeName.message"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeMissingNodeName.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeMisspecError"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeMisspecError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeMisspecError.message"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeMisspecError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeNodeMissingAttrError"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeNodeMissingAttrError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.AnnotatedTreeNodeMissingAttrError.message"><code class="docutils literal notranslate"><span class="pre">AnnotatedTreeNodeMissingAttrError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DAGCannotAddNodeError"><code class="docutils literal notranslate"><span class="pre">DAGCannotAddNodeError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DAGCannotAddNodeError.message"><code class="docutils literal notranslate"><span class="pre">DAGCannotAddNodeError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DAGCannotInitialize"><code class="docutils literal notranslate"><span class="pre">DAGCannotInitialize</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DAGCannotInitialize.message"><code class="docutils literal notranslate"><span class="pre">DAGCannotInitialize.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityError"><code class="docutils literal notranslate"><span class="pre">DimensionalityError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityError.dn_name"><code class="docutils literal notranslate"><span class="pre">DimensionalityError.dn_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityError.message"><code class="docutils literal notranslate"><span class="pre">DimensionalityError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityError.par_name"><code class="docutils literal notranslate"><span class="pre">DimensionalityError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityWarning"><code class="docutils literal notranslate"><span class="pre">DimensionalityWarning</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityWarning.dn_name"><code class="docutils literal notranslate"><span class="pre">DimensionalityWarning.dn_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityWarning.message"><code class="docutils literal notranslate"><span class="pre">DimensionalityWarning.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.DimensionalityWarning.rv_name"><code class="docutils literal notranslate"><span class="pre">DimensionalityWarning.rv_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.FunctionArgsMismatchError"><code class="docutils literal notranslate"><span class="pre">FunctionArgsMismatchError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.FunctionArgsMismatchError.fn_name"><code class="docutils literal notranslate"><span class="pre">FunctionArgsMismatchError.fn_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.FunctionArgsMismatchError.message"><code class="docutils literal notranslate"><span class="pre">FunctionArgsMismatchError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.GenerateFailError"><code class="docutils literal notranslate"><span class="pre">GenerateFailError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.GenerateFailError.message"><code class="docutils literal notranslate"><span class="pre">GenerateFailError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.IncorrectDimensionError"><code class="docutils literal notranslate"><span class="pre">IncorrectDimensionError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.IncorrectDimensionError.container_name"><code class="docutils literal notranslate"><span class="pre">IncorrectDimensionError.container_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.IncorrectDimensionError.exp_len"><code class="docutils literal notranslate"><span class="pre">IncorrectDimensionError.exp_len</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.IncorrectDimensionError.message"><code class="docutils literal notranslate"><span class="pre">IncorrectDimensionError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.IncorrectDimensionError.obs_len"><code class="docutils literal notranslate"><span class="pre">IncorrectDimensionError.obs_len</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.InexistentVariableError"><code class="docutils literal notranslate"><span class="pre">InexistentVariableError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.InexistentVariableError.message"><code class="docutils literal notranslate"><span class="pre">InexistentVariableError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.InexistentVariableError.rv_name"><code class="docutils literal notranslate"><span class="pre">InexistentVariableError.rv_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.InvalidMCMCChainLength"><code class="docutils literal notranslate"><span class="pre">InvalidMCMCChainLength</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.InvalidMCMCChainLength.message"><code class="docutils literal notranslate"><span class="pre">InvalidMCMCChainLength.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.MissingColumnName"><code class="docutils literal notranslate"><span class="pre">MissingColumnName</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.MissingColumnName.message"><code class="docutils literal notranslate"><span class="pre">MissingColumnName.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NoPlatingAllowedError"><code class="docutils literal notranslate"><span class="pre">NoPlatingAllowedError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NoPlatingAllowedError.det_name"><code class="docutils literal notranslate"><span class="pre">NoPlatingAllowedError.det_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NoPlatingAllowedError.message"><code class="docutils literal notranslate"><span class="pre">NoPlatingAllowedError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NoPlatingAllowedError.node_dag_name"><code class="docutils literal notranslate"><span class="pre">NoPlatingAllowedError.node_dag_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NodeDAGStatCantFloatError"><code class="docutils literal notranslate"><span class="pre">NodeDAGStatCantFloatError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NodeDAGStatCantFloatError.message"><code class="docutils literal notranslate"><span class="pre">NodeDAGStatCantFloatError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NodeInferenceDimensionalityError"><code class="docutils literal notranslate"><span class="pre">NodeInferenceDimensionalityError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NodeInferenceDimensionalityError.message"><code class="docutils literal notranslate"><span class="pre">NodeInferenceDimensionalityError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NodeInferenceDimensionalityError.node_name"><code class="docutils literal notranslate"><span class="pre">NodeInferenceDimensionalityError.node_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NotBetweenZeroAndOneError"><code class="docutils literal notranslate"><span class="pre">NotBetweenZeroAndOneError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NotBetweenZeroAndOneError.message"><code class="docutils literal notranslate"><span class="pre">NotBetweenZeroAndOneError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.NotBetweenZeroAndOneError.par_name"><code class="docutils literal notranslate"><span class="pre">NotBetweenZeroAndOneError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError"><code class="docutils literal notranslate"><span class="pre">ObjInitIncorrectDimensionError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.at_least"><code class="docutils literal notranslate"><span class="pre">ObjInitIncorrectDimensionError.at_least</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.exp_len"><code class="docutils literal notranslate"><span class="pre">ObjInitIncorrectDimensionError.exp_len</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitIncorrectDimensionError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.obj_name"><code class="docutils literal notranslate"><span class="pre">ObjInitIncorrectDimensionError.obj_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitIncorrectDimensionError.obs_len"><code class="docutils literal notranslate"><span class="pre">ObjInitIncorrectDimensionError.obs_len</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitInvalidArgError"><code class="docutils literal notranslate"><span class="pre">ObjInitInvalidArgError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitInvalidArgError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitInvalidArgError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitInvalidArgError.obj_name"><code class="docutils literal notranslate"><span class="pre">ObjInitInvalidArgError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitMissingParameterError"><code class="docutils literal notranslate"><span class="pre">ObjInitMissingParameterError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitMissingParameterError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitMissingParameterError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitMissingParameterError.obj_name"><code class="docutils literal notranslate"><span class="pre">ObjInitMissingParameterError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError"><code class="docutils literal notranslate"><span class="pre">ObjInitMissingStateDependentParameterError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitMissingStateDependentParameterError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitMissingStateDependentParameterError.symmetric_diff_str"><code class="docutils literal notranslate"><span class="pre">ObjInitMissingStateDependentParameterError.symmetric_diff_str</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRepeatedStateDependentParameterError"><code class="docutils literal notranslate"><span class="pre">ObjInitRepeatedStateDependentParameterError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRepeatedStateDependentParameterError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitRepeatedStateDependentParameterError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireNonZeroStateDependentParameterError"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireNonZeroStateDependentParameterError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireNonZeroStateDependentParameterError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireNonZeroStateDependentParameterError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireNonZeroStateDependentParameterError.obj_name"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireNonZeroStateDependentParameterError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireSameParameterTypeError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.message"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireSameParameterTypeError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.n_diff_par"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireSameParameterTypeError.n_diff_par</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ObjInitRequireSameParameterTypeError.obj_name"><code class="docutils literal notranslate"><span class="pre">ObjInitRequireSameParameterTypeError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.PJCLIInvalidInputError"><code class="docutils literal notranslate"><span class="pre">PJCLIInvalidInputError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.PJCLIInvalidInputError.message"><code class="docutils literal notranslate"><span class="pre">PJCLIInvalidInputError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.PJCLIInvalidInputError.par_name"><code class="docutils literal notranslate"><span class="pre">PJCLIInvalidInputError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.PJCLISampleOutOfRangeError"><code class="docutils literal notranslate"><span class="pre">PJCLISampleOutOfRangeError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.PJIOFileDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">PJIOFileDoesNotExistError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseCtFnInitFailError"><code class="docutils literal notranslate"><span class="pre">ParseCtFnInitFailError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseCtFnInitFailError.ct_fn_name"><code class="docutils literal notranslate"><span class="pre">ParseCtFnInitFailError.ct_fn_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseCtFnInitFailError.message"><code class="docutils literal notranslate"><span class="pre">ParseCtFnInitFailError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseDetFnInitFailError"><code class="docutils literal notranslate"><span class="pre">ParseDetFnInitFailError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseDetFnInitFailError.det_fn_name"><code class="docutils literal notranslate"><span class="pre">ParseDetFnInitFailError.det_fn_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseDetFnInitFailError.message"><code class="docutils literal notranslate"><span class="pre">ParseDetFnInitFailError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseDnInitFailError"><code class="docutils literal notranslate"><span class="pre">ParseDnInitFailError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseDnInitFailError.dn_name"><code class="docutils literal notranslate"><span class="pre">ParseDnInitFailError.dn_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseDnInitFailError.message"><code class="docutils literal notranslate"><span class="pre">ParseDnInitFailError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseFunctionArgError"><code class="docutils literal notranslate"><span class="pre">ParseFunctionArgError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseFunctionArgError.message"><code class="docutils literal notranslate"><span class="pre">ParseFunctionArgError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseFunctionArgError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseFunctionArgError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseInvalidArgumentError"><code class="docutils literal notranslate"><span class="pre">ParseInvalidArgumentError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseInvalidArgumentError.message"><code class="docutils literal notranslate"><span class="pre">ParseInvalidArgumentError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseInvalidArgumentError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseInvalidArgumentError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseInvalidNewickStringError"><code class="docutils literal notranslate"><span class="pre">ParseInvalidNewickStringError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseInvalidNewickStringError.message"><code class="docutils literal notranslate"><span class="pre">ParseInvalidNewickStringError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseInvalidNewickStringError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseInvalidNewickStringError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingArgumentError"><code class="docutils literal notranslate"><span class="pre">ParseMissingArgumentError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingArgumentError.message"><code class="docutils literal notranslate"><span class="pre">ParseMissingArgumentError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingArgumentError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseMissingArgumentError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingParameterError"><code class="docutils literal notranslate"><span class="pre">ParseMissingParameterError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingParameterError.message"><code class="docutils literal notranslate"><span class="pre">ParseMissingParameterError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingParameterError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseMissingParameterError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingSpecificationError"><code class="docutils literal notranslate"><span class="pre">ParseMissingSpecificationError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMissingSpecificationError.message"><code class="docutils literal notranslate"><span class="pre">ParseMissingSpecificationError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMutuallyExclusiveParametersError"><code class="docutils literal notranslate"><span class="pre">ParseMutuallyExclusiveParametersError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMutuallyExclusiveParametersError.message"><code class="docutils literal notranslate"><span class="pre">ParseMutuallyExclusiveParametersError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMutuallyExclusiveParametersError.mutually_exclusive_par_name"><code class="docutils literal notranslate"><span class="pre">ParseMutuallyExclusiveParametersError.mutually_exclusive_par_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseMutuallyExclusiveParametersError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseMutuallyExclusiveParametersError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseNotAParameterError"><code class="docutils literal notranslate"><span class="pre">ParseNotAParameterError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseNotAParameterError.message"><code class="docutils literal notranslate"><span class="pre">ParseNotAParameterError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseNotAParameterError.par_name"><code class="docutils literal notranslate"><span class="pre">ParseNotAParameterError.par_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParsePathDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">ParsePathDoesNotExistError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParsePathDoesNotExistError.message"><code class="docutils literal notranslate"><span class="pre">ParsePathDoesNotExistError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParsePathDoesNotExistError.par_name"><code class="docutils literal notranslate"><span class="pre">ParsePathDoesNotExistError.par_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParsePathDoesNotExistError.path_str"><code class="docutils literal notranslate"><span class="pre">ParsePathDoesNotExistError.path_str</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireIntegerError"><code class="docutils literal notranslate"><span class="pre">ParseRequireIntegerError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireIntegerError.message"><code class="docutils literal notranslate"><span class="pre">ParseRequireIntegerError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireIntegerError.obj_name"><code class="docutils literal notranslate"><span class="pre">ParseRequireIntegerError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireNumericError"><code class="docutils literal notranslate"><span class="pre">ParseRequireNumericError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireNumericError.message"><code class="docutils literal notranslate"><span class="pre">ParseRequireNumericError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireNumericError.obj_name"><code class="docutils literal notranslate"><span class="pre">ParseRequireNumericError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequirePositiveIntegerError"><code class="docutils literal notranslate"><span class="pre">ParseRequirePositiveIntegerError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequirePositiveIntegerError.message"><code class="docutils literal notranslate"><span class="pre">ParseRequirePositiveIntegerError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequirePositiveIntegerError.obj_name"><code class="docutils literal notranslate"><span class="pre">ParseRequirePositiveIntegerError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireSingleValueError"><code class="docutils literal notranslate"><span class="pre">ParseRequireSingleValueError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireSingleValueError.message"><code class="docutils literal notranslate"><span class="pre">ParseRequireSingleValueError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ParseRequireSingleValueError.obj_name"><code class="docutils literal notranslate"><span class="pre">ParseRequireSingleValueError.obj_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ReplicateNumberError"><code class="docutils literal notranslate"><span class="pre">ReplicateNumberError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ReplicateNumberError.message"><code class="docutils literal notranslate"><span class="pre">ReplicateNumberError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ReplicateNumberError.node_name"><code class="docutils literal notranslate"><span class="pre">ReplicateNumberError.node_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.SSEStashMisspec"><code class="docutils literal notranslate"><span class="pre">SSEStashMisspec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.SSEStashMisspec.message"><code class="docutils literal notranslate"><span class="pre">SSEStashMisspec.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ScriptSyntaxError"><code class="docutils literal notranslate"><span class="pre">ScriptSyntaxError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ScriptSyntaxError.cmd_line"><code class="docutils literal notranslate"><span class="pre">ScriptSyntaxError.cmd_line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.ScriptSyntaxError.message"><code class="docutils literal notranslate"><span class="pre">ScriptSyntaxError.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.StateDependentParameterMisspec"><code class="docutils literal notranslate"><span class="pre">StateDependentParameterMisspec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.StateDependentParameterMisspec.message"><code class="docutils literal notranslate"><span class="pre">StateDependentParameterMisspec.message</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableAssignmentError"><code class="docutils literal notranslate"><span class="pre">VariableAssignmentError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableAssignmentError.message"><code class="docutils literal notranslate"><span class="pre">VariableAssignmentError.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableAssignmentError.rv_name"><code class="docutils literal notranslate"><span class="pre">VariableAssignmentError.rv_name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableMisspec"><code class="docutils literal notranslate"><span class="pre">VariableMisspec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableMisspec.message"><code class="docutils literal notranslate"><span class="pre">VariableMisspec.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.exception_classes.VariableMisspec.rv_name"><code class="docutils literal notranslate"><span class="pre">VariableMisspec.rv_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="phylojunction.utility.html#module-phylojunction.utility.helper_functions">phylojunction.utility.helper_functions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.autovivify"><code class="docutils literal notranslate"><span class="pre">autovivify()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.check_and_vectorize_if_must"><code class="docutils literal notranslate"><span class="pre">check_and_vectorize_if_must()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.create_str_defaultdict"><code class="docutils literal notranslate"><span class="pre">create_str_defaultdict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.get_covg"><code class="docutils literal notranslate"><span class="pre">get_covg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.get_ellapsed_time_in_minutes"><code class="docutils literal notranslate"><span class="pre">get_ellapsed_time_in_minutes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.is_val_in_interval"><code class="docutils literal notranslate"><span class="pre">is_val_in_interval()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.print_progress"><code class="docutils literal notranslate"><span class="pre">print_progress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="phylojunction.utility.html#phylojunction.utility.helper_functions.symmetric_difference"><code class="docutils literal notranslate"><span class="pre">symmetric_difference()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.utility.html#module-phylojunction.utility">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="module-phylojunction">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction" title="Permalink to this heading"></a></h2>
-</div>
-</div>
+</section>
+<section id="module-phylojunction">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-phylojunction" title="Link to this heading"></a></h2>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="phylojunction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="phylojunction.calculation.html" class="btn btn-neutral float-right" title="phylojunction.calculation package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

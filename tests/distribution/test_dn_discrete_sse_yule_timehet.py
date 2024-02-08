@@ -241,14 +241,14 @@ if __name__ == '__main__':
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/distribution/test_dn_discrete_sse_yule_timehet.py
+    # $ python3 tests/distribution/test_dn_discrete_sse_yule_timehet.py
     # 
     # or
     #
-    # $ python3.9 -m tests.distribution.test_dn_discrete_sse_yule_timehet
+    # $ python3 -m tests.distribution.test_dn_discrete_sse_yule_timehet
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.distribution.test_dn_discrete_sse_yule_timehet.TestYuleTimeHetTrees.test_tree_size_state_count_max_taxa_timehet_yule
+    # $ python3 -m unittest tests.distribution.test_dn_discrete_sse_yule_timehet.TestYuleTimeHetTrees.test_tree_size_state_count_max_taxa_timehet_yule
 
     unittest.main()

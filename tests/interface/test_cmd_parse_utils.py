@@ -64,6 +64,6 @@ if __name__ == "__main__":
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.interface.test_cmd_parse_utils.TestCommandParseUtils.test_tokenizer
+    # $ python3 -m unittest tests.interface.test_cmd_parse_utils.TestCommandParseUtils.test_tokenizer
 
     unittest.main()

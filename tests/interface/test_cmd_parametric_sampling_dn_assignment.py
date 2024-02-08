@@ -546,14 +546,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3.9 tests/interface/test_cmd_parametric_sampling_dn_assignment.py
+    # $ python3 tests/interface/test_cmd_parametric_sampling_dn_assignment.py
     # 
     # or
     #
-    # $ python3.9 -m tests.interface.test_cmd_parametric_sampling_dn_assignment
+    # $ python3 -m tests.interface.test_cmd_parametric_sampling_dn_assignment
     #
     # or 
     #
-    # $ python3.9 -m unittest tests.interface.test_cmd_parametric_sampling_dn_assignment.TestParametricSamplingDnAssignment.test_sampling_unif_assignment
+    # $ python3 -m unittest tests.interface.test_cmd_parametric_sampling_dn_assignment.TestParametricSamplingDnAssignment.test_sampling_unif_assignment
     
     unittest.main()

@@ -26,7 +26,7 @@ __email__ = "f.mendes@wustl.edu"
 class AnnotatedTree(dp.Tree):
     """Tree annotated with discrete states. 
 
-    Attributes:
+    Parameters:
         tree (dendropy.Tree): Main class member, holding the full tree.
         tree_reconstructed (dendropy.Tree): Reconstructed tree
             produced by pruning the full tree from non-observed
