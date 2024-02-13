@@ -63,7 +63,7 @@ The editable install is carried out from |pj|'s root folder, ``PhyloJunction/``,
 
     python3.11 -m pip install -e .
 
-With this command, ``pip`` will place |pj|'s entry-point executables (``pjcli`` and ``pjgui``) into the ``bin/`` directory of wherever you Python 3.9 lives.
+With this command, ``pip`` will place |pj|'s entry-point executables (``pjcli`` and ``pjgui``) into the ``bin/`` directory of wherever you Python 3.11 lives.
 If Python 3.11 was installed with `Homebrew <https://brew.sh/>`_, for example, that could be ``/opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/bin``.
 
 The ``-e`` flag tells ``pip`` to do an editable install, which further writes the path to |pj| modules to ``/opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/__editable__.phylojunction-0.0.1.pth``.
@@ -113,9 +113,31 @@ Lastly, paths to |pj|'s modules will be written to ``~/.local/lib/python3.11/sit
 Linux
 +++++
 
-TODO
+In construction.
 
+------------------------
+Testing the installation
+------------------------
+
+If installation was successful (see the Note box above), it should be possible to call |pj|'s graphical (:ref:`GUI <GUI>`) and command-line user interfaces (:ref:`CLI <CLI>`) directly from the shell or Terminal:
+
+.. code-block:: bash
+    :caption: **Executing PhyloJunction's binaries from the Terminal**. If the binaries cannot be found, make sure you have set your PATH environmental variable correctly.
+
+    pjcli # CLI
+    pjgui # GUI
+
+Alternatively, users can import all of |pj|'s modules within a Python session.
+First call Python's interpreter, and then:
+
+.. code-block:: python
+
+    import phylojunction
+
+Examples of how to use |pj| while bypassing the user interfaces can be found :ref:`here <bypass>`.
+
+---------------------
 Building PJ on an IDE 
-=====================
+---------------------
 
-TODO
+In construction.

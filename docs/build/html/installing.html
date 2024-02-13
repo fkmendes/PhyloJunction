@@ -7,7 +7,7 @@
   <title>Installing and configuring PhyloJunction &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=b916aa57" />
 
   
   <!--[if lt IE 9]>
@@ -57,9 +57,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#linux">Linux</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#building-pj-on-an-ide">Building PJ on an IDE</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-the-installation">Testing the installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-pj-on-an-ide">Building PJ on an IDE</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pjdoc/index.html">Documentation</a></li>
@@ -133,7 +134,7 @@ This is because <code class="docutils literal notranslate"><span class="pre">pip
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3.11<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
-<p>With this command, <code class="docutils literal notranslate"><span class="pre">pip</span></code> will place PhyloJunction’s entry-point executables (<code class="docutils literal notranslate"><span class="pre">pjcli</span></code> and <code class="docutils literal notranslate"><span class="pre">pjgui</span></code>) into the <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory of wherever you Python 3.9 lives.
+<p>With this command, <code class="docutils literal notranslate"><span class="pre">pip</span></code> will place PhyloJunction’s entry-point executables (<code class="docutils literal notranslate"><span class="pre">pjcli</span></code> and <code class="docutils literal notranslate"><span class="pre">pjgui</span></code>) into the <code class="docutils literal notranslate"><span class="pre">bin/</span></code> directory of wherever you Python 3.11 lives.
 If Python 3.11 was installed with <a class="reference external" href="https://brew.sh/" rel="noopener noreferrer" target="_blank">Homebrew</a>, for example, that could be <code class="docutils literal notranslate"><span class="pre">/opt/homebrew/opt/python&#64;3.11/Frameworks/Python.framework/Versions/3.11/bin</span></code>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag tells <code class="docutils literal notranslate"><span class="pre">pip</span></code> to do an editable install, which further writes the path to PhyloJunction modules to <code class="docutils literal notranslate"><span class="pre">/opt/homebrew/opt/python&#64;3.11/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/__editable__.phylojunction-0.0.1.pth</span></code>.</p>
 <p>The last argument <code class="docutils literal notranslate"><span class="pre">.</span></code> tells <code class="docutils literal notranslate"><span class="pre">pip</span></code> where the local project directory is (where it can find file <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>).</p>
@@ -170,13 +171,30 @@ On macOS, that file is <code class="docutils literal notranslate"><span class="p
 </section>
 <section id="linux">
 <h4>Linux<a class="headerlink" href="#linux" title="Link to this heading"></a></h4>
-<p>TODO</p>
+<p>In construction.</p>
 </section>
+</section>
+</section>
+<section id="testing-the-installation">
+<h2>Testing the installation<a class="headerlink" href="#testing-the-installation" title="Link to this heading"></a></h2>
+<p>If installation was successful (see the Note box above), it should be possible to call PhyloJunction’s graphical (<a class="reference internal" href="pjdoc/index.html#gui"><span class="std std-ref">GUI</span></a>) and command-line user interfaces (<a class="reference internal" href="pjdoc/index.html#cli"><span class="std std-ref">CLI</span></a>) directly from the shell or Terminal:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text"><strong>Executing PhyloJunction’s binaries from the Terminal</strong>. If the binaries cannot be found, make sure you have set your PATH environmental variable correctly.</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pjcli<span class="w"> </span><span class="c1"># CLI</span>
+pjgui<span class="w"> </span><span class="c1"># GUI</span>
+</pre></div>
+</div>
+</div>
+<p>Alternatively, users can import all of PhyloJunction’s modules within a Python session.
+First call Python’s interpreter, and then:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">phylojunction</span>
+</pre></div>
+</div>
+<p>Examples of how to use PhyloJunction while bypassing the user interfaces can be found <a class="reference internal" href="pjdoc/index.html#bypass"><span class="std std-ref">here</span></a>.</p>
 </section>
 <section id="building-pj-on-an-ide">
-<h3>Building PJ on an IDE<a class="headerlink" href="#building-pj-on-an-ide" title="Link to this heading"></a></h3>
-<p>TODO</p>
-</section>
+<h2>Building PJ on an IDE<a class="headerlink" href="#building-pj-on-an-ide" title="Link to this heading"></a></h2>
+<p>In construction.</p>
 </section>
 </section>
 

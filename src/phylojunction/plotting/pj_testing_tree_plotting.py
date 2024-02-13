@@ -43,7 +43,8 @@ if __name__ == "__main__":
 
     try:
         ann_tr1 = pjr.read_nwk_tree_str(tr_str1,
-                                       in_file=False)
+                                        in_file=False)
+
     except (TypeError,
             AttributeError,
             dp.dataio.tokenizer.Tokenizer.UnexpectedEndOfStreamError,
@@ -51,7 +52,7 @@ if __name__ == "__main__":
             dp.dataio.newickreader.NewickReader.NewickReaderDuplicateTaxonError) as e:
         print(e)
     
-    print("ann_tr1.tree_read_as_newick", ann_tr1.tree_read_as_newick)
+    # print("ann_tr1.tree_read_as_newick", ann_tr1.tree_read_as_newick)
 
     # we will overwrite ann_tr1 current at_dict, which
     # is an empty dictionary at the moment
@@ -77,7 +78,8 @@ if __name__ == "__main__":
         }
 
     ann_tr1.at_dict = at_dict
-    ann_tr1.populate_nd_attr_dict(["state"], attr_added_separately_from_tree=True)
+    ann_tr1.populate_nd_attr_dict(["state"], attr_dict_added_separately_from_tree=True)
+    ann_tr1.state_count = 3
     
     fig = matplotlib.pyplot.figure()
 
@@ -90,15 +92,15 @@ if __name__ == "__main__":
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
-    # pjt.plot_ann_tree(
-    #     ann_tr1,
-    #     ax,
-    #     use_age=False,
-    #     start_at_origin=True,
-    #     sa_along_branches=False,
-    #     attr_of_interest="state")
+    pjt.plot_ann_tree(
+        ann_tr1,
+        ax,
+        use_age=False,
+        start_at_origin=True,
+        sa_along_branches=False,
+        attr_of_interest="state")
     
-    # plt.show()
+    plt.show()
 
 
 
@@ -130,12 +132,12 @@ if __name__ == "__main__":
     # TODO: should update state_count to 3 in read_node_attr_update_tree
     # print(ann_tr2.state_count)
 
-    pjt.plot_ann_tree(
-        ann_tr2,
-        ax,
-        use_age=False,
-        start_at_origin=False,
-        sa_along_branches=False,
-        attr_of_interest="state")
+    # pjt.plot_ann_tree(
+    #     ann_tr2,
+    #     ax,
+    #     use_age=False,
+    #     start_at_origin=False,
+    #     sa_along_branches=False,
+    #     attr_of_interest="state")
 
-    plt.show()
+    # plt.show()

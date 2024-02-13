@@ -13,10 +13,10 @@ Subpackages
 Submodules
 ----------
 
-phylojunction.interface.pj\_explorer module
--------------------------------------------
+phylojunction.interface.pj\_sandbox module
+------------------------------------------
 
-.. automodule:: phylojunction.interface.pj_explorer
+.. automodule:: phylojunction.interface.pj_sandbox
    :members:
    :undoc-members:
    :show-inheritance:

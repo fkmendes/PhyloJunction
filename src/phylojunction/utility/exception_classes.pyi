@@ -260,8 +260,12 @@ class MissingColumnName(Exception):
     message: str
     def __init__(self, col_name: str, message: str) -> None: ...
     def __str__(self) -> str: ...
-    
-# CLI exceptions #
+
+class RunTimeLimit(Exception):
+    def __init__(self, runtime_limit: float) -> None: ...
+    def __str__(self) -> str: ...
+
+# CLI/GUI exceptions #
 class PJCLIInvalidInputError(Exception):
     par_name: str
     message: str

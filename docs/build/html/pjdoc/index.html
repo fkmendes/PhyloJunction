@@ -7,7 +7,7 @@
   <title>Documentation &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/pj_custom.css?v=9b458176" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/pj_custom.css?v=b916aa57" />
 
   
   <!--[if lt IE 9]>
@@ -69,6 +69,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#command-line-interface-cli">Command-line interface (CLI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bypassing-the-interfaces">Bypassing the interfaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lexicon">Lexicon</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#parametric-distributions">Parametric distributions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#uniform">Uniform</a></li>
@@ -76,6 +77,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#gamma">Gamma</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#normal">Normal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#log-normal">Log-normal</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tree-distributions">Tree distributions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#discrete-sse">Discrete SSE</a></li>
 </ul>
 </li>
 </ul>
@@ -113,37 +118,43 @@
 <h1>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#overview" id="id14">Overview</a></p>
+<li><p><a class="reference internal" href="#overview" id="id17">Overview</a></p>
 <ul>
-<li><p><a class="reference internal" href="#origins-and-design" id="id15">Origins and design</a></p></li>
-<li><p><a class="reference internal" href="#graphical-models" id="id16">Graphical models</a></p>
+<li><p><a class="reference internal" href="#origins-and-design" id="id18">Origins and design</a></p></li>
+<li><p><a class="reference internal" href="#graphical-models" id="id19">Graphical models</a></p>
 <ul>
-<li><p><a class="reference internal" href="#how-to-read-a-dag" id="id17">How to read a DAG?</a></p></li>
+<li><p><a class="reference internal" href="#how-to-read-a-dag" id="id20">How to read a DAG?</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#specifying-a-model-an-example" id="id18">Specifying a model (an example)</a></p>
+<li><p><a class="reference internal" href="#specifying-a-model-an-example" id="id21">Specifying a model (an example)</a></p>
 <ul>
-<li><p><a class="reference internal" href="#multiple-samples-and-replicates" id="id19">Multiple samples and replicates</a></p></li>
+<li><p><a class="reference internal" href="#multiple-samples-and-replicates" id="id22">Multiple samples and replicates</a></p></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#graphical-user-interface-gui" id="id20">Graphical user interface (GUI)</a></p>
+<li><p><a class="reference internal" href="#graphical-user-interface-gui" id="id23">Graphical user interface (GUI)</a></p>
 <ul>
-<li><p><a class="reference internal" href="#implementation-comparison" id="id21">Implementation comparison</a></p></li>
-<li><p><a class="reference internal" href="#coverage-validation" id="id22">Coverage validation</a></p></li>
+<li><p><a class="reference internal" href="#implementation-comparison" id="id24">Implementation comparison</a></p></li>
+<li><p><a class="reference internal" href="#coverage-validation" id="id25">Coverage validation</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#command-line-interface-cli" id="id23">Command-line interface (CLI)</a></p></li>
-<li><p><a class="reference internal" href="#lexicon" id="id24">Lexicon</a></p>
+<li><p><a class="reference internal" href="#command-line-interface-cli" id="id26">Command-line interface (CLI)</a></p></li>
+<li><p><a class="reference internal" href="#bypassing-the-interfaces" id="id27">Bypassing the interfaces</a></p></li>
+<li><p><a class="reference internal" href="#lexicon" id="id28">Lexicon</a></p>
 <ul>
-<li><p><a class="reference internal" href="#parametric-distributions" id="id25">Parametric distributions</a></p>
+<li><p><a class="reference internal" href="#parametric-distributions" id="id29">Parametric distributions</a></p>
 <ul>
-<li><p><a class="reference internal" href="#uniform" id="id26">Uniform</a></p></li>
-<li><p><a class="reference internal" href="#exponential" id="id27">Exponential</a></p></li>
-<li><p><a class="reference internal" href="#gamma" id="id28">Gamma</a></p></li>
-<li><p><a class="reference internal" href="#normal" id="id29">Normal</a></p></li>
-<li><p><a class="reference internal" href="#log-normal" id="id30">Log-normal</a></p></li>
+<li><p><a class="reference internal" href="#uniform" id="id30">Uniform</a></p></li>
+<li><p><a class="reference internal" href="#exponential" id="id31">Exponential</a></p></li>
+<li><p><a class="reference internal" href="#gamma" id="id32">Gamma</a></p></li>
+<li><p><a class="reference internal" href="#normal" id="id33">Normal</a></p></li>
+<li><p><a class="reference internal" href="#log-normal" id="id34">Log-normal</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#tree-distributions" id="id35">Tree distributions</a></p>
+<ul>
+<li><p><a class="reference internal" href="#discrete-sse" id="id36">Discrete SSE</a></p></li>
 </ul>
 </li>
 </ul>
@@ -317,17 +328,27 @@ Errors will be thrown only if such nodes are used as input for a function, and t
 </section>
 <section id="graphical-user-interface-gui">
 <h2>Graphical user interface (GUI)<a class="headerlink" href="#graphical-user-interface-gui" title="Link to this heading"></a></h2>
-<p>PhyloJunction comes with a (simple!) graphical user interface (GUI; see Fig. 3) that allows users to incrementally build a model while simultaneously inspecting any simulation output (among other things).</p>
+<p id="gui">PhyloJunction comes with a (simple!) graphical user interface (GUI; see Fig. 3) that allows users to incrementally build a model while simultaneously inspecting any simulation output (among other things).</p>
 <figure class="align-center" id="id6" style="width: 100%">
 <img alt="../_images/pjgui_model.png" src="../_images/pjgui_model.png" />
 <figcaption>
 <p><span class="caption-text"><strong>Figure 3.</strong> PhyloJunction’s GUI main window.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<p>Like any modern computer application, PhyloJunction’s GUI exposes its features to users via a menu (Fi. 3, number 2).
-On the main tab (“Model”), one can navigate the DAG being built and see its node values as a plot, text string, or both (Fig. 3, numbers 3 and 4).
-Users can also cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
+<p>Like any modern computer application, PhyloJunction’s GUI exposes its features to users via a menu (Fig. 3, number 2).
+On the main tab (“Model”), one can build a model (DAG) with commands entered in the prompt (Fig. 3, number 1), or by loading a <em>phylojunction</em> script or a model from a previous PhyloJunction section.
+The latter can be done by clicking the application’s menu (top-left corner of the Desktop on Apple machines), and clicking “File &gt; Read script” or “File &gt; Load model”.
+Model building commands can be revisited by going into the menu’s “Command log” tab.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If mistakes are made when entering a command, PhyloJunction will flash a “Warning produced” message in red, at the bottom of the main window.
+The warning message can be seen by visiting the “Warnings” tab.</p>
+</div>
+<p>Given a model, DAG node values can be navigated as a plot, text string, or both (Fig. 3, numbers 3 and 4).
+Users can cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
 Node-value summaries include the mean and standard deviation for scalar variables, and statistics like the root age and number of tips for phylogenetic trees.</p>
+<p>After a model is specified, saving the main plot (from the “Model” tab) to disk can be done by clicking “Save plot as”.
+Simulated data tables, or the model itself, in turn, can be saved to disk by clicking the application menu (top menu), and clicking “File &gt; Save data as” or “File &gt; Save model as”.</p>
 <section id="implementation-comparison">
 <h3>Implementation comparison<a class="headerlink" href="#implementation-comparison" title="Link to this heading"></a></h3>
 <p>The “Compare” tab (under “Model”) streamlines the comparison of PhyloJunction’s simulations with those from an external simulator, with respect to a summary statistic.
@@ -403,9 +424,30 @@ An almost identical plot should have been produced, and coverage is again approp
 </section>
 <section id="command-line-interface-cli">
 <h2>Command-line interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Link to this heading"></a></h2>
+<p id="cli">PhyloJunction has a command-line interface (CLI) as an entry point for some of its functionalities – it is particularly handy when running PhyloJunction is a step in a longer pipeline (perhaps being run on a cluster).
+The easiest way to see what is possible with the CLI is to call it on the Terminal with the <code class="docutils literal notranslate"><span class="pre">-h</span></code> flag, like so:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pjcli<span class="w"> </span>-h
+</pre></div>
+</div>
+<p>The help message should list a series of flags, which we expand on below:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">-d</span></code>: Simulated data tables are written to disk.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">-f</span></code>: Plots for the selected DAG nodes (whose names and sample ranges are passed as arguments) are written to disk. The argument for <code class="docutils literal notranslate"><span class="pre">-f</span></code> should be passed within single-quotes, e.g., ‘birth_rate,trs;1-2,1-10’.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">-o</span></code>: Directory where to place simulated data tables and figures.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">-p</span></code>: Prefix to prepend output files with (e.g., “simulation1”)</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">-nex</span></code>: Certain simulated data is written to disk in NEXUS format.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">-r</span></code>: Random seed so that simulations always produce the same output.</div>
+</div>
+</div></blockquote>
+<p>Note that if no argument is passed to <code class="docutils literal notranslate"><span class="pre">-o</span></code>, data tables written to disk (prompted by <code class="docutils literal notranslate"><span class="pre">-d</span></code>) will be placed in the directory from which PhyloJunction is called.
+Figures (prompted by <code class="docutils literal notranslate"><span class="pre">-f</span></code>), in turn, will be placed in a “figures/” sub-directory, next to the data tables.</p>
+</section>
+<section id="bypassing-the-interfaces">
+<h2>Bypassing the interfaces<a class="headerlink" href="#bypassing-the-interfaces" title="Link to this heading"></a></h2>
 </section>
 <section id="lexicon">
-<h2>Lexicon<a class="headerlink" href="#lexicon" title="Link to this heading"></a></h2>
+<span id="bypass"></span><h2>Lexicon<a class="headerlink" href="#lexicon" title="Link to this heading"></a></h2>
 <section id="parametric-distributions">
 <h3>Parametric distributions<a class="headerlink" href="#parametric-distributions" title="Link to this heading"></a></h3>
 <p>PhyloJunction ships with a (growing) number of parametric distributions.
@@ -497,11 +539,125 @@ On this page you will find examples of how to invoke the available distributions
 </div>
 </div></blockquote>
 <div class="literal-block-wrapper docutils container" id="id13">
-<div class="code-block-caption"><span class="caption-text"><strong>Example command.</strong> Specifying two samples of a twice replicated normally (mean log(<span class="math notranslate nohighlight">\(\mu)=-3.25\)</span>, standard deviation <span class="math notranslate nohighlight">\(\sigma=0.25\)</span>) distributed random variable <span class="math notranslate nohighlight">\(x\)</span>.</span><a class="headerlink" href="#id13" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text"><strong>Example command.</strong> Specifying two samples of a twice replicated log-normally (mean log(<span class="math notranslate nohighlight">\(\mu)=-3.25\)</span>, standard deviation <span class="math notranslate nohighlight">\(\sigma=0.25\)</span>) distributed random variable <span class="math notranslate nohighlight">\(x\)</span>.</span><a class="headerlink" href="#id13" title="Link to this code"></a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">~</span> <span class="n">lognormal</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">mean</span><span class="o">=-</span><span class="mf">3.25</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+</section>
+</section>
+<section id="tree-distributions">
+<h3>Tree distributions<a class="headerlink" href="#tree-distributions" title="Link to this heading"></a></h3>
+<p>Phylogenetic tree stochastic nodes can be added to a model’s DAG using tree distributions.
+At the moment, PhyloJunction comes with one tree distribution that produce a variety of tree types.</p>
+<section id="discrete-sse">
+<h4>Discrete SSE<a class="headerlink" href="#discrete-sse" title="Link to this heading"></a></h4>
+<p>Discrete SSE (<code class="docutils literal notranslate"><span class="pre">discrete_sse</span></code>) stands for discrete state-dependent speciation and extinction process, a general model that includes many popular special cases documented below.</p>
+<p><span class="underline">Rate types</span></p>
+<p>The implementation and usage of <code class="docutils literal notranslate"><span class="pre">discrete_sse</span></code> in PhyloJunction is very flexible and takes inspiration from Tim Vaughan’s great <a class="reference external" href="https://tgvaughan.github.io/remaster/" rel="noopener noreferrer" target="_blank">ReMASTER</a> simulator program: a model with any number of rates of whatever types may be specified.
+Of course, this flexibility comes at the price of user responsibility!</p>
+<p>SSE rates are added to a DAG by passing deterministic function <code class="docutils literal notranslate"><span class="pre">sse_rate</span></code> a stochastic or constant node containing a rate’s value (the value can also be passed directly):</p>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text"><strong>Script excerpt 1.</strong> Command in <em>phylojunction</em> to add a birth rate (deterministic node) to the DAG.</span><a class="headerlink" href="#id14" title="Link to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">birth_rate</span> <span class="o">~</span> <span class="n">exponential</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nr</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">det_birth_rate</span> <span class="o">:=</span> <span class="n">sse_rate</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lambda&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">birth_rate</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;speciation&quot;</span><span class="p">)</span>
+
+<span class="c1"># alternatively, one could pass values directly to sse_rate()</span>
+<span class="c1"># det_birth_rate := sse_rate(name=&quot;lambda&quot;, value=[0.95, 1.05], event=&quot;speciation&quot;)</span>
+</pre></div>
+</div>
+</div>
+<p>Parameters for <code class="docutils literal notranslate"><span class="pre">sse_rate</span></code> include:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">name</span></code> (string, required): The name of the rate parameter. Not particularly critical other than for printing sensical messages to the screen, when using the GUI. The argument to <code class="docutils literal notranslate"><span class="pre">name</span></code> does not have to match anything else in the model, and can in practice be any string enclosed in double quotes.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">value</span></code> (positive real, required): The rate value. This parameter can also take the name of other nodes in the DAG (in which case the value of those nodes are extracted and used).</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">event</span></code> (string, required): A string specifying the rate type (see below).</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">epoch</span></code> (positive integer, optional): Integer specifying the epoch to which this rate applies. See more in the “Time-heterogeneity” section below. Defaults to 1.</div>
+</div>
+<div class="line-block">
+<div class="line">Arguments for the <code class="docutils literal notranslate"><span class="pre">event</span></code> parameter should be enclosed in double quotes and can be:</div>
+</div>
+<blockquote>
+<div><ol class="lowerroman simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;speciation&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;w_speciation&quot;</span></code> for within-state birth rates;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;b_speciation&quot;</span></code> for between-state birth rates;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;asym_speciation&quot;</span></code> for asymmetric birth rates;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;extinction&quot;</span></code> for extinction rates;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;transition&quot;</span></code> for anagenetic transition rates;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;anc_sampling&quot;</span></code> for ancestor sampling (e.g., “fossilization”) rates.</p></li>
+</ol>
+</div></blockquote>
+</div></blockquote>
+<p><span class="underline">Sampling probabilities</span></p>
+<p>The discrete SSE model in PhyloJunction supports not only state-dependent rates, but also state-dependent sampling probabilities.
+Specifying SSE probabilities can be done like so:</p>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text"><strong>Script excerpt 2.</strong> Command in <em>phylojunction</em> to add a sampling probability parameter (deterministic node) to the DAG.</span><a class="headerlink" href="#id15" title="Link to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">det_sampling_prob</span> <span class="o">:=</span> <span class="n">sse_prob</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;rho&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># by setting the value to 1.0, we assume complete sampling!</span>
+</pre></div>
+</div>
+</div>
+<p>The parameters for <code class="docutils literal notranslate"><span class="pre">sse_prob</span></code> are:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">name</span></code> (string, required): The name of the probability parameter. Behaves the same as the name of SSE rate parameters.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">value</span></code> (real between 0.0 and 1.0, required): The probability value. As with SSE rates, this parameter can also take the name of DAG nodes that hold probability values.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">state</span></code> (positive integer starting at 0, optional): This integer represents the state to which the probability is associated. Defaults to 0.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">epoch</span></code> (positive integer, optional): Integer specifying the epoch to which this probability applies. See more in the “Time-heterogeneity” section below. Defaults to 1.</div>
+</div>
+</div></blockquote>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">state</span></code> parameter defaults to 0, and is the state value used in non-state-dependent tree models, like the Yule or birth-death models.</p>
+<p><span class="underline">The SSE stash (and time-heterogeneity)</span></p>
+<p>Before <code class="docutils literal notranslate"><span class="pre">discrete_sse</span></code> can be assigned as the tree distribution to a DAG stochastic node, state-dependent rate and probability parameters must be stashed together and combined with some more information.
+This is accomplished with deterministic function <code class="docutils literal notranslate"><span class="pre">sse_stash</span></code>, whose parameters are:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">flat_rate_mat</span></code> (string vector, required): A vector (deterministic) DAG node names holding the objects created with <code class="docutils literal notranslate"><span class="pre">sse_rate</span></code>. DAG node names do not have to appear in any specific order.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">flat_prob_mat</span></code> (string vector, required): A vector (deterministic) DAG node names holding the objects created with <code class="docutils literal notranslate"><span class="pre">sse_prob</span></code>. DAG node names do not have to appear in any specific order.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">n_states</span></code> (positive integer, optional): How many states the SSE process has. Defaults to 1.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">n_epochs</span></code> (positive integer, optional): How many epochs characterize the skyline of the SSE process. Defaults to 1.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">seed_age</span></code> (positive real, optional): The age of the node at which the SSE process starts (either the origin or root node). This parameter must receive an argument if parameters are time-heterogeneous, and it must match the value given to <code class="docutils literal notranslate"><span class="pre">stop_value</span></code> when specifying <code class="docutils literal notranslate"><span class="pre">discrete_sse</span></code> with <code class="docutils literal notranslate"><span class="pre">stop=&quot;age&quot;</span></code> (see more below).</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">epoch_age_ends</span></code> (positive real vector, optional): The age of the ends of each epoch (i.e., the “younger” limit of each epoch, measured as an age), going from the oldest to the youngest epoch. The end of the youngest epoch (which contains the present) should be ommitted as it is added by default. The number of provided age ends should thus be the number of epochs (in <code class="docutils literal notranslate"><span class="pre">n_epochs</span></code>) minus one. Defaults to [0.0].</div>
+</div>
+</div></blockquote>
+<p>The discrete SSE model in PhyloJunction is a “skyline” model, that is, it allows both state-dependent rates and parameters to vary over time (i.e., to be time-heterogeneous).
+In the presence of time-heterogeneity, these parameters are assumed to vary according to a user-defined piecewise constant function (this is coded into the model via the <code class="docutils literal notranslate"><span class="pre">value</span></code> and <code class="docutils literal notranslate"><span class="pre">epoch</span></code> parameters of <code class="docutils literal notranslate"><span class="pre">sse_rate</span></code> and <code class="docutils literal notranslate"><span class="pre">sse_prob</span></code>).
+The limits of each “piece” of that function are given by the argument to <code class="docutils literal notranslate"><span class="pre">epoch_age_ends</span></code> (see above).</p>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text"><strong>Script excerpt 3.</strong> Command in <em>phylojunction</em> to organize rate and probability parameters into a stash (a deterministic node in the DAG).</span><a class="headerlink" href="#id16" title="Link to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">det_birth_rate1</span> <span class="o">:=</span> <span class="n">sse_rate</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lambda1&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;speciation&quot;</span><span class="p">)</span>
+<span class="n">det_birth_rate2</span> <span class="o">:=</span> <span class="n">sse_rate</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lambda2&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="s2">&quot;speciation&quot;</span><span class="p">)</span>
+
+<span class="n">stash</span> <span class="o">:=</span> <span class="n">sse_stash</span><span class="p">(</span><span class="n">flat_rate_mat</span><span class="o">=</span><span class="p">[</span><span class="n">det_birth_rate1</span><span class="p">,</span> <span class="n">det_birth_rate2</span><span class="p">],</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">seed_age</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">epoch_age_ends</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="c1"># there are two epochs, the oldest one ends at age 1.0, the youngest one ends at the present</span>
+<span class="c1"># the birth-rate of the oldest epoch is 1.0, but that rate doubles in the youngest epoch</span>
+</pre></div>
+</div>
+</div>
+<p><span class="underline">The discrete SSE distribution</span></p>
+<p>We have seen how to add to the DAG a series of ingredients required by the <code class="docutils literal notranslate"><span class="pre">discrete_sse</span></code> distribution.
+The parameters of this function are:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">n</span></code> (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">nr</span></code> (integer, optional): Number of replicates to draw per sample. Defaults to 1.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stash</span></code> (string, required): Name of DAG node holding the object created by <code class="docutils literal notranslate"><span class="pre">sse_stash</span></code>.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">start_state</span></code> (positive integer vector starting at 0, required): State at which the process starts for each sample.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop</span></code> (string, required): String specifying the simulation stopping condition. If set to <code class="docutils literal notranslate"><span class="pre">&quot;age&quot;</span></code>, the simulation will stop when the origin or root’s age (see parameter <code class="docutils literal notranslate"><span class="pre">origin</span></code>) reaches the value provided in <code class="docutils literal notranslate"><span class="pre">stop_value</span></code>. If set to <code class="docutils literal notranslate"><span class="pre">&quot;size&quot;</span></code>, the simulation will stop when the tree has the number of sampled nodes provided in <code class="docutils literal notranslate"><span class="pre">stop_value</span></code>.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">stop_value</span></code> (positive numeric, required): The stopping condition threshold. If <code class="docutils literal notranslate"><span class="pre">stop=&quot;age&quot;</span></code>, this can be any positive real number. If <code class="docutils literal notranslate"><span class="pre">stop=&quot;size&quot;</span></code>, this can be any positive integer.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">origin</span></code> (string boolean, required): Flag specifying if process starts at origin node (as opposed to the root node). Defaults to “true”.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cond_spn</span></code> (string boolean, optional): Condition the process on at least one speciation event happening. Note that this speciation event may or not be the event represented by the root of the reconstructed tree. Defaults to “false”.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cond_surv</span></code> (string boolean, optional): Condition the process on having at least one surviving lineage at the present moment. This conditioning only makes sense when <code class="docutils literal notranslate"><span class="pre">stop=&quot;age&quot;</span></code>. Defaults to “true”.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">cond_obs_both_sides</span></code> (string boolean, optional): Condition the process on having sampled nodes on both sides of the complete tree’s root node. Defaults to “false”.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">min_rec_taxa</span></code> (positive integer, optional): Minimum number of sampled (extant and sampled ancestors) nodes the tree should have. Defaults to 0.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">max_rec_taxa</span></code> (positive integer, optional): Maximum number of sampled (extant and sampled ancestors) nodes the tree should have. Defaults to 1e12.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">abort_at_alive_count</span></code> (positive integer, optional): The count of a tree’s living nodes (irrespective of node sampling) at which point the tree is considered too large for simulation to continue. Trees can grow out of control when <code class="docutils literal notranslate"><span class="pre">stop=&quot;age&quot;</span></code> and one of the rates allows it to grow too big before the stopping condition is met. This parameter can be used to throw away such trees and preventing PhyloJunction from crashing. Defaults to 1e12.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">runtime_limit</span></code> (positive integer, optional): Maximum number of minutes to wait until all samples are drawn. Sampling is aborted at this point. Defaults to 5.</div>
+</div>
+</div></blockquote>
 </section>
 </section>
 </section>

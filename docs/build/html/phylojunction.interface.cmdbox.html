@@ -7,7 +7,7 @@
   <title>phylojunction.interface.cmdbox package &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=b916aa57" />
 
   
   <!--[if lt IE 9]>
@@ -154,10 +154,9 @@ script or via GUI.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.cmdbox.cmd_parse.parse_samp_dn_assignment">
 <span class="sig-prename descclassname"><span class="pre">phylojunction.interface.cmdbox.cmd_parse.</span></span><span class="sig-name descname"><span class="pre">parse_samp_dn_assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">stoch_node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stoch_node_dn_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.cmdbox.cmd_parse.parse_samp_dn_assignment" title="Link to this definition"></a></dt>
-<dd><p>Create and add stochastic node to graphical model</p>
-<p>Called when ‘~’ operator is used.
-This node will be sampled from a distribution and is a random
-variable.</p>
+<dd><p>Create and add stochastic node to graphical model.</p>
+<p>Called when ‘~’ operator is used. This node will be sampled from
+distribution and is a random variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -166,7 +165,7 @@ created by user via commands.</p></li>
 <li><p><strong>stoch_node_name</strong> (<em>str</em>) – Name of stochastic node being created</p></li>
 <li><p><strong>stoch_node_dn_spec</strong> (<em>str</em>) – Specification string for distribution
 from which stochastic node will be sampled (whatever is
-right of ‘~’’ operator in PJ command)</p></li>
+right of ‘~’ operator in PJ command)</p></li>
 <li><p><strong>cmd_line</strong> (<em>str</em>) – Command line string provided by user through
 static script or via GUI</p></li>
 </ul>

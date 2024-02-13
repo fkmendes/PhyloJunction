@@ -31,7 +31,9 @@ class PJDnGrammar():
             tuple(["n", "nr", "min", "max"]),
             "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin",
                                    "stash", "start_state", "eps", "runtime_limit",
-                                   "cond_spn", "cond_surv"])
+                                   "cond_spn", "cond_surv", "cond_obs_both_sides",
+                                   "min_rec_taxa", "max_rec_taxa",
+                                   "abort_at_alive_count"])
         }
 
     def __init__(self) -> None:
@@ -464,6 +466,10 @@ class PJDnGrammar():
 
         if not dn_param_dict:
             raise ec.ParseMissingSpecificationError("discrete_sse")
+        
+        for arg, val in dn_param_dict.items():
+            if not cls.grammar_check("discrete_sse", arg):
+                raise ec.ParseNotAParameterError(arg)
 
         return make_dnsse.make_discrete_SSE_dn("discrete_sse", dn_param_dict)
 

@@ -213,6 +213,8 @@ Errors will be thrown only if such nodes are used as input for a function, and t
 Graphical user interface (GUI)
 ------------------------------
 
+.. _GUI:
+
 |pj| comes with a (simple!) graphical user interface (GUI; see Fig. 3) that allows users to incrementally build a model while simultaneously inspecting any simulation output (among other things).
 
 ..  figure:: ../images/pjgui_model.png
@@ -221,10 +223,21 @@ Graphical user interface (GUI)
 
     **Figure 3.** |pj|'s GUI main window.
 
-Like any modern computer application, |pj|'s GUI exposes its features to users via a menu (Fi. 3, number 2).
-On the main tab ("Model"), one can navigate the DAG being built and see its node values as a plot, text string, or both (Fig. 3, numbers 3 and 4).
-Users can also cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
+Like any modern computer application, |pj|'s GUI exposes its features to users via a menu (Fig. 3, number 2).
+On the main tab ("Model"), one can build a model (DAG) with commands entered in the prompt (Fig. 3, number 1), or by loading a *phylojunction* script or a model from a previous |pj| section.
+The latter can be done by clicking the application's menu (top-left corner of the Desktop on Apple machines), and clicking "File > Read script" or "File > Load model".
+Model building commands can be revisited by going into the menu's "Command log" tab.
+
+.. warning::
+    If mistakes are made when entering a command, |pj| will flash a "Warning produced" message in red, at the bottom of the main window.
+    The warning message can be seen by visiting the "Warnings" tab.
+
+Given a model, DAG node values can be navigated as a plot, text string, or both (Fig. 3, numbers 3 and 4).
+Users can cycle through replicated simulations (Fig. 3, number 5), and examine node-value summaries computed for individual simulations or across replicates (Fig. 3, number 6).
 Node-value summaries include the mean and standard deviation for scalar variables, and statistics like the root age and number of tips for phylogenetic trees.
+
+After a model is specified, saving the main plot (from the "Model" tab) to disk can be done by clicking "Save plot as".
+Simulated data tables, or the model itself, in turn, can be saved to disk by clicking the application menu (top menu), and clicking "File > Save data as" or "File > Save model as".
 
 Implementation comparison
 =========================
@@ -316,6 +329,34 @@ An almost identical plot should have been produced, and coverage is again approp
 Command-line interface (CLI)
 ----------------------------
 
+.. _CLI:
+
+|pj| has a command-line interface (CLI) as an entry point for some of its functionalities -- it is particularly handy when running |pj| is a step in a longer pipeline (perhaps being run on a cluster).
+The easiest way to see what is possible with the CLI is to call it on the Terminal with the ``-h`` flag, like so:
+
+.. code-block:: bash
+
+    pjcli -h
+
+The help message should list a series of flags, which we expand on below:
+
+    | ``-d``: Simulated data tables are written to disk.
+    | ``-f``: Plots for the selected DAG nodes (whose names and sample ranges are passed as arguments) are written to disk. The argument for ``-f`` should be passed within single-quotes, e.g., 'birth_rate,trs;1-2,1-10'.
+    | ``-o``: Directory where to place simulated data tables and figures.
+    | ``-p``: Prefix to prepend output files with (e.g., "simulation1")
+    | ``-nex``: Certain simulated data is written to disk in NEXUS format.
+    | ``-r``: Random seed so that simulations always produce the same output.
+
+Note that if no argument is passed to ``-o``, data tables written to disk (prompted by ``-d``) will be placed in the directory from which PhyloJunction is called.
+Figures (prompted by ``-f``), in turn, will be placed in a "figures/" sub-directory, next to the data tables. 
+
+------------------------
+Bypassing the interfaces
+------------------------
+
+.. _bypass:
+
+
 
 -------
 Lexicon
@@ -325,3 +366,8 @@ Parametric distributions
 ========================
 
 .. include:: parametric.rst
+
+Tree distributions
+==================
+
+.. include::  treedists.rst

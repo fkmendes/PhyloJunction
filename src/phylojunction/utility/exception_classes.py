@@ -786,8 +786,19 @@ class MissingColumnName(Exception):
     message: str
 
     def __init__(self, col_name: str, message: str) -> None:
-        self.message = "ERROR: " + message + ". " + col_name + \
-            " was not found in DataFrame."
+        self.message = "ERROR: " + message + ". " + col_name \
+            + " was not found in DataFrame."
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class RunTimeLimit(Exception):
+    def __init__(self, runtime_limit: float) -> None:
+        self.message = "ERROR: Hit runtime limit of " + str(runtime_limit) \
+            + "."
+
+        super().__init__(self.message)
 
     def __str__(self) -> str:
         return self.message
@@ -800,7 +811,7 @@ class PJCLIInvalidInputError(Exception):
 
     def __init__(self, par_name: str, message: str) -> None:
         self.par_name = par_name
-        self.message = "ERROR: The argument to " + par_name + \
+        self.message = "ERROR: The argument to " + par_name \
             + " was invalid. " + message
 
         super().__init__(self.message)
@@ -829,3 +840,5 @@ class PJIOFileDoesNotExistError(Exception):
 
     def __str__(self) -> str:
         return self.message
+
+

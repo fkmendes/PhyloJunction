@@ -69,7 +69,7 @@ def selected_node_plot_cli(
     outfile_path += node_dag.node_name + str(sample_idx + 1) \
         + "_" + str(repl_idx + 1)
     
-    print("outfile_path = " + outfile_path)
+    print("Writing", outfile_path)
     
     # if stochastic or constant, value will be list
     if isinstance(node_dag.value, list):
@@ -121,12 +121,13 @@ def call_node_plot_cli(
                 end_idx = n_samples
 
             elif len(range_tup) == 1:
-                start_idx = range_tup[0]
+                start_idx = range_tup[0] - 1 # offset
                 end_idx = start_idx + 1
 
             elif len(range_tup) == 2:
                 start_idx, end_idx = range_tup
-                end_idx += 1
+                start_idx -= 1
+                # end_idx += 1
 
             # debugging
             # print("start_idx = " + str(start_idx))

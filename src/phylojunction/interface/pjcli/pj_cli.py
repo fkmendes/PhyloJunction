@@ -126,14 +126,14 @@ def call_cli() -> None:
         action="store",
         help=("String specifying which stochastic nodes to draw figures "
               "for, and in what range of the sample (e.g., "
-              "\'birth_rate,tr;0-1,0-10\')"))
-    parser.add_argument(
-        "-i",
-        "--inference-output",
-        dest="write_inference",
-        action="store_true",
-        default=False,
-        help="Toggle inference script output")
+              "\'birth_rate,tr;1-2,1-10\')"))
+    # parser.add_argument(
+    #     "-i",
+    #     "--inference-output",
+    #     dest="write_inference",
+    #     action="store_true",
+    #     default=False,
+    #     help="Toggle inference script output")
     parser.add_argument(
         "-o",
         "--output-dir",
@@ -170,7 +170,7 @@ def call_cli() -> None:
         out_dir=args.out_dir,
         write_data=args.write_data,
         write_figures=args.write_figures,
-        write_inference=args.write_inference,
+        # write_inference=args.write_inference,
         write_nex_states=args.write_nex_states,
         a_random_seed=args.random_seed
     )

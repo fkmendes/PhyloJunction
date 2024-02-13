@@ -51,7 +51,7 @@ class DnSSE(pgm.DistrForSampling):
                  condition_on_obs_both_sides_root: bool = False,
                  min_rec_taxa: int = 0,
                  max_rec_taxa: int = int(1e12),
-                 abort_at_obs: int = int(1e12),
+                 abort_at_alive_count: int = int(1e12),
                  epsilon: float = 1e-12,
                  runtime_limit: int = 5,
                  rng_seed: ty.Optional[int] = None,

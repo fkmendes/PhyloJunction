@@ -1232,8 +1232,8 @@ class AnnotatedTree(dp.Tree):
    
     def populate_nd_attr_dict(self,
                               attrs_of_interest_list: ty.List[str],
-                              attr_added_separately_from_tree:
-                              bool = False) -> None:
+                              attr_dict_added_separately_from_tree: bool = False) \
+                                -> None:
         """Populate member nested dictionary with node attributes.
 
         This method is not called upon initialization of class,
@@ -1248,7 +1248,7 @@ class AnnotatedTree(dp.Tree):
         Args:
             attrs_of_interest_list (str): List of attribute names to
                 store in member dictionary.
-            attr_added_separately_from_tree (bool): Flag specifying
+            attr_dict_added_separately_from_tree (bool): Flag specifying
                 whether method is being called outside tree
                 initialization (i.e., to a tree that already exists),
                 or during tree initialization.
@@ -1260,11 +1260,17 @@ class AnnotatedTree(dp.Tree):
                       "Exiting"))
 
             for att, att_val in nd.__dict__.items():
-                if attr_added_separately_from_tree and \
-                        att == "_annotations":
-                    for att_str, att_v in att_val.values_as_dict().items():
-                        if att_str in attrs_of_interest_list:
-                            self.node_attr_dict[nd.label][att_str] = att_v
+                if attr_dict_added_separately_from_tree:
+                    if att == "_annotations":
+                        for att_str, att_v in att_val.values_as_dict().items():
+                            if att_str in attrs_of_interest_list:
+                                try:
+                                    self.node_attr_dict[nd.label][att_str] = float(att_v)
+                                
+                                except:
+                                    raise ec.AnnotatedTreeNodeMissingAttrError(
+                                        nd, att_str, "Attribute value could not be converted to float."
+                                    )
 
                 else:
                     if att in attrs_of_interest_list:
@@ -1615,20 +1621,6 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
     # make sure we reset things
     axes.cla()
-
-    # axes = None
-    # if axes is None:
-        # original
-        # fig = plt.figure()
-        # axes = fig.add_subplot(1, 1, 1)
-
-        # print("oi")
-
-        # fig = plt.figure(figsize=(11,4.5))
-        # axes = fig.add_axes([0.1, 0.15, 0.8, 0.7]) # left, bottom, width, height
-
-    # elif not isinstance(axes, plt.matplotlib.axes.Axes):
-    #    raise ValueError(f"Invalid argument for axes: {axes}")
 
     # side-effect:
     # populates: horizontal_linecollections
@@ -2076,13 +2068,13 @@ def get_color_map(n_states: int) -> ty.Dict[int, str]:
     color_map: ty.Dict[int, str] = dict()
 
     if n_states <= 20:
-        qual_cmap = matplotlib.cm.get_cmap('tab20')
+        qual_cmap = matplotlib.colormaps.get_cmap('tab20')
         color_map = dict(
             (i, matplotlib.colors.rgb2hex(qual_cmap(i)[:3]))
             for i in range(qual_cmap.N))
 
     elif n_states <= 120:
-        cmap = matplotlib.pyplot.cm.get_cmap('terrain', n_states)
+        cmap = matplotlib.colormaps.get_cmap('terrain', n_states)
         new_cmap = truncate_colormap(cmap, minval=0.0, maxval=2.08, n=n_states)
         color_map = dict(
             (i, matplotlib.colors.rgb2hex(new_cmap(i)[:3]))
@@ -2091,7 +2083,7 @@ def get_color_map(n_states: int) -> ty.Dict[int, str]:
 
     # if n_states >120 up to 250
     else:
-        cmap = matplotlib.pyplot.cm.get_cmap('terrain', n_states)
+        cmap = matplotlib.colormaps.get_cmap('terrain', n_states)
         maxv = 120 * 2.08 / n_states
         new_cmap = truncate_colormap(cmap, minval=0.0, maxval=maxv, n=n_states)
         color_map = dict(
@@ -2283,7 +2275,11 @@ if __name__ == "__main__":
             epsilon=1e-12
         )
 
-    print(ann_tr_sa_with_root_survives_max_age.tree.as_string(schema="newick"))
+    print(ann_tr_sa_with_root_survives_max_age.tree.as_string(schema="newick"))  
+    
+    # this print statement invokes populate_nd_attr_dict() 
+    # that then populates a member of AnnotatedTree, allowing
+    # for branches to be painted according to the right attribute
     print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_str(nexus=True))
 
     ######################

@@ -1,7 +1,7 @@
 import unittest
 import re
 import math
-from statistics import mean
+from statistics import mean, stdev
 
 # pj imports #
 import phylojunction.pgm.pgm as pgm
@@ -219,7 +219,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         
         self.assertTrue(isinstance(a_node_dag.value, list))
         self.assertEqual(len(a_node_dag.value), 100000)
-        self.assertAlmostEqual(2.37, mean(a_node_dag.value), delta=0.1)
+        self.assertAlmostEqual(0.04, mean(a_node_dag.value), delta=0.1)
+        self.assertAlmostEqual(0.01, stdev(a_node_dag.value), delta=0.1)
         self.assertEqual(1, dag_obj.n_nodes)
         
         ##########################
@@ -227,9 +228,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         ##########################
 
         exp_mean = str(math.exp(-3.25))
-        exp_sd = str(math.exp(0.25))
         cmd_line2 = "ln2 ~ lognormal(n=100000, mean=" + exp_mean \
-            + ", sd=" + exp_sd + ", log_space=\"false\")"
+            + ", sd=0.25, log_space=\"false\")"
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line2)
@@ -243,7 +243,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertTrue(isinstance(a_node_dag.value, list))
         self.assertEqual(len(a_node_dag.value), 100000)
-        self.assertAlmostEqual(2.37, mean(a_node_dag.value), delta=0.1)
+        self.assertAlmostEqual(0.04, mean(a_node_dag.value), delta=0.1)
+        self.assertAlmostEqual(0.01, stdev(a_node_dag.value), delta=0.1)
         self.assertEqual(2, dag_obj.n_nodes)
 
 

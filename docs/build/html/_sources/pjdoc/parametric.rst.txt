@@ -2,7 +2,6 @@
 All distributions support replication (i.e., plating in the DAG) and take as arguments both direct scalar values (e.g., "1.0") and values stored in DAG nodes.
 On this page you will find examples of how to invoke the available distributions (using the *phylojunction* language) when building a model.
 
-
 Uniform
 -------
 
@@ -76,6 +75,6 @@ The function for assigning a log-normal (``lognormal``) distribution to a variab
     | ``log_space`` (string boolean, optional): Whether the value of ``mean`` is in log-space. Defaults to "true".
 
 .. code-block:: 
-    :caption: **Example command.** Specifying two samples of a twice replicated normally (mean log(:math:`\mu)=-3.25`, standard deviation :math:`\sigma=0.25`) distributed random variable :math:`x`.
+    :caption: **Example command.** Specifying two samples of a twice replicated log-normally (mean log(:math:`\mu)=-3.25`, standard deviation :math:`\sigma=0.25`) distributed random variable :math:`x`.
 
     x ~ lognormal(n=1000, mean=-3.25, sd=0.25)

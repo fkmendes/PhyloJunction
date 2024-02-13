@@ -410,8 +410,10 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     #     print(nd is dp_tr.seed_node)
     #     print(nd.parent_node)
 
+    n_state = 1
+
     ann_tr = AnnotatedTree(dp_tr,
-                           1,
+                           n_state,
                            start_at_origin=is_origin,
                            tree_died=False,
                            read_as_newick_string=True)

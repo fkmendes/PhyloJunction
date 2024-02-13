@@ -453,11 +453,11 @@ def prep_data_df(
                 idx = 0
                 for replicate_tree in node_val:
                     tree_summary_df_dict[rv_name].at[idx, "root_age"] = \
-                        "{:,.4f}".format(replicate_tree.root_age)
+                        float("{:,.4f}".format(replicate_tree.root_age))
 
                     if replicate_tree.origin_age:
                         tree_summary_df_dict[rv_name].at[idx, "origin_age"] = \
-                            "{:,.4f}".format(replicate_tree.origin_age)
+                            float("{:,.4f}".format(replicate_tree.origin_age))
 
                     # conservative: should match n_extant + n_extinct!
                     tree_summary_df_dict[rv_name].at[idx, "n_total"] = \

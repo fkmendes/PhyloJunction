@@ -9,20 +9,21 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-def extract_value_from_pgmnodes(dag_node_list: ty.List[pgm.NodeDAG]) \
+def extract_value_from_dagnodes(dag_node_list: ty.List[pgm.NodeDAG]) \
         -> ty.List[float]:
     """_summary_
 
     Args:
-        pgm_node_list (NodeDM): List of NodeDAG objects (typing includes str because of type-safety)
+        dag_node_list (NodeDAG): List of NodeDAG objects.
 
     Raises:
         ec.NoPlatingAllowedError: _description_
         ec.StateDependentParameterMisspec: _description_
 
     Returns:
-        ty.List[ty.List[float]]: _description_
+        (list): List of values extracted from the DAG node.
     """
+
     many_nodes_dag = len(dag_node_list) > 1
     v_list: ty.List[float] = []
 
@@ -104,7 +105,7 @@ def make_DiscreteStateDependentRate(
                 # need to declare cast_val separately so mypy won't complain
                 cast_val1: ty.List[pgm.NodeDAG] = \
                     ty.cast(ty.List[pgm.NodeDAG], val)
-                value = extract_value_from_pgmnodes(cast_val1)
+                value = extract_value_from_dagnodes(cast_val1)
 
             # val is a list of strings
             elif isinstance(val[0], str):
@@ -197,24 +198,24 @@ def make_DiscreteStateDependentProbability(
         ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
         -> sseobj.DiscreteStateDependentProbability:
     """
-    Create and return DiscreteStateDependentProbability as prompted by
-        deterministic function call
+    Return SSE probability as prompted by deterministic function call.
 
     Args:
-        det_fn_name (str): Name of the function being called
-        det_fn_param_dict (dict): dictionary containing parameter
+        det_fn_name (str): Name of the function being called.
+        det_fn_param_dict (dict): Dictionary containing parameter
             strings as keys, and lists of either strings or NodeDAGs
-            as value(s)
+            as value(s).
 
     Returns:
-        Object holding the info about a discrete state-dependent probability
+        DiscreteStateDependentProbability: Object holding the info
+            about a discrete state-dependent probability.
     """
 
     if not det_fn_param_dict:
         raise ec.ParseMissingSpecificationError(det_fn_name)
 
     value: ty.List[float] = []
-    state: ty.Optional[int] = None
+    state: ty.Optional[int] = 0
     epoch_idx: int = 1
 
     ######################################
@@ -235,7 +236,7 @@ def make_DiscreteStateDependentProbability(
                 # need to declare cast_val separately so mypy won't complain
                 cast_val1: ty.List[pgm.NodeDAG] = \
                     ty.cast(ty.List[pgm.NodeDAG], val)
-                value = extract_value_from_pgmnodes(cast_val1)
+                value = extract_value_from_dagnodes(cast_val1)
 
             # val is a list of strings
             elif isinstance(val[0], str):

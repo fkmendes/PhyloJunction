@@ -48,19 +48,22 @@ class DnSSE(pgm.DistrForSampling):
             'True' if process starts at the root.
         start_states (int): List of integers representing the starting
             states of each of the 'n_sim' samples.
-        seed_age (float, optional):
+        seed_age (float, optional): Age of seed node (either origin or
+            root).
         condition_on_speciation (bool): Flag for rejecting tree samples
             that do not go a single speciation event before 'stop_val'
             is met. Note that this first speciation event may or not be
             what is canonically the reconstructed tree root node. If
-            'True', rejects tree sample. Defaults to 'False'.
+            'True', rejects tree sample failing to meet condition.
+            Defaults to 'False'.
         condition_on_survival (bool): Flag for rejecting tree samples
             that go extinct before 'stop_val' is met. If 'True',
-            rejects tree sample. Defaults to 'True'.
+            rejects tree sample failing to meet condition. Defaults to
+            'True'.
         condition_on_obs_both_sides_root (bool): Flag for rejecting
             tree samples that do not have observed nodes on both sides
             of the complete tree's root node. If 'True', rejects tree
-            sample. Defaults to 'False'.
+            sample failing to meet condition. Defaults to 'False'.
         stop (str): Stop condition to end sampling (simulation)
             procedure and return tree. If 'age', stops when age of
             either origin or is equal to 'stop_val' (see below).
@@ -73,7 +76,7 @@ class DnSSE(pgm.DistrForSampling):
             reconstructed tree. Defaults to 0.
         max_rec_taxa (int): Required maximum number of observed taxa in
             reconstructed tree. Defaults to 1e12.
-        abort_at_living_count (int): Number of living (not observed!)
+        abort_at_alive_count (int): Number of living (not observed!)
             nodes at which point sample is rejected. This parameter is
             used to abort samples whose SSE parameters cause trees to
             grow too large. Defaults to 1e12.
@@ -135,7 +138,7 @@ class DnSSE(pgm.DistrForSampling):
     stop_val: ty.List[float]
     min_rec_taxa: int
     max_rec_taxa: int
-    abort_at_living_count: int
+    abort_at_alive_count: int
     
     # model parameters
     sse_stash: sseobj.SSEStash
@@ -165,7 +168,7 @@ class DnSSE(pgm.DistrForSampling):
                  condition_on_obs_both_sides_root: bool = False,
                  min_rec_taxa: int = 0,
                  max_rec_taxa: int = int(1e12),
-                 abort_at_obs: int = int(1e12),
+                 abort_at_alive_count: int = int(1e12),
                  epsilon: float = 1e-12,
                  runtime_limit: int = 5,
                  rng_seed: ty.Optional[int] = None,
@@ -194,7 +197,7 @@ class DnSSE(pgm.DistrForSampling):
         # rejection sampling
         self.min_rec_taxa = min_rec_taxa
         self.max_rec_taxa = max_rec_taxa
-        self.abort_at_living_count = abort_at_obs
+        self.abort_at_alive_count = abort_at_alive_count
 
         # model parameters #
         # macroevol rate handler and prob handler inside
@@ -1850,7 +1853,7 @@ class DnSSE(pgm.DistrForSampling):
                 #
                 # this helps stop trees growing out of control
                 # within age limit
-                if current_node_target_count == self.abort_at_living_count:
+                if current_node_target_count == self.abort_at_alive_count:
                     tree_invalid = True
                     reached_stop_condition = True
 
@@ -2082,8 +2085,7 @@ class DnSSE(pgm.DistrForSampling):
                 pjh.get_ellapsed_time_in_minutes(start_time, time.time())
 
             if ellapsed_time >= self.runtime_limit:
-                print("Aborted simulations, hit runtime limit")
-                break
+                raise ec.RunTimeLimit(self.runtime_limit)
 
             # simulate!
             repl_size = 0

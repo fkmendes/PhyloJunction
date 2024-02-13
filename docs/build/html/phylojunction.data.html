@@ -7,7 +7,7 @@
   <title>phylojunction.data package &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=b916aa57" />
 
   
   <!--[if lt IE 9]>
@@ -516,7 +516,7 @@ Defaults to ‘state’.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phylojunction.data.tree.AnnotatedTree.populate_nd_attr_dict">
-<span class="sig-name descname"><span class="pre">populate_nd_attr_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs_of_interest_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_added_separately_from_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.data.tree.AnnotatedTree.populate_nd_attr_dict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">populate_nd_attr_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs_of_interest_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict_added_separately_from_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.data.tree.AnnotatedTree.populate_nd_attr_dict" title="Link to this definition"></a></dt>
 <dd><p>Populate member nested dictionary with node attributes.</p>
 <p>This method is not called upon initialization of class,
 but rather when information about nodes’ states is required,
@@ -530,7 +530,7 @@ node_attr_dict.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>attrs_of_interest_list</strong> (<em>str</em>) – List of attribute names to
 store in member dictionary.</p></li>
-<li><p><strong>attr_added_separately_from_tree</strong> (<em>bool</em>) – Flag specifying
+<li><p><strong>attr_dict_added_separately_from_tree</strong> (<em>bool</em>) – Flag specifying
 whether method is being called outside tree
 initialization (i.e., to a tree that already exists),
 or during tree initialization.</p></li>

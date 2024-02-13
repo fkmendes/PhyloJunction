@@ -61,61 +61,6 @@ def script2dag(script_file_path_or_model_spec: str,
     # side-effect: populates DAG
     _execute_spec_lines(all_lines_list, dag)
 
-    ###################
-    # Debugging space #
-    ###################
-    # seeing trees in script strings in main()
-    # for node_name, node_dag in dag_obj.name_node_dict.items():
-        # if node_name == "trs":
-        # # note that pjgui uses matplotlib.figure.Figure
-        # # (which is part of Matplotlib's OOP class library)
-        # # here, we instead use pyplot's figure, which is the
-        # # Matlab-like state-machine API
-        #     fig = plt.figure()
-        #     ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-        #     ax.patch.set_alpha(0.0)
-        #     ax.xaxis.set_ticks([])
-        #     ax.yaxis.set_ticks([])
-        #     ax.spines['left'].set_visible(False)
-        #     ax.spines['bottom'].set_visible(False)
-        #     ax.spines['right'].set_visible(False)
-        #     ax.spines['top'].set_visible(False)
-
-        #     print(node_dag.value[0].tree.as_string(schema="newick"))
-
-        #     pjtr.plot_ann_tree(
-        #         node_dag.value[0],
-        #         ax,
-        #         use_age=False,
-        #         start_at_origin=True,
-        #         sa_along_branches=True
-        #     )
-
-        #     plt.show()
-
-        # print(node_dag.get_node_stats_str(0, len(node_dag.value), 0))
-
-    # as if we had clicked "See" in the inference tab
-    # all_sims_model_spec_list, all_sims_mcmc_logging_spec_list, dir_list = \
-    #     pjinf.dag_obj_to_rev_inference_spec(
-    #         dag_obj,
-    #         "./inference_test/",
-    #         mcmc_chain_length=1000,
-    #         prefix="test")
-    # for i, ith_sim_model_spec in enumerate(all_sims_model_spec_list):
-    #     print(ith_sim_model_spec)
-    #     print(all_sims_mcmc_logging_spec_list[i])
-
-    # pjio.output_inference_rev_scripts(
-    #     all_sims_model_spec_list,
-    #     all_sims_mcmc_logging_spec_list,
-    #     dir_list,
-    #     prefix="test")
-
-    ##########################
-    # End of debugging space #
-    ##########################
-
     return dag
 
 
@@ -359,12 +304,13 @@ def parse_variable_assignment(
         spec_dict, parent_pgm_nodes = \
             cmdu.parse_spec(dag_obj, constant_fn_spec, cmd_line)
 
-        ####################################################
-        # Create the sampling distribution object          #
-        #                                                  #
-        # Inside create_dn_obj, we check that distribution #
-        # are ok                                           #
-        ####################################################
+        ################################################
+        # Create the constant function object          #
+        #                                              #
+        # Inside PJCtFnGrammar, we check that constant #
+        # function is ok                               #
+        ################################################
+
         try:
             # exists outside try!
             ct_fn_obj = \
@@ -412,11 +358,10 @@ def parse_samp_dn_assignment(
         stoch_node_name: str,
         stoch_node_dn_spec: str,
         cmd_line: str) -> None:
-    """Create and add stochastic node to graphical model
+    """Create and add stochastic node to graphical model.
 
-    Called when '~' operator is used.
-    This node will be sampled from a distribution and is a random
-    variable.
+    Called when '~' operator is used. This node will be sampled from 
+    distribution and is a random variable.
 
     Args:
         dag_obj (DirectedAcyclicGraph): Object that will hold all nodes
@@ -424,7 +369,7 @@ def parse_samp_dn_assignment(
         stoch_node_name (str): Name of stochastic node being created
         stoch_node_dn_spec (str): Specification string for distribution
             from which stochastic node will be sampled (whatever is
-            right of '~'' operator in PJ command)
+            right of '~' operator in PJ command)
         cmd_line (str): Command line string provided by user through
             static script or via GUI
     """
@@ -905,41 +850,3 @@ if __name__ == "__main__":
     # file_handle_exception = io.StringIO(script_str36)
 
     dag = script2dag(script_str8, in_pj_file=False)
-    # dag = script2dag("examples/geosse_timehet_6regions.pj", in_pj_file=True)
-
-    # looking at dag nodes
-    for node_name, node_dag in dag.name_node_dict.items():
-        if isinstance(node_dag, pgm.StochasticNodeDAG):
-            if isinstance(node_dag.value[0], pjtr.AnnotatedTree):
-                print(node_dag.value[0].tree.as_string(schema="newick"))
-
-                if False:
-                    # note that pjgui uses matplotlib.figure.Figure
-                    # (which is part of Matplotlib's OOP class library)
-                    # here, we instead use pyplot's figure, which is the
-                    # Matlab-like state-machine API
-                    fig = plt.figure()
-                    ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-                    ax.patch.set_alpha(0.0)
-                    ax.xaxis.set_ticks([])
-                    ax.yaxis.set_ticks([])
-                    ax.spines['left'].set_visible(False)
-                    ax.spines['bottom'].set_visible(False)
-                    ax.spines['right'].set_visible(False)
-                    ax.spines['top'].set_visible(False)
-
-                    pjtr.plot_ann_tree(
-                        node_dag.value[0],
-                        ax,
-                        use_age=False,
-                        start_at_origin=False,
-                        sa_along_branches=True
-                    )
-
-                    plt.show()
-
-            else:
-                print(node_dag.value)
-
-            # print(node_dag.get_node_stats_str(0, len(node_dag.value), 0))
-

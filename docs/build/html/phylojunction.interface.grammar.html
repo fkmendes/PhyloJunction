@@ -7,7 +7,7 @@
   <title>phylojunction.interface.grammar package &mdash; PhyloJunction 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=9b458176" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pj_custom.css?v=b916aa57" />
 
   
   <!--[if lt IE 9]>
@@ -161,12 +161,12 @@ stochastic node</p>
 <section id="module-phylojunction.interface.grammar.det_fn_discrete_sse_makers">
 <span id="phylojunction-interface-grammar-det-fn-discrete-sse-makers-module"></span><h2>phylojunction.interface.grammar.det_fn_discrete_sse_makers module<a class="headerlink" href="#module-phylojunction.interface.grammar.det_fn_discrete_sse_makers" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_pgmnodes">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">extract_value_from_pgmnodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_node_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_pgmnodes" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_dagnodes">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">extract_value_from_dagnodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_node_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_dagnodes" title="Link to this definition"></a></dt>
 <dd><p>_summary_</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pgm_node_list</strong> (<em>NodeDM</em>) – List of NodeDAG objects (typing includes str because of type-safety)</p>
+<dd class="field-odd"><p><strong>dag_node_list</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><em>NodeDAG</em></a>) – List of NodeDAG objects.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -175,10 +175,10 @@ stochastic node</p>
 </ul>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>_description_</p>
+<dd class="field-odd"><p>List of values extracted from the DAG node.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ty.List[ty.List[float]]</p>
+<dd class="field-even"><p>(list)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -186,21 +186,25 @@ stochastic node</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentProbability">
 <span class="sig-prename descclassname"><span class="pre">phylojunction.interface.grammar.det_fn_discrete_sse_makers.</span></span><span class="sig-name descname"><span class="pre">make_DiscreteStateDependentProbability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">det_fn_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_fn_param_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.NodeDAG" title="phylojunction.pgm.pgm.NodeDAG"><span class="pre">NodeDAG</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability"><span class="pre">DiscreteStateDependentProbability</span></a></span></span><a class="headerlink" href="#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentProbability" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Create and return DiscreteStateDependentProbability as prompted by</dt><dd><p>deterministic function call</p>
-</dd>
-</dl>
+<dd><p>Return SSE probability as prompted by deterministic function call.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>det_fn_name</strong> (<em>str</em>) – Name of the function being called</p></li>
-<li><p><strong>det_fn_param_dict</strong> (<em>dict</em>) – dictionary containing parameter
+<li><p><strong>det_fn_name</strong> (<em>str</em>) – Name of the function being called.</p></li>
+<li><p><strong>det_fn_param_dict</strong> (<em>dict</em>) – Dictionary containing parameter
 strings as keys, and lists of either strings or NodeDAGs
-as value(s)</p></li>
+as value(s).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Object holding the info about a discrete state-dependent probability</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>Object holding the info</dt><dd><p>about a discrete state-dependent probability.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="phylojunction.calculation.html#phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentProbability">DiscreteStateDependentProbability</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -375,7 +379,7 @@ strings or StochasticNodeDAGs) as values.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.interface.grammar.dn_grammar.PJDnGrammar.dn_grammar_dict">
-<span class="sig-name descname"><span class="pre">dn_grammar_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'discrete_sse':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'stop',</span> <span class="pre">'stop_value',</span> <span class="pre">'origin',</span> <span class="pre">'stash',</span> <span class="pre">'start_state',</span> <span class="pre">'eps',</span> <span class="pre">'runtime_limit',</span> <span class="pre">'cond_spn',</span> <span class="pre">'cond_surv'),</span> <span class="pre">'exponential':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'rate',</span> <span class="pre">'rate_parameterization'),</span> <span class="pre">'gamma':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'shape',</span> <span class="pre">'scale',</span> <span class="pre">'rate_parameterization'),</span> <span class="pre">'lognormal':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'mean',</span> <span class="pre">'sd',</span> <span class="pre">'log_space'),</span> <span class="pre">'normal':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'mean',</span> <span class="pre">'sd'),</span> <span class="pre">'unif':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'min',</span> <span class="pre">'max')}</span></em><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.dn_grammar_dict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dn_grammar_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'discrete_sse':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'stop',</span> <span class="pre">'stop_value',</span> <span class="pre">'origin',</span> <span class="pre">'stash',</span> <span class="pre">'start_state',</span> <span class="pre">'eps',</span> <span class="pre">'runtime_limit',</span> <span class="pre">'cond_spn',</span> <span class="pre">'cond_surv',</span> <span class="pre">'cond_obs_both_sides',</span> <span class="pre">'min_rec_taxa',</span> <span class="pre">'max_rec_taxa',</span> <span class="pre">'abort_at_alive_count'),</span> <span class="pre">'exponential':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'rate',</span> <span class="pre">'rate_parameterization'),</span> <span class="pre">'gamma':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'shape',</span> <span class="pre">'scale',</span> <span class="pre">'rate_parameterization'),</span> <span class="pre">'lognormal':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'mean',</span> <span class="pre">'sd',</span> <span class="pre">'log_space'),</span> <span class="pre">'normal':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'mean',</span> <span class="pre">'sd'),</span> <span class="pre">'unif':</span> <span class="pre">('n',</span> <span class="pre">'nr',</span> <span class="pre">'min',</span> <span class="pre">'max')}</span></em><a class="headerlink" href="#phylojunction.interface.grammar.dn_grammar.PJDnGrammar.dn_grammar_dict" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
