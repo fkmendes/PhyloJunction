@@ -33,8 +33,8 @@ det_trans_rate01_t1 := sse_rate(name="q01_t1", value=trans_rate01_t1, states=[0,
 det_trans_rate10_t1 := sse_rate(name="q10_t1", value=trans_rate10_t1, states=[1,0], event="transition", epoch=2)
 
 # deterministic-node variable ('sse_stash') assignment
-# all first-epoch rates first, then all second-epoch rates!
 stash := sse_stash(flat_rate_mat=[det_birth_rate0_t0, det_death_rate0_t0, det_birth_rate1_t0, det_death_rate1_t0, det_trans_rate01_t0, det_trans_rate10_t0, det_birth_rate0_t1, det_death_rate0_t1, det_birth_rate1_t1, det_death_rate1_t1, det_trans_rate01_t1, det_trans_rate10_t1], n_states=2, n_epochs=2, epoch_age_ends=[1.5], seed_age=3.0)
 
 # stochastic-node variable ('trs') assignment
-trs ~ discrete_sse(n=100, stash=stash, start_state=[0], stop="age", stop_value=3.0, origin="true")
+ori <- 3.0
+trs ~ discrete_sse(n=2, nr=2, stash=stash, start_state=[0,0], stop="age", stop_value=ori, origin="true")

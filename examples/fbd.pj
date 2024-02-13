@@ -9,7 +9,8 @@ det_death_rate := sse_rate(name="mu", value=death_rate, states=[0], event="extin
 det_fossil_rate := sse_rate(name="psi", value=fossil_rate, states=[0], event="anc_sampling")
 
 # deterministic-node variable ('sse_stash') assignment
-stash := sse_stash(flat_rate_mat=[det_birth_rate, det_death_rate, det_fossil_rate], n_states=1, n_epochs=1) 
+stash := sse_stash(flat_rate_mat=[det_birth_rate, det_death_rate, det_fossil_rate], n_states=1) 
 
 # stochastic-node variable ('trs') assignment
-trs ~ discrete_sse(n=100, stash=stash, start_state=[0], stop="age", stop_value=3.0, origin="true", cond_spn="true", cond_surv="true")
+ori <- 3.0
+trs ~ discrete_sse(n=2, nr=2, stash=stash, start_state=[0,0], stop="age", stop_value=ori, origin="true", cond_spn="true", cond_surv="true")
