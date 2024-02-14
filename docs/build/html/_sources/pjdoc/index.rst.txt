@@ -350,12 +350,72 @@ The help message should list a series of flags, which we expand on below:
 Note that if no argument is passed to ``-o``, data tables written to disk (prompted by ``-d``) will be placed in the directory from which PhyloJunction is called.
 Figures (prompted by ``-f``), in turn, will be placed in a "figures/" sub-directory, next to the data tables. 
 
-------------------------
-Bypassing the interfaces
-------------------------
+---------------------------------
+Sandbox: Bypassing the interfaces
+---------------------------------
 
 .. _bypass:
 
+Users and developers who wish to bypass |pj|'s standalone interfaces to explore the code base can do so by using ``pj_sandbox.py``.
+Of course, some familiarity with Python is required.
+
+
+The ``pj_sandbox.py`` `script <https://raw.githubusercontent.com/fkmendes/PhyloJunction/main/src/phylojunction/interface/pj_sandbox.py>`_ contains a few examples of how |pj| can be imported as a module and used for different purposes.
+Each example is wrapped within its own function, like so:
+
+.. code-block:: python
+    :caption: **Example 1 in pj_sandbox.py.** The first example in the sandbox script demonstrates how one can build a simple DAG with a (Yule) tree stochastic node.
+
+    # pj imports
+    import phylojunction.interface.cmdbox.cmd_parse as cmdp
+    import phylojunction.pgm.pgm as pgm
+    ...
+
+    def run_example_yule_string() -> pgm.DirectedAcyclicGraph:
+        """Run example 1.
+    
+        This example sets up a simple Yule model with two samples,
+        and two Yule tree replicates per sample.
+        """
+
+        yule_model_str = \
+            ('n_sim <- 2\nn_rep <- 2\nbirth_rate <- 1.0\n'
+             'det_birth_rate := sse_rate(name="lambda", value=birth_rate,'
+             ' event="speciation")\n'
+             'stash := sse_stash(flat_rate_mat=[det_birth_rate])\n'
+             'trs ~ discrete_sse(n=n_sim, nr=n_rep, stash=stash, start_state=[0],'
+             ' stop="size", stop_value=10.0, origin="false")\n')
+    
+        dag_obj = cmdp.script2dag(yule_model_str, in_pj_file=False)
+
+        return dag_obj
+
+The example above is then invoked later in ``pj_sandbox.py``:
+
+    .. code-block:: python
+        :caption: **Calling example 1 in pj_sandbox.py.** Which example to execute can be specified in the script main body.
+
+        dag_obj: pgm.DirectedAcyclicGraph = pgm.DirectedAcyclicGraph()
+
+        ...
+
+        # examples
+        # 1: Yule model string, 2 tree samples, 2 tree replicates per sample
+        # 2: Same as (1), but reading a pre-made .pj script in examples/yule.pj
+        # 3: BiSSE model with incomplete sample, 2 tree samples, 2 tree replicates per sample
+        # 4: Builds discrete SSE tree manually, then prints on screen
+        # 5: Builds discrete SSE tree from newick string, then prints on screen
+
+        example_to_run = 1
+        # example_to_run = 2
+        # example_to_run = 3
+        # example_to_run = 4
+        # example_to_run = 5
+            
+        if example_to_run == 1:
+            dag_obj = run_example_yule_string()
+
+        ...
 
 
 -------

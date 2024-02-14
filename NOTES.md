@@ -184,7 +184,52 @@ Important notes:
 
 ### Known issues
 
-* Installing `scipy` for python3.10 under M1 architecture is complicated
+* Installing `scipy` for python3.10 under M1 architecture is complicated (it seems issues were fixed, because a pip install for 3.11 worked for scipy)
+
+## Releasing PJ to TestPyPI
+
+First, create an account on https://test.pypi.org/.
+We will use TestPyPI to test a package before releasing it for real with PyPI.
+
+Then start by logging in to TestPyPI, and go to Account Settings.
+Then set up 2FA with an app like Authy, for example.
+With the 2FA set up, get an API token -- this will save time every time the package is pushed to TestPyPI.
+Then place the token inside $HOME/.pypirc, like so:
+
+```
+[testpypi]
+  username = __token__
+  password = <API token here>
+```
+
+Now from Phylojunction/ (make sure you have the `build` Python package installed):
+
+```
+python3 -m build --sdist
+python3 -m build --wheel
+```
+
+These two commands will create a dist/ directory inside PhyloJunction/, and place a .tar.gz (containing all source .py/.pyi files, license, readme, setup files) and a wheel file inside.
+
+Then to release to TestPyPI, do:
+
+```
+twine upload --repository testpypi dist/*
+```
+
+And to test the package, do:
+
+```
+python3 -m pip install --index-url https://test.pypi.org/simple/ phylojunction
+```
+
+## Releasing PJ to PyPI
+
+To release to PyPI, we just change the twine command in the previous section to
+
+```
+twine upload dist/*
+```
 
 ## Icon for launching PJ 
 

@@ -422,11 +422,11 @@ if __name__ == "__main__":
     # 4: Builds discrete SSE tree manually, then prints on screen
     # 5: Builds discrete SSE tree from newick string, then prints on screen
 
-    # example_to_run = 1
+    example_to_run = 1
     # example_to_run = 2
     # example_to_run = 3
     # example_to_run = 4
-    example_to_run = 5
+    # example_to_run = 5
         
     if example_to_run == 1:
         dag_obj = run_example_yule_string()

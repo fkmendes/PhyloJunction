@@ -177,9 +177,9 @@ On macOS, that file is <code class="docutils literal notranslate"><span class="p
 </section>
 <section id="testing-the-installation">
 <h2>Testing the installation<a class="headerlink" href="#testing-the-installation" title="Link to this heading"></a></h2>
-<p>If installation was successful (see the Note box above), it should be possible to call PhyloJunction’s graphical (<a class="reference internal" href="pjdoc/index.html#gui"><span class="std std-ref">GUI</span></a>) and command-line user interfaces (<a class="reference internal" href="pjdoc/index.html#cli"><span class="std std-ref">CLI</span></a>) directly from the shell or Terminal:</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text"><strong>Executing PhyloJunction’s binaries from the Terminal</strong>. If the binaries cannot be found, make sure you have set your PATH environmental variable correctly.</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<p>If installation was successful (see the Note box above), it should be possible to call PhyloJunction’s graphical (<a class="reference internal" href="pjdoc/index.html#gui"><span class="std std-ref">GUI</span></a>) and command-line user interfaces (<a class="reference internal" href="pjdoc/index.html#cli"><span class="std std-ref">CLI</span></a>) directly from the Terminal or shell:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text"><strong>Executing PhyloJunction’s binaries from the Terminal or shell</strong>. If the binaries cannot be found, make sure you have set your PATH environmental variable correctly.</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pjcli<span class="w"> </span><span class="c1"># CLI</span>
 pjgui<span class="w"> </span><span class="c1"># GUI</span>
 </pre></div>
@@ -190,11 +190,29 @@ First call Python’s interpreter, and then:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">phylojunction</span>
 </pre></div>
 </div>
-<p>Examples of how to use PhyloJunction while bypassing the user interfaces can be found <a class="reference internal" href="pjdoc/index.html#bypass"><span class="std std-ref">here</span></a>.</p>
+<p>Lastly, users can bypass the standalone user interfaces via a “sandbox” script (<code class="docutils literal notranslate"><span class="pre">pj_sandbox.py</span></code>) that can be found <a class="reference internal" href="pjdoc/index.html#bypass"><span class="std std-ref">here</span></a>.
+After replacing <code class="docutils literal notranslate"><span class="pre">[path]</span></code> with whatever the path is to the PhyloJunction/ directory, running the sandbox script can be done like so from the Terminal or shell:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text"><strong>Executing PhyloJunction’s sandbox script from the Terminal or shell</strong>. Different examples can be found inside pj_sandbox.py, and can be turned on or off by modifying that script.</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>/<span class="o">[</span>path<span class="o">]</span>/PhyloJunction/src/phylojunction/interface/pj_sandbox.py
+</pre></div>
+</div>
+</div>
 </section>
 <section id="building-pj-on-an-ide">
 <h2>Building PJ on an IDE<a class="headerlink" href="#building-pj-on-an-ide" title="Link to this heading"></a></h2>
-<p>In construction.</p>
+<p>Researchers who want to navigate or expand PhyloJunction’s code base may want to build the library using an integrated development environment (IDE).
+One IDE that continues to be supported on multiple operating systems is JetBrains’ <a class="reference external" href="https://www.jetbrains.com/pycharm/" rel="noopener noreferrer" target="_blank">PyCharm</a> (Visual Studio Code for Mac will be retired in August 2024).</p>
+<p>Assuming the user has a fresh install of PyCharm, the first thing to do is to open the IDE and set up a Python interpreter.
+This can be done by clicking “&lt;No interpreter&gt;” in the bottom-right corner, and then doing “Add New Interpreter” &gt; “Add Local Interpreter” &gt; “System Interpreter” (left menu) &gt; Interpreter: [path to Python 3 binary].</p>
+<figure class="align-center" id="id4" style="width: 100%">
+<img alt="_images/pj_IDE.png" src="_images/pj_IDE.png" />
+<figcaption>
+<p><span class="caption-text"><strong>Figure 1.</strong> The PhyloJunction project after being built with PyCharm.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Then all that needs to be done is to click “File” (top-left menu) &gt; “Open…”, and then select the root of PhyloJunction GitHub’s repository (PhyloJunction/; see Fig. 1).
+If building is successful, it should be possible to double-click <code class="docutils literal notranslate"><span class="pre">pj_sandbox.py</span></code> (inside src/phylojunction/interface), select “Current file” from the top-right menu next to the green arrow icon, and then run the script (by clicking the green arrow).</p>
 </section>
 </section>
 

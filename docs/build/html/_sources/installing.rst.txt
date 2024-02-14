@@ -119,10 +119,10 @@ In construction.
 Testing the installation
 ------------------------
 
-If installation was successful (see the Note box above), it should be possible to call |pj|'s graphical (:ref:`GUI <GUI>`) and command-line user interfaces (:ref:`CLI <CLI>`) directly from the shell or Terminal:
+If installation was successful (see the Note box above), it should be possible to call |pj|'s graphical (:ref:`GUI <GUI>`) and command-line user interfaces (:ref:`CLI <CLI>`) directly from the Terminal or shell:
 
 .. code-block:: bash
-    :caption: **Executing PhyloJunction's binaries from the Terminal**. If the binaries cannot be found, make sure you have set your PATH environmental variable correctly.
+    :caption: **Executing PhyloJunction's binaries from the Terminal or shell**. If the binaries cannot be found, make sure you have set your PATH environmental variable correctly.
 
     pjcli # CLI
     pjgui # GUI
@@ -134,10 +134,29 @@ First call Python's interpreter, and then:
 
     import phylojunction
 
-Examples of how to use |pj| while bypassing the user interfaces can be found :ref:`here <bypass>`.
+Lastly, users can bypass the standalone user interfaces via a "sandbox" script (``pj_sandbox.py``) that can be found :ref:`here <bypass>`.
+After replacing ``[path]`` with whatever the path is to the |pj|/ directory, running the sandbox script can be done like so from the Terminal or shell:
+
+.. code-block:: bash
+    :caption: **Executing PhyloJunction's sandbox script from the Terminal or shell**. Different examples can be found inside pj_sandbox.py, and can be turned on or off by modifying that script.
+    
+    python3 /[path]/PhyloJunction/src/phylojunction/interface/pj_sandbox.py
 
 ---------------------
 Building PJ on an IDE 
 ---------------------
 
-In construction.
+Researchers who want to navigate or expand |pj|'s code base may want to build the library using an integrated development environment (IDE).
+One IDE that continues to be supported on multiple operating systems is JetBrains' `PyCharm <https://www.jetbrains.com/pycharm/>`_ (Visual Studio Code for Mac will be retired in August 2024).
+
+Assuming the user has a fresh install of PyCharm, the first thing to do is to open the IDE and set up a Python interpreter.
+This can be done by clicking "<No interpreter>" in the bottom-right corner, and then doing "Add New Interpreter" > "Add Local Interpreter" > "System Interpreter" (left menu) > Interpreter: [path to Python 3 binary].
+
+..  figure:: images/pj_IDE.png
+    :figwidth: 100%
+    :align: center
+
+    **Figure 1.** The PhyloJunction project after being built with PyCharm.
+
+Then all that needs to be done is to click "File" (top-left menu) > "Open...", and then select the root of |pj| GitHub's repository (|pj|/; see Fig. 1).
+If building is successful, it should be possible to double-click ``pj_sandbox.py`` (inside src/phylojunction/interface), select "Current file" from the top-right menu next to the green arrow icon, and then run the script (by clicking the green arrow).
