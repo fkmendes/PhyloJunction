@@ -35,7 +35,8 @@ def read_text_file(fp_string: str) -> ty.List[str]:
         for line in infile:
             line = line.rstrip()
 
-            if line: cmd_line_list.append(line)
+            if line:
+                cmd_line_list.append(line)
 
     return cmd_line_list
 
@@ -223,10 +224,12 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
     Args:
         nwk_tree_path_or_str (str): Tree Newick string, or path to file
-            containing single tree Newick string
-        in_file (bool): If tree string is in a file being passed as argument
-            (True) or if Newick string is being passed directly (False).
-            Defaults to 'True'.
+            containing single tree Newick string.
+        fn_name (str): Name of the function (in the .pj script) being
+            called.
+        in_file (bool): If tree string is in a file being passed as
+            argument (True) or if Newick string is being passed directly
+            (False). Defaults to 'True'.
         node_names_attribute (str): Defaults to empty string "".
 
     Returns:
@@ -284,7 +287,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                     fn_name,
                     "'node_name_attribute'",
                     message=("The attribute for node names "
-                                "was not in the newick strings."))
+                             "was not in the newick strings."))
 
             node_names_attribute_val = nd.annotations[node_names_attribute].value
             nd_name = "nd" + node_names_attribute_val
@@ -430,7 +433,19 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
 def read_node_attr_update_tree(attr_tsv_fp: str,
                                attr_name: str,
+                               attr_cast: ty.Callable,
                                ann_tr: AnnotatedTree) -> None:
+    """Update AnnotatedTree members with attribute information.
+
+    Args:
+        attr_tsv_path (string): Path to .tsv file containing attribute
+            values for nodes in the tree.
+        attr_name: Name of the attribute.
+        attr_cast (ty.Callable): Type to be used to cast value
+            as (e.g., int, float).
+        ann_tr (AnnotatedTree): AnnotatedTree object to be updated
+            with attribute name and values
+    """
 
     node_name_attr_str_list = read_text_file(attr_tsv_fp)
     ann_tr_nd_names = \
@@ -441,19 +456,19 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
 
         # if node name is not in tree, something must be wrong
         if nd_name not in ann_tr_nd_names:
-            print("nd_name", nd_name)
-            print(ann_tr_nd_names)
-            exit("test")
+            # print("nd_name", nd_name)
+            # print(ann_tr_nd_names)
+            exit("Need to add exception here.")
 
         nd = ann_tr.tree.find_node_with_label(nd_name)
         # set the attribute value
-        nd.__setattr__(attr_name, int(nd_attr_val))
+        nd.__setattr__(attr_name, attr_cast(nd_attr_val))
 
     ann_tr.populate_nd_attr_dict([attr_name],
-                                 attr_added_separately_from_tree=False)
-        
-        
-    
+                                 attr_dict_added_separately_from_tree=False)
+
+
+def read_revbayes_stochmaps_table()
 
 if __name__ == "__main__":
 
@@ -472,11 +487,16 @@ if __name__ == "__main__":
     # parse_cli_str_write_fig("rv,tr;0,")
 
     # should all work!
-    tr = read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
-    # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree1.tre",
-    # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree2.tre",
-    # tr = read_nwk_tree_str("examples/trees_maps_files/dummy_tree3.tre",
-                      node_names_attribute="index")
+    # tr = read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
+    tr = read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree1.tre",
+                           node_names_attribute="index")
+
+    read_node_attr_update_tree("examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
+                               "state",
+                               int,
+                               tr)
+
+    print(tr.node_attr_dict)
     
     # dummy trees should be:
     # (((sp1:1.0,sp2:1.5)nd4:1.0,sp3:1.7)root:0.5)origin:0.5

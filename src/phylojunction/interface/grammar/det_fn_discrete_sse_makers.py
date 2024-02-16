@@ -31,7 +31,6 @@ def extract_value_from_dagnodes(dag_node_list: ty.List[pgm.NodeDAG]) \
 
         # so mypy won't complain
         if isinstance(node_dag, pgm.NodeDAG):
-
             # no plating supported
             if node_dag.repl_size > 1:
                 raise ec.NoPlatingAllowedError(

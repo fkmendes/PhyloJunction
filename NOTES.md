@@ -231,6 +231,14 @@ To release to PyPI, we just change the twine command in the previous section to
 twine upload dist/*
 ```
 
+To see where pip installs things:
+
+```
+python3 -m pip list -v
+```
+
+The PyPI link to PJ is: https://pypi.org/project/PhyloJunction/
+
 ## Icon for launching PJ 
 
 On Linux, there are two ways to have icons for PJ:

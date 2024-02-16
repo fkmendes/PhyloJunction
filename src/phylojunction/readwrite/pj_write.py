@@ -714,9 +714,10 @@ def prep_data_filepaths_dfs(
         output_fp_list.append("scalar_constants.csv")
         output_df_str_list.append(scalar_output_stash[0])
 
+    # one .csv file per plating replication
     if scalar_output_stash[1]:
         for n_repl, df in scalar_output_stash[1].items():
-            output_fp_list.append("scalar_rvs_" + str(n_repl) + "repl.csv")
+            output_fp_list.append("scalar_rvs_repl" + str(n_repl) + ".csv")
             output_df_str_list.append(df)
 
     if not scalar_output_stash[2].empty:

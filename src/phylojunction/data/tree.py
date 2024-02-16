@@ -1265,11 +1265,14 @@ class AnnotatedTree(dp.Tree):
                         for att_str, att_v in att_val.values_as_dict().items():
                             if att_str in attrs_of_interest_list:
                                 try:
-                                    self.node_attr_dict[nd.label][att_str] = float(att_v)
+                                    self.node_attr_dict[nd.label][att_str] = \
+                                        float(att_v)
                                 
                                 except:
                                     raise ec.AnnotatedTreeNodeMissingAttrError(
-                                        nd, att_str, "Attribute value could not be converted to float."
+                                        nd,
+                                        att_str,
+                                        "Attribute value could not be converted to float."
                                     )
 
                 else:

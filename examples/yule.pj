@@ -9,7 +9,7 @@ birth_rate <- [0.8, 0.9]
 
 # alternatively, stochastic-node variable ('birth_rate') assignment
 # (comment out previous command)
-# birth_rate ~ exponential(n=n_sim, nr=n_rep, rate=1.0)
+# birth_rate ~ exponential(n=n_sim, rate=1.0)
 
 # deterministic-node variable ('det_birth_rate') assignment
 det_birth_rate := sse_rate(name="lambda", value=birth_rate, event="speciation")
