@@ -69,7 +69,7 @@ class DirectedAcyclicGraph():
     @random_seed.setter
     def random_seed(self, a_seed) -> None:
         # handle seed if not None, not empty string, and is integer
-        if a_seed and isinstance(a_seed, int):
+        if a_seed is not None and isinstance(a_seed, int):
             self._random_seed = a_seed
             
             # now we execute the seed (for two random number generators)!
