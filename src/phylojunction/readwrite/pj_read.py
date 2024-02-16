@@ -468,7 +468,8 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
                                  attr_dict_added_separately_from_tree=False)
 
 
-def read_revbayes_stochmaps_table()
+def read_revbayes_stochmaps_table():
+    pass
 
 if __name__ == "__main__":
 
