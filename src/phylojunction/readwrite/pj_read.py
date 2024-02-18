@@ -282,14 +282,19 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
         nd_name: str = "nd" + str(nd_count)
         node_names_attribute_val: str = ""
         if node_names_attribute != "":
-            if nd.annotations[node_names_attribute].value == "":
+            node_names_attribute_val = nd.annotations[node_names_attribute].value
+
+            if node_names_attribute_val == "":
                 raise ec.ObjInitInvalidArgError(
                     fn_name,
                     "'node_name_attribute'",
                     message=("The attribute for node names "
                              "was not in the newick strings."))
 
-            node_names_attribute_val = nd.annotations[node_names_attribute].value
+            # we make the node have that attribute!
+            setattr(nd, node_names_attribute, node_names_attribute_val)
+
+            # now we also use that attribute value as a node name
             nd_name = "nd" + node_names_attribute_val
             with_attribute = True
 
@@ -431,7 +436,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     # print(node_id_to_name)
 
 
-def read_node_attr_update_tree(attr_tsv_fp: str,
+def read_node_attr_update_tree(attr_tsv_path: str,
                                attr_name: str,
                                attr_cast: ty.Callable,
                                ann_tr: AnnotatedTree) -> None:
@@ -447,7 +452,7 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
             with attribute name and values
     """
 
-    node_name_attr_str_list = read_text_file(attr_tsv_fp)
+    node_name_attr_str_list = read_text_file(attr_tsv_path)
     ann_tr_nd_names = \
         set([nd.label for nd in ann_tr.tree.taxon_namespace])
     
@@ -467,9 +472,6 @@ def read_node_attr_update_tree(attr_tsv_fp: str,
     ann_tr.populate_nd_attr_dict([attr_name],
                                  attr_dict_added_separately_from_tree=False)
 
-
-def read_revbayes_stochmaps_table():
-    pass
 
 if __name__ == "__main__":
 
@@ -492,12 +494,18 @@ if __name__ == "__main__":
     tr = read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree1.tre",
                            node_names_attribute="index")
 
+    print(tr.node_attr_dict)
+
     read_node_attr_update_tree("examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
                                "state",
                                int,
                                tr)
 
-    print(tr.node_attr_dict)
+    it_stochmaps_info_dict = \
+        read_revbayes_stochmaps_table("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv")
+
+    print(it_stochmaps_info_dict)
+
     
     # dummy trees should be:
     # (((sp1:1.0,sp2:1.5)nd4:1.0,sp3:1.7)root:0.5)origin:0.5
