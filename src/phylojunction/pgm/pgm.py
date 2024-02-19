@@ -639,7 +639,6 @@ class StochasticNodeDAG(NodeDAG):
             return self.sampling_dn.generate()
         
         elif self.constant_fn:
-            print("inside generate_value()")
             return self.constant_fn.generate()
 
         else:
@@ -748,8 +747,13 @@ class DeterministicNodeDAG(NodeDAG):
                  deterministic: bool = True,
                  parent_nodes: ty.Optional[ty.List[NodeDAG]] = None) -> None:
 
+        sample_size = None
+        if isinstance(value, list):
+            sample_size = len(value)
+
         super().__init__(node_name,
-                         sample_size=None,
+                         sample_size=sample_size,
+                         replicate_size=1,
                          value=value,
                          call_order_idx=call_order_idx,
                          deterministic=deterministic,
@@ -763,9 +767,12 @@ class DeterministicNodeDAG(NodeDAG):
     def __lt__(self, other) -> bool:
         return super().__lt__(other)
 
-    # deterministic nodes have all sorts of members, len() here should have no meaning
     def __len__(self) -> int:
-        return 0
+        if isinstance(self.value, list):
+            return super().__len__()
+
+        else:
+            return 0
 
     def plot_node(self,
                   axes: plt.Axes,
@@ -773,7 +780,25 @@ class DeterministicNodeDAG(NodeDAG):
                   repl_idx: ty.Optional[int] = 0,
                   repl_size: ty.Optional[int] = 1,
                   branch_attr: ty.Optional[str] = "state") -> None:
-        plot_blank(axes)
+
+        # if list
+        if super().__len__() >= 1 and isinstance(self.value, list):
+            # if tree, we only plot one
+            if isinstance(self.value[0], pjtr.AnnotatedTree):
+                # so mypy won't complain
+                if isinstance(sample_idx, int) and \
+                        isinstance(self.value[sample_idx * repl_size + repl_idx],
+                                   pjtr.AnnotatedTree):
+                    if self.value[0].state_count > 1:
+                        self.value[sample_idx * repl_size + repl_idx] \
+                            .plot_node(axes, node_attr=branch_attr)
+
+                    else:
+                        self.value[sample_idx * repl_size + repl_idx] \
+                            .plot_node(axes)
+
+        else:
+            plot_blank(axes)
 
     def populate_operator_weight(self):
         pass
@@ -835,6 +860,57 @@ def plot_blank(axes: plt.Axes) -> None:
 ####################
 # Helper functions #
 ####################
+
+def extract_value_from_dagnodes(dag_node_list: ty.List[NodeDAG]) \
+        -> ty.List[float]:
+    """_summary_
+
+    Args:
+        dag_node_list (NodeDAG): List of NodeDAG objects.
+
+    Raises:
+        ec.NoPlatingAllowedError: _description_
+        ec.StateDependentParameterMisspec: _description_
+
+    Returns:
+        (list): List of values extracted from the DAG node.
+    """
+
+    many_nodes_dag = len(dag_node_list) > 1
+    v_list: ty.List[float] = []
+
+    for node_dag in dag_node_list:
+
+        # so mypy won't complain
+        if isinstance(node_dag, NodeDAG):
+            # no plating supported
+            if node_dag.repl_size > 1:
+                raise ec.NoPlatingAllowedError(
+                    "sse_rate", node_dag.node_name)
+
+            v = node_dag.value  # list (I think before I also
+                                # allowed numpy.ndarray, but not anymore)
+
+            # so mypy won't complain
+            if isinstance(v, list):
+                if len(v) > 1 and many_nodes_dag:
+                    raise ec.StateDependentParameterMisspec(
+                        message=(
+                            ("If many variables are passed as arguments "
+                             "to initialize another variable, each of these "
+                             "variables can contain only a single value")))
+
+                elif len(v) == 1 and many_nodes_dag:
+                    # making list longer
+                    # (v should be a list, which is why I don't use append)
+                    v_list += v
+
+                elif len(v) >= 1 and not many_nodes_dag:
+                    return v
+
+    return v_list
+
+
 def extract_vals_as_str_from_node_dag(
         val_list: ty.List[ty.Union[str, NodeDAG]]) -> ty.List[str]:
     """Get values from DAG node.

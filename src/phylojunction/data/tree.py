@@ -171,9 +171,13 @@ class AnnotatedTree(dp.Tree):
     sa_lineage_dict: \
         ty.Optional[
             ty.Dict[str, ty.List[pjsa.SampledAncestor]]]  # can be None
+    # attribute transitions (along branches, including the ones simultaneous
+    # with speciation)
     at_dict: \
         ty.Optional[ty.Dict[
             str, ty.List[pjat.AttributeTransition]]]  # can be None
+    clado_at_dict: \
+        ty.Optional[ty.Dict[str, pjat.AttributeTransition]]  # can be None
 
     # to deal with effectively zero floats
     epsilon: float
@@ -193,6 +197,8 @@ class AnnotatedTree(dp.Tree):
             at_dict:
             ty.Optional[
                 ty.Dict[str, ty.List[pjat.AttributeTransition]]] = None,
+            clado_at_dict:
+            ty.Optional[ty.Dict[str, pjat.AttributeTransition]] = None,
             tree_died: ty.Optional[bool] = None,
             tree_invalid: ty.Optional[bool] = None,
             read_as_newick_string: bool = False,
@@ -281,6 +287,7 @@ class AnnotatedTree(dp.Tree):
         # for plotting and counting nodes
         self.sa_lineage_dict = sa_lineage_dict
         self.at_dict = at_dict
+        self.clado_at_dict = clado_at_dict
 
         # node counting
         self.n_extant_terminal_nodes = 0

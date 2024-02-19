@@ -218,6 +218,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                       fn_name: str = "read_tree",
                       in_file: bool = True,
                       node_names_attribute: str = "",
+                      n_states: int = 1,
                       epsilon: float = 1e-12) \
         -> AnnotatedTree:
     """Read Newick tree string directly or in provided file.
@@ -418,16 +419,16 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     #     print(nd is dp_tr.seed_node)
     #     print(nd.parent_node)
 
-    n_state = 1
-
+    # note the empty attribute transition dict members
     ann_tr = AnnotatedTree(dp_tr,
-                           n_state,
+                           n_states,
                            start_at_origin=is_origin,
                            tree_died=False,
-                           read_as_newick_string=True)
+                           read_as_newick_string=True,
+                           at_dict=dict(),
+                           clado_at_dict=dict())
     
     ann_tr.node_attr_dict = node_attr_dict
-    ann_tr.at_dict = dict()
 
     return ann_tr
 
@@ -500,11 +501,6 @@ if __name__ == "__main__":
                                "state",
                                int,
                                tr)
-
-    it_stochmaps_info_dict = \
-        read_revbayes_stochmaps_table("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv")
-
-    print(it_stochmaps_info_dict)
 
     
     # dummy trees should be:

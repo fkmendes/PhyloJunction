@@ -456,9 +456,6 @@ class GUIMainWindow(QMainWindow):
         then update canvas with new plot
         """
 
-        # try:
-
-        # if stochastic or constant, value will be list
         if isinstance(node_dag.value, list):
             # if a tree
             if isinstance(node_dag.value[0], pjdt.AnnotatedTree):

@@ -35,14 +35,15 @@ def run_example_yule_string() -> pgm.DirectedAcyclicGraph:
     return dag_obj
 
 
-def run_example_yule_file() -> pgm.DirectedAcyclicGraph:
+def run_example_geosse_file() -> pgm.DirectedAcyclicGraph:
     """Run example 2.
     
-    This example reads script examples/yule.pj, which builds
-    the same model specified in example 1.
+    This example reads script examples/bisse.pj. The tree
+    is a sample from a geographic state-dependent speciation
+    extinction (GeoSSE) process.
     """
 
-    dag_obj = cmdp.script2dag("examples/yule.pj", \
+    dag_obj = cmdp.script2dag("examples/geosse.pj", \
                               in_pj_file=True)
     
     return dag_obj
@@ -368,6 +369,22 @@ def run_example_read_tree_function(ax: matplotlib.pyplot.Axes) -> None:
         sa_along_branches=False,
         attr_of_interest="state")
 
+
+def run_example_map_attr(ax: matplotlib.pyplot.Axes) -> None:
+    """Run example 6.
+
+    Returns:
+    """
+
+    dag_obj = cmdp.script2dag("examples/see_stoch_maps.pj", \
+                              in_pj_file=True)
+
+    for node_name, node_dag in dag_obj.name_node_dict.items():
+        if isinstance(node_dag, pgm.StochasticNodeDAG):
+            ann_tr = node_dag.value[0]
+
+
+
 # TODO
 # def run_example_inference_string():
     # as if we had clicked "See" in the inference tab
@@ -414,22 +431,24 @@ if __name__ == "__main__":
 
     # examples
     # 1: Yule model string, 2 tree samples, 2 tree replicates per sample
-    # 2: Same as (1), but reading a pre-made .pj script in examples/yule.pj
+    # 2: Same as (1), but reading a pre-made .pj script in examples/geosse.pj
     # 3: BiSSE model with incomplete sample, 2 tree samples, 2 tree replicates per sample
     # 4: Builds discrete SSE tree manually, then prints on screen
     # 5: Builds discrete SSE tree from newick string, then prints on screen
+    # 6: Read .pj script examples/see_stoch_maps.pj
 
     # example_to_run = 1
-    example_to_run = 2
+    # example_to_run = 2
     # example_to_run = 3
     # example_to_run = 4
     # example_to_run = 5
+    example_to_run = 6
         
     if example_to_run == 1:
         dag_obj = run_example_yule_string()
 
     elif example_to_run == 2:
-        dag_obj = run_example_yule_file()
+        dag_obj = run_example_geosse_file()
 
     elif example_to_run == 3:
         dag_obj = run_example_manual_incomplete_sampling_bisse()
@@ -442,6 +461,10 @@ if __name__ == "__main__":
         run_example_read_tree_function(ax)
         matplotlib.pyplot.show()
 
+    elif example_to_run == 6:
+        run_example_map_attr(ax)
+        # matplotlib.pyplot.show()
+
     # printing to screen
     if example_to_run in ([1, 2, 3]):
         for node_name, node_dag in dag_obj.name_node_dict.items():
@@ -449,3 +472,7 @@ if __name__ == "__main__":
                 if isinstance(node_dag.value[0], pjtr.AnnotatedTree):
                     print(node_dag.value[0].tree.as_string(schema="newick"))
                     print(node_dag.get_node_stats_str(0, len(node_dag.value), 0))
+
+                    # if one wants to see cladogenetic attribute transitions
+                    for nd_name, clado_at in node_dag.value[0].clado_at_dict.items():
+                        print(nd_name, "\n", clado_at)

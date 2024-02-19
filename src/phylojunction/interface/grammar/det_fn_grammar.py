@@ -4,7 +4,7 @@ import typing as ty
 import phylojunction.calculation.discrete_sse as sseobj
 import phylojunction.utility.exception_classes as ec
 import phylojunction.interface.grammar.det_fn_discrete_sse_makers as detsse
-import phylojunction.interface.grammar.det_fn_map_attribute as detmap
+import phylojunction.interface.grammar.det_fn_map_attribute as detatt
 import phylojunction.pgm.pgm as pgm
 import phylojunction.data.tree as pjtr
 
@@ -24,7 +24,9 @@ class PJDetFnGrammar():
         "sse_rate": set(["name", "value", "event", "states", "epoch"]),
         "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states",
                           "seed_age", "epoch_age_ends", "n_epochs"]),
-        "map_attribute": set(["tree", "maps_file_path", "attr_name"])
+        "map_attr": set(["tree", "fun", "tip_attr_file_path",
+                         "maps_file_path", "attr_name", "n_states",
+                         "geo"])
     }
 
     @classmethod
@@ -91,9 +93,15 @@ class PJDetFnGrammar():
         cls,
         det_fn_param_dict: \
             ty.Dict[str, ty.List[ty.Union[str, pgm.NodeDAG]]]) \
-                -> pjtr.AnnotatedTree:
-        
-        return detmap.make_mapped_ann_tree()
+                -> ty.List[pjtr.AnnotatedTree]:
+
+        try:
+            return detatt.make_mapped_ann_tree("map_attr", det_fn_param_dict)
+
+        except (ec.ParseInvalidArgumentError,
+                ec.ParseRequireIntegerError,
+                ec.PJIOFileDoesNotExistError) as e:
+            raise ec.ParseDetFnInitFailError("map_attr", e.message)
 
     @classmethod
     def create_det_fn_obj(
@@ -104,7 +112,8 @@ class PJDetFnGrammar():
                 ty.Union[
                     sseobj.DiscreteStateDependentRate,
                     sseobj.DiscreteStateDependentProbability,
-                    sseobj.SSEStash
+                    sseobj.SSEStash,
+                    ty.List[pjtr.AnnotatedTree]
                 ]]:
         """
         Build and return deterministic function object.
@@ -139,7 +148,7 @@ class PJDetFnGrammar():
         if det_fn_id == "sse_stash":
             return cls.init_return_sse_stash(det_fn_param_dict)
         
-        if det_fn_id == "map_attribute":
+        if det_fn_id == "map_attr":
             return cls.init_return_tree_mapped_with_attr(det_fn_param_dict)
 
         return None

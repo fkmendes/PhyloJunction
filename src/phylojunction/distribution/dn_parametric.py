@@ -320,7 +320,7 @@ class DnExponential(pgm.DistrForSampling):
             n_samples: int,
             scale_or_rate_param: float,
             rate_parameterization: bool = True) \
-                -> ty.Union[np.float64, np.ndarray]:
+                -> np.ndarray:
         """Return sample from exponential distribution.
 
         Args:

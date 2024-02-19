@@ -2,61 +2,12 @@ import typing as ty
 
 # pj imports
 import phylojunction.utility.exception_classes as ec
+import phylojunction.utility.helper_functions as pjh
 import phylojunction.pgm.pgm as pgm
 import phylojunction.calculation.discrete_sse as sseobj  # type: ignore
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
-
-
-def extract_value_from_dagnodes(dag_node_list: ty.List[pgm.NodeDAG]) \
-        -> ty.List[float]:
-    """_summary_
-
-    Args:
-        dag_node_list (NodeDAG): List of NodeDAG objects.
-
-    Raises:
-        ec.NoPlatingAllowedError: _description_
-        ec.StateDependentParameterMisspec: _description_
-
-    Returns:
-        (list): List of values extracted from the DAG node.
-    """
-
-    many_nodes_dag = len(dag_node_list) > 1
-    v_list: ty.List[float] = []
-
-    for node_dag in dag_node_list:
-
-        # so mypy won't complain
-        if isinstance(node_dag, pgm.NodeDAG):
-            # no plating supported
-            if node_dag.repl_size > 1:
-                raise ec.NoPlatingAllowedError(
-                    "sse_rate", node_dag.node_name)
-
-            v = node_dag.value  # list (I think before I also
-                                # allowed numpy.ndarray, but not anymore)
-
-            # so mypy won't complain
-            if isinstance(v, list):
-                if len(v) > 1 and many_nodes_dag:
-                    raise ec.StateDependentParameterMisspec(
-                        message=(
-                            ("If many variables are passed as arguments "
-                             "to initialize another variable, each of these "
-                             "variables can contain only a single value")))
-
-                elif len(v) == 1 and many_nodes_dag:
-                    # making list longer
-                    # (v should be a list, which is why I don't use append)
-                    v_list += v
-
-                elif len(v) >= 1 and not many_nodes_dag:
-                    return v
-
-    return v_list
 
 
 def make_DiscreteStateDependentRate(
@@ -104,7 +55,7 @@ def make_DiscreteStateDependentRate(
                 # need to declare cast_val separately so mypy won't complain
                 cast_val1: ty.List[pgm.NodeDAG] = \
                     ty.cast(ty.List[pgm.NodeDAG], val)
-                value = extract_value_from_dagnodes(cast_val1)
+                value = pgm.extract_value_from_dagnodes(cast_val1)
 
             # val is a list of strings
             elif isinstance(val[0], str):
@@ -235,7 +186,7 @@ def make_DiscreteStateDependentProbability(
                 # need to declare cast_val separately so mypy won't complain
                 cast_val1: ty.List[pgm.NodeDAG] = \
                     ty.cast(ty.List[pgm.NodeDAG], val)
-                value = extract_value_from_dagnodes(cast_val1)
+                value = pgm.extract_value_from_dagnodes(cast_val1)
 
             # val is a list of strings
             elif isinstance(val[0], str):

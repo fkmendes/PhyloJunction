@@ -44,6 +44,7 @@ class AnnotatedTree(dp.Tree):
     sa_obs_nodes_labels: ty.Tuple[str]
     sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]
     at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]]
+    clado_at_dict: ty.Optional[ty.Dict[str, pjat.AttributeTransition]]
     epsilon: float
 
     def __init__(self,
@@ -56,6 +57,7 @@ class AnnotatedTree(dp.Tree):
                  slice_age_ends: ty.Optional[ty.List[float]] = None,
                  sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]] = None,
                  at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]] = None,
+                 clado_at_dict: ty.Optional[ty.Dict[str, pjat.AttributeTransition]] = None,
                  tree_died: ty.Optional[bool] = None,
                  tree_invalid: ty.Optional[bool] = None,
                  read_as_newick_string: bool = False,

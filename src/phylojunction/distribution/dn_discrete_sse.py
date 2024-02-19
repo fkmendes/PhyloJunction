@@ -690,6 +690,7 @@ class DnSSE(pgm.DistrForSampling):
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
             state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+            clado_state_transition_dict: ty.Dict[str, AttributeTransition],
             untargetable_node_set: ty.Set[str],
             cumulative_node_count: int,
             sse_birth_rate_object: sseobj.DiscreteStateDependentRate,
@@ -706,8 +707,9 @@ class DnSSE(pgm.DistrForSampling):
             (ii)  self.state_representation_dict
             (iii) self.sa_lineage_dict
             (iv)  self.state_transition_dict
-            (v)   self.root_is_born
-            (vi)  self.untargetable_node_set
+            (v)   self.clado_state_transition_dict
+            (vi)   self.root_is_born
+            (vii)  self.untargetable_node_set
 
         Args:
             tr_namespace (dendropy.TaxonNamespace): Dendropy object
@@ -726,6 +728,11 @@ class DnSSE(pgm.DistrForSampling):
                 of nodes subtending which state transitions happen
                 (used for plotting). Keys are taxon names (strings)
                 and values are lists of AttributeTransition objects.
+            clado_state_transition_dict (dict): Dictionary that keeps
+                track of speciating nodes whose children have different
+                states (used for stochastic maps I/O). Keys are
+                taxon names (strings) and values are
+                AttributeTransition objects.
             untargetable_node_set (str): Set of Node labels that
                 cannot be targeted for events anymore (went extinct).
             cumulative_node_count (int): Total number of nodes in the
@@ -881,8 +888,9 @@ class DnSSE(pgm.DistrForSampling):
 
         ####################################
         # Adding state transition instance #
-        # to class member that bookkeeps   #
-        # (for painting mid-branch)        #
+        # to class members that bookkeep   #
+        # for either painting mid-branch,  #
+        # or for stochastic map I/O        #
         ####################################
         for idx, child_node in enumerate((left_child, right_child)):
             arriving_state: int = -1
@@ -899,15 +907,30 @@ class DnSSE(pgm.DistrForSampling):
                     child_node.label,
                     event_t,
                     chosen_node.state,
-                    arriving_state
+                    arriving_state,
+                    at_speciation=True
                 )
 
-                try:
+                if child_node.label in state_transition_dict:
                     state_transition_dict[child_node.label] \
                         .append(state_trans)
 
-                except KeyError:
+                else:
                     state_transition_dict[child_node.label] = [state_trans]
+
+        if chosen_node.state != left_arriving_state or \
+                chosen_node.state != right_arriving_state:
+            clado_state_trans = AttributeTransition(
+                "state",
+                chosen_node.label,
+                event_t,
+                chosen_node.state,
+                left_arriving_state,
+                to_state2=right_arriving_state,
+                at_speciation=True
+            )
+
+            clado_state_transition_dict[chosen_node.label] = clado_state_trans
 
         # updating parent node
         # (1) adding both children
@@ -1332,6 +1355,7 @@ class DnSSE(pgm.DistrForSampling):
             chosen_node: dp.Node,
             state_representation_dict: ty.Dict[int, ty.Set[str]],
             state_transition_dict: ty.Dict[str, ty.List[AttributeTransition]],
+            clado_state_transition_dict: ty.Dict[str, AttributeTransition],
             sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
             untargetable_node_set: ty.Set[str],
             cumulative_node_count: int,
@@ -1360,6 +1384,11 @@ class DnSSE(pgm.DistrForSampling):
                 of nodes subtending which state transitions happen
                 (used for plotting). Keys are taxon names (strings)
                 and values are lists of AttributeTransition objects.
+            clado_state_transition_dict (dict): Dictionary that keeps
+                track of speciating nodes whose children have different
+                states (used for stochastic maps I/O). Keys are
+                taxon names (strings) and values are
+                AttributeTransition objects.
             sa_lineage_dict (dict): Dictionary that keeps track of
                 nodes that have direct (sampled) ancestor children.
                 Keys are taxon names (strings), values are lists
@@ -1398,6 +1427,7 @@ class DnSSE(pgm.DistrForSampling):
                     state_representation_dict,
                     sa_lineage_dict,
                     state_transition_dict,
+                    clado_state_transition_dict,
                     untargetable_node_set,
                     cumulative_node_count,
                     sse_rate_object,
@@ -1527,7 +1557,7 @@ class DnSSE(pgm.DistrForSampling):
                 float(
                     dnpar.DnExponential.draw_exp(1,
                                                 total_rate,
-                                                rate_parameterization=True))
+                                                rate_parameterization=True)[0])
 
             return next_time
     
@@ -1582,6 +1612,9 @@ class DnSSE(pgm.DistrForSampling):
             ty.Dict[str, ty.List[AttributeTransition]] = dict()
         sa_lineage_dict: \
             ty.Dict[str, ty.List[SampledAncestor]] = dict()
+        # this dict is for stochastic maps I/O
+        clado_state_transition_dict: \
+            ty.Dict[str, AttributeTransition] = dict()
 
         # germinate the tree #
         tr: dp.Tree
@@ -1809,6 +1842,7 @@ class DnSSE(pgm.DistrForSampling):
                         chosen_node,
                         state_representation_dict,
                         state_transition_dict,
+                        clado_state_transition_dict,
                         sa_lineage_dict,
                         untargetable_node_set,
                         cumulative_node_count,
@@ -1925,6 +1959,7 @@ class DnSSE(pgm.DistrForSampling):
                 slice_age_ends=self.events.slice_age_ends,
                 sa_lineage_dict=sa_lineage_dict,
                 at_dict=state_transition_dict,
+                clado_at_dict=clado_state_transition_dict,
                 condition_on_obs_both_sides_root=\
                     self.condition_on_obs_both_sides_root,
                 tree_invalid=tree_invalid,
@@ -1937,6 +1972,7 @@ class DnSSE(pgm.DistrForSampling):
                 start_at_origin=self.with_origin,
                 sa_lineage_dict=sa_lineage_dict,
                 at_dict=state_transition_dict,
+                clado_at_dict=clado_state_transition_dict,
                 condition_on_obs_both_sides_root=\
                     self.condition_on_obs_both_sides_root,
                 tree_invalid=tree_invalid)

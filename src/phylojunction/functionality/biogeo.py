@@ -25,6 +25,13 @@ class State2BitLookup:
     character can take. In the case of 1-character-1-region, then
     the number of states is 2, because a species is either present
     or not in a region.
+
+    Parameters:
+        n_char (int):
+        n_states_per_char (int):
+        n_states (int):
+        int2bit_dict (dict):
+        bit2int_dict (dict):
     """
 
     # e.g., for 2 states
@@ -58,7 +65,7 @@ class State2BitLookup:
         self._populate_dicts(geosse)
 
         if geosse:
-            self.n_states -= 1  # add back null range
+            self.n_states -= 1  # remove null range
 
 
     # internal
