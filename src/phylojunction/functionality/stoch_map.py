@@ -1,15 +1,13 @@
 import os
 import copy
-import enum
 import typing as ty
 import matplotlib.pyplot as plt  # type: ignore
-from abc import ABC, abstractmethod
 
 # pj imports
-import phylojunction.data.tree as pjt
 from phylojunction.data.attribute_transition import AttributeTransition
 import phylojunction.data.tree as pjtr
 import phylojunction.readwrite.pj_read as pjr
+import phylojunction.functionality.evol_event as pjev
 import phylojunction.functionality.biogeo as pjbio
 import phylojunction.utility.exception_classes as ec
 
@@ -17,135 +15,7 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-class Hypothesis(enum.Enum):
-    VICARIANCE = 0
-    FOUNDER_EVENT = 1
-
-
-class EvolRelevantEvent(ABC):
-    """Evolution-relevant event.
-
-    Examples of evolution-relevant events are those represented by
-    stochastic maps (e.g., range contraction, range expansion,
-    extinction, dispersal) or the (paleogeographic) appearance and
-    disappearance of barriers.
-
-    Parameters:
-        n_chars (int): Number of characters involved in event.
-        age (float): Age of event (age of present moment is 0.0).
-        time (float, optional): Time of event (0.0 at origin or
-        root). Defaults to None.
-    """
-
-    _n_chars: int
-    _age: float
-    _time: float
-
-    @abstractmethod
-    def __init__(self,
-                 n_chars: int,
-                 age: ty.Optional[float],
-                 time: ty.Optional[float] = None) -> None:
-
-        self._n_chars = n_chars
-        self._age = age
-        self._time = time
-
-
-    @property
-    def age(self) -> float:
-        return self._age
-
-    @property
-    def time(self) -> float:
-        return self._time
-
-
-class EvolRelevantEventSeries:
-    """Series of evolution-relevant events.
-
-    This class has member methods that interrogate a series of event,
-    truncating it depending on what the user specifies.
-
-    """
-
-    _event_list: ty.List[EvolRelevantEvent]
-    _n_events: int
-    _series_type: str
-    _trunc_event_list: ty.List[EvolRelevantEvent]
-    _trunc_n_events: int
-    _supported_hyp: Hypothesis
-
-    def __init__(self,
-                 event_list: ty.List[EvolRelevantEvent],
-                 series_type: str) -> None:
-
-        self._series_type = series_type
-
-        self.health_check()
-
-        self._event_list = event_list
-        self._n_events = len(event_list)
-
-    def health_check(self) -> None:
-        """Confirm validity of event list given series type."""
-
-        if self._series_type == "speciation":
-            last_event = self._event_list[-1]
-
-            if not isinstance(last_event, RangeSplitOrBirth):
-                raise ec.SequenceInvalidLastError(type(last_event))
-
-    def truncate_upstream(self, truncator_fn: ty.Callable) -> None:
-        """Deep-copy series and truncate copy upstream.
-
-        Truncation of an event series is done according to some
-        user-specified function. Truncation may be carried out, for
-        example, at the first event that destabilizes a range (i.e.,
-        the first "destabilizer" event).
-
-        Side-effects:
-            (i)  Populate self._trunc_event_list
-            (ii) Populate self._trunc_n_events
-
-        Parameters:
-            truncator_fn (function): Method of static Truncate class
-                that executes truncation.
-        """
-
-        self._trunc_event_list = truncator_fn(
-            copy.deepcopy(self._event_list))
-
-        self._trunc_n_events = len(self._trunc_event_list)
-
-
-    @property
-    def event_list(self) -> ty.List[EvolRelevantEvent]:
-        return self._event_list
-
-    @property
-    def n_events(self) -> int:
-        return self._n_events
-
-    @property
-    def series_type(self) -> str:
-        return self._series_type
-
-    @property
-    def supported_hyp(self) -> Hypothesis:
-        return self._supported_hyp
-
-    @supported_hyp.setter
-    def supported_hyp(self, a_hyp: Hypothesis) -> None:
-        if (a_hyp == Hypothesis.VICARIANCE or \
-                a_hyp == Hypothesis.FOUNDER_EVENT) and \
-                self._series_type != "speciation":
-            raise ec.SequenceHypothesisTypeError(a_hyp, self._series_type)
-
-        self._supported_hyp = a_hyp
-
-
-class StochMap(EvolRelevantEvent):
+class StochMap(pjev.EvolRelevantEvent):
     """Parent class for a single stochastic map.
     
     Parameters:
@@ -525,6 +395,9 @@ class RangeSplitOrBirth(StochMap):
 
 class StochMapsOnTree():
     """Collection of stochastic maps on a single tree.
+
+    This collection of stochastic maps consists of all stochastic
+    maps logged during a single iteration.
 
     Parameters:
         ann_tr (AnnotatedTree): AnnotatedTree object on which maps
@@ -1098,7 +971,7 @@ class StochMapsOnTreeCollection():
             indices as keys, and StochMapsOnTree objects as values.
         n_stoch_map_iterations (int): Total number of MCMC iterations
             where stochastic maps were logged.
-        sorted_iteration_idxs (int): This is the sorted indices of
+        sorted_it_idxs (int): This is the sorted indices of
             iterations for which stochastic maps were logged. Not
             all iterations have maps, which is why we keep track of
             those who do.
@@ -1109,7 +982,7 @@ class StochMapsOnTreeCollection():
     stoch_maps_tree_dict: \
         ty.Dict[int, StochMapsOnTree]
     n_stoch_map_iterations: int
-    sorted_iteration_idxs: ty.List[int]
+    sorted_it_idxs: ty.List[int]
     str_representation: str
 
     def __init__(self,
@@ -1120,12 +993,16 @@ class StochMapsOnTreeCollection():
                  node_states_file_path: str = "") -> None:
 
         self.stoch_maps_tree_dict = dict()
-        self.sorted_iteration_idxs = list()
+        self.sorted_it_idxs = list()
 
+        # side-effects:
         # initializes
         # (i) stoch_maps_tree_list
         # (ii) sorted_iteration_idxs (also sorts it)
         # (iii) n_stoch_map_iterations
+        #
+        # updates members of AnnotatedTree objects passed
+        # in 'ann_trs'
         self._read_stoch_maps_file(stoch_maps_file_path,
                                    node_states_file_path,
                                    stoch_map_attr_name,
@@ -1152,12 +1029,19 @@ class StochMapsOnTreeCollection():
         Side-effects of this method populate:
             (i)    self.stoch_maps_tree_dict
             (ii)   self.n_stoch_map_iterations
-            (iii)  self.sorted_iteration_idxs
+            (iii)  self.sorted_it_idxs
 
         Args:
-            stoch_maps_file_path (str):
-            node_states_file_path (str):
-            stoch_map_attr_name (str):
+            stoch_maps_file_path (str): Path to the .tsv file
+                containing stochastic maps, in the format outputted by
+                RevBayes.
+            node_states_file_path (str): Path to the .tsv file
+                containing the states of all terminal nodes. Nodes
+                must be named as 'nd' + index, where index is provided
+                as metadata for each node.
+            stoch_map_attr_name (str): Name of the attribute (e.g.,
+                'state') whose transitions are being stochastically
+                mapped.
             ann_trs (AnnotatedTree): List of AnnotatedTree objects. Can
                 have a single tree inside, in which case it is deep-
                 cloned should there be multiple iterations of
@@ -1211,14 +1095,14 @@ class StochMapsOnTreeCollection():
         n_different_iterations: int = 0
         for line in stoch_map_on_tree_str_list:
             stoch_map_on_tree_str_list = line.split("\t")
-            iteration_idx = int(stoch_map_on_tree_str_list[0])
+            it_idx = int(stoch_map_on_tree_str_list[0])
 
-            if iteration_idx not in self.sorted_iteration_idxs:
-                self.sorted_iteration_idxs.append(iteration_idx)
+            if it_idx not in self.sorted_it_idxs:
+                self.sorted_it_idxs.append(it_idx)
 
-            if iteration_idx not in self.stoch_maps_tree_dict: 
-                self.stoch_maps_tree_dict[iteration_idx] \
-                    = StochMapsOnTree(iteration_idx,
+            if it_idx not in self.stoch_maps_tree_dict:
+                self.stoch_maps_tree_dict[it_idx] \
+                    = StochMapsOnTree(it_idx,
                                       ann_trs[n_different_iterations],
                                       state2bit_lookup,
                                       node_states_file_path,
@@ -1228,19 +1112,19 @@ class StochMapsOnTreeCollection():
 
             # we append this map to the members of the
             # already initialized smot
-            self.stoch_maps_tree_dict[iteration_idx] \
+            self.stoch_maps_tree_dict[it_idx] \
                 .add_map(stoch_map_on_tree_str_list[1:])
                 
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
         
-        sorted(self.sorted_iteration_idxs)
+        sorted(self.sorted_it_idxs)
 
         #############################################
         # Make every SMOT update its tree's members #
         # according to the stochastic maps of their #
         # assigned iteration                        #
         #############################################
-        for iteration_idx, smot in self.stoch_maps_tree_dict.items():
+        for it_idx, smot in self.stoch_maps_tree_dict.items():
             # sets critical properties in stoch maps
             # if iteration_idx == 11:
             #     smot.update_tree_attributes(stoch_map_attr_name, debug=True)
@@ -1389,17 +1273,8 @@ class StochMapsOnTreeCollection():
         return self.str_representation
     
     def iter_mcmc_generations(self) -> ty.Iterator[StochMapsOnTree]:
-        for idx in self.sorted_iteration_idxs:
+        for idx in self.sorted_it_idxs:
             yield self.stoch_maps_tree_dict[idx]
-
-
-##################################
-# Event series parsing functions #
-##################################
-
-def truncate_at_split_relevant_event(event_series: EvolRelevantEventSeries):
-    def _is_split_relevant_event():
-        pass
 
 
 if __name__ == "__main__":
@@ -1443,7 +1318,7 @@ if __name__ == "__main__":
     n_chars = 2
     state2bit_lookup = pjbio.State2BitLookup(n_chars, 2, geosse=True)
 
-    stoch_mapcoll = \
+    smap_coll = \
         StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
                            trs,
                            state2bit_lookup,
