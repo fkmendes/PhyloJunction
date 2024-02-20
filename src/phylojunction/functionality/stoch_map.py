@@ -1,12 +1,9 @@
-import sys
 import os
 import copy
 import enum
-import math
-import numpy as np
 import typing as ty
-import matplotlib
 import matplotlib.pyplot as plt  # type: ignore
+from abc import ABC, abstractmethod
 
 # pj imports
 import phylojunction.data.tree as pjt
@@ -20,13 +17,138 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-class StochMap():
+class Hypothesis(enum.Enum):
+    VICARIANCE = 0
+    FOUNDER_EVENT = 1
+
+
+class EvolRelevantEvent(ABC):
+    """Evolution-relevant event.
+
+    Examples of evolution-relevant events are those represented by
+    stochastic maps (e.g., range contraction, range expansion,
+    extinction, dispersal) or the (paleogeographic) appearance and
+    disappearance of barriers.
+
+    Parameters:
+        n_chars (int): Number of characters involved in event.
+        age (float): Age of event (age of present moment is 0.0).
+        time (float, optional): Time of event (0.0 at origin or
+        root). Defaults to None.
+    """
+
+    _n_chars: int
+    _age: float
+    _time: float
+
+    @abstractmethod
+    def __init__(self,
+                 n_chars: int,
+                 age: ty.Optional[float],
+                 time: ty.Optional[float] = None) -> None:
+
+        self._n_chars = n_chars
+        self._age = age
+        self._time = time
+
+
+    @property
+    def age(self) -> float:
+        return self._age
+
+    @property
+    def time(self) -> float:
+        return self._time
+
+
+class EvolRelevantEventSeries:
+    """Series of evolution-relevant events.
+
+    This class has member methods that interrogate a series of event,
+    truncating it depending on what the user specifies.
+
+    """
+
+    _event_list: ty.List[EvolRelevantEvent]
+    _n_events: int
+    _series_type: str
+    _trunc_event_list: ty.List[EvolRelevantEvent]
+    _trunc_n_events: int
+    _supported_hyp: Hypothesis
+
+    def __init__(self,
+                 event_list: ty.List[EvolRelevantEvent],
+                 series_type: str) -> None:
+
+        self._series_type = series_type
+
+        self.health_check()
+
+        self._event_list = event_list
+        self._n_events = len(event_list)
+
+    def health_check(self) -> None:
+        """Confirm validity of event list given series type."""
+
+        if self._series_type == "speciation":
+            last_event = self._event_list[-1]
+
+            if not isinstance(last_event, RangeSplitOrBirth):
+                raise ec.SequenceInvalidLastError(type(last_event))
+
+    def truncate_upstream(self, truncator_fn: ty.Callable) -> None:
+        """Deep-copy series and truncate copy upstream.
+
+        Truncation of an event series is done according to some
+        user-specified function. Truncation may be carried out, for
+        example, at the first event that destabilizes a range (i.e.,
+        the first "destabilizer" event).
+
+        Side-effects:
+            (i)  Populate self._trunc_event_list
+            (ii) Populate self._trunc_n_events
+
+        Parameters:
+            truncator_fn (function): Method of static Truncate class
+                that executes truncation.
+        """
+
+        self._trunc_event_list = truncator_fn(
+            copy.deepcopy(self._event_list))
+
+        self._trunc_n_events = len(self._trunc_event_list)
+
+
+    @property
+    def event_list(self) -> ty.List[EvolRelevantEvent]:
+        return self._event_list
+
+    @property
+    def n_events(self) -> int:
+        return self._n_events
+
+    @property
+    def series_type(self) -> str:
+        return self._series_type
+
+    @property
+    def supported_hyp(self) -> Hypothesis:
+        return self._supported_hyp
+
+    @supported_hyp.setter
+    def supported_hyp(self, a_hyp: Hypothesis) -> None:
+        if (a_hyp == Hypothesis.VICARIANCE or \
+                a_hyp == Hypothesis.FOUNDER_EVENT) and \
+                self._series_type != "speciation":
+            raise ec.SequenceHypothesisTypeError(a_hyp, self._series_type)
+
+        self._supported_hyp = a_hyp
+
+
+class StochMap(EvolRelevantEvent):
     """Parent class for a single stochastic map.
     
     Parameters:
-        n_chars (int): Number of characters (e.g., atomic regions).
-        age (float): Age of stochastic map (0.0 at present).
-        time (float): Time of stochastic map (0.0 at origin or root).
         from_state (int): Integer representation of source state (i.e.,
             source biogeographic range).
         from_state_bit_patt (str): Bit pattern representation of
@@ -51,9 +173,6 @@ class StochMap():
             focal node.
     """
 
-    n_chars: int
-    age: float
-    time: float
     from_state: int
     from_state_bit_patt: str
     to_state: int
@@ -79,9 +198,10 @@ class StochMap():
                  to_state2: ty.Optional[int] = None,
                  to_state2_bit_patt: ty.Optional[str] = None,
                  child2_node_name: ty.Optional[str] = None) -> None:
-            
-        self.age = age
-        self.time = time
+
+        # initializing EvolRelevantEvent members
+        super().__init__(n_chars, age, time=time)
+
         self.from_state = from_state
         self.from_state_bit_patt = from_state_bit_patt
         self.to_state = to_state
@@ -89,7 +209,6 @@ class StochMap():
         self.focal_node_name = focal_node_name
         self.parent_node_name = parent_node_name
         self.child_node_name = child_node_name
-        self.n_chars = n_chars
 
         # if cladogenetic range split
         self.child2_node_name = child2_node_name
@@ -1274,7 +1393,13 @@ class StochMapsOnTreeCollection():
             yield self.stoch_maps_tree_dict[idx]
 
 
+##################################
+# Event series parsing functions #
+##################################
 
+def truncate_at_split_relevant_event(event_series: EvolRelevantEventSeries):
+    def _is_split_relevant_event():
+        pass
 
 
 if __name__ == "__main__":
@@ -1325,7 +1450,7 @@ if __name__ == "__main__":
                            node_states_file_path="examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
                            stoch_map_attr_name="state")
 
-    fig = matplotlib.pyplot.figure()
+    fig = plt.figure()
 
     ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
     ax.patch.set_alpha(0.0)
