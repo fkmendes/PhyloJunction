@@ -380,8 +380,16 @@ def run_example_map_attr(ax: matplotlib.pyplot.Axes) -> None:
                               in_pj_file=True)
 
     for node_name, node_dag in dag_obj.name_node_dict.items():
-        if isinstance(node_dag, pgm.StochasticNodeDAG):
-            ann_tr = node_dag.value[0]
+        if node_name == "mapped_trs":
+            i = 0 # 1
+            ann_tr = node_dag.value[i]
+            pjtr.plot_ann_tree(
+                ann_tr,
+                ax,
+                use_age=False,
+                start_at_origin=False,
+                sa_along_branches=False,
+                attr_of_interest="state")
 
 
 
@@ -463,7 +471,7 @@ if __name__ == "__main__":
 
     elif example_to_run == 6:
         run_example_map_attr(ax)
-        # matplotlib.pyplot.show()
+        matplotlib.pyplot.show()
 
     # printing to screen
     if example_to_run in ([1, 2, 3]):

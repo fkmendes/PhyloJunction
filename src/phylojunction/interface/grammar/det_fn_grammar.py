@@ -25,7 +25,7 @@ class PJDetFnGrammar():
         "sse_stash": set(["flat_rate_mat", "flat_prob_mat", "n_states",
                           "seed_age", "epoch_age_ends", "n_epochs"]),
         "map_attr": set(["tree", "fun", "tip_attr_file_path",
-                         "maps_file_path", "attr_name", "n_states",
+                         "maps_file_path", "attr_name", "n_regions",
                          "geo"])
     }
 

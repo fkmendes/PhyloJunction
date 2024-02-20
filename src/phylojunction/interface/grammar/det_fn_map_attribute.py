@@ -23,7 +23,7 @@ def make_mapped_ann_tree(det_fn_name: str,
     maps_file_path = str()
     mapping_function = str()
     mapped_ann_tr_list: ty.List[pjtr.AnnotatedTree] = list()
-    n_states: int = 1
+    n_regions: int = 1
     geosse: bool = False
 
     # val is a list of strings or nodes
@@ -93,29 +93,25 @@ def make_mapped_ann_tree(det_fn_name: str,
 
             mapping_function = val[0]
 
-        elif arg == "n_states":
+        elif arg == "n_regions":
             if isinstance(val[0], pgm.NodeDAG):
                 # need to declare cast_val separately so mypy won't complain
                 cast_val1: ty.List[pgm.NodeDAG] = \
                     ty.cast(ty.List[pgm.NodeDAG], val)
 
                 if len(cast_val1) > 1:
-                    raise ec.ParseRequireIntegerError("map_attr", "n_states")
+                    raise ec.ParseRequireIntegerError("map_attr", "n_regions")
 
-                n_states = int(pgm.extract_value_from_dagnodes(cast_val1)[0])
+                n_regions = int(pgm.extract_value_from_dagnodes(cast_val1)[0])
 
             # val is a list of strings
             elif isinstance(val[0], str):
                 cast_val2: ty.List[str] = ty.cast(ty.List[str], val)
 
                 if len(cast_val2) > 1:
-                    raise ec.ParseRequireIntegerError("map_attr", "n_states")
+                    raise ec.ParseRequireIntegerError("map_attr", "n_regions")
 
-                n_states = int(int(cast_val2[0]))
-
-            # updating the number of states in trees
-            for ann_tr in mapped_ann_tr_list:
-                ann_tr.state_count = n_states
+                n_regions = int(int(cast_val2[0]))
 
         elif arg == "geo":
             if isinstance(val[0], pgm.NodeDAG):
@@ -140,9 +136,12 @@ def make_mapped_ann_tree(det_fn_name: str,
     ################################
 
     if mapping_function == '"smap"':
-        n_regions = 2
         n_states_per_char = 2 if geosse else -1
         state2bit_lookup = pjbio.State2BitLookup(n_regions, n_states_per_char, geosse=geosse)
+
+        # updating the number of states in trees
+        for ann_tr in mapped_ann_tr_list:
+            ann_tr.state_count = state2bit_lookup.n_states
 
         # side-effect:
         # (i) annotated trees in mapped_ann_tr_list can now be plotted

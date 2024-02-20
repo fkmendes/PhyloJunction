@@ -24,7 +24,7 @@ class StochMap():
     """Parent class for a single stochastic map.
     
     Parameters:
-        n_regions (int): Number of (atomic) regions.
+        n_chars (int): Number of characters (e.g., atomic regions).
         age (float): Age of stochastic map (0.0 at present).
         time (float): Time of stochastic map (0.0 at origin or root).
         from_state (int): Integer representation of source state (i.e.,
@@ -51,7 +51,7 @@ class StochMap():
             focal node.
     """
 
-    n_regions: int
+    n_chars: int
     age: float
     time: float
     from_state: int
@@ -66,7 +66,7 @@ class StochMap():
     child2_node_name: str
 
     def __init__(self,
-                 n_regions: int,
+                 n_chars: int,
                  age: ty.Optional[float],
                  from_state: int,
                  from_state_bit_patt: str,
@@ -89,7 +89,7 @@ class StochMap():
         self.focal_node_name = focal_node_name
         self.parent_node_name = parent_node_name
         self.child_node_name = child_node_name
-        self.n_regions = n_regions
+        self.n_chars = n_chars
 
         # if cladogenetic range split
         self.child2_node_name = child2_node_name
@@ -470,7 +470,7 @@ class StochMapsOnTree():
     iteration_idx: int
     str_representation: str
     state2bit_lookup: pjbio.State2BitLookup
-    n_regions: int
+    n_chars: int
 
     # for summary and printing
     maps_counts_dict: ty.Dict[ty.Tuple[str], int]
@@ -1315,8 +1315,8 @@ if __name__ == "__main__":
     #     print(k, v)
 
     # state2bit_lookup = pjbio.State2BitLookup(8, 2, geosse=True)
-    n_regions = 2
-    state2bit_lookup = pjbio.State2BitLookup(n_regions, 2, geosse=True)
+    n_chars = 2
+    state2bit_lookup = pjbio.State2BitLookup(n_chars, 2, geosse=True)
 
     stoch_mapcoll = \
         StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree1_maps.tsv",
