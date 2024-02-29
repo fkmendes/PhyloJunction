@@ -23,6 +23,26 @@ class GeoFeatureType(enum.Enum):
 
 
 class GeoFeature():
+    """Geographic feature class.
+
+    Parameters:
+        time_idx (int): Index of epoch when feature is measured.
+        feat_idx (int): Index of feature in its container.
+        n_regions (int): Number of atomic (i.e., unsplittable) regions
+            in the system.
+        feat_rel (GeoFeatureRelationship): Enum object that
+            characterizes how the feature relates one or more regions
+            ("within" or "between)".
+        feat_type (GeoFeatureType): Enum object carrying the type of
+            the feature ("categorical" or "quantitative").
+        n_dim (int): Number of dimensions in the container containing
+            geographic feature values.
+        value (NumPy.array): Value(s) measured for geographic feature.
+        name (str): Geographic feature name.
+        str_representation (str): String representation of geographic
+            feature for printing.
+    """
+
     time_idx: int  # epoch index
     feat_idx: int  # should be unique to this feature
     n_regions: int  # automatically computed
@@ -31,6 +51,7 @@ class GeoFeature():
     value: np.array
     name: str
     str_representation: str
+    n_dim: int
 
     def __init__(self,
                  time_idx: int,
@@ -84,12 +105,13 @@ class GeoFeature():
                                        self.n_regions))
 
     # setters
-    def _set_attr_values(self, attr_name: str, val:
-                         ty.Tuple[int,
-                                  GeoFeatureRelationship,
-                                  GeoFeatureType,
-                                  str,
-                                  np.array]) -> None:
+    def _set_attr_values(self,
+                         attr_name: str,
+                         val: ty.Tuple[int,
+                                       GeoFeatureRelationship,
+                                       GeoFeatureType,
+                                       str,
+                                       np.array]) -> None:
         self.__setattr__(attr_name, val)
 
         # automatically setting self.n_regions
@@ -121,20 +143,54 @@ class GeoFeature():
 
 
 class GeoFeatureCollection():
+    """Collection of geographic features.
 
-    geofeat_list: ty.List[GeoFeature] = list()
-    epoch_age_end_list_young2old: ty.List[float] = [0.0]  # present epoch ends at 0.0
-    epoch_mid_age_list_young2old: ty.List[float] = [-math.inf]  # oldest epoch midpoint 
-    is_timehet: bool = False
+    This class organizes
 
-    # ways in which to store (for later grabbing) features
+    Parameters:
+        geofeat_list (GeoFeature): List of GeoFeature objects.
+        epoch_age_end_list_young2old (list[float]): List of age ends
+            (float), one per epoch, going from the youngest epoch
+            to the oldest.
+        epoch_mid_age_list_young2old (list[float]): List of age mid points
+            (float), one per epoch, going from the youngest epoch
+            to the oldest.
+        epoch_age_start_list_young2old (list[float]): List of age starts
+            (float),
+        is_timehet (bool): Flag specifying if the geographic data
+            is time-heterogeneous.
+        feat_name_epochs_dict (dict): Nested dictionaries. The outer
+            dictionary has feature names (str) as keys (i.e., features
+            must have different names), and the inner dictionaries as
+            values. The inner dictionary has epoch indices as keys
+            (int), and GeoFeature objects as values.
+        feat_type_rel_featid_epochs_dict (dict): Quadruple nested
+            dictionaries. The outer keys are GeoFeatureType. The next
+            nested keys are GeoFeatureRelationship. The third nested
+            keys are the index (int) of the feature. The fourth and
+            last nested keys are epoch indices (int), with values being
+            GeoFeatures.
+        region_name_idx_dict (dict): Dictionary for converting between
+            region names and their indices. Names (str) for keys,
+            indices (int) for values.
+        region_idx_name_dict (dict): Dictionary for converting between
+            region indices and their names. Indices (int) for keys,
+            names (str) for values.
+    """
+
+    geofeat_list: ty.List[GeoFeature]
+    epoch_age_end_list_young2old: ty.List[float]
+    epoch_mid_age_list_young2old: ty.List[float]
+    epoch_age_start_list_young2old: ty.List[float]
+    is_timehet: bool
+
+    # ways in which to store (for later grabbing) features values
     #
     # (1) by name (assumes name cannot be repeated across feature
     # types and/or relationships); final dict is k: time_idx, v: feat
     #
     # TODO: add check here!!!!
-    feat_name_epochs_dict: ty.Dict[str, ty.Dict[int, GeoFeature]] \
-        = pjh.autovivify(2)
+    feat_name_epochs_dict: ty.Dict[str, ty.Dict[int, GeoFeature]]
     # (2) by feature type, relationship and feature number (index);
     # final dict is k: time_idx, v: feat
     feat_type_rel_featid_epochs_dict: \
@@ -145,23 +201,41 @@ class GeoFeatureCollection():
                                 ]]] \
                                 = pjh.autovivify(4)
 
-    region_name_idx_dict: ty.Dict[str, int] = dict()
-    region_idx_name_dict: ty.Dict[int, str] = dict()
+    region_name_idx_dict: ty.Dict[str, int]
+    region_idx_name_dict: ty.Dict[int, str]
 
     def __init__(self,
                  feat_summary_fp: str,
                  age_summary_fp: str = "") -> None:
-        
+
+        # starting class members off
+        self.geofeat_list = list()
+        self.epoch_age_end_list_young2old = [0.0]  # present epoch ends at 0.0
+        self.epoch_mid_age_list_young2old = [-math.inf]  # oldest epoch midpoint
+        self.epoch_age_start_list_young2old = list()
+        self.is_timehet = False
+        self.feat_name_epochs_dict = pjh.autovivify(2)
+        self.feat_type_rel_featid_epochs_dict = pjh.autovivify(4)
+        self.region_name_idx_dict = dict()
+        self.region_idx_name_dict = dict()
+
         self._check_filepaths(feat_summary_fp)
 
         # if only one epoch, age_summary not necessary
-        if age_summary_fp:
+        if age_summary_fp is not None and age_summary_fp != "":
             self._check_filepaths(age_summary_fp)
 
+            # initializes
+            #     self.epoch_age_end_list_young2old
+            #     self.epoch_mid_age_list_young2old
+            #     self.epoch_age_end_list_old2young
+            #     self.epoch_mid_age_list_old2young
+            self._read_age_summary(age_summary_fp)
+
         # initializes:
-        #     is_timehet
-        #     region_name_idx_dict
-        #     region_idx_name_dict
+        #     self.is_timehet
+        #     self.region_name_idx_dict
+        #     self.region_idx_name_dict
         self._read_feat_summary_init_feats(feat_summary_fp)
 
         # initializes self.feat_name_epochs_dict
@@ -172,13 +246,6 @@ class GeoFeatureCollection():
 
         # debugging
         # self._debug_print_dicts()
-
-        # initializes
-        #     self.epoch_age_end_list_young2old
-        #     self.epoch_mid_age_list_young2old
-        #     self.epoch_age_end_list_old2young
-        #     self.epoch_mid_age_list_old2young
-        self._read_age_summary(age_summary_fp)
 
     # init methods
     def _read_feat_summary_init_feats(
@@ -254,12 +321,26 @@ class GeoFeatureCollection():
 
     def _read_age_summary(
             self,
-            age_summary_fp):
-        """Populate epoch age end list
+            age_summary_fp: str) -> None:
+        """Populate class members holding information about epochs
         
-        Open, read and parse age summary .csv file, and populate
-        class member list of epoch age ends
+        Open, read and parse age summary .csv file. then populate class
+        members.
+
+        Side-effects are populating:
+            (i)   a
+            (ii)  a
+            (iii) a
+
+        Args:
+            age_summary_fp (str): Path to .csv file containing
+                information about the age ends of the different epochs
+                should geographic data be time-heterogeneous.
         """
+
+        ############################
+        # Doing end age dictionary #
+        ############################
 
         with open(age_summary_fp, "r") as infile:
             header = infile.readline()
@@ -285,6 +366,10 @@ class GeoFeatureCollection():
         # debugging
         # print(self.epoch_age_end_list_young2old)
 
+        ############################
+        # Doing mid age dictionary #
+        ############################
+
         n_epochs = len(self.epoch_age_end_list_young2old)
         mid_ages_minus_last_epoch = list()
         for idx in range(len(self.epoch_age_end_list_young2old)):
@@ -308,6 +393,18 @@ class GeoFeatureCollection():
         
         # debugging
         # print(self.epoch_mid_age_list_young2old)
+
+        ##############################
+        # Doing start age dictionary #
+        ##############################
+
+        for age_end in self.epoch_age_end_list_young2old[1:]:
+            self.epoch_age_start_list_young2old.append(age_end)
+
+        self.epoch_age_start_list_young2old.append(-math.inf)
+        self.epoch_age_start_list_old2young = \
+            self.epoch_age_start_list_young2old[::-1]
+
 
     def _init_feat_name_epochs_dict(self):
         for geofeat in self.geofeat_list:
@@ -395,14 +492,23 @@ class MyCallableType(ty.Protocol):
 
 
 class GeoFeatureQuery():
+    """
+
+    Parameters:
+        feat_col (GeoFeatureCollection):
+        geo_cond_bit_dict (dict):
+        geo_cond_change_times_dict (dict):
+        geo_oldest_cond_bit_dict (dict):
+    """
+
     feat_coll: GeoFeatureCollection
     # bit patterns are in old -> young epochs
     #
     # the value is either a list or a nested list depending on
     # whether the feature was between or within
     geo_cond_bit_dict: ty.Dict[str,
-                        ty.Union[ty.List[ty.List[str]],
-                                 ty.List[str]]]
+                               ty.Union[ty.List[ty.List[str]],
+                               ty.List[str]]]
 
     # the value is a 2-D or 3-D list of floats, with all ages
     # of geographic condition change, as indicated by a bit in the
@@ -412,11 +518,17 @@ class GeoFeatureQuery():
                                                  ty.List[ty.List[ty.List[float]]]]]
 
     # this member below helps us tell if geographic conditions were
-    # always met, e.g., maybe a barrier never "appears" during the
-    # considered epochs, but that's because it existed a long time ago
-    # and we will want to know that it did; if it's a "component" barrier
-    # of the "full" barrier between complex ranges, we need to know if it's
-    # already there so we can say the "full" barrier is observed
+    # previously met, e.g., maybe a barrier never "appears" during the
+    # considered epochs, but that's because it appeared in the unobservable
+    # past
+    # (the geog. condition bit pattern could be '111111'; there is no '01' in there
+    # but that is not because a barrier never appeared between the focal two
+    # regions -- instead, it always existed for the analyzed time window)
+    #
+    # also, if a barrier between a specific pair of regions is a 'component' of a
+    # 'full' barrier between complex ranges, we need to know if the 'component'
+    # barrier was/wasn't always there, so we can say the 'full' barrier is
+    # manifested
     geo_oldest_cond_bit_dict: ty.Dict[str,
                                   ty.Union[ty.List[ty.List[str]],
                                            ty.List[str]]]
@@ -427,14 +539,33 @@ class GeoFeatureQuery():
         self.geo_oldest_cond_bit_dict = dict()
         self.geo_cond_change_times_dict = dict()
 
+    # class methods take 'cls' as first argument, and can know about class state
+    # static methods do not know about state at all
+
     # requirement function 1
-    @classmethod
-    def cw_feature_equals_value(cls,
-                            feat_col: GeoFeatureCollection,
-                            val2match: int,
-                            feat_name: str = "",
-                            feat_id: int = None) \
-            -> ty.List[str]:
+    @staticmethod
+    def cw_feature_equals_value(
+            feat_col: GeoFeatureCollection,
+            val2match: int,
+            feat_name: str = "",
+            feat_id: int = None) -> ty.List[str]:
+        """Determine geographic condition from (feat.) value requirement.
+
+        The feature must be 'categorical-within'.
+
+        Args:
+            feat_col (GeoFeatureCollection):
+            val2match (int): Categorical (feature) value that, if
+                matched, indicate the manifestation of the geographic
+                condition.
+            feat_name (str): Name of the feature.
+            feat_id (int, optional): Feature index. Defaults to 'None'.
+
+        Returns:
+            (list): List of strings. These strings are bit patterns
+                denoting the manifestation of the geographic condition
+                for each region, in the different epochs.
+        """
     
         ft_all_epochs_list: ty.List[GeoFeature] = list()
         
@@ -483,13 +614,13 @@ class GeoFeatureQuery():
         return bits_match_list
     
     # requirement function 2
-    @classmethod
-    def qw_feature_threshold(cls,
-                            feat_col: GeoFeatureCollection,
-                            threshold: float,
-                            above: bool,
-                            feat_name: str = "",
-                            feat_id: int = None) \
+    @staticmethod
+    def qw_feature_threshold(
+            feat_col: GeoFeatureCollection,
+            threshold: float,
+            above: bool,
+            feat_name: str = "",
+            feat_id: int = None) \
             -> ty.List[ty.List[float]]:
     
         ft_all_epochs_list: ty.List[GeoFeature] = list()
@@ -548,19 +679,36 @@ class GeoFeatureQuery():
         # return mid_ages_match_list
         
     # requirement function 3
-    @classmethod
-    def cb_feature_equals_value(cls,
-                                feat_col: GeoFeatureCollection,
-                                val2match: int,
-                                feat_name: str = "",
-                                feat_id: int = None
-                                ) \
+    @staticmethod
+    def cb_feature_equals_value(
+            feat_col: GeoFeatureCollection,
+            val2match: int,
+            feat_name: str = "",
+            feat_id: ty.Optional[int] = None) \
             -> ty.List[ty.List[str]]:
-            # -> ty.List[ty.List[float]]:
+        """Determine geographic condition from (feat.) value requirement.
+
+        An example of 'geographic condition' is the presence of a
+        barrier. The feature must be 'categorical-between'.
+
+        Args:
+            feat_col (GeoFeatureCollection):
+            val2match (int): Categorical (feature) value that, if
+                matched, indicate the manifestation of the geographic
+                condition (e.g., a barrier).
+            feat_name (str): Name of the feature.
+            feat_id (int, optional): Feature index. Defaults to 'None'.
+
+        Returns:
+            (list): Two-dimensional list of strings. These strings are
+                bit patterns denoting the manifestation of a geographic
+                condition (e.g., a barrier), for each pair of regions,
+                for each epoch.
+        """
         
         ft_all_epochs_list: ty.List[GeoFeature] = list()
 
-        if feat_name:
+        if feat_name != "":
             # young -> old
             ft_all_epochs_list = feat_col.get_feat_by_name(feat_name)
 
@@ -573,43 +721,40 @@ class GeoFeatureQuery():
             )
 
         else:
-            exit(("ERROR: Function \'qw_feature_threshold\' needs a "
-                    "quantitative-within feature name or feature id."
+            exit(("ERROR: Function \'cb_feature_threshold\' needs a "
+                    "categorical-between feature name or feature id."
                     ". Exiting."))
             
         n_regions = ft_all_epochs_list[0].n_regions  # just grabbing 1st
-        # mid_ages = feat_col.epoch_mid_age_list_young2old
 
-        # mid_ages_match_2d_list = list()
+        # 1D: "from" region
+        # 2D: "to" region
+        # values: bit pattern where 1 means requirement met, 0 otherwise
         bits_match_2d_list = list()
 
+        # nested iterations to check all pairs of regions
         for region_idx1 in range(n_regions):
-            # mid_ages_match_from_region = list()
             bits_match_from_region = list()
             
             for region_idx2 in range(n_regions):
-                # mid_ages_match_to_region = list()     
                 bits_match_to_region_str = str()   
 
                 # for epoch_idx, ft_this_epoch in enumerate(ft_all_epochs_list):
                 for ft_this_epoch in ft_all_epochs_list:
+                    # bit is 1 if requirement is met
                     if ft_this_epoch \
                         .get_val_from_to(region_idx1, region_idx2) \
                             == val2match:
-                        # mid_ages_match_to_region.append(
-                        #     (epoch_idx, mid_ages[ft_this_epoch.time_idx-1]))
                         bits_match_to_region_str += "1"
 
+                    # bit is 0 if requirement is not met
                     else:
                         bits_match_to_region_str += "0"
 
-                # mid_ages_match_from_region.append(mid_ages_match_to_region)
                 bits_match_from_region.append(bits_match_to_region_str)
 
-            # mid_ages_match_2d_list.append(mid_ages_match_from_region)
             bits_match_2d_list.append(bits_match_from_region)
 
-        # return mid_ages_match_2d_list
         return bits_match_2d_list
         
     # requirement function 4
@@ -708,13 +853,15 @@ class GeoFeatureQuery():
         the requirement function provided by the user)
         
         Args:
-            geo_cond_name (str): the name one is giving the geographic
-                condition (e.g., \"altitude\", \"distance\", \"ancient
-                sea\")
-            requirement_fn (function): this function receives a feature
-                collection and a list of integers defining the involved
-                regions, and returns a nested (1 or 2 dimensions) list
-                of strings representing bit patterns
+            geo_cond_name (str): Name of the geographic
+                condition (e.g., \"mountain range\", \"ancient sea\",
+                \"riverine barrier\").
+            requirement_fn (function): A function that receives a
+                feature collection and a list of integers defining
+                the involved regions, and returns a (1 or 2
+                dimensional) list of strings representing the
+                manifestation of the condition, in each region or
+                region pair, for each epoch.
         """
 
         self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
@@ -724,11 +871,21 @@ class GeoFeatureQuery():
         self._populate_geo_cond_change_times_dict(geo_cond_name)
 
     # internal
-    def _populate_geo_cond_change_times_dict(
-            self,
-            geo_cond_name):
+    def _populate_geo_cond_change_times_dict(self, geo_cond_name) -> None:
+        """Populate class member holding geog. condition change times.
+
+        This method has the side-effect of populating
+        self.geo_cond_change_times_dict, whose keys are names of the
+        geographic condition, and values are
+
+        Args:
+            geo_cond_name (str): Name of the geographic condition
+            (e.g., 'mountain range', 'ancient sea', 'riverine barrier').
+        """
         
-        mid_ages_old2young = self.feat_coll.epoch_mid_age_list_old2young
+        age_starts_old2young = self.feat_coll.epoch_age_start_list_old2young
+
+        # initializing dictionary values
         self.geo_cond_change_times_dict[geo_cond_name] = list()
 
         # either 1d or 2d list, depending on
@@ -741,9 +898,18 @@ class GeoFeatureQuery():
             # between
             if type(region1_str_or_list) == list:
                 # old to young bit
-                for region2_str in region1_str_or_list:                    
+                for region2_str in region1_str_or_list:
+                    # scanning the geographic condition bit pattern
+                    # (sliding window of size 2) for a '01' string
+                    # which indicates when the geographic condition
+                    # manifested -- note that each position in the
+                    # bit pattern is a different epoch
+                    #
+                    # we get the position in the bit pattern where
+                    # we had the departing '0', and use that position
+                    # to grab the start of the epoch with the '1'
                     region2_times_list = \
-                        [mid_ages_old2young[idx+1] for idx, (i, j) \
+                        [age_starts_old2young[idx+1] for idx, (i, j) \
                            in enumerate(zip(region2_str,
                                             region2_str[1:])) \
                                                 if (i, j) == ('0', '1')]
@@ -756,7 +922,7 @@ class GeoFeatureQuery():
             else:
                 # old to young bit
                 region1_times_list.append(
-                    [mid_ages_old2young[idx+1] for idx, (i, j) \
+                    [age_starts_old2young[idx+1] for idx, (i, j) \
                      in enumerate(zip(region1_str_or_list,
                                       region1_str_or_list[1:])) \
                                         if (i, j) == ('0', '1')]
@@ -764,8 +930,21 @@ class GeoFeatureQuery():
 
                 self.geo_cond_change_times_dict[geo_cond_name].append(region1_times_list)
 
-    def _populate_oldest_geo_cond_bit_dict(self, geo_cond_name):
+    def _populate_oldest_geo_cond_bit_dict(self, geo_cond_name: str) -> None:
+        """Populate class member holding oldest geog. condition bit.
 
+        This method has the side-effect of populating
+        self.geo_oldest_cond_bit_dict, whose keys are names of the
+        geographic condition, and values are whether the condition is
+        met in each region or region pair, at the oldest epoch.
+
+        Args:
+            ggeo_cond_name (str): Name of the geographic condition
+                (e.g., 'mountain range', 'ancient sea',
+                'riverine barrier').
+        """
+
+        # adding initial values to dictionary
         self.geo_oldest_cond_bit_dict[geo_cond_name] = list()
 
         # either 1d or 2d list, depending on
@@ -792,9 +971,10 @@ class GeoFeatureQuery():
                 self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
 
     # getters
-    def get_geo_condition_change_times(
-            self,
-            geo_cond_name):
+    def get_geo_condition_change_times(self, geo_cond_name) -> \
+            ty.Dict[str,
+                    ty.Union[ty.List[ty.List[float]],
+                    ty.List[ty.List[ty.List[float]]]]]:
 
         if not self.geo_cond_change_times_dict[geo_cond_name]:
             self._populate_geo_cond_change_times_dict(geo_cond_name)
@@ -818,7 +998,7 @@ if __name__ == "__main__":
     fc = GeoFeatureCollection(sys.argv[1],
                               age_summary_fp=sys.argv[2])
 
-    test_basic_stuff = False
+    test_basic_stuff = True
     if test_basic_stuff:
         # (1) can do it like this
         # print(fc.get_feat_by_name("qb_1", time_idx=1))
@@ -843,7 +1023,7 @@ if __name__ == "__main__":
         # print(feat_list[0].get_val_from_to(1, 2))
     
     # testing querying
-    test_querying = True
+    test_querying = False
     if test_querying:
         fq = GeoFeatureQuery(fc)
         

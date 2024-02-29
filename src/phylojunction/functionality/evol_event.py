@@ -6,9 +6,20 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
-class RegionStatus(enum.Enum):
-    DISCONNECTED = 0
-    CONNECTED = 1
+class RegionStatus():
+    _comm_class_id: int
+
+    def __init__(self) -> None:
+        pass
+
+    @property
+    def comm_class_id(self) -> int:
+        return self._comm_class_id
+
+    @comm_class_id.setter
+    def comm_class_id(self, id: int) -> None:
+        self._comm_class_id = id
+
 
 
 class EvolRelevantEvent(ABC):

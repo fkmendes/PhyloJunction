@@ -1,6 +1,7 @@
 import typing as ty
 import enum
 import copy
+import dendropy as dp
 
 # pj imports
 import phylojunction.readwrite.pj_read as pjr
@@ -9,6 +10,7 @@ import phylojunction.functionality.evol_event as pjev
 import phylojunction.functionality.stoch_map as pjsmap
 import phylojunction.functionality.biogeo as pjbio
 import phylojunction.utility.exception_classes as ec
+import phylojunction.utility.helper_functions as pjh
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -17,6 +19,7 @@ __email__ = "f.mendes@wustl.edu"
 class Hypothesis(enum.Enum):
     VICARIANCE = 0
     FOUNDER_EVENT = 1
+    SPECIATION_BY_EXT = 2
 
 
 class EvolRelevantEventSeries:
@@ -30,7 +33,7 @@ class EvolRelevantEventSeries:
     _event_list: ty.List[pjev.EvolRelevantEvent]
     _n_events: int
     _series_type: str
-    _it_idx: int
+    _it_idx: int  # MCMC iteration from which we get an event
 
     # not initialized at instantiation, but populated
     # by external functions
@@ -39,10 +42,11 @@ class EvolRelevantEventSeries:
     _supported_hyp: Hypothesis
 
     def __init__(self,
-                 event_list: ty.List[pjev.EvolRelevantEvent],
-                 series_type: str,
-                 it_idx: int) -> None:
+                 event_list: ty.List[pjev.EvolRelevantEvent] = [],
+                 series_type: str = "",
+                 it_idx: int = -1) -> None:
 
+        self._it_idx = it_idx
         self._series_type = series_type
 
         self.health_check()
@@ -86,6 +90,18 @@ class EvolRelevantEventSeries:
     def event_list(self) -> ty.List[pjev.EvolRelevantEvent]:
         return self._event_list
 
+    def add_events(self, event_or_events: \
+            ty.Union[pjev.EvolRelevantEvent,
+            ty.List[pjev.EvolRelevantEvent]]):
+        if isinstance(event_or_events, pjev.EvolRelevantEvent):
+            self._event_list.append(event_or_events)
+
+        elif isinstance(event_or_events, list):
+            self._event_list += event_or_events
+
+        else:
+            exit("Cannot add event to event series. Exiting...")
+
     @property
     def n_events(self) -> int:
         return self._n_events
@@ -125,12 +141,17 @@ class EvolRelevantEventSeriesTabulator():
 
     _ann_tr_list: ty.List[pjt.AnnotatedTree]
     _smap_collection: pjsmap.StochMapsOnTreeCollection
-    _event_series_dict: ty.Dict[str, ty.List[EvolRelevantEventSeries]]
+
+    # key of inner dict is the iteration index
+    _event_series_dict: ty.Dict[str, ty.Dict[int, ty.List[EvolRelevantEventSeries]]]
+
     _hyp_support_dict: ty.Dict[Hypothesis, int]
 
     def __init__(self,
                  ann_tr_list: ty.List[pjt.AnnotatedTree],
                  smap_collection: pjsmap.StochMapsOnTreeCollection) -> None:
+
+        self._event_series_dict = pjh.autovivify(2)
 
         self._ann_tr_list = ann_tr_list
         print("Read trees.")
@@ -149,36 +170,79 @@ class EvolRelevantEventSeriesTabulator():
         # with respect to its char_status_dict member --
         # this member keeps track of a region's connected or
         # disconnected status
-        self.update_event_char_member()
-        print("  Finished going through all event series and annotating it.")
+        # self.update_event_char_member()
+        # print("  Finished going through all event series and annotating it.")
 
         # for each truncated event series, update its supported_hyp
         # member depending on the nature of the truncated series
-        self.update_event_series_hyp_member()
-        print("  Finished classifying event series as supporting each hypothesis.")
+        # self.update_event_series_hyp_member()
+        # print("  Finished classifying event series as supporting each hypothesis.")
 
         # side-effect:
         # initializes self._hyp_support_dict
-        self.tabulate_hyp_support()
-        print("  Finished tabulating hypothesis support.")
+        # self.tabulate_hyp_support()
+        # print("  Finished tabulating hypothesis support.")
 
     def initialize_event_series_dict(self) -> None:
-        # (1) traverse the tree
-        # (2) collect stoch maps for b/w-region speciation event
-        # (3) initialize event series
-        # (4)
+
+        def recursively_populate_event_series_dict(nd: dp.Node,
+                                                   it_idx: int):
+            """Populate self._event_series_dict recursively."""
+
+            nd_name = nd.label
+            event_series = EvolRelevantEventSeries()
+
+            # retrieve list of events from parent node
+            if nd.parent_node is not None:
+                parent_nd = nd.parent_node
+                parent_nd_name = parent_nd.label
+                parent_event_series = \
+                    self._event_series_dict[parent_nd_name][it_idx]
+
+                # we will add events to those from the parent node
+                # (has to be deep copy!)
+                event_series = copy.deepcopy(parent_event_series)
+
+            # do current node
+            smap_on_tree = smap_coll.stoch_maps_tree_dict[it_idx]
+
+            # anagenetic
+            # NOTE: assumes stochastic maps are sorted in chronological order!!!
+            # (old first, young later)
+            if nd_name in smap_on_tree.anag_stoch_maps_dict:
+                anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
+                event_series.add_events(anagenetic_smaps_list)
+
+            # cladogenetic (has to be the last one in the event series)
+            if nd_name in smap_on_tree.clado_stoch_maps_dict:
+                clado_smap = smap_on_tree.clado_stoch_maps_dict[nd_name]
+                event_series.add_events(clado_smap)
+
+            # update or create value in dictionary
+            self._event_series_dict[nd_name][it_idx] = event_series
+
+            # recur
+            for ch_nd in nd.child_nodes():
+                recursively_populate_event_series_dict(ch_nd, it_idx)
 
         # iterating over each MCMC iteration when stochastic maps were logged
-        for it_idx in smap_coll.sorted_it_idxs:
-            ann_tr = self._ann_tr_list[it_idx]
+        for it_idx, smap in smap_coll.stoch_maps_tree_dict.items():
+            ann_tr = smap.ann_tr
+            root_nd = ann_tr.root_node
 
-            # traversing the tree
-            for nd in self.ann_tr.tree.preorder_traversal():
+            # populate self._self._event_series_dict
+            # key: node name
+            # value: event series object
+            recursively_populate_event_series_dict(root_nd,
+                                                   1)
 
-                # collect full series
-
-                # truncate series
-                pass
+            # debugging
+            for nd_label, it_event_series_dict in self._event_series_dict.items():
+                print(nd_label)
+                for it_idx, event_series in it_event_series_dict.items():
+                    for ev in event_series.event_list:
+                        print(ev)
+                print("\n")
 
 
     def update_event_char_member(self) -> None:
@@ -230,3 +294,9 @@ if __name__ == "__main__":
                                          state2bit_lookup,
                                          node_states_file_path="examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv",
                                          stoch_map_attr_name="state")
+
+    event_series_tabulator = \
+        EvolRelevantEventSeriesTabulator(
+            ann_tr_list,
+            smap_coll
+        )
