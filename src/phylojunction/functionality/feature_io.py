@@ -12,6 +12,28 @@ __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
+class GeoGraph():
+
+    _n_nodes: int
+    _node_set: ty.Set[int]
+    _edge_set: ty.Set[ty.Tuple[int]]
+    _comm_class_idx: ty.List[int] # one comm class per node
+
+    def __init__(self):
+
+        self._name_list = name_list
+
+        if name_list is not None:
+            self._n_nodes = len(name_list)
+
+            for idx, a_name in enumerate(name_list):
+                self._name2idx[a_name] = idx
+
+    def add_node_to_graph(self, region_idx: int):
+        self._n_nodes += 1
+        self._node_set.add(region_idx)
+
+
 class GeoFeatureRelationship(enum.Enum):
     WITHIN = "within"
     BETWEEN = "between"
@@ -156,7 +178,7 @@ class GeoFeatureCollection():
             (float), one per epoch, going from the youngest epoch
             to the oldest.
         epoch_age_start_list_young2old (list[float]): List of age starts
-            (float),
+        n_epochs (int): Number of epochs
         is_timehet (bool): Flag specifying if the geographic data
             is time-heterogeneous.
         feat_name_epochs_dict (dict): Nested dictionaries. The outer
@@ -182,6 +204,7 @@ class GeoFeatureCollection():
     epoch_age_end_list_young2old: ty.List[float]
     epoch_mid_age_list_young2old: ty.List[float]
     epoch_age_start_list_young2old: ty.List[float]
+    n_epochs: int
     is_timehet: bool
 
     # ways in which to store (for later grabbing) features values
@@ -231,6 +254,8 @@ class GeoFeatureCollection():
             #     self.epoch_age_end_list_old2young
             #     self.epoch_mid_age_list_old2young
             self._read_age_summary(age_summary_fp)
+            self.n_epochs = \
+                len(self.epoch_age_end_list_young2old)
 
         # initializes:
         #     self.is_timehet
@@ -498,7 +523,9 @@ class GeoFeatureQuery():
         feat_col (GeoFeatureCollection):
         geo_cond_bit_dict (dict):
         geo_cond_change_times_dict (dict):
+        geo_cond_change_back_times_dict (dict):
         geo_oldest_cond_bit_dict (dict):
+        conn_graph (GeoGraph): Connectivity graph.
     """
 
     feat_coll: GeoFeatureCollection
@@ -511,11 +538,20 @@ class GeoFeatureQuery():
                                ty.List[str]]]
 
     # the value is a 2-D or 3-D list of floats, with all ages
-    # of geographic condition change, as indicated by a bit in the
-    # bit pattern flipping (if not flips no changes)
-    geo_cond_change_times_dict: ty.Dict[str,
-                                        ty.Union[ty.List[ty.List[float]],
-                                                 ty.List[ty.List[ty.List[float]]]]]
+    # of geographic condition change as indicated by a bit in
+    # the bit pattern flipping, '01' (0 in epoch 1, 1 in epoch 2);
+    # if no flips, no changes
+    geo_cond_change_times_dict: \
+        ty.Dict[str,
+                ty.Union[ty.List[ty.List[float]],
+                ty.List[ty.List[ty.List[float]]]]]
+
+    # same as above, but with the bit flipping the other way around,
+    # '10'
+    geo_cond_change_back_times_dict: \
+        ty.Dict[str,
+                ty.Union[ty.List[ty.List[float]],
+                ty.List[ty.List[ty.List[float]]]]]
 
     # this member below helps us tell if geographic conditions were
     # previously met, e.g., maybe a barrier never "appears" during the
@@ -533,11 +569,17 @@ class GeoFeatureQuery():
                                   ty.Union[ty.List[ty.List[str]],
                                            ty.List[str]]]
 
+    # connectivity graph
+    _conn_graph: GeoGraph
+
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
+        self.n_epochs = self.feat_coll.n_epochs
+
         self.geo_cond_bit_dict = dict()
         self.geo_oldest_cond_bit_dict = dict()
         self.geo_cond_change_times_dict = dict()
+        self.geo_cond_change_back_times_dict = dict()
 
     # class methods take 'cls' as first argument, and can know about class state
     # static methods do not know about state at all
@@ -840,7 +882,7 @@ class GeoFeatureQuery():
         # return mid_ages_match_2d_list
         return bits_match_2d_list
                           
-    def populate_geo_cond_bit_dicts(
+    def populate_geo_cond_member_dicts(
             self,
             geo_cond_name: str,
             requirement_fn: MyCallableType) \
@@ -870,13 +912,20 @@ class GeoFeatureQuery():
 
         self._populate_geo_cond_change_times_dict(geo_cond_name)
 
+        self._populate_conn_graph(geo_cond_name)
+
     # internal
-    def _populate_geo_cond_change_times_dict(self, geo_cond_name) -> None:
+    def _populate_geo_cond_change_times_dict(self,
+                                             geo_cond_name: str) -> None:
         """Populate class member holding geog. condition change times.
 
-        This method has the side-effect of populating
-        self.geo_cond_change_times_dict, whose keys are names of the
-        geographic condition, and values are
+        This method has the side-effect of populating:
+            (i)  self.geo_cond_change_times_dict, and
+            (ii) self.geo_cond_change_back_times_dict,
+
+        whose keys are names of the geographic condition, and values
+        are the epoch times at which geographic conditions either
+        change (in (i)) or change back (in (ii)).
 
         Args:
             geo_cond_name (str): Name of the geographic condition
@@ -887,6 +936,7 @@ class GeoFeatureQuery():
 
         # initializing dictionary values
         self.geo_cond_change_times_dict[geo_cond_name] = list()
+        self.geo_cond_change_back_times_dict[geo_cond_name] = list()
 
         # either 1d or 2d list, depending on
         # if within or between feature condition
@@ -894,6 +944,7 @@ class GeoFeatureQuery():
 
         for region1_str_or_list in geo_cond_bits_list:
             region1_times_list = list()
+            region1_back_times_list = list()
 
             # between
             if type(region1_str_or_list) == list:
@@ -913,10 +964,22 @@ class GeoFeatureQuery():
                            in enumerate(zip(region2_str,
                                             region2_str[1:])) \
                                                 if (i, j) == ('0', '1')]
+
+                    # now doing change back times ('10')
+                    region2_back_times_list = \
+                        [age_starts_old2young[idx + 1] for idx, (i, j) \
+                         in enumerate(zip(region2_str,
+                                          region2_str[1:])) \
+                         if (i, j) == ('1', '0')]
                     
                     region1_times_list.append(region2_times_list)
+                    region1_back_times_list.append(region2_back_times_list)
 
-                self.geo_cond_change_times_dict[geo_cond_name].append(region1_times_list)
+                self.geo_cond_change_times_dict[geo_cond_name].\
+                    append(region1_times_list)
+
+                self.geo_cond_change_back_times_dict[geo_cond_name].\
+                    append(region1_back_times_list)
 
             # within
             else:
@@ -928,7 +991,18 @@ class GeoFeatureQuery():
                                         if (i, j) == ('0', '1')]
                 )
 
-                self.geo_cond_change_times_dict[geo_cond_name].append(region1_times_list)
+                region1_back_times_list.append(
+                    [age_starts_old2young[idx + 1] for idx, (i, j) \
+                     in enumerate(zip(region1_str_or_list,
+                                      region1_str_or_list[1:])) \
+                     if (i, j) == ('1', '0')]
+                )
+
+                self.geo_cond_change_times_dict[geo_cond_name].\
+                    append(region1_times_list)
+
+                self.geo_cond_change_back_times_dict[geo_cond_name]. \
+                    append(region1_back_times_list)
 
     def _populate_oldest_geo_cond_bit_dict(self, geo_cond_name: str) -> None:
         """Populate class member holding oldest geog. condition bit.
@@ -970,8 +1044,51 @@ class GeoFeatureQuery():
 
                 self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
 
+
+    def _populate_conn_graph(self, geo_cond_name: str):
+
+        # first check when graphs have changed
+        # self.geo_cond_change_back_dict[geo_cond_name]
+        # self.geo_cond_change_back_times_dict
+
+        self._graph_list = list()
+        for idx, ep_age in \
+                enumerate(self.feat_coll.epoch_age_start_list_old2young):
+
+            g = GeoGraph()
+            n_regions = len(self.feat_coll.region_idx_name_dict)
+
+            for from_region_idx in range(n_regions):
+                for to_region_idx in range(n_regions):
+                    # will be empty if condition does not change
+                    # has a time if condition did change
+                    potential_cond_change_age_list = \
+                        self.geo_cond_change_back_dict[geo_cond_name]\
+                            [from_region_idx][to_region_idx]
+
+                    # there was a change in this epoch for this region pair
+                    if ep_age in potential_cond_change_age_list:
+                        # for now assume that condition met here means pair is connected
+                        # g.add_node_to_graph()
+                        pass
+
+
+            # one graph per epoch
+            self._graph_list.append(g)
+
+
+
+
+
+    def get_comm_classes(self, list_of_regions, an_age: float):
+        # self._graph(list_of_regions)
+
+        pass
+
+
     # getters
-    def get_geo_condition_change_times(self, geo_cond_name) -> \
+    def get_geo_condition_change_times(self,
+                                       geo_cond_name: str) -> \
             ty.Dict[str,
                     ty.Union[ty.List[ty.List[float]],
                     ty.List[ty.List[ty.List[float]]]]]:
@@ -980,6 +1097,17 @@ class GeoFeatureQuery():
             self._populate_geo_cond_change_times_dict(geo_cond_name)
 
         return self.geo_cond_change_times_dict[geo_cond_name]
+
+    def get_geo_condition_change_back_times(self,
+                                            geo_cond_name: str) -> \
+            ty.Dict[str,
+                    ty.Union[ty.List[ty.List[float]],
+                    ty.List[ty.List[ty.List[float]]]]]:
+
+        if not self.geo_cond_change_back_times_dict[geo_cond_name]:
+            self._populate_geo_cond_change_times_dict(geo_cond_name)
+
+        return self.geo_cond_change_back_times_dict[geo_cond_name]
     
     def get_geo_oldest_condition_bit(
             self,
@@ -998,7 +1126,11 @@ if __name__ == "__main__":
     fc = GeoFeatureCollection(sys.argv[1],
                               age_summary_fp=sys.argv[2])
 
-    test_basic_stuff = True
+    fq = GeoFeatureQuery(fc)
+
+    g = GeoGraph(name_list=['A', 'B', 'C', 'D'])
+
+    test_basic_stuff = False
     if test_basic_stuff:
         # (1) can do it like this
         # print(fc.get_feat_by_name("qb_1", time_idx=1))
@@ -1025,13 +1157,11 @@ if __name__ == "__main__":
     # testing querying
     test_querying = False
     if test_querying:
-        fq = GeoFeatureQuery(fc)
-        
         requirement_fn1 = \
             GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_name="cw_1")
         
         # for all regions, gives all times when it happened
-        fq.populate_geo_cond_bit_dicts("ancient_sea", requirement_fn1)
+        fq.populate_geo_cond_member_dicts("ancient_sea", requirement_fn1)
         print("\nancient_sea 1:")
         print(" ".join(fq.geo_cond_bit_dict["ancient_sea"]))
         # ancient_sea 1:
@@ -1055,7 +1185,7 @@ if __name__ == "__main__":
             GeoFeatureQuery.cw_feature_equals_value(fc, 1, feat_id=1)
         
         # for all regions, gives all times when it happened
-        fq.populate_geo_cond_bit_dicts("ancient_sea", requirement_fn1_1)
+        fq.populate_geo_cond_member_dicts("ancient_sea", requirement_fn1_1)
         print("\nancient_sea 2:")
         print(" ".join(fq.geo_cond_bit_dict["ancient_sea"]))
         # ancient_sea 2:
@@ -1075,7 +1205,7 @@ if __name__ == "__main__":
         requirement_fn2 = \
             GeoFeatureQuery.qw_feature_threshold(fc, thresh, True, feat_name="qw_1")
         
-        fq.populate_geo_cond_bit_dicts("altitude", requirement_fn2)
+        fq.populate_geo_cond_member_dicts("altitude", requirement_fn2)
         print("\naltitude:")
         print(" ".join(fq.geo_cond_bit_dict["altitude"]))
         # altitude:
@@ -1094,7 +1224,7 @@ if __name__ == "__main__":
         requirement_fn3 = \
             GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_name="cb_1")
         
-        fq.populate_geo_cond_bit_dicts("land_bridge", requirement_fn3)
+        fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn3)
         print("\nland_bridge 1:")
         for k in fq.geo_cond_bit_dict["land_bridge"]:
             print(*k)
@@ -1126,7 +1256,7 @@ if __name__ == "__main__":
         requirement_fn3_1 = \
             GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_id=1)
         
-        fq.populate_geo_cond_bit_dicts("land_bridge", requirement_fn3_1)
+        fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn3_1)
         print("\nland_bridge 2:")
         for k in fq.geo_cond_bit_dict["land_bridge"]:
             print(*k)
@@ -1159,7 +1289,7 @@ if __name__ == "__main__":
         requirement_fn4 = \
             GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_name="qb_1")
         
-        fq.populate_geo_cond_bit_dicts("distance", requirement_fn4)
+        fq.populate_geo_cond_member_dicts("distance", requirement_fn4)
         print("\ndistance 1:")
         for k in fq.geo_cond_bit_dict["distance"]:
             print(*k)
@@ -1190,7 +1320,7 @@ if __name__ == "__main__":
         requirement_fn4_1 = \
             GeoFeatureQuery.qb_feature_threshold(fc, thresh, True, feat_id=2)
         
-        fq.populate_geo_cond_bit_dicts("distance", requirement_fn4_1)
+        fq.populate_geo_cond_member_dicts("distance", requirement_fn4_1)
         print("\ndistance 2:")
         for k in fq.geo_cond_bit_dict["distance"]:
             print(*k)
@@ -1217,3 +1347,13 @@ if __name__ == "__main__":
         # 1 0 0 0
         # 0 0 0 0
         # 0 0 0 0
+
+    test_graph = True
+    if test_graph:
+        requirement_fn = \
+            GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_id=1)
+
+        # all members, including graph, are populated here!
+        fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn)
+
+

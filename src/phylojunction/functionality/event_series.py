@@ -234,7 +234,7 @@ class EvolRelevantEventSeriesTabulator():
             # key: node name
             # value: event series object
             recursively_populate_event_series_dict(root_nd,
-                                                   1)
+                                                   it_idx)
 
             # debugging
             for nd_label, it_event_series_dict in self._event_series_dict.items():

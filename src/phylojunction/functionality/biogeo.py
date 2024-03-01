@@ -182,7 +182,7 @@ class StatesGeoCondChangeLookup():
         self.requirement_fn = requirement_fn
         
         self.geo_query = geo_query
-        self.geo_query.populate_geo_cond_bit_dicts(
+        self.geo_query.populate_geo_cond_member_dicts(
             requirement_fn_name,
             requirement_fn)
 

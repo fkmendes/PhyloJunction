@@ -2084,7 +2084,8 @@ def get_color_map(n_states: int) -> ty.Dict[int, str]:
             for i in range(qual_cmap.N))
 
     elif n_states <= 120:
-        cmap = matplotlib.colormaps.get_cmap('terrain', n_states)
+        # cmap = matplotlib.colormaps.get_cmap('terrain', n_states)
+        cmap = plt.get_cmap('terrain', n_states)
         new_cmap = truncate_colormap(cmap, minval=0.0, maxval=2.08, n=n_states)
         color_map = dict(
             (i, matplotlib.colors.rgb2hex(new_cmap(i)[:3]))
@@ -2093,7 +2094,8 @@ def get_color_map(n_states: int) -> ty.Dict[int, str]:
 
     # if n_states >120 up to 250
     else:
-        cmap = matplotlib.colormaps.get_cmap('terrain', n_states)
+        # cmap = matplotlib.colormaps.get_cmap('terrain', n_states)
+        cmap = plt.get_cmap('terrain', n_states)
         maxv = 120 * 2.08 / n_states
         new_cmap = truncate_colormap(cmap, minval=0.0, maxval=maxv, n=n_states)
         color_map = dict(
