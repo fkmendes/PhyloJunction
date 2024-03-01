@@ -2131,6 +2131,14 @@ class DnSSE(pgm.DistrForSampling):
                     self.stop_val[ith_sim],
                     sample_idx=ith_sim)
 
+                # TODO: Add support to gracefully fail if num_attempt (j) >
+                #       self.max_num_attempt_per_sim
+                # Example code:
+                # print("Attempt", num_attempt, ':', tr)
+                # max_num_attempt = 100
+                # if j > max_num_attempt:
+                #     quit()
+
                 # check if tr has right specs
                 if self._is_tr_ok(tr, self.stop_val[ith_sim]):
                     output.append(tr)
