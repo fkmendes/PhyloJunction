@@ -426,7 +426,7 @@ class DiscreteStateDependentParameterManager:
         
         # t-th time slice
         for t, list_params in enumerate(
-                self.matrix_state_dep_params[:self.n_time_slices]):
+                self.matrix_state_dep_params[self.slice_t_offset_idx:self.n_time_slices+self.slice_t_offset_idx]):
             for param in list_params:
                 try:
                     self.state_dep_params_dict[param.state][t].append(param)
@@ -477,16 +477,19 @@ class DiscreteStateDependentParameterManager:
             self.slice_t_ends: ty.List[float] = list()
 
             # old first, young last
+            idx = 0
             for age_end in self.slice_age_ends:
                 # we ignore user-specified age ends that for some reason
                 # older than the seed (origin/root) age; must have been
                 # a user oversight...
                 if age_end > self.seed_age:
+                    idx += 1
                     continue
 
                 else:
                     self.slice_t_ends.append(self.seed_age - age_end)
-
+                    
+            self.slice_t_offset_idx = idx
             self.n_time_slices = len(self.slice_t_ends)
 
     ##########################
@@ -703,14 +706,13 @@ class DiscreteStateDependentParameterManager:
         time_slice_index: int = 0
         # (if n_time_slices is 0, for loop has no effect)
         for time_slice_index in range(0, self.n_time_slices):
-
             # try:
             if isinstance(self.slice_t_ends, list) and \
                     isinstance(self.slice_t_ends[time_slice_index], float):
                 # time end of this time slice
                 time_slice_t_end = \
                     ty.cast(float, self.slice_t_ends[time_slice_index])
-
+                
                 # if time is larger than this time slice time end OR
                 # if time is the same as the time slice, we continue to
                 # the next time slice and check again
@@ -719,7 +721,7 @@ class DiscreteStateDependentParameterManager:
                     continue
 
             break
-
+        
         # now that we know the time slice, we get the SSE parameter
         #
         # params_matrix will have been provided as a matrix conditioned on a
@@ -1352,9 +1354,11 @@ class DiscreteStateDependentProbabilityHandler():
             exit(("Should only have one probability deterministic node "
                   " per state per slice. Exiting..."))
 
+        # TODO: uncomment and fix bug related to invalid index error
         prob_at_state_in_slice_ith_sample = \
             prob_at_state_in_slice_list[0].value[sample_idx]
-
+        # prob_at_state_in_slice_ith_sample = 1
+        
         if prob_at_state_in_slice_ith_sample == 1.0:
             return True
 
