@@ -35,6 +35,7 @@ class DnSSE(pgm.DistrForSampling):
     prob_handler: sseobj.DiscreteStateDependentProbabilityHandler
     epsilon: float
     runtime_limit: int
+    max_n_failed_attempts: int
     rng_seed: int
     debug: bool
     info: bool
@@ -54,6 +55,7 @@ class DnSSE(pgm.DistrForSampling):
                  abort_at_alive_count: int = int(1e12),
                  epsilon: float = 1e-12,
                  runtime_limit: int = 5,
+                 max_n_failed_attempts: int = 100,
                  rng_seed: ty.Optional[int] = None,
                  debug: ty.Optional[bool] = False,
                  info: ty.Optional[bool] = False) -> None: ...

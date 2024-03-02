@@ -327,13 +327,22 @@ class DiscreteStateDependentParameterManager:
     Parameters:
         matrix_state_dep_params (DiscreteStateDependentParameter): 2D
             list, with first dimension being time slices, the second
-            being SSE parameters.
+            being SSE parameters. This is just a raw container of SSE
+            parameters, and is not used for computations.
+        state_dep_params_dict (dict): Dictionary with state indices
+            (int) as keys, and a list of SSE parameters as values.
+            This is the container that is used by MacroEvolEventHandler
+            when calculating rates.
         seed_age (float, optional): Age of origin or root used to
             anchor time slice age ends so as to convert them into time
             slice time ends.
         slice_age_ends (float): List of time slice age ends.
         slice_t_ends (float, optional): List of time slice time ends.
             It is automatically filled upon initialization.
+        n_slices_to_ignore (int): How many time slices are in their
+            totality older than the whole tree (the user may have
+            specified more time slice age ends than necessary given
+            an origin or root time for the tree). Defaults to 0.
         param_type (DiscreteStateDependentParameterType): Attribute
             holding what type of SSE parameter this is (rate or
             probability).
@@ -343,9 +352,13 @@ class DiscreteStateDependentParameterManager:
 
     matrix_state_dep_params: \
         ty.List[ty.List[DiscreteStateDependentParameter]]
+    state_dep_params_dict: \
+        ty.Dict[int,
+                ty.List[ty.List[DiscreteStateDependentParameter]]]
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.Optional[ty.List[float]]
+    n_slices_to_ignore: int
     param_type: DiscreteStateDependentParameterType
     epsilon: float
 
@@ -364,6 +377,8 @@ class DiscreteStateDependentParameterManager:
                  epsilon: float = 1e-12) -> None:
         
         self.epsilon = epsilon
+
+        self.n_slices_to_ignore = 0
 
         # 1D: time slices
         # 2D: list of SSE params
@@ -391,6 +406,9 @@ class DiscreteStateDependentParameterManager:
 
         # if user provides age ends for time slices
         if list_time_slice_age_ends:
+            # updates self.n_slices_to_ignore
+            #         self.slice_age_ends
+            #         self.slice_t_ends
             self._init_update_slice_age_and_t_ends(
                 list_time_slice_age_ends)
 
@@ -415,7 +433,7 @@ class DiscreteStateDependentParameterManager:
                 associated to the SSE parameter is not an integer
                 between 0 and the total number of states.
         """
-        
+
         # key (int): state
         # value (2D list): 1D are time slices, 2D are SSE parameters
         self.state_dep_params_dict: \
@@ -423,10 +441,12 @@ class DiscreteStateDependentParameterManager:
                     ty.List[ty.List[DiscreteStateDependentParameter]]] = \
                         dict((s, [[] for j in range(self.n_time_slices)])
                              for s in range(self.state_count))
-        
+
         # t-th time slice
         for t, list_params in enumerate(
-                self.matrix_state_dep_params[self.slice_t_offset_idx:self.n_time_slices+self.slice_t_offset_idx]):
+                self.matrix_state_dep_params[
+                self.n_slices_to_ignore:(self.n_time_slices + self.n_slices_to_ignore)
+                ]):
             for param in list_params:
                 try:
                     self.state_dep_params_dict[param.state][t].append(param)
@@ -477,19 +497,22 @@ class DiscreteStateDependentParameterManager:
             self.slice_t_ends: ty.List[float] = list()
 
             # old first, young last
-            idx = 0
+            n_slices_to_ignore = 0
             for age_end in self.slice_age_ends:
                 # we ignore user-specified age ends that for some reason
                 # older than the seed (origin/root) age; must have been
                 # a user oversight...
                 if age_end > self.seed_age:
-                    idx += 1
+                    n_slices_to_ignore += 1
                     continue
 
                 else:
                     self.slice_t_ends.append(self.seed_age - age_end)
-                    
-            self.slice_t_offset_idx = idx
+
+            # these slices are older than the tree, so we will ignore them!
+            self.n_slices_to_ignore = n_slices_to_ignore
+
+            # reflects n_slices_to_ignore!
             self.n_time_slices = len(self.slice_t_ends)
 
     ##########################
@@ -705,6 +728,9 @@ class DiscreteStateDependentParameterManager:
         # SSE parameter value from
         time_slice_index: int = 0
         # (if n_time_slices is 0, for loop has no effect)
+
+        # number of time slices is the number of age ends provided by
+        # user, but only those that are as old or younger than the tree!!!
         for time_slice_index in range(0, self.n_time_slices):
             # try:
             if isinstance(self.slice_t_ends, list) and \
@@ -1324,10 +1350,12 @@ class DiscreteStateDependentProbabilityHandler():
             DiscreteStateDependentProbability: A list with a single
                 SSE probability inside.
         """
+
         # scoped to total_rate
         state_cond_prob_matrix = \
             self.state_dep_prob_manager \
                 .state_dep_params_dict[state_idx]  # conditioning
+
 
         # in the context of rates (multiple rates per departing state)
         # state_dep_params_at_time returns a list of rates,
@@ -1347,6 +1375,7 @@ class DiscreteStateDependentProbabilityHandler():
 
         Raises:
         """
+
         prob_at_state_in_slice_list = \
             self._state_dep_prob_at_time(a_time, state_idx)
 
@@ -1354,10 +1383,8 @@ class DiscreteStateDependentProbabilityHandler():
             exit(("Should only have one probability deterministic node "
                   " per state per slice. Exiting..."))
 
-        # TODO: uncomment and fix bug related to invalid index error
         prob_at_state_in_slice_ith_sample = \
             prob_at_state_in_slice_list[0].value[sample_idx]
-        # prob_at_state_in_slice_ith_sample = 1
         
         if prob_at_state_in_slice_ith_sample == 1.0:
             return True
@@ -1433,9 +1460,15 @@ class SSEStash():
         matrix_state_dep_probs: \
             ty.List[ty.List[DiscreteStateDependentProbability]] = list()
 
-        # TODO: this code is wrong, fix it!
-        for t in range(0,
-                       self.meh.sse_rate_manager.n_time_slices):
+        # we need a full size matrix of SSE probs, with one list of
+        # SSE probs for each epoch with an age end provided by the
+        # user (as opposed to the 'actual' number of epochs, which
+        # would ignore epochs older than the root or origin)
+        #
+        # this matrix is later subset in
+        # DiscreteStateDependentParameterManager's
+        # _init_matrix_state_dep_params_dict
+        for t in range(0, len(self.meh.slice_age_ends)):
             state_dep_probs: \
                 ty.List[DiscreteStateDependentProbability] = list()
 

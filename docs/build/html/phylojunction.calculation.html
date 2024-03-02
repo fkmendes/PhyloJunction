@@ -167,13 +167,22 @@ of time slices.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>matrix_state_dep_params</strong> (<a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><em>DiscreteStateDependentParameter</em></a>) – 2D
 list, with first dimension being time slices, the second
-being SSE parameters.</p></li>
+being SSE parameters. This is just a raw container of SSE
+parameters, and is not used for computations.</p></li>
+<li><p><strong>state_dep_params_dict</strong> (<em>dict</em>) – Dictionary with state indices
+(int) as keys, and a list of SSE parameters as values.
+This is the container that is used by MacroEvolEventHandler
+when calculating rates.</p></li>
 <li><p><strong>seed_age</strong> (<em>float</em><em>, </em><em>optional</em>) – Age of origin or root used to
 anchor time slice age ends so as to convert them into time
 slice time ends.</p></li>
 <li><p><strong>slice_age_ends</strong> (<em>float</em>) – List of time slice age ends.</p></li>
 <li><p><strong>slice_t_ends</strong> (<em>float</em><em>, </em><em>optional</em>) – List of time slice time ends.
 It is automatically filled upon initialization.</p></li>
+<li><p><strong>n_slices_to_ignore</strong> (<em>int</em>) – How many time slices are in their
+totality older than the whole tree (the user may have
+specified more time slice age ends than necessary given
+an origin or root time for the tree). Defaults to 0.</p></li>
 <li><p><strong>param_type</strong> (<a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterType" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterType"><em>DiscreteStateDependentParameterType</em></a>) – Attribute
 holding what type of SSE parameter this is (rate or
 probability).</p></li>
@@ -190,6 +199,11 @@ to zero.</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.matrix_state_dep_params">
 <span class="sig-name descname"><span class="pre">matrix_state_dep_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><span class="pre">DiscreteStateDependentParameter</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.matrix_state_dep_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.n_slices_to_ignore">
+<span class="sig-name descname"><span class="pre">n_slices_to_ignore</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.n_slices_to_ignore" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -243,6 +257,11 @@ second dimension are SSE parameters.</p></li>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.state_dep_params_dict">
+<span class="sig-name descname"><span class="pre">state_dep_params_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter" title="phylojunction.calculation.discrete_sse.DiscreteStateDependentParameter"><span class="pre">DiscreteStateDependentParameter</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#phylojunction.calculation.discrete_sse.DiscreteStateDependentParameterManager.state_dep_params_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

@@ -17,21 +17,93 @@ class GeoGraph():
     _n_nodes: int
     _node_set: ty.Set[int]
     _edge_set: ty.Set[ty.Tuple[int]]
+    _edge_dict: ty.Dict[int, ty.Set[int]]
     _comm_class_idx: ty.List[int] # one comm class per node
 
-    def __init__(self):
+    def __init__(self, n_nodes: int) -> None:
+        self._n_nodes = n_nodes
+        self._node_set = set(i for i in range(n_nodes))
+        self._edge_set = set()
+        self._edge_dict = dict()
 
-        self._name_list = name_list
-
-        if name_list is not None:
-            self._n_nodes = len(name_list)
-
-            for idx, a_name in enumerate(name_list):
-                self._name2idx[a_name] = idx
-
-    def add_node_to_graph(self, region_idx: int):
+    def add_node(self, node_idx: int) -> None:
         self._n_nodes += 1
-        self._node_set.add(region_idx)
+        self._node_set.add(node_idx)
+
+    def add_edge(self,
+                 node1_idx: int,
+                 node2_idx: int,
+                 is_directed: bool = False) -> None:
+        if not ((node1_idx in self._node_set) \
+                and (node2_idx in self._node_set)):
+            # TODO: later add exception
+            exit("Either or both nodes could not be found in the connectivity graph. Exiting....")
+
+        edge_tup = (node1_idx, node2_idx)
+        self._edge_set.add(edge_tup)
+        if node1_idx not in self._edge_dict:
+            self._edge_dict[node1_idx] = set([node2_idx])
+
+        else:
+            self._edge_dict[node1_idx].add(node2_idx)
+
+        if not is_directed:
+            edge_tup2 = (node2_idx, node1_idx)
+            self._edge_set.add(edge_tup2)
+
+            if node2_idx not in self._edge_dict:
+                self._edge_dict[node1_idx] = set([node2_idx])
+
+            else:
+                self._edge_dict[node1_idx].add(node2_idx)
+
+    @property
+    def edge_set(self) -> ty.Set[ty.Tuple[int]]:
+        return self._edge_set
+
+    def edge_dict(self) -> ty.Dict[int, ty.Set[int]]:
+        return self._edge_dict
+
+    def populate_comm_classes(self):
+        """
+
+        Communicating classes are mutually exclusive sets of nodes
+        that are connected to each other directly or indirectly.
+        A connection is established by a single directed edge (even
+        if it is missing in the other direction).
+
+        Returns:
+
+        """
+        for from_node, to_node_set in self._edge_dict.items():
+            # a node and all nodes connected to it by at least
+            # one directed edge
+            node_and_edges_coming_out = set([from_node]).union(to_node_set)
+
+            intersected = False
+            for i, ccs in enumerate(self._comm_class_set_list):
+                # set of nodes has any overlap with an existing comm class
+                if not ccs.isdisjoint(node_and_edges_coming_out):
+                    # we merge the two into a larger comm class
+                    ccs = ccs.union(node_and_edges_coming_out)
+
+                    # and update list of communicating classes
+                    self._comm_class_set_list[i] = ccs
+                    intersected = True
+
+            # if the set of nodes from this iteration has no intersection
+            # with any existing communicating class, it is a new class on
+            # its own
+            if not intersected:
+                self._comm_class_set_list.append(node_and_edges_coming_out)
+
+    def __str__(self) -> str:
+        str_representation = ""
+        for e_tup in self._edge_set:
+            e_str = " -> ".join(str(i) for i in e_tup)
+            str_representation += e_str + "\n"
+
+        return str_representation
 
 
 class GeoFeatureRelationship(enum.Enum):
@@ -520,13 +592,20 @@ class GeoFeatureQuery():
     """
 
     Parameters:
+        n_regions (int): Number of regions in the system.
+        n_epochs (int): Number of epochs for which one has geographic
+            features scored.
         feat_col (GeoFeatureCollection):
         geo_cond_bit_dict (dict):
         geo_cond_change_times_dict (dict):
         geo_cond_change_back_times_dict (dict):
         geo_oldest_cond_bit_dict (dict):
-        conn_graph (GeoGraph): Connectivity graph.
+        conn_graph_list (GeoGraph): List of connectivity graphs, one
+            per epoch.
     """
+
+    n_regions: int
+    n_epochs: int
 
     feat_coll: GeoFeatureCollection
     # bit patterns are in old -> young epochs
@@ -569,17 +648,19 @@ class GeoFeatureQuery():
                                   ty.Union[ty.List[ty.List[str]],
                                            ty.List[str]]]
 
-    # connectivity graph
-    _conn_graph: GeoGraph
+    # connectivity graph list, one graph per epoch
+    conn_graph_list: ty.List[GeoGraph]
 
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
+        self.n_regions = len(self.feat_coll.region_idx_name_dict)
         self.n_epochs = self.feat_coll.n_epochs
 
         self.geo_cond_bit_dict = dict()
         self.geo_oldest_cond_bit_dict = dict()
         self.geo_cond_change_times_dict = dict()
         self.geo_cond_change_back_times_dict = dict()
+        self.conn_graph_list = list()
 
     # class methods take 'cls' as first argument, and can know about class state
     # static methods do not know about state at all
@@ -885,8 +966,8 @@ class GeoFeatureQuery():
     def populate_geo_cond_member_dicts(
             self,
             geo_cond_name: str,
-            requirement_fn: MyCallableType) \
-                -> None:
+            requirement_fn: MyCallableType,
+            is_directed: bool = False) -> None:
         """Populate geographic condition bit dictionaries
 
         e.g., for 2 regions, 3 epochs {"altitude": ["010", "010"]}
@@ -901,9 +982,11 @@ class GeoFeatureQuery():
             requirement_fn (function): A function that receives a
                 feature collection and a list of integers defining
                 the involved regions, and returns a (1 or 2
-                dimensional) list of strings representing the
+                dimensional) list of bit strings representing the
                 manifestation of the condition, in each region or
                 region pair, for each epoch.
+            is_directed (bool): Flag specifying if connectivity graph
+                is directed or not. Defaults to False.
         """
 
         self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
@@ -912,7 +995,7 @@ class GeoFeatureQuery():
 
         self._populate_geo_cond_change_times_dict(geo_cond_name)
 
-        self._populate_conn_graph(geo_cond_name)
+        self._populate_conn_graph_list(geo_cond_name, is_directed)
 
     # internal
     def _populate_geo_cond_change_times_dict(self,
@@ -1045,39 +1128,26 @@ class GeoFeatureQuery():
                 self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
 
 
-    def _populate_conn_graph(self, geo_cond_name: str):
-
-        # first check when graphs have changed
-        # self.geo_cond_change_back_dict[geo_cond_name]
-        # self.geo_cond_change_back_times_dict
-
-        self._graph_list = list()
+    def _populate_conn_graph_list(self, geo_cond_name: str, is_directed: bool=False):
         for idx, ep_age in \
                 enumerate(self.feat_coll.epoch_age_start_list_old2young):
 
-            g = GeoGraph()
-            n_regions = len(self.feat_coll.region_idx_name_dict)
+            g = GeoGraph(self.n_regions)
 
-            for from_region_idx in range(n_regions):
-                for to_region_idx in range(n_regions):
-                    # will be empty if condition does not change
-                    # has a time if condition did change
-                    potential_cond_change_age_list = \
-                        self.geo_cond_change_back_dict[geo_cond_name]\
-                            [from_region_idx][to_region_idx]
+            for from_region_idx in range(self.n_regions):
+                for to_region_idx in range(self.n_regions):
+                    if from_region_idx != to_region_idx:
+                        cond_change_bit_patt = \
+                            self.geo_cond_bit_dict[geo_cond_name]\
+                                [from_region_idx][to_region_idx]
 
-                    # there was a change in this epoch for this region pair
-                    if ep_age in potential_cond_change_age_list:
-                        # for now assume that condition met here means pair is connected
-                        # g.add_node_to_graph()
-                        pass
-
+                        # geog condition is met in this epoch
+                        if cond_change_bit_patt[idx] == '1':
+                            # for now assume that condition met here means pair is connected
+                            g.add_edge(from_region_idx, to_region_idx, is_directed=is_directed)
 
             # one graph per epoch
-            self._graph_list.append(g)
-
-
-
+            self.conn_graph_list.append(g)
 
 
     def get_comm_classes(self, list_of_regions, an_age: float):

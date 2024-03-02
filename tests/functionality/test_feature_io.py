@@ -138,12 +138,13 @@ class TestFeatureIO(unittest.TestCase):
         info inside the class' appropriate members.
         """
 
+        # from feature_summary.csv, epoch 1 is youngest, epoch 3 is oldest
         exp1 = ('Feature (cb_1) | between-categorical 1 | Epoch 1 '
-                '| 2 regions\n[[0 0]\n [0 0]]')
+                '| 2 regions\n[[0 0]\n [1 0]]')
         exp2 = ('Feature (cb_1) | between-categorical 1 | Epoch 2 '
                 '| 2 regions\n[[0 1]\n [1 0]]')
         exp3 = ('Feature (cb_1) | between-categorical 1 | Epoch 3 '
-                '| 2 regions\n[[0 0]\n [0 0]]')
+                '| 2 regions\n[[0 1]\n [0 0]]')
 
         self.assertEqual(str(self.two_region_geo_coll.feat_name_epochs_dict['cb_1'][1]),
                          exp1)
@@ -167,10 +168,21 @@ class TestFeatureIO(unittest.TestCase):
         self.assertEqual(cb3_1_str, exp3)
 
     def test_geo_query_two_regions(self) -> None:
-        # two regions
+        """
+        Test that GeoFeaturesQuery is capable of initializing its
+        members correctly, namely:
+            (i)   geo_cond_bit_dict
+            (ii)  geo_condition_change_times
+            (iii) geo_condition_change_back_times
+            (iv)  conn_graph_list
+
+        Using feature_files/two_regions_feature_set/
+        """
+
         self.two_geo_query.populate_geo_cond_member_dicts(
             "land_bridge",
-            self.two_cb_is_1_requirement_fn)
+            self.two_cb_is_1_requirement_fn,
+            True)
 
         geo_cond_bit_patterns_list = list()
         for k in self.two_geo_query.geo_cond_bit_dict["land_bridge"]:
@@ -178,25 +190,73 @@ class TestFeatureIO(unittest.TestCase):
             geo_cond_bit_patterns_list.append(" ".join(k))
 
         # A -> A, A -> B, B -> A, B -> B
-        # each bit is for an epoch
+        # each bit is for an epoch, from young to old (see feature_summary.csv)
         geo_cond_bit_patterns = " ".join(i for i in geo_cond_bit_patterns_list)
-        self.assertEqual(geo_cond_bit_patterns, "111 101 101 111")
+        self.assertEqual(geo_cond_bit_patterns, "111 100 001 111")
 
         self.assertEqual(
         self.two_geo_query.geo_oldest_cond_bit_dict,
-            {'land_bridge': [['1', '1'], ['1', '1']]}
+            {'land_bridge': [['1', '1'], ['0', '1']]}
         )
 
         self.assertEqual(
             self.two_geo_query.get_geo_condition_change_times("land_bridge"),
-            [[[], [1.5]], [[1.5], []]]
+            [[[], []], [[1.5], []]]
         )
 
         self.assertEqual(
             self.two_geo_query.get_geo_condition_change_back_times("land_bridge"),
-            [[[], [4.25]], [[4.25], []]]
+            [[[], [4.25]], [[], []]]
         )
 
+        # epoch 1, idx = 0 (youngest, the index comes from feat_summary.csv)
+        self.assertSetEqual(
+            self.two_geo_query.conn_graph_list[0].edge_set,
+            {(0, 1)}
+        )
+
+        # epoch 2, idx = 1 (no edges!)
+        self.assertSetEqual(
+            self.two_geo_query.conn_graph_list[1].edge_set,
+            set()
+        )
+
+        # epoch 3, idx = 2 (oldest, the index comes from feat_summary.csv)
+        self.assertSetEqual(
+            self.two_geo_query.conn_graph_list[2].edge_set,
+            {(1, 0)}
+        )
+
+    def test_geo_query_four_regions(self) -> None:
+        """
+        Test that GeoFeaturesQuery is capable of initializing its
+        members correctly, namely:
+            (i)   geo_cond_bit_dict
+            (ii)  geo_condition_change_times
+            (iii) geo_condition_change_back_times
+            (iv)  conn_graph_list
+
+        Using feature_files/four_regions_feature_set/
+        """
+
+        self.four_geo_query.populate_geo_cond_member_dicts(
+            "land_bridge",
+            self.four_cb_is_1_requirement_fn,
+            True)
+
+        geo_cond_bit_patterns_list = list()
+        for k in self.four_geo_query.geo_cond_bit_dict["land_bridge"]:
+            # * unpacks list
+            geo_cond_bit_patterns_list.append(" ".join(k))
+
+        self.assertEqual(geo_cond_bit_patterns_list[0],
+                         '111 000 010 111')
+        self.assertEqual(geo_cond_bit_patterns_list[1],
+                         '000 111 010 111')
+        self.assertEqual(geo_cond_bit_patterns_list[2],
+                         '111 010 111 110')
+        self.assertEqual(geo_cond_bit_patterns_list[3],
+                         '111 111 011 111')
 
 if __name__ == '__main__':
     # From PhyloJunction/

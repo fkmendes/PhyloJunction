@@ -140,7 +140,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="phylojunction.interface.grammar.html#module-phylojunction.interface.grammar.det_fn_discrete_sse_makers">phylojunction.interface.grammar.det_fn_discrete_sse_makers module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.extract_value_from_dagnodes"><code class="docutils literal notranslate"><span class="pre">extract_value_from_dagnodes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentProbability"><code class="docutils literal notranslate"><span class="pre">make_DiscreteStateDependentProbability()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_DiscreteStateDependentRate"><code class="docutils literal notranslate"><span class="pre">make_DiscreteStateDependentRate()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="phylojunction.interface.grammar.html#phylojunction.interface.grammar.det_fn_discrete_sse_makers.make_SSEStash"><code class="docutils literal notranslate"><span class="pre">make_SSEStash()</span></code></a></li>
@@ -190,6 +189,15 @@
 <section id="module-phylojunction.interface.pj_sandbox">
 <span id="phylojunction-interface-pj-sandbox-module"></span><h2>phylojunction.interface.pj_sandbox module<a class="headerlink" href="#module-phylojunction.interface.pj_sandbox" title="Link to this heading"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.pj_sandbox.run_example_geosse_file">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.pj_sandbox.</span></span><span class="sig-name descname"><span class="pre">run_example_geosse_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.interface.pj_sandbox.run_example_geosse_file" title="Link to this definition"></a></dt>
+<dd><p>Run example 2.</p>
+<p>This example reads script examples/bisse.pj. The tree
+is a sample from a geographic state-dependent speciation
+extinction (GeoSSE) process.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.pj_sandbox.run_example_manual_incomplete_sampling_bisse">
 <span class="sig-prename descclassname"><span class="pre">phylojunction.interface.pj_sandbox.</span></span><span class="sig-name descname"><span class="pre">run_example_manual_incomplete_sampling_bisse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.interface.pj_sandbox.run_example_manual_incomplete_sampling_bisse" title="Link to this definition"></a></dt>
 <dd><p>Run example 3.</p>
@@ -207,19 +215,18 @@ and plots it on provided Axes object.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.interface.pj_sandbox.run_example_map_attr">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.pj_sandbox.</span></span><span class="sig-name descname"><span class="pre">run_example_map_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.pj_sandbox.run_example_map_attr" title="Link to this definition"></a></dt>
+<dd><p>Run example 6.</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.interface.pj_sandbox.run_example_read_tree_function">
 <span class="sig-prename descclassname"><span class="pre">phylojunction.interface.pj_sandbox.</span></span><span class="sig-name descname"><span class="pre">run_example_read_tree_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.interface.pj_sandbox.run_example_read_tree_function" title="Link to this definition"></a></dt>
 <dd><p>Run example 5.</p>
 <p>This example reads a newick string into an AnnotatedTree instance, and
 plots it in the provided Axes object.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="phylojunction.interface.pj_sandbox.run_example_yule_file">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.interface.pj_sandbox.</span></span><span class="sig-name descname"><span class="pre">run_example_yule_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></span><a class="headerlink" href="#phylojunction.interface.pj_sandbox.run_example_yule_file" title="Link to this definition"></a></dt>
-<dd><p>Run example 2.</p>
-<p>This example reads script examples/yule.pj, which builds
-the same model specified in example 1.</p>
 </dd></dl>
 
 <dl class="py function">

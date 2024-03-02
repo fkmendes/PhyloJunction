@@ -717,6 +717,7 @@ The parameters of this function are:</p>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">max_rec_taxa</span></code> (positive integer, optional): Maximum number of sampled (extant and sampled ancestors) nodes the tree should have. Defaults to 1e12.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">abort_at_alive_count</span></code> (positive integer, optional): The count of a tree’s living nodes (irrespective of node sampling) at which point the tree is considered too large for simulation to continue. Trees can grow out of control when <code class="docutils literal notranslate"><span class="pre">stop=&quot;age&quot;</span></code> and one of the rates allows it to grow too big before the stopping condition is met. This parameter can be used to throw away such trees and preventing PhyloJunction from crashing. Defaults to 1e12.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">runtime_limit</span></code> (positive integer, optional): Maximum number of minutes to wait until all samples are drawn. Sampling is aborted at this point. Defaults to 5.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">max_n_attempts</span></code> (positive integer, optional): Maximum number of (failed) attempts before sampling is aborted. Defaults to 200.</div>
 </div>
 </div></blockquote>
 <p>Below, an example of assigning a discrete SSE to a stochastic DAG node representing phylogenetic tree samples:</p>

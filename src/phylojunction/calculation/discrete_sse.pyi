@@ -39,6 +39,7 @@ class DiscreteStateDependentProbability(DiscreteStateDependentParameter):
 
 class DiscreteStateDependentParameterManager:
     matrix_state_dep_params: ty.List[ty.List[DiscreteStateDependentParameter]]
+    state_dep_params_dict: ty.Dict[int, ty.List[ty.List[DiscreteStateDependentParameter]]]
     seed_age: ty.Optional[float]
     slice_age_ends: ty.List[float]
     slice_t_ends: ty.Optional[ty.List[float]]

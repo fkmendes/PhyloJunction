@@ -104,6 +104,9 @@ class DnSSE(pgm.DistrForSampling):
         runtime_limit (int, optional): Runtime ceiling (in minutes)
             for obtaining the 'n' tree samples. If this limit is met,
             the sampling procedure is aborted. Defaults to 5.
+        max_n_failed_attempts (int, optional): Maximum number of failed
+            tree sampling attempts (replicates included) before
+            PhyloJunction quits. Defaults to 200.
         rng_seed (int, optional): Integer seed for the two random
             number generators used in this class. This seed is only
             ever used by user if bypassing the scripting language
@@ -151,6 +154,7 @@ class DnSSE(pgm.DistrForSampling):
     # other specs
     epsilon: float
     runtime_limit: int
+    max_n_failed_attempts: int
     rng_seed: int
     debug: bool
     info: bool
@@ -171,6 +175,7 @@ class DnSSE(pgm.DistrForSampling):
                  abort_at_alive_count: int = int(1e12),
                  epsilon: float = 1e-12,
                  runtime_limit: int = 5,
+                 max_n_failed_attempts: int = 200,
                  rng_seed: ty.Optional[int] = None,
                  debug: ty.Optional[bool] = False,
                  info: ty.Optional[bool] = False) -> None:
@@ -215,6 +220,7 @@ class DnSSE(pgm.DistrForSampling):
         # other specs #
         self.epsilon = epsilon
         self.runtime_limit = runtime_limit
+        self.max_n_failed_attempts = max_n_failed_attempts
         self.debug = debug
         self.info = info
         # handling random number generator seeds
@@ -2115,29 +2121,22 @@ class DnSSE(pgm.DistrForSampling):
         # do something with self.runtime_limit
         start_time = time.time()
         ith_sim = 0
-        j = 0
+        n_failed_attempts = 0
         while len(output) < (self.n_sim * self.n_repl):
-            ellapsed_time = \
-                pjh.get_ellapsed_time_in_minutes(start_time, time.time())
-
-            if ellapsed_time >= self.runtime_limit:
-                raise ec.RunTimeLimit(self.runtime_limit)
-
-            # simulate!
             repl_size = 0
+
             while repl_size < self.n_repl:
+                # abort due to runtime limit
+                ellapsed_time = \
+                    pjh.get_ellapsed_time_in_minutes(start_time, time.time())
+                if ellapsed_time >= self.runtime_limit:
+                    raise ec.RunTimeLimit(self.runtime_limit)
+
+                # simulate!
                 tr = self.simulate(
                     self.start_states[ith_sim],
                     self.stop_val[ith_sim],
                     sample_idx=ith_sim)
-
-                # TODO: Add support to gracefully fail if num_attempt (j) >
-                #       self.max_num_attempt_per_sim
-                # Example code:
-                # print("Attempt", num_attempt, ':', tr)
-                # max_num_attempt = 100
-                # if j > max_num_attempt:
-                #     quit()
 
                 # check if tr has right specs
                 if self._is_tr_ok(tr, self.stop_val[ith_sim]):
@@ -2146,12 +2145,14 @@ class DnSSE(pgm.DistrForSampling):
 
                 # tree not good, stay in while loop
                 else:
-                    # print("\n\ntree was not good, trying again")
-                    j += 1
+                    # abort due to max number of attempts
+                    n_failed_attempts += 1
+                    if n_failed_attempts > self.max_n_failed_attempts:
+                        raise ec.MaxNFailedAttemptsLimit(n_failed_attempts)
+
                     continue
 
             ith_sim += 1
-            # print(ith_sim)
 
         return output
 

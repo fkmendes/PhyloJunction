@@ -63,6 +63,7 @@ def make_tree_reader(ct_fn_name: str,
                     raise ec.ParseMutuallyExclusiveParametersError(arg, "string")
 
                 if not os.path.isfile(tr_fp_or_str):
+                    print('arg', arg, 'tr_fp_or_str', tr_fp_or_str)
                     raise ec.ParsePathDoesNotExistError(
                         arg,
                         tr_fp_or_str)

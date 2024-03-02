@@ -621,11 +621,12 @@ class ParsePathDoesNotExistError(Exception):
     par_name: str
     path_str: str
 
-    def __init__(self, par_name: str, path_str: str, message: str) -> None:
+    def __init__(self, par_name: str, path_str: str, message: ty.Optional[str] = "") -> None:
+        super().__init__(par_name, path_str, message)
         self.par_name = par_name
         self.path_str = path_str
         self.message = "Path provided to argument \'" + self.par_name \
-            + "\' does not seem to store a file. " + message
+            + "\' does not seem to store a file." + message
         
     def __str__(self) -> str:
         return self.message
@@ -652,10 +653,10 @@ class ParseCtFnInitFailError(Exception):
     message: str
 
     def __init__(self, ct_fn_name: str, message: str) -> None:
+        super().__init__(ct_fn_name, message)
         self.ct_fn_name = ct_fn_name
         self.message = "Constant output from \'" + self.ct_fn_name \
             + "\' could not be instantiated. " + message
-        super().__init__(self.message)
 
     def __str__(self) -> str:
         return self.message
@@ -796,7 +797,19 @@ class MissingColumnName(Exception):
 class RunTimeLimit(Exception):
     def __init__(self, runtime_limit: float) -> None:
         self.message = "ERROR: Hit runtime limit of " + str(runtime_limit) \
-            + "."
+            + " minutes."
+
+        super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return self.message
+
+
+class MaxNFailedAttemptsLimit(Exception):
+    def __init__(self, max_n_attempts: int) -> None:
+        self.message = \
+            "ERROR: Hit maximum number of (failed) sampling attempts (" + \
+            str(max_n_attempts) + ")."
 
         super().__init__(self.message)
 

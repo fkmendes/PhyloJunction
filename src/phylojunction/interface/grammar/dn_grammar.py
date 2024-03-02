@@ -30,7 +30,8 @@ class PJDnGrammar():
             "unif":
             tuple(["n", "nr", "min", "max"]),
             "discrete_sse": tuple(["n", "nr", "stop", "stop_value", "origin",
-                                   "stash", "start_state", "eps", "runtime_limit",
+                                   "stash", "start_state", "eps",
+                                   "runtime_limit", "max_n_attempts",
                                    "cond_spn", "cond_surv", "cond_obs_both_sides",
                                    "min_rec_taxa", "max_rec_taxa",
                                    "abort_at_alive_count"])

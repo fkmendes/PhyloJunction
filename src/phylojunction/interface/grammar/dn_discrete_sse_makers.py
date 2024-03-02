@@ -68,6 +68,7 @@ def make_discrete_SSE_dn(
     start_states_list: ty.List[int] = []
     eps: float = 1e-12
     runtime_limit: int = 5  # 5 minutes
+    max_n_failed_attempts: int = 200  # 100 failed tree sampling attempts
 
     # input validation (only things that are not already done by DnSSE)
     for arg, val in dn_param_dict.items():
@@ -105,8 +106,9 @@ def make_discrete_SSE_dn(
                     # wasn't created by user through script
                     # prob_handler = node_dag_val.get_prob_handler()
 
-            elif arg in ("n", "nr", "runtime_limit", "min_rec_taxa",
-                         "max_rec_taxa", "abort_at_alive_count"):
+            elif arg in ("n", "nr", "runtime_limit", "max_n_attempts",
+                         "min_rec_taxa", "max_rec_taxa",
+                         "abort_at_alive_count"):
                 try:
                     if isinstance(first_val, str):
                         # no vectorization allowed here
@@ -117,8 +119,9 @@ def make_discrete_SSE_dn(
 
                 # if user specified n or runtime_limit, we use it, otherwise defaults are used
                 if arg == "n": n_samples = int_val
-                if arg == "runtime_limit": runtime_limit = int_val
                 if arg == "nr": n_repl = int_val
+                if arg == "runtime_limit": runtime_limit = int_val
+                if arg == "max_n_attempts": max_n_failed_attempts = int_val
                 if arg == "min_rec_taxa": min_rec_taxa = int_val
                 if arg == "max_rec_taxa": max_rec_taxa = int_val
                 if arg == "abort_at_alive_count": abort_at_alive_count = int_val
@@ -230,7 +233,8 @@ def make_discrete_SSE_dn(
         max_rec_taxa=max_rec_taxa,
         abort_at_alive_count=abort_at_alive_count,
         epsilon=eps,
-        runtime_limit=runtime_limit
+        runtime_limit=runtime_limit,
+        max_n_failed_attempts=max_n_failed_attempts
     )
 
 
