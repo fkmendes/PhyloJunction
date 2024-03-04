@@ -18,13 +18,20 @@ class GeoGraph():
     _node_set: ty.Set[int]
     _edge_set: ty.Set[ty.Tuple[int]]
     _edge_dict: ty.Dict[int, ty.Set[int]]
-    _comm_class_idx: ty.List[int] # one comm class per node
+    comm_class_set_list: ty.List[ty.Set[int]]
+
+    # one comm class per node idx (starting at 0)
+    _node_comm_class_dict: ty.Dict[int, int]
+    _n_comm_classes: int
 
     def __init__(self, n_nodes: int) -> None:
         self._n_nodes = n_nodes
         self._node_set = set(i for i in range(n_nodes))
         self._edge_set = set()
         self._edge_dict = dict()
+        self.comm_class_set_list = list()
+        self._node_comm_class_dict = dict()
+        self._n_comm_classes = 0
 
     def add_node(self, node_idx: int) -> None:
         self._n_nodes += 1
@@ -61,41 +68,113 @@ class GeoGraph():
     def edge_set(self) -> ty.Set[ty.Tuple[int]]:
         return self._edge_set
 
+    @property
     def edge_dict(self) -> ty.Dict[int, ty.Set[int]]:
         return self._edge_dict
 
-    def populate_comm_classes(self):
-        """
+    @property
+    def n_comm_classes(self) -> int:
+        return self._n_comm_classes
+
+    def populate_comm_class_members(self) -> None:
+        """Populate communicating-class-related members.
+
+        Side-effect is to populate:
+            (i)   self.comm_class_set_list
+            (ii)  self._node_comm_class_dict
+            (iii) self._n_comm_classes
 
         Communicating classes are mutually exclusive sets of nodes
         that are connected to each other directly or indirectly.
         A connection is established by a single directed edge (even
         if it is missing in the other direction).
-
-        Returns:
-
         """
+
+        visited_nodes_set = set()
+        tmp_comm_class_set_list = list()
+
         for from_node, to_node_set in self._edge_dict.items():
+            # first we mark the nodes that have been visited
+            visited_nodes_set.add(from_node)
+            for to_node in to_node_set:
+                visited_nodes_set.add(to_node)
+
             # a node and all nodes connected to it by at least
             # one directed edge
             node_and_edges_coming_out = set([from_node]).union(to_node_set)
 
             intersected = False
-            for i, ccs in enumerate(self._comm_class_set_list):
+            for i, ccs in enumerate(tmp_comm_class_set_list):
                 # set of nodes has any overlap with an existing comm class
                 if not ccs.isdisjoint(node_and_edges_coming_out):
                     # we merge the two into a larger comm class
                     ccs = ccs.union(node_and_edges_coming_out)
 
                     # and update list of communicating classes
-                    self._comm_class_set_list[i] = ccs
+                    tmp_comm_class_set_list[i] = ccs
                     intersected = True
 
             # if the set of nodes from this iteration has no intersection
             # with any existing communicating class, it is a new class on
             # its own
             if not intersected:
-                self._comm_class_set_list.append(node_and_edges_coming_out)
+                tmp_comm_class_set_list.append(node_and_edges_coming_out)
+
+        # 'singlet' comm classes
+        for a_node in self._node_set:
+            if a_node not in visited_nodes_set:
+                tmp_comm_class_set_list.append(set([a_node]))
+
+        # final pass: collapsing comm classes that overlap
+        for cc in tmp_comm_class_set_list:
+            if len(self.comm_class_set_list) == 0:
+                self.comm_class_set_list.append(cc)
+
+            else:
+                for i, seen_cc in enumerate(self.comm_class_set_list):
+                    if cc not in self.comm_class_set_list:
+                        # if mutually exclusive with all other comm classes
+                        if seen_cc.isdisjoint(cc):
+                            self.comm_class_set_list.append(cc)
+
+                        # if not mutually exclusive, we collapse
+                        else:
+                            updated_cc = seen_cc.union(cc)
+                            self.comm_class_set_list[i] = updated_cc
+
+        # at this point, self.comm_class_set_list contains only
+        # mutually exclusive communicating classes -- we can populate
+        # other class members
+        for i, cc in enumerate(self.comm_class_set_list):
+            self._n_comm_classes += 1
+
+            for node_idx in cc:
+                self._node_comm_class_dict[node_idx] = i
+
+    def are_connected(self, node1_idx: int, node2_idx) -> bool:
+        """Return boolean for two nodes in the same comm class.
+
+        If two nodes are in the same communicating class, it means they
+        are connected in the connectivity graph.
+
+        Args:
+            node1_idx (int): Index of node 1 (region 1).
+            node2_idx (int): Index of node 2 (region 2).
+
+        Returns:
+            (bool): If two nodes are connected
+        """
+
+        if node1_idx == node2_idx:
+            exit("Can only compare different nodes. Exiting...")
+
+        cc1 = self._node_comm_class_dict[node1_idx]
+        cc2 = self._node_comm_class_dict[node2_idx]
+
+        if cc1 == cc2:
+            return True
+
+        return False
 
     def __str__(self) -> str:
         str_representation = ""
@@ -281,6 +360,9 @@ class GeoFeatureCollection():
 
     # ways in which to store (for later grabbing) features values
     #
+    # NOTE: time_idx is user provided, class is unaware of what is
+    # old and young
+    #
     # (1) by name (assumes name cannot be repeated across feature
     # types and/or relationships); final dict is k: time_idx, v: feat
     #
@@ -293,8 +375,7 @@ class GeoFeatureCollection():
                 ty.Dict[GeoFeatureRelationship,
                         ty.Dict[int,
                                 ty.Dict[int, GeoFeature]
-                                ]]] \
-                                = pjh.autovivify(4)
+                                ]]]
 
     region_name_idx_dict: ty.Dict[str, int]
     region_idx_name_dict: ty.Dict[int, str]
@@ -545,6 +626,21 @@ class GeoFeatureCollection():
                                 feat_id: int,
                                 time_idx: ty.Optional[int] = None) \
             -> ty.Tuple[float, ty.List[float]]:
+        """
+
+        Args:
+            feat_type:
+            feat_rel:
+            feat_id:
+            time_idx: Index of epoch for which we want to get features.
+                Note that these indices are provided by the user in
+                the feature summary .csv file.
+
+        Returns:
+            (GeoFeature): Geographic feature (GeoFeature object) or
+                list of geographic features, depending on whether
+                time_idx was provided.
+        """
 
         # digging into the 4-nested dictionary
         feat_rel_dict_all_epochs = \
@@ -564,7 +660,9 @@ class GeoFeatureCollection():
             return feat_dict_all_epochs[time_idx]
 
         else:
-            return [v for k, v in feat_dict_all_epochs.items()]
+            # returning GeoFeature list sorted by the
+            # epoch indices provided by the user
+            return [feat_dict_all_epochs[k] for k in sorted(feat_dict_all_epochs)]
 
     # debug
     def _debug_print_dicts(self) -> None:
@@ -597,18 +695,18 @@ class GeoFeatureQuery():
             features scored.
         feat_col (GeoFeatureCollection):
         geo_cond_bit_dict (dict):
-        geo_cond_change_times_dict (dict):
-        geo_cond_change_back_times_dict (dict):
         geo_oldest_cond_bit_dict (dict):
         conn_graph_list (GeoGraph): List of connectivity graphs, one
             per epoch.
     """
 
     n_regions: int
-    n_epochs: int
+    n_time_slices: int
 
     feat_coll: GeoFeatureCollection
-    # bit patterns are in old -> young epochs
+    # bit patterns are in whatever order the time slices appear
+    # in the user-specified feature summary file (according
+    # to each time slice index)
     #
     # the value is either a list or a nested list depending on
     # whether the feature was between or within
@@ -620,20 +718,21 @@ class GeoFeatureQuery():
     # of geographic condition change as indicated by a bit in
     # the bit pattern flipping, '01' (0 in epoch 1, 1 in epoch 2);
     # if no flips, no changes
-    geo_cond_change_times_dict: \
-        ty.Dict[str,
-                ty.Union[ty.List[ty.List[float]],
-                ty.List[ty.List[ty.List[float]]]]]
+    # DEPRECATED
+    # geo_cond_change_times_dict: \
+    #     ty.Dict[str,
+    #             ty.Union[ty.List[ty.List[float]],
+    #             ty.List[ty.List[ty.List[float]]]]]
 
-    # same as above, but with the bit flipping the other way around,
-    # '10'
-    geo_cond_change_back_times_dict: \
-        ty.Dict[str,
-                ty.Union[ty.List[ty.List[float]],
-                ty.List[ty.List[ty.List[float]]]]]
+    # same as above, but with the bit flipping the other way around, '10'
+    # DEPRECATED
+    # geo_cond_change_back_times_dict: \
+    #     ty.Dict[str,
+    #             ty.Union[ty.List[ty.List[float]],
+    #             ty.List[ty.List[ty.List[float]]]]]
 
-    # this member below helps us tell if geographic conditions were
-    # previously met, e.g., maybe a barrier never "appears" during the
+    # this member below helps us tell if geographic connectivity had
+    # previously happened, e.g., maybe a barrier never "appears" during the
     # considered epochs, but that's because it appeared in the unobservable
     # past
     # (the geog. condition bit pattern could be '111111'; there is no '01' in there
@@ -654,12 +753,12 @@ class GeoFeatureQuery():
     def __init__(self, feat_coll) -> None:
         self.feat_coll = feat_coll
         self.n_regions = len(self.feat_coll.region_idx_name_dict)
-        self.n_epochs = self.feat_coll.n_epochs
+        self.n_time_slices = self.feat_coll.n_epochs
 
         self.geo_cond_bit_dict = dict()
         self.geo_oldest_cond_bit_dict = dict()
-        self.geo_cond_change_times_dict = dict()
-        self.geo_cond_change_back_times_dict = dict()
+        # self.geo_cond_change_times_dict = dict()
+        # self.geo_cond_change_back_times_dict = dict()
         self.conn_graph_list = list()
 
     # class methods take 'cls' as first argument, and can know about class state
@@ -803,22 +902,30 @@ class GeoFeatureQuery():
         
     # requirement function 3
     @staticmethod
-    def cb_feature_equals_value(
+    def cb_feature_equals_value_is_connected(
             feat_col: GeoFeatureCollection,
             val2match: int,
             feat_name: str = "",
             feat_id: ty.Optional[int] = None) \
             -> ty.List[ty.List[str]]:
-        """Determine geographic condition from (feat.) value requirement.
+        """Determine geographic connection from (feat.) value.
 
-        An example of 'geographic condition' is the presence of a
-        barrier. The feature must be 'categorical-between'.
+        This function builds bit patterns for all pairs of regions.
+        The bit pattern will have as many bits as there are time
+        slices (epochs), and will be sorted according to the time
+        indices provided in the feature summary .csv file specified
+        by the user. So if the youngest epoch has time index 1 and the
+        oldest has time index 3, a bit pattern '100' indicates that
+        for a given pair of regions, at the present moment (youngest
+        epoch) there is connectivity.
 
         Args:
-            feat_col (GeoFeatureCollection):
+            feat_col (GeoFeatureCollection): A GeoFeatureCollection
+                object containing all information available for
+                features over time.
             val2match (int): Categorical (feature) value that, if
-                matched, indicate the manifestation of the geographic
-                condition (e.g., a barrier).
+                matched, indicate the geographic connection between
+                two regions.
             feat_name (str): Name of the feature.
             feat_id (int, optional): Feature index. Defaults to 'None'.
 
@@ -968,12 +1075,12 @@ class GeoFeatureQuery():
             geo_cond_name: str,
             requirement_fn: MyCallableType,
             is_directed: bool = False) -> None:
-        """Populate geographic condition bit dictionaries
+        """Populate geographic connectivity bit dictionaries
 
         e.g., for 2 regions, 3 epochs {"altitude": ["010", "010"]}
-        the 0's represent a geographic condition that was NOT met,
-        while the 1's represent those that were met (depending on
-        the requirement function provided by the user)
+        the 0's represent no geographic connectivity, while 1's
+        represent connectivities (depending on the requirement
+        function provided by the user)
         
         Args:
             geo_cond_name (str): Name of the geographic
@@ -983,8 +1090,8 @@ class GeoFeatureQuery():
                 feature collection and a list of integers defining
                 the involved regions, and returns a (1 or 2
                 dimensional) list of bit strings representing the
-                manifestation of the condition, in each region or
-                region pair, for each epoch.
+                manifestation of geographic connectivity, in each
+                region or region pair, for each epoch.
             is_directed (bool): Flag specifying if connectivity graph
                 is directed or not. Defaults to False.
         """
@@ -993,7 +1100,8 @@ class GeoFeatureQuery():
 
         self._populate_oldest_geo_cond_bit_dict(geo_cond_name)
 
-        self._populate_geo_cond_change_times_dict(geo_cond_name)
+        # DEPRECATED
+        # self._populate_geo_cond_change_times_dict(geo_cond_name)
 
         self._populate_conn_graph_list(geo_cond_name, is_directed)
 
@@ -1127,7 +1235,6 @@ class GeoFeatureQuery():
 
                 self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
 
-
     def _populate_conn_graph_list(self, geo_cond_name: str, is_directed: bool=False):
         for idx, ep_age in \
                 enumerate(self.feat_coll.epoch_age_start_list_old2young):
@@ -1149,11 +1256,30 @@ class GeoFeatureQuery():
             # one graph per epoch
             self.conn_graph_list.append(g)
 
+    def find_epoch_idx(self, an_age: float) -> int:
 
-    def get_comm_classes(self, list_of_regions, an_age: float):
-        # self._graph(list_of_regions)
+        time_slice_index = 0
+        for time_slice_index in range(0, self.n_time_slices):
+            # old -> young
+            time_slice_age_end = \
+                self.feat_coll.epoch_age_end_list_old2young[time_slice_index]
 
-        pass
+            if an_age < time_slice_age_end or \
+                    (abs(an_age - time_slice_age_end) <= 1e-12):
+                continue
+
+            break
+
+        return time_slice_index
+
+    def get_comm_classes(self, an_age: float) -> ty.List[ty.Set[int]]:
+        epoch_idx = self.find_epoch_idx(an_age)
+        g = self.conn_graph_list[epoch_idx]
+
+        if len(g.comm_class_set_list) == 0:
+            g.populate_comm_class_members()
+
+        return g.comm_class_set_list
 
 
     # getters
@@ -1292,7 +1418,7 @@ if __name__ == "__main__":
 
         # for all pairs of regions, gives all times when it happened
         requirement_fn3 = \
-            GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_name="cb_1")
+            GeoFeatureQuery.cb_feature_equals_value_is_connected(fc, 0, feat_name="cb_1")
         
         fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn3)
         print("\nland_bridge 1:")
@@ -1324,7 +1450,7 @@ if __name__ == "__main__":
 
         # for all pairs of regions, gives all times when it happened
         requirement_fn3_1 = \
-            GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_id=1)
+            GeoFeatureQuery.cb_feature_equals_value_is_connected(fc, 0, feat_id=1)
         
         fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn3_1)
         print("\nland_bridge 2:")
@@ -1421,7 +1547,7 @@ if __name__ == "__main__":
     test_graph = True
     if test_graph:
         requirement_fn = \
-            GeoFeatureQuery.cb_feature_equals_value(fc, 0, feat_id=1)
+            GeoFeatureQuery.cb_feature_equals_value_is_connected(fc, 0, feat_id=1)
 
         # all members, including graph, are populated here!
         fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn)

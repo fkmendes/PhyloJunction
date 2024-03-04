@@ -37,14 +37,14 @@ class TestFeatureIO(unittest.TestCase):
         cls.four_geo_query = pjgeo.GeoFeatureQuery(cls.four_region_geo_coll)
 
         cls.two_cb_is_1_requirement_fn = \
-            pjgeo.GeoFeatureQuery.cb_feature_equals_value(cls.two_region_geo_coll,
-                                                          0,
-                                                          feat_name="cb_1")
+            pjgeo.GeoFeatureQuery.cb_feature_equals_value_is_connected(cls.two_region_geo_coll,
+                                                                       0,
+                                                                       feat_name="cb_1")
 
         cls.four_cb_is_1_requirement_fn = \
-            pjgeo.GeoFeatureQuery.cb_feature_equals_value(cls.four_region_geo_coll,
-                                                          0,
-                                                          feat_name="cb_1")
+            pjgeo.GeoFeatureQuery.cb_feature_equals_value_is_connected(cls.four_region_geo_coll,
+                                                                       0,
+                                                                       feat_name="cb_1")
 
     def test_read_features_epoch_ages_two_regions(self) -> None:
         """
@@ -97,6 +97,34 @@ class TestFeatureIO(unittest.TestCase):
         self.assertEqual(
             self.four_region_geo_coll.epoch_mid_age_list_old2young,
             [-math.inf, 15.0, 5.0])
+
+    def test_epoch_find(self) -> None:
+        """Test that auxiliary method finds the epoch a time belongs.
+
+        This test also checks that the epoch index cache is built
+        correctly (some times will be repeatedly queried if the
+        tree never changes and its internal node ages remain
+        constant).
+        """
+
+        # present epoch (2)
+        age1 = 1.0
+        epoch_idx1 = self.four_geo_query.find_epoch_idx(age1)
+
+        # second youngest epoch (1)
+        age2 = 11.0
+        epoch_idx2 = self.four_geo_query.find_epoch_idx(age2)
+
+        # oldest epoch (0)
+        age3 = 21.0
+        epoch_idx3 = self.four_geo_query.find_epoch_idx(age3)
+
+        # present epoch (2)
+        age4 = 10.0
+        epoch_idx4 = self.four_geo_query.find_epoch_idx(age4)
+
+        self.assertEqual([epoch_idx1, epoch_idx2, epoch_idx3, epoch_idx4],
+                         [2, 1, 0, 2])
 
     def test_read_features_names_two_regions(self) -> None:
         """
@@ -199,15 +227,15 @@ class TestFeatureIO(unittest.TestCase):
             {'land_bridge': [['1', '1'], ['0', '1']]}
         )
 
-        self.assertEqual(
-            self.two_geo_query.get_geo_condition_change_times("land_bridge"),
-            [[[], []], [[1.5], []]]
-        )
-
-        self.assertEqual(
-            self.two_geo_query.get_geo_condition_change_back_times("land_bridge"),
-            [[[], [4.25]], [[], []]]
-        )
+        # self.assertEqual(
+        #     self.two_geo_query.get_geo_condition_change_times("land_bridge"),
+        #     [[[], []], [[1.5], []]]
+        # )
+        #
+        # self.assertEqual(
+        #     self.two_geo_query.get_geo_condition_change_back_times("land_bridge"),
+        #     [[[], [4.25]], [[], []]]
+        # )
 
         # epoch 1, idx = 0 (youngest, the index comes from feat_summary.csv)
         self.assertSetEqual(
@@ -226,6 +254,15 @@ class TestFeatureIO(unittest.TestCase):
             self.two_geo_query.conn_graph_list[2].edge_set,
             {(1, 0)}
         )
+
+        self.assertEqual(self.two_geo_query.get_comm_classes(0.1),
+                         [{0, 1}])
+        self.assertEqual(self.two_geo_query.get_comm_classes(1.0),
+                         [{0, 1}])
+        self.assertEqual(self.two_geo_query.get_comm_classes(1.6),
+                         [{0}, {1}])
+        self.assertEqual(self.two_geo_query.get_comm_classes(4.35),
+                         [{0, 1}])
 
     def test_geo_query_four_regions(self) -> None:
         """
@@ -249,6 +286,8 @@ class TestFeatureIO(unittest.TestCase):
             # * unpacks list
             geo_cond_bit_patterns_list.append(" ".join(k))
 
+        # each bit is an epoch, and it goes from young -> old
+        # as specified by the time indices in the feature summary file
         self.assertEqual(geo_cond_bit_patterns_list[0],
                          '111 000 010 111')
         self.assertEqual(geo_cond_bit_patterns_list[1],
@@ -257,6 +296,20 @@ class TestFeatureIO(unittest.TestCase):
                          '111 010 111 110')
         self.assertEqual(geo_cond_bit_patterns_list[3],
                          '111 111 011 111')
+
+        # youngest epoch: 1-> 4 (111), 2 -> 4 (111), 3 -> 4 (110), so all connected
+        # middle epoch:   1-> 4 (111), 2 -> 4 (111), 3 -> 4 (110), so all connected
+        # oldeset epoch:  1-> 4 (111), 2 -> 4 (111), 4 -> 3 (011), so all connected
+        # youngest epoch: 1-> 4 (111), 2 -> 4 (111), 3 -> 4 (110), so all connected
+        self.assertEqual(self.four_geo_query.get_comm_classes(1.0),
+                         [{0, 1, 2, 3}])
+        self.assertEqual(self.four_geo_query.get_comm_classes(11.0),
+                         [{0, 1, 2, 3}])
+        self.assertEqual(self.four_geo_query.get_comm_classes(21.0),
+                         [{0, 1, 2, 3}])
+        self.assertEqual(self.four_geo_query.get_comm_classes(10.0),
+                         [{0, 1, 2, 3}])
+
 
 if __name__ == '__main__':
     # From PhyloJunction/

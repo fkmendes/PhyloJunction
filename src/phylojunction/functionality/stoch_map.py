@@ -41,6 +41,8 @@ class StochMap(pjev.EvolRelevantEvent):
             focal node.
         child2_node_name (str): Name of the second child node of the
             focal node.
+        map_type (str): Class of stochastic map (e.g., 'expansion',
+        'contraction', 'range_split', 'no_change'). Defaults to None.
     """
 
     from_state: int
@@ -53,6 +55,7 @@ class StochMap(pjev.EvolRelevantEvent):
     parent_node_name: str
     child_node_name: str
     child2_node_name: str
+    map_type: str
 
     def __init__(self,
                  n_chars: int,
@@ -64,6 +67,7 @@ class StochMap(pjev.EvolRelevantEvent):
                  focal_node_name: str,
                  parent_node_name: str,
                  child_node_name: str,
+                 map_type: ty.Optional[str] = None,
                  time: ty.Optional[int] = None,
                  to_state2: ty.Optional[int] = None,
                  to_state2_bit_patt: ty.Optional[str] = None,
@@ -72,6 +76,7 @@ class StochMap(pjev.EvolRelevantEvent):
         # initializing EvolRelevantEvent members
         super().__init__(n_chars, age, time=time)
 
+        self.map_type = map_type
         self.from_state = from_state
         self.from_state_bit_patt = from_state_bit_patt
         self.to_state = to_state
@@ -118,7 +123,8 @@ class NoChange(StochMap):
                          state_bit_patt,
                          focal_node_name,
                          parent_node_name,
-                         child_node_name)
+                         child_node_name,
+                         map_type='no_change')
 
         self.size_of_unchanging_range = sum(int(i) for i in state_bit_patt)
         self._init_str_representation()
@@ -159,6 +165,7 @@ class RangeExpansion(StochMap):
     str_representation: str
     size_of_expanding_range: int
     size_of_final_range: int
+    from_region_idx: ty.Optional[int]
     region_gained_idx: int
     ancestral_over_barrier: bool
     range_expansion_erased_by_extinction: bool
@@ -174,6 +181,7 @@ class RangeExpansion(StochMap):
                  focal_node_name: str,
                  parent_node_name: str,
                  child_node_name: str,
+                 from_region_idx: ty.Optional[int] = None,
                  time: ty.Optional[float] = None):
         
         super().__init__(n_regions,
@@ -185,8 +193,10 @@ class RangeExpansion(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
+                         map_type='expansion',
                          time=time)
 
+        self.from_region_idx = from_region_idx
         self.region_gained_idx = region_gained_idx
         self.size_of_expanding_range = \
             sum(int(i) for i in from_state_bit_patt)
@@ -204,7 +214,9 @@ class RangeExpansion(StochMap):
             + "range size " + str(self.size_of_expanding_range) \
             + "\n    To state " + str(self.to_state) + ", bits \'" \
             + self.to_state_bit_patt + "\', " \
-            + "range size " + str(self.size_of_final_range)
+            + "range size " + str(self.size_of_final_range) \
+            + "\n    Dispersal from region (index): " + str(self.from_region_idx) \
+            + "\n    Region gained (index): " + str(self.region_gained_idx)
 
     # setter
     def gained_region_is_lost_in_future(self):
@@ -261,6 +273,7 @@ class RangeContraction(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
+                         map_type='contraction',
                          time=time)
 
         self.region_lost_idx = region_lost_idx
@@ -280,7 +293,8 @@ class RangeContraction(StochMap):
             + "range size " + str(self.size_of_contracting_range) \
             + "\n    To state " + str(self.to_state) + ", bits \'" \
             + self.to_state_bit_patt + "\', " \
-            + "range size " + str(self.size_of_final_range)
+            + "range size " + str(self.size_of_final_range) \
+            + "\n    Region lost (index): " + str(self.region_lost_idx)
 
     def __str__(self) -> str:
         return self.str_representation
@@ -344,6 +358,7 @@ class RangeSplitOrBirth(StochMap):
                          child2_node_name=child2_node_name,
                          to_state2=to_state2,
                          to_state2_bit_patt=to_state2_bit_patt,
+                         map_type='range_split',
                          time=time)
         
         self.size_of_splitting_node_range = \
@@ -967,6 +982,7 @@ class StochMapsOnTreeCollection():
     StochMapsOnTree. These are in turn stored in class members.
 
     Attributes:
+        n_char (int): Number of characters.
         stoch_maps_tree_dict (dict): Dictionary with iteration
             indices as keys, and StochMapsOnTree objects as values.
         n_stoch_map_iterations (int): Total number of MCMC iterations
@@ -979,6 +995,7 @@ class StochMapsOnTreeCollection():
             instance for printing.
     """
 
+    n_char: int
     stoch_maps_tree_dict: \
         ty.Dict[int, StochMapsOnTree]
     n_stoch_map_iterations: int
@@ -997,8 +1014,9 @@ class StochMapsOnTreeCollection():
 
         # side-effects:
         # initializes
-        # (i) stoch_maps_tree_list
-        # (ii) sorted_iteration_idxs (also sorts it)
+        # (i)   n_char
+        # (i)   stoch_maps_tree_list
+        # (ii)  sorted_iteration_idxs (also sorts it)
         # (iii) n_stoch_map_iterations
         #
         # updates members of AnnotatedTree objects passed
@@ -1027,9 +1045,10 @@ class StochMapsOnTreeCollection():
         """Read text file with stochastic maps and populate members.
         
         Side-effects of this method populate:
-            (i)    self.stoch_maps_tree_dict
-            (ii)   self.n_stoch_map_iterations
-            (iii)  self.sorted_it_idxs
+            (i)   self.n_char
+            (ii)  self.stoch_maps_tree_dict
+            (iii) self.n_stoch_map_iterations
+            (iv)  self.sorted_it_idxs
 
         Args:
             stoch_maps_file_path (str): Path to the .tsv file
@@ -1049,6 +1068,8 @@ class StochMapsOnTreeCollection():
             state2bit_lookup (State2BitLookup): State2BitLookup object
                 for......
         """
+
+        self.n_char = state2bit_lookup.n_char
 
         if not os.path.isfile(stoch_maps_file_path):
             exit("ERROR: Could not find " + stoch_maps_file_path + ". Exiting.")

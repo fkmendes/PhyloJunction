@@ -1,6 +1,9 @@
-import typing as ty
+import os
+import math
 import enum
 import copy
+import typing as ty
+from natsort import natsorted
 import dendropy as dp
 
 # pj imports
@@ -20,6 +23,157 @@ class Hypothesis(enum.Enum):
     VICARIANCE = 0
     FOUNDER_EVENT = 1
     SPECIATION_BY_EXT = 2
+
+
+class FromRegionSampler():
+
+    _n_char: int
+    _n_time_slices: int
+    _param_log_dir: str
+
+    # keys: iterations idx
+    # values: 2d-list with parameter values
+    _param_value_dict: ty.Dict[int, ty.List[ty.List[float]]]
+
+    def __init__(self,
+                 n_char: int,
+                 param_log_dir: str,
+                 file_name_prefix: str,
+                 file_name_suffix: str,
+                 param_name: str) -> None:
+
+        self._n_char = n_char
+        self._param_name = param_name
+        self._time_slice_dict_list = list()
+
+        # reading log files
+        if not param_log_dir.endswith("/"):
+            param_log_dir += "/"
+        self._param_log_dir = param_log_dir
+
+        log_fp_list = natsorted(
+            [param_log_dir + f for f in os.listdir(param_log_dir) \
+             if f.startswith(file_name_prefix) and \
+             f.endswith(file_name_suffix + ".log")])
+        self._n_time_slices = len(log_fp_list)
+
+        # side-effect: populates
+        #     (i)  self._n_its
+        #     (ii) self._param_value_dict
+        self.populate_param_value_dict(
+            log_fp_list,
+            file_name_prefix,
+            file_name_suffix)
+
+        # debugging
+        # print(self._param_value_dict)
+
+        print(("Finished reading .log files containing parameter "
+               "values used to decode stochastic maps."))
+
+        pass
+
+    def populate_param_value_dict(self,
+                                  param_log_fp_list: ty.List[str],
+                                  prefix: str,
+                                  suffix: str) -> None:
+        for param_log_fp in param_log_fp_list:
+            time_slice_idx = param_log_fp.\
+                replace(prefix, "").\
+                replace(suffix, "").\
+                replace(".log", "").\
+                replace(self._param_log_dir, "")
+
+            # debugging
+            # print('time_slice_idx', time_slice_idx)
+
+            param_value_dict = dict()
+            with open(param_log_fp, "r") as infile:
+                tokens = infile.readline().rstrip().split("\t")
+
+                # parameter name as key, column index as value
+                param_name_idx_dict = dict()
+                for region1_idx in range(1, self._n_char + 1):
+                    for region2_idx in range(1, self._n_char + 1):
+                        # name of parameter we care about
+                        # (it assumes it is a triple-nested parameter
+                        # 1D: epoch
+                        # 2D: from region
+                        # 3D: to region)
+                        param_name = \
+                            self._param_name \
+                            + "[" + time_slice_idx + "]" \
+                            + "[" + str(region1_idx) + "]" \
+                            + "[" + str(region2_idx) + "]"
+
+                        # this dictionary gives us the column index
+                        # of the parameters we care about
+                        param_name_idx_dict[param_name] = \
+                            tokens.index(param_name)
+
+                        # debugging
+                        # print('param_name', param_name, 'pos', tokens.index(param_name))
+
+                # reading rest of .log file
+                for line in infile:
+                    # empty matrix
+                    param_val_mat = [[math.inf] * self._n_char for i in range(self._n_char)]
+                    vals = line.rstrip().split("\t")
+                    it = vals[0]
+
+                    # we populate param_val_mat
+                    for region1_idx in range(1, self._n_char + 1):
+                        for region2_idx in range(1, self._n_char + 1):
+                            param_name = \
+                                self._param_name \
+                                + "[" + time_slice_idx + "]" \
+                                + "[" + str(region1_idx) + "]" \
+                                + "[" + str(region2_idx) + "]"
+
+                            val_idx = param_name_idx_dict[param_name]
+                            param_val_mat[region1_idx-1][region2_idx-1] = float(vals[val_idx])
+
+                    param_value_dict[int(it)] = param_val_mat
+
+            # adding this time slice's dict to list
+            self._time_slice_dict_list.append(param_value_dict)
+
+    @property
+    def time_slice_dict_list(self) -> \
+            ty.List[ty.Dict[int, ty.List[ty.List[float]]]]:
+        return self._time_slice_dict_list
+
+    @property
+    def sample_from_region_idx(self,
+                               time_slice_idx: int,
+                               potential_from_region_idx: ty.List[int],
+                               to_region_idx: int) -> int:
+        """Sample a region according to parameter values.
+
+        Parameter values in a .log file can be normalized and serve
+        as weights for sampling a 'from' region for dispersal
+        stochastic maps.
+
+        Args:
+            time_slice_idx: Index of time slice.
+            potential_from_region_idx: List of indices for regions
+                from which dispersal (range expansion) may have
+                happened.
+            to_region_idx: Index for region to which dispersal (range
+                expansion) happened.
+
+        Returns:
+            (int): A sampled region index.
+        """
+
+        param_values = list()
+        for param_mat in self._param_value_dict[time_slice_idx]:
+            for from_idx in potential_from_region_idx:
+                param_values.append(param_mat[from_idx][to_region_idx])
+
+        # 1. obtain weight list
+        # 2. sample indices according to the weight list
+        # 3. return sampled index
 
 
 class EvolRelevantEventSeries:
@@ -146,12 +300,15 @@ class EvolRelevantEventSeriesTabulator():
     _event_series_dict: ty.Dict[str, ty.Dict[int, ty.List[EvolRelevantEventSeries]]]
 
     _hyp_support_dict: ty.Dict[Hypothesis, int]
+    _from_region_sampler: FromRegionSampler
 
     def __init__(self,
                  ann_tr_list: ty.List[pjt.AnnotatedTree],
-                 smap_collection: pjsmap.StochMapsOnTreeCollection) -> None:
+                 smap_collection: pjsmap.StochMapsOnTreeCollection,
+                 from_region_sampler: ty.Optional[FromRegionSampler] = None) -> None:
 
         self._event_series_dict = pjh.autovivify(2)
+        self._from_region_sampler = from_region_sampler
 
         self._ann_tr_list = ann_tr_list
         print("Read trees.")
@@ -165,6 +322,10 @@ class EvolRelevantEventSeriesTabulator():
         # initializes self._trunc_event_series_dict
         self.initialize_event_series_dict()
         print("  Finished building all event series and truncating them.")
+
+        # for each event series, classify events as dispersal
+        # or local extinction
+        self.scan_update_events()
 
         # for each event series, update each event component
         # with respect to its char_status_dict member --
@@ -213,6 +374,9 @@ class EvolRelevantEventSeriesTabulator():
                 anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
                 event_series.add_events(anagenetic_smaps_list)
 
+            # TODO:
+            # decode anagenetic smaps here!!! (i.e., find 'from' regions)
+
             # cladogenetic (has to be the last one in the event series)
             if nd_name in smap_on_tree.clado_stoch_maps_dict:
                 clado_smap = smap_on_tree.clado_stoch_maps_dict[nd_name]
@@ -237,13 +401,41 @@ class EvolRelevantEventSeriesTabulator():
                                                    it_idx)
 
             # debugging
-            for nd_label, it_event_series_dict in self._event_series_dict.items():
-                print(nd_label)
-                for it_idx, event_series in it_event_series_dict.items():
-                    for ev in event_series.event_list:
-                        print(ev)
-                print("\n")
+            # for nd_label, it_event_series_dict in self._event_series_dict.items():
+            #     print(nd_label)
+            #     for it_idx, event_series in it_event_series_dict.items():
+            #         for ev in event_series.event_list:
+            #             print(ev)
+            #     print("\n")
 
+    def scan_update_events(self) -> None:
+        n_regions = self._smap_collection.n_char
+        print('n_regions', n_regions)
+
+        for nd_label, it_event_series_dict \
+                in self._event_series_dict.items():
+            for it_idx, event_series in it_event_series_dict.items():
+                for ev in event_series.event_list:
+                    # if range expansion (dispersal), we need to know which
+                    # region the dispersal happened from
+                    if ev.map_type == "expansion":
+                        bp = ev.from_state_bit_patt
+                        potential_from_region_idx = \
+                            [idx for idx, b in enumerate(bp) if b == '1']
+
+                        # if the class member exists, nothing needs to be done,
+                        # otherwise, we need to determine it
+                        if ev.from_region_idx == None:
+                            # sample proportional to some scheme (e.g., proportional
+                            # to FIG rate scalers, m_d)
+                            if self._from_region_sampler != None:
+                                sampled_idx = \
+                                    self._from_region_sampler(potential_from_region_idx)
+
+                            else:
+                                # uniformly pick element of list
+                                # random_pick(potential_from_region_idx)
+                                pass
 
     def update_event_char_member(self) -> None:
         """
