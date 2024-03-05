@@ -3,8 +3,9 @@ import math
 import enum
 import copy
 import typing as ty
-from natsort import natsorted
 import dendropy as dp
+from natsort import natsorted
+from numpy.random import choice
 
 # pj imports
 import phylojunction.readwrite.pj_read as pjr
@@ -12,6 +13,7 @@ import phylojunction.data.tree as pjt
 import phylojunction.functionality.evol_event as pjev
 import phylojunction.functionality.stoch_map as pjsmap
 import phylojunction.functionality.biogeo as pjbio
+import phylojunction.functionality.feature_io as pjfio
 import phylojunction.utility.exception_classes as ec
 import phylojunction.utility.helper_functions as pjh
 
@@ -143,19 +145,21 @@ class FromRegionSampler():
             ty.List[ty.Dict[int, ty.List[ty.List[float]]]]:
         return self._time_slice_dict_list
 
-    @property
     def sample_from_region_idx(self,
+                               it_idx: int,
                                time_slice_idx: int,
                                potential_from_region_idx: ty.List[int],
                                to_region_idx: int) -> int:
-        """Sample a region according to parameter values.
+        """Sample a region for an iteration.
 
         Parameter values in a .log file can be normalized and serve
         as weights for sampling a 'from' region for dispersal
         stochastic maps.
 
         Args:
-            time_slice_idx: Index of time slice.
+            it_idx (int): Index of iteration we are looking at.
+                This is parsed from the stochastic map table file.
+            time_slice_idx (int): Index of time slice.
             potential_from_region_idx: List of indices for regions
                 from which dispersal (range expansion) may have
                 happened.
@@ -163,17 +167,81 @@ class FromRegionSampler():
                 expansion) happened.
 
         Returns:
-            (int): A sampled region index.
+            (int): Sampled region index.
         """
 
-        param_values = list()
-        for param_mat in self._param_value_dict[time_slice_idx]:
-            for from_idx in potential_from_region_idx:
-                param_values.append(param_mat[from_idx][to_region_idx])
+        # print('self._time_slice_dict_list', self._time_slice_dict_list)
 
-        # 1. obtain weight list
-        # 2. sample indices according to the weight list
-        # 3. return sampled index
+        epoch_dict_it_param_mat = \
+            self._time_slice_dict_list[time_slice_idx][it_idx]
+        weight_list = list()
+        for from_region_idx in potential_from_region_idx:
+            weight_list.append(
+                epoch_dict_it_param_mat[from_region_idx][to_region_idx]
+            )
+
+        tot = sum(weight_list)
+        weight_list = [i / tot for i in weight_list]
+
+        sampled_region_idx = \
+            choice(potential_from_region_idx,
+               1,
+                p=weight_list).tolist()[0]
+
+        return sampled_region_idx
+
+
+class RegionDispersalAncestry():
+    """Track all regions gained by dispersal
+
+    This class keeps track of all regions gained by dispersal (range
+    expansion) both (i) over a barrier, (ii) without a barrier. The
+    purpose of this class is quantifying what proportion (in number
+    of regions) of the splitting range had something to do with a
+    dispersal over a barrier.
+    """
+
+    # keys are the region index that was gained at dispersal (range
+    # expansion)
+    # values are tuple containing:
+    #   (i)  the 'to-region' index of the over-barrier dispersal
+    #        that is the (direct or indirect) ancestor of the focal
+    #        dispersal
+    #   (ii) the time of the "seeding" over-barrier dispersal
+    _regions_idx_gained_over_barrier: ty.Dict[int, ty.Tuple[int, float]]
+
+    # each tuple corresponds to a "seeding" over-barrier dispersal,
+    # where each of these is unique
+    #
+    # (these are the values of dictionary
+    # _region_idx_gained_over_barrier, where they may appear
+    # multiple times, for different gained regions)
+    _over_barrier_seeding_dispersals: ty.Set[ty.Tuple[int, float]]
+
+    # all region indices that were gained through standard no-barrier
+    # dispersals
+    _regions_idx_gained_w_out_barrier: ty.Set[int]
+
+    _n_regions_gained_over_barrier: int
+    _n_regions_gained_w_out_barrier: int
+
+    def __init__(self) -> None:
+        self._regions_idx_gained_over_barrier = set()
+        self._over_barrier_seeding_dispersals = set()
+        self._regions_idx_gained_w_out_barrier = set()
+
+    @property
+    def regions_idx_gained_over_barrier(self) -> \
+            ty.Set[ty.Tuple[int, float]]:
+        return self._regions_idx_gained_over_barrier
+
+    @property
+    def n_regions_gained_over_barrier(self) -> int:
+        return len(self._regions_idx_gained_over_barrier)
+
+    @property
+    def n_regions_gained_w_out_barrier(self) -> int:
+        return len(self._regions_idx_gained_w_out_barrier)
 
 
 class EvolRelevantEventSeries:
@@ -295,9 +363,18 @@ class EvolRelevantEventSeriesTabulator():
 
     _ann_tr_list: ty.List[pjt.AnnotatedTree]
     _smap_collection: pjsmap.StochMapsOnTreeCollection
+    _geofeat_query: pjfio.GeoFeatureQuery
 
+    # key of outer dict: node label
     # key of inner dict is the iteration index
-    _event_series_dict: ty.Dict[str, ty.Dict[int, ty.List[EvolRelevantEventSeries]]]
+    _event_series_dict: ty.Dict[str, ty.Dict[int, EvolRelevantEventSeries]]
+    # same as above, but event series is truncated at its oldest end
+    # at the first destabilizer dispersal
+    _truncated_event_series_dict: ty.Dict[str, ty.Dict[int, EvolRelevantEventSeries]]
+
+    # key of outer dict: node label
+    # key of inner dict is the iteration index
+    _region_dispersal_ancestry_dict: ty.Dict[str, ty.Dict[int, RegionDispersalAncestry]]
 
     _hyp_support_dict: ty.Dict[Hypothesis, int]
     _from_region_sampler: FromRegionSampler
@@ -305,27 +382,47 @@ class EvolRelevantEventSeriesTabulator():
     def __init__(self,
                  ann_tr_list: ty.List[pjt.AnnotatedTree],
                  smap_collection: pjsmap.StochMapsOnTreeCollection,
-                 from_region_sampler: ty.Optional[FromRegionSampler] = None) -> None:
+                 geofeat_query: pjfio.GeoFeatureQuery,
+                 from_region_sampler: ty.Optional[FromRegionSampler] = None,
+                 verbose: ty.Optional[bool] = False) -> None:
 
         self._event_series_dict = pjh.autovivify(2)
+        self._truncated_event_series_dict = pjh.autovivify(2)
+        self._region_dispersal_ancestry_dict = pjh.autovivify(2)
         self._from_region_sampler = from_region_sampler
 
         self._ann_tr_list = ann_tr_list
-        print("Read trees.")
 
         self._smap_collection = smap_collection
-        print("Read stochastic maps.")
 
-        print("Beginning event series parsing:")
+        self._geofeat_query = geofeat_query
+
         # side-effect:
         # initializes self._event_series_dict
         # initializes self._trunc_event_series_dict
-        self.initialize_event_series_dict()
-        print("  Finished building all event series and truncating them.")
+        #
+        # range expansion stochastic maps are disambiguated in here
+        if verbose:
+            print("Beginning event series parsing:")
 
-        # for each event series, classify events as dispersal
-        # or local extinction
-        self.scan_update_events()
+        self.initialize_event_series_dict()
+
+        if verbose:
+            print("  ... finished building all event series.")
+
+        self.initialize_truncated_event_series_dict()
+
+        if verbose:
+            print("  ... finished truncating event series.")
+
+        # this method further annotates the last dispersal
+        # event of a truncated event series as stabilizing
+        # the splitting range or not
+        # self.initialize_region_dispersal_ancestry_dict()
+
+        if verbose:
+            print(("  ... finished tracking down the dispersal ancestry of every "
+                   "gained region."))
 
         # for each event series, update each event component
         # with respect to its char_status_dict member --
@@ -344,11 +441,76 @@ class EvolRelevantEventSeriesTabulator():
         # self.tabulate_hyp_support()
         # print("  Finished tabulating hypothesis support.")
 
+    def disambiguate_range_expansion(self,
+                                     smap: pjsmap.StochMap,
+                                     it_idx: int) -> None:
+        """
+
+        The side-effect of this method is to populate the
+        member 'from_region_idx' of StochMap of RangeExpansion
+        type.
+
+        This disambiguation is necessary because....
+
+        Args:
+            smap (StochMap): StochMap object instance, carrying all
+                info on a stochastic map.
+            it_idx (int): Iteration index for which to disambiguate
+                stochastic map. Note that the index is whatever is
+                written in the stochastic map table and in the .log
+                file of parameter values used to disambiguate the
+                stochastic map. The indices for those iterations
+                must match!
+        """
+
+        if smap.map_type == "expansion":
+            bp = smap.from_state_bit_patt
+            to_region_idx = smap.region_gained_idx
+            potential_from_region_idx = \
+                [idx for idx, b in enumerate(bp) if b == '1']
+
+            # from 0 to (number of time slices - 1)
+            time_slice_idx = self._geofeat_query.find_epoch_idx(smap.age)
+
+            # if the class member exists, nothing needs to be done,
+            # otherwise, we need to disambiguate it
+            if smap.from_region_idx == None:
+                # sample proportional to some scheme (e.g., proportional
+                # to FIG rate scalers, m_d)
+                if self._from_region_sampler != None:
+                    sampled_idx = \
+                        self._from_region_sampler.sample_from_region_idx(
+                            it_idx,
+                            time_slice_idx,
+                            potential_from_region_idx,
+                            to_region_idx)
+
+                    # debugging
+                    print('bit pattern', bp,
+                          'potential_from_region_idx',
+                          potential_from_region_idx,
+                          'to_region_idx',
+                          to_region_idx,
+                          'sampled_idx',
+                          sampled_idx)
+
+                    # disambiguation!
+                    smap.from_region_idx = sampled_idx
+
+                else:
+                    # uniformly pick element of list
+                    # random_pick(potential_from_region_idx)
+                    pass
+
     def initialize_event_series_dict(self) -> None:
 
         def recursively_populate_event_series_dict(nd: dp.Node,
                                                    it_idx: int):
-            """Populate self._event_series_dict recursively."""
+            """Populate self._event_series_dict recursively.
+
+            Disambiguation of range expansion (dispersal) events
+            happens here.
+            """
 
             nd_name = nd.label
             event_series = EvolRelevantEventSeries()
@@ -372,10 +534,28 @@ class EvolRelevantEventSeriesTabulator():
             # (old first, young later)
             if nd_name in smap_on_tree.anag_stoch_maps_dict:
                 anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
-                event_series.add_events(anagenetic_smaps_list)
 
-            # TODO:
-            # decode anagenetic smaps here!!! (i.e., find 'from' regions)
+                ############################################
+                # Further annotatation of range expansions #
+                # (dispersals)                             #
+                ############################################
+                for ana_smap in anagenetic_smaps_list:
+                    # first we disambiguate the source region
+                    self.disambiguate_range_expansion(ana_smap,
+                                                      it_idx)
+                    # then we annotate the over barrier status
+                    time_slice_idx = \
+                        self._geofeat_query.find_epoch_idx(ana_smap.age)
+                    conn_graph = \
+                        self._geofeat_query.conn_graph_list[time_slice_idx]
+                    from_region_idx = ana_smap.from_region_idx
+                    to_region_idx = ana_smap.region_gained_idx
+                    are_connected = \
+                        conn_graph.are_connected(from_region_idx,
+                                                 to_region_idx)
+                    ana_smap.over_barrier = not are_connected
+
+                event_series.add_events(anagenetic_smaps_list)
 
             # cladogenetic (has to be the last one in the event series)
             if nd_name in smap_on_tree.clado_stoch_maps_dict:
@@ -402,40 +582,117 @@ class EvolRelevantEventSeriesTabulator():
 
             # debugging
             # for nd_label, it_event_series_dict in self._event_series_dict.items():
+            #     # if nd_label in ("nd6", "nd7", "nd8"):
             #     print(nd_label)
             #     for it_idx, event_series in it_event_series_dict.items():
             #         for ev in event_series.event_list:
             #             print(ev)
             #     print("\n")
 
-    def scan_update_events(self) -> None:
-        n_regions = self._smap_collection.n_char
-        print('n_regions', n_regions)
 
-        for nd_label, it_event_series_dict \
-                in self._event_series_dict.items():
+    def initialize_truncated_event_series_dict(self) -> None:
+        for nd_label, it_event_series_dict in self._event_series_dict.items():
+            rda = RegionDispersalAncestry()
+
             for it_idx, event_series in it_event_series_dict.items():
-                for ev in event_series.event_list:
-                    # if range expansion (dispersal), we need to know which
-                    # region the dispersal happened from
-                    if ev.map_type == "expansion":
-                        bp = ev.from_state_bit_patt
-                        potential_from_region_idx = \
-                            [idx for idx, b in enumerate(bp) if b == '1']
+                smap_list = event_series.event_list
+                has_seen_first_split_relevant_over_barrier = False
+                # first element must be both split-relevant and over barrier
+                relevant_smap_idx_list = list()
 
-                        # if the class member exists, nothing needs to be done,
-                        # otherwise, we need to determine it
-                        if ev.from_region_idx == None:
-                            # sample proportional to some scheme (e.g., proportional
-                            # to FIG rate scalers, m_d)
-                            if self._from_region_sampler != None:
-                                sampled_idx = \
-                                    self._from_region_sampler(potential_from_region_idx)
+                # root/origin will have an empty smap_list
+                if len(smap_list) > 0:
+                    # first we find out the mutually exclusive sets of regions
+                    range_split_smap = smap_list[-1] # last event is range split
+                    ch1_bp = range_split_smap.to_state_bit_patt
+                    ch2_bp = range_split_smap.to_state2_bit_patt
+                    ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
+                    ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
+                    if not ch1_set.isdisjoint(ch2_set):
+                        # print(ch1_set, ch2_set)
+                        exit(("Error during trunctation of event series. "
+                              "At range split, the two mutually exclusive ranges shared"
+                              "regions. Exiting..."))
+
+                    # now we go through each dispersal and determine whether it is
+                    # relevant to the focal range split
+                    non_split_smap_list = smap_list[:-1]
+                    for smap_idx, smap in enumerate(non_split_smap_list):
+                        if smap.map_type == "expansion":
+                            from_region_idx = smap.from_region_idx
+                            to_region_idx = smap.region_gained_idx
+
+                            # dispersal involves a from- and a to- regions
+                            # that are being split between at speciation
+                            if (from_region_idx in ch1_set and to_region_idx in ch2_set) or \
+                               (from_region_idx in ch2_set and to_region_idx in ch1_set):
+                                    smap.split_relevant = True
+
+                                    if smap.over_barrier:
+                                        has_seen_first_split_relevant_over_barrier = True
+
+                                    if has_seen_first_split_relevant_over_barrier:
+                                        relevant_smap_idx_list.append(smap_idx)
 
                             else:
-                                # uniformly pick element of list
-                                # random_pick(potential_from_region_idx)
-                                pass
+                                smap.split_relevant = False
+
+                                if has_seen_first_split_relevant_over_barrier:
+                                    relevant_smap_idx_list.append(smap_idx)
+
+                        # extinctions
+                        else:
+                            if has_seen_first_split_relevant_over_barrier:
+                                relevant_smap_idx_list.append(smap_idx)
+
+                relevant_event_list = list()
+                relevant_smap_idx_list.append(-1)
+
+                # debugging
+                # print('nd_label', nd_label, 'relevant_smap_idx_list', relevant_smap_idx_list)
+
+                # getting only stochastic maps (shallow copies!) that matter and that
+                # will form the truncated event series
+                for relevant_smap_idx in relevant_smap_idx_list:
+                    if len(smap_list) > 0:
+                        relevant_event_list.append(smap_list[relevant_smap_idx])
+
+                # enter truncated event series into class member
+                if len(relevant_event_list) > 0:
+                    truncated_event_series = \
+                        EvolRelevantEventSeries(event_list=relevant_event_list)
+                    self._truncated_event_series_dict[nd_label][it_idx] = \
+                        truncated_event_series
+
+                # if there are no relevant stochastic maps, we use
+                # the original event series, which is probably empty anyway
+                else:
+                    self._truncated_event_series_dict[nd_label][it_idx] = \
+                        event_series
+
+            # debugging
+            for nd_label, it_event_series_dict in self._truncated_event_series_dict.items():
+            # for nd_label, it_event_series_dict in self._event_series_dict.items():
+                # if nd_label in ("nd9"):
+                print(nd_label)
+                for it_idx, event_series in it_event_series_dict.items():
+                    for ev in event_series.event_list:
+                        print(ev)
+                print("\n")
+
+                # for ev in event_series.event_list:
+                #     if ev.map_type == "expansion":
+                #         # update rda members
+                #         pass
+                #
+                #     elif ev.map_type == "contraction":
+                #         # update rda members
+                #         pass
+                #
+                # self._region_dispersal_ancestry_dict[nd_label][it_idx] = rda
+
+
+
 
     def update_event_char_member(self) -> None:
         """
@@ -487,8 +744,33 @@ if __name__ == "__main__":
                                          node_states_file_path="examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv",
                                          stoch_map_attr_name="state")
 
+    frs = FromRegionSampler(
+        n_chars,
+        "examples/feature_files/two_regions_feature_set",
+        "epoch_",
+        "_rel_rates",
+        "m_d"
+    )
+
+    feature_summary_fp = "examples/feature_files/two_regions_feature_set/feature_summary.csv"
+    age_summary_fp = "examples/feature_files/two_regions_feature_set/age_summary.csv"
+
+    fc = pjfio.GeoFeatureCollection(
+        feature_summary_fp,
+        age_summary_fp=age_summary_fp)
+
+    fq = pjfio.GeoFeatureQuery(fc)
+
+    requirement_fn = \
+        pjfio.GeoFeatureQuery.cb_feature_equals_value_is_connected(fc, 0, feat_id=1)
+
+    # all members, including graph, are populated here!
+    fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn)
+
     event_series_tabulator = \
         EvolRelevantEventSeriesTabulator(
             ann_tr_list,
-            smap_coll
+            smap_coll,
+            fq,
+            from_region_sampler=frs
         )

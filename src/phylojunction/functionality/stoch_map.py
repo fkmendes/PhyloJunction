@@ -124,7 +124,7 @@ class NoChange(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
-                         map_type='no_change')
+                         map_type="no_change")
 
         self.size_of_unchanging_range = sum(int(i) for i in state_bit_patt)
         self._init_str_representation()
@@ -155,9 +155,13 @@ class RangeExpansion(StochMap):
         region_gained_idx (int): Index of region that was added to the
             starting range (index is the position of the region in the
             bit pattern).
-        ancestral_over_barrier (bool): Flag specifying if dispersal
-            was over a barrier.
-        range_expansion_erased_by_extinction (bool): Flag specifying if
+        over_barrier (bool, optional): Flag specifying if dispersal was over a
+            barrier. Note that even though the dispersal may have been
+            over a barrier, it may not matter for a focal range-split
+            (speciation) event.
+        split_relevant (bool, optional): Flag specified if dispersal
+            matters for range split happening in the future.
+        erased_by_extinction (bool, optional): Flag specifying if
             the expanded range contracted in the reverse direction
             later on, due to extinction.
     """
@@ -167,8 +171,11 @@ class RangeExpansion(StochMap):
     size_of_final_range: int
     from_region_idx: ty.Optional[int]
     region_gained_idx: int
-    ancestral_over_barrier: bool
-    range_expansion_erased_by_extinction: bool
+
+    # additional annotation for testing hypotheses
+    over_barrier: ty.Optional[bool]
+    split_relevant: ty.Optional[bool]
+    erased_by_extinction: ty.Optional[bool]
 
     def __init__(self,
                  region_gained_idx: int,
@@ -193,7 +200,7 @@ class RangeExpansion(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
-                         map_type='expansion',
+                         map_type="expansion",
                          time=time)
 
         self.from_region_idx = from_region_idx
@@ -203,7 +210,10 @@ class RangeExpansion(StochMap):
         self.size_of_final_range = \
             sum(int(i) for i in to_state_bit_patt)
 
-        self._init_str_representation()
+        # additional annotation for testing hypotheses
+        self.over_barrier = None
+        self.split_relevant = None
+        self.erased_by_extinction = None
 
     def _init_str_representation(self) -> None:
         self.str_representation = \
@@ -216,16 +226,17 @@ class RangeExpansion(StochMap):
             + self.to_state_bit_patt + "\', " \
             + "range size " + str(self.size_of_final_range) \
             + "\n    Dispersal from region (index): " + str(self.from_region_idx) \
-            + "\n    Region gained (index): " + str(self.region_gained_idx)
+            + "\n    Region gained (index): " + str(self.region_gained_idx) \
+            + "\n  Dispersal over barrier: " + str(self.over_barrier) \
+            + ("\n  Dispersal relevant to split: ") + str(self.split_relevant)
 
     # setter
     def gained_region_is_lost_in_future(self):
         self.range_expansion_erased_by_extinction = True
 
-    def dispersal_is_over_barrier(self):
-        self.ancestral_over_barrier = True
-
     def __str__(self) -> str:
+        self._init_str_representation()
+
         return self.str_representation
 
 
@@ -273,7 +284,7 @@ class RangeContraction(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
-                         map_type='contraction',
+                         map_type="contraction",
                          time=time)
 
         self.region_lost_idx = region_lost_idx
@@ -358,7 +369,7 @@ class RangeSplitOrBirth(StochMap):
                          child2_node_name=child2_node_name,
                          to_state2=to_state2,
                          to_state2_bit_patt=to_state2_bit_patt,
-                         map_type='range_split',
+                         map_type="range_split",
                          time=time)
         
         self.size_of_splitting_node_range = \
@@ -675,10 +686,20 @@ class StochMapsOnTree():
                 # Initializing maps #
                 #####################
                 if is_expansion:
-                    # TODO: later replace idx with node name
-                    stoch_map = RangeExpansion(idx,
+                    # find out which region was gained
+                    region_gained_idx = -1
+                    count_gained = count_lost = 0
+                    for i, b in enumerate(from_state_bit_patt):
+                        if b == "0" and to_state_bit_patt[i] == "1":
+                            if count_gained > 0:
+                                exit("I found two bits that were different. This should not have happened.")
+                            region_gained_idx = i
+                            count_gained += 1
+
+                    # now build stoch map!
+                    stoch_map = RangeExpansion(region_gained_idx,
                                                self.n_regions,
-                                               event_age,
+                                               float(event_age),
                                                int(from_state),
                                                from_state_bit_patt,
                                                int(to_state),
@@ -691,8 +712,18 @@ class StochMapsOnTree():
                     self.n_range_exp_maps += 1
 
                 else:
-                    # TODO: later replace idx with node name
-                    stoch_map = RangeContraction(idx,
+                    # find out which region was lost
+                    region_lost_idx = -1
+                    count_lost = 0
+                    for i, b in enumerate(from_state_bit_patt):
+                        if b == "1" and to_state_bit_patt[i] == "0":
+                            if count_lost > 0:
+                                exit("I found two bits that were different. This should not have happened.")
+                            region_lost_idx = i
+                            count_lost += 1
+
+                    # now build stoch map!
+                    stoch_map = RangeContraction(region_lost_idx,
                                                  self.n_regions,
                                                  event_age,
                                                  int(from_state),
@@ -1112,7 +1143,7 @@ class StochMapsOnTreeCollection():
         # debugging
         # print("n_iterations", self.n_stoch_map_iterations)
 
-        # iterating over MCMC iterations logging stochastic maps
+        # iterating over MCMC iterations when stochastic maps were logged
         n_different_iterations: int = 0
         for line in stoch_map_on_tree_str_list:
             stoch_map_on_tree_str_list = line.split("\t")

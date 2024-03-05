@@ -168,6 +168,8 @@ class GeoGraph():
         if node1_idx == node2_idx:
             exit("Can only compare different nodes. Exiting...")
 
+        print('self._node_comm_class_dict', self._node_comm_class_dict)
+
         cc1 = self._node_comm_class_dict[node1_idx]
         cc2 = self._node_comm_class_dict[node2_idx]
 
@@ -1252,6 +1254,8 @@ class GeoFeatureQuery():
                         if cond_change_bit_patt[idx] == '1':
                             # for now assume that condition met here means pair is connected
                             g.add_edge(from_region_idx, to_region_idx, is_directed=is_directed)
+
+            g.populate_comm_class_members()
 
             # one graph per epoch
             self.conn_graph_list.append(g)

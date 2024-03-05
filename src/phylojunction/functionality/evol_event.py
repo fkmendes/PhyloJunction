@@ -47,8 +47,8 @@ class EvolRelevantEvent(ABC):
     """
 
     _n_chars: int
-    _age: float
-    _time: float
+    _age: ty.Optional[float]
+    _time: ty.Optional[float]
     _char_status_dict: ty.Dict[int, bool]
 
     @abstractmethod
@@ -58,8 +58,14 @@ class EvolRelevantEvent(ABC):
                  time: ty.Optional[float] = None) -> None:
 
         self._n_chars = n_chars
-        self._age = age
-        self._time = time
+        self._age = None
+        if age is not None:
+            self._age = float(age)
+
+        self._time = None
+        if time is not None:
+            self._time = float(time)
+
         self._char_status_dict = dict()
         for idx in range(n_chars):
             self._char_status_dict[idx] = False

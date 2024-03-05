@@ -262,11 +262,13 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
         dp_tr = dp.Tree.get(data=nwk_tree_path_or_str, schema="newick")
 
     # first we deal with having a root vs an origin
-    is_origin = (True if len(dp_tr.seed_node.child_nodes()) == 1 \
+    is_origin = (True if (len(dp_tr.seed_node.child_nodes()) == 1)# or \
+                          # dp_tr.seed_node.edge_length > 0.0)
                  else False)
     
     root_height = dp_tr.max_distance_from_root()
     seen_root = False
+    root_alternative_label = ""
 
     # debugging
     # print("root height = " + str(root_height))
@@ -344,10 +346,14 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
 
                 # root!
                 if not nd.is_sa_dummy_parent and \
-                        not seen_root and not with_attribute:
-                    nd.taxon = dp.Taxon(label="root")
-                    nd.label = "root"
-                    seen_root = True
+                        not seen_root:
+                    if not with_attribute:
+                        nd.taxon = dp.Taxon(label="root")
+                        nd.label = "root"
+                        seen_root = True
+                    # dp_tr.taxon_namespace.add_taxon(nd.taxon)
+                    root_alternative_label = nd_name
+                    print('root_alternative_label', nd_name, 'parent', nd.parent_node)
 
             # annotate node as sampled ancestor or not
             if abs(nd.edge_length) <= epsilon:
@@ -422,6 +428,7 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
     # note the empty attribute transition dict members
     ann_tr = AnnotatedTree(dp_tr,
                            n_states,
+                           alternative_root_label=root_alternative_label,
                            start_at_origin=is_origin,
                            tree_died=False,
                            read_as_newick_string=True,
@@ -453,7 +460,16 @@ def read_node_attr_update_tree(attr_tsv_path: str,
             with attribute name and values
     """
 
+    # nodes may be just tips, or also internal nodes, but they
+    # must match the names in the namespace below
+    #
+    # NOTE: if the AnnotatedTree was read in by passing a tree
+    # in Newick string, the node label for the root will be 'root'.
+    # This may cause a problem if the .tsv file below provides
+    # an attribute for the root, but the root node in that file
+    # is not labeled 'root'
     node_name_attr_str_list = read_text_file(attr_tsv_path)
+
     ann_tr_nd_names = \
         set([nd.label for nd in ann_tr.tree.taxon_namespace])
     
@@ -462,8 +478,6 @@ def read_node_attr_update_tree(attr_tsv_path: str,
 
         # if node name is not in tree, something must be wrong
         if nd_name not in ann_tr_nd_names:
-            # print("nd_name", nd_name)
-            # print(ann_tr_nd_names)
             exit("Need to add exception here.")
 
         nd = ann_tr.tree.find_node_with_label(nd_name)
@@ -492,12 +506,15 @@ if __name__ == "__main__":
 
     # should all work!
     # tr = read_nwk_tree_str("examples/trees_maps_files/turtle.tre",
-    tr = read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree1.tre",
+    # tr = read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree1.tre",
+    #                        node_names_attribute="index")
+    tr = read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree3.tre",
                            node_names_attribute="index")
 
-    print(tr.node_attr_dict)
+    # print(tr.node_attr_dict)
 
-    read_node_attr_update_tree("examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
+    read_node_attr_update_tree("examples/trees_maps_files/geosse_dummy_tree3_tip_states.tsv",
+    # read_node_attr_update_tree("examples/trees_maps_files/geosse_dummy_tree1_tip_states.tsv",
                                "state",
                                int,
                                tr)

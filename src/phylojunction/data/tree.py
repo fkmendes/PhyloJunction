@@ -39,6 +39,13 @@ class AnnotatedTree(dp.Tree):
             node when tree starts from origin node. The brosc_node can
             be a terminal or internal node, and is replaced by the root
             node if a speciation event happens.
+        alternative_root_label (str): An AnnotatedTree may be read in
+            with a constant function rather than be simulated by
+            discrete_sse(). In this case, the root node is named 'root'
+            so that AnnotatedTree is initialized properly, but we want
+            to keep track of an alternative label for the root node,
+            which may appear in a stochastic map table, or in a table
+            with tip states. Defaults to ''.
         with_origin (bool): Flag indicating that tree starts at origin
             node. Upon instantiation of class, defaults to 'False'. 
         tree_read_as_newick (bool): Flag indicating that tree was not
@@ -126,6 +133,7 @@ class AnnotatedTree(dp.Tree):
     origin_node: ty.Optional[dp.Node]
     root_node: ty.Optional[dp.Node]
     brosc_node: ty.Optional[dp.Node]
+    alternative_root_label: str
 
     # flags
     with_origin: bool
@@ -187,6 +195,7 @@ class AnnotatedTree(dp.Tree):
             a_tree: dp.Tree,
             total_state_count: int,
             start_at_origin: bool = False,
+            alternative_root_label: str = "",
             condition_on_obs_both_sides_root: bool = False,
             max_age: ty.Optional[float] = None,
             slice_t_ends: ty.Optional[ty.List[float]] = [],
@@ -225,6 +234,7 @@ class AnnotatedTree(dp.Tree):
         self.origin_node = None
         self.root_node = None
         self.brosc_node = None
+        self.alternative_root_label = alternative_root_label
 
         # flags
         self.with_origin = start_at_origin
@@ -508,14 +518,15 @@ class AnnotatedTree(dp.Tree):
                 # [origin] - [root + children] ............. [stop condition]
                 # b.1.2 (survived):
                 # [origin] -------------- [root + children at stop condition]
-                if "root" in origin_children_labels:
+                if "root" in origin_children_labels or \
+                        self.alternative_root_label in origin_children_labels:
                     self.origin_age = self.seed_age
 
                     # because the origin may have immediate children who are
                     # not the root, we need to specifically ask for the root
                     self.root_node = \
                         [nd for nd in origin_children \
-                         if nd.label == "root"][0]
+                         if nd.label in ("root", self.alternative_root_label)][0]
 
                     # the origin edge is by definition the edge between the
                     # origin and the root; so by finding the time of the root
@@ -909,7 +920,9 @@ class AnnotatedTree(dp.Tree):
                 found_sampled_count: int,
                 found_sampled: bool) -> int:
 
-            if a_node.label == "root" or a_node.taxon == "root":
+            if a_node.label == "root" or a_node.taxon == "root" \
+                    or a_node.label == self.alternative_root_label \
+                    or a_node.taxon == self.alternative_root_label:
                 has_seen_root = True
 
             # can only return if this node is not the seed node
@@ -921,8 +934,8 @@ class AnnotatedTree(dp.Tree):
             # are not the very first node on this side of the tree!
             # (this is why we have the a_node.parent_node.lavel != 'root')
             if a_node.parent_node and \
-                    (a_node.parent_node.label != "root" and
-                     found_sampled):
+                    (a_node.parent_node.label not in ("root", self.alternative_root_label) \
+                     and found_sampled):
                 return found_sampled_count, found_sampled
 
             # if we have not returned above, then we need to recur;
@@ -934,7 +947,8 @@ class AnnotatedTree(dp.Tree):
 
                 # if early on, at the root, we found sampled nodes,
                 # we just stop recurring 
-                if a_node.label != "root" and found_sampled:
+                if (a_node.label not in ("root", self.alternative_root_label)) \
+                        and found_sampled:
                     break
 
                 if has_seen_root:
@@ -950,7 +964,7 @@ class AnnotatedTree(dp.Tree):
 
                         # found extant, stop recursion
                         # on current side of a_node if not root
-                        if a_node.label != "root":
+                        if a_node.label not in ("root", self.alternative_root_label):
                             break
 
                     # still have not found a sampled node,
@@ -962,7 +976,7 @@ class AnnotatedTree(dp.Tree):
                         # the important thing is that we must pass 'False'
                         # as found_sampled because we cannot by definition
                         # have found sampled nodes yet
-                        if a_node.label == "root":
+                        if a_node.label in ("root", self.alternative_root_lable):
                             found_sampled_count, found_sampled = \
                                 _recur_find_extant_or_sa(
                                     ch_node,

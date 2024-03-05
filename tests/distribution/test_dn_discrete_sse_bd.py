@@ -409,6 +409,7 @@ class TestBDTrees(unittest.TestCase):
                 condition_on_survival=True,
                 epsilon=1e-12,
                 runtime_limit=3600,
+                max_n_failed_attempts=500,
                 debug=False)
 
             trs = sse_sim.generate()

@@ -1,0 +1,1 @@
+trs <- read_tree(n=1, file_path="examples/trees_maps_files/geosse_dummy_tree3.tre", node_name_attr="index")
