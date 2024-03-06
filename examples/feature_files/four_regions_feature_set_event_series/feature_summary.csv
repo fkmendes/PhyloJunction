@@ -1,0 +1,7 @@
+time_index,feature_index,feature_relationship,feature_type,feature_path,name
+1,1,between,categorical,examples/feature_files/four_regions_feature_set_event_series/age1/cb1_1.csv,cb_1
+2,1,between,categorical,examples/feature_files/four_regions_feature_set_event_series/age2/cb2_1.csv,cb_1
+3,1,between,categorical,examples/feature_files/four_regions_feature_set_event_series/age3/cb3_1.csv,cb_1
+4,1,between,categorical,examples/feature_files/four_regions_feature_set_event_series/age4/cb4_1.csv,cb_1
+5,1,between,categorical,examples/feature_files/four_regions_feature_set_event_series/age5/cb5_1.csv,cb_1
+6,1,between,categorical,examples/feature_files/four_regions_feature_set_event_series/age6/cb6_1.csv,cb_1

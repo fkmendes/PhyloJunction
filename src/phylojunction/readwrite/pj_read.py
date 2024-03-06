@@ -353,7 +353,6 @@ def read_nwk_tree_str(nwk_tree_path_or_str: str,
                         seen_root = True
                     # dp_tr.taxon_namespace.add_taxon(nd.taxon)
                     root_alternative_label = nd_name
-                    print('root_alternative_label', nd_name, 'parent', nd.parent_node)
 
             # annotate node as sampled ancestor or not
             if abs(nd.edge_length) <= epsilon:

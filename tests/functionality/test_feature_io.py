@@ -13,10 +13,10 @@ class TestFeatureIO(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         two_region_feat_summary_fp = \
-            ("examples/feature_files/two_regions_feature_set/"
+            ("examples/feature_files/two_regions_feature_set_event_series/"
              "feature_summary.csv")
         two_region_age_summary_fp = \
-            ("examples/feature_files/two_regions_feature_set/"
+            ("examples/feature_files/two_regions_feature_set_event_series/"
              "age_summary.csv")
         four_region_feat_summary_fp = \
             ("examples/feature_files/four_regions_feature_set/"
@@ -51,7 +51,7 @@ class TestFeatureIO(unittest.TestCase):
         Test that GeoFeatureCollection (specifically its initialization
         method _read_age_summary()) is populating the right ages into
         the class' appropriate members. This test uses
-        feature_files/two_regions_feature_set.
+        feature_files/two_regions_feature_set_event_series.
         """
 
         self.assertEqual(self.two_region_geo_coll.epoch_age_end_list_young2old,
@@ -132,7 +132,7 @@ class TestFeatureIO(unittest.TestCase):
         method _read_feat_summary_init_feats is populating the right
         region names and indices into the class' appropriate members.
         This test uses
-        feature_files/two_regions_feature_set.
+        feature_files/two_regions_feature_set_event_series.
         """
 
         self.assertEqual(self.two_region_geo_coll.region_name_idx_dict,
@@ -204,7 +204,7 @@ class TestFeatureIO(unittest.TestCase):
             (iii) geo_condition_change_back_times
             (iv)  conn_graph_list
 
-        Using feature_files/two_regions_feature_set/
+        Using feature_files/two_regions_feature_set_event_series/
         """
 
         self.two_geo_query.populate_geo_cond_member_dicts(

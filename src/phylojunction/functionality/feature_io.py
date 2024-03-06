@@ -168,7 +168,9 @@ class GeoGraph():
         if node1_idx == node2_idx:
             exit("Can only compare different nodes. Exiting...")
 
-        print('self._node_comm_class_dict', self._node_comm_class_dict)
+        # debugging
+        # print('self._node_comm_class_dict', self._node_comm_class_dict)
+        # print('node1_idx', node1_idx, 'node2_idx', node2_idx)
 
         cc1 = self._node_comm_class_dict[node1_idx]
         cc2 = self._node_comm_class_dict[node2_idx]

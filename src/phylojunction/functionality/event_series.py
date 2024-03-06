@@ -2,6 +2,8 @@ import os
 import math
 import enum
 import copy
+import random
+import collections
 import typing as ty
 import dendropy as dp
 from natsort import natsorted
@@ -169,8 +171,6 @@ class FromRegionSampler():
         Returns:
             (int): Sampled region index.
         """
-
-        # print('self._time_slice_dict_list', self._time_slice_dict_list)
 
         epoch_dict_it_param_mat = \
             self._time_slice_dict_list[time_slice_idx][it_idx]
@@ -498,9 +498,9 @@ class EvolRelevantEventSeriesTabulator():
                     smap.from_region_idx = sampled_idx
 
                 else:
-                    # uniformly pick element of list
-                    # random_pick(potential_from_region_idx)
-                    pass
+                    # disambiguation!
+                    smap.from_region_idx = \
+                        random.choice(potential_from_region_idx)
 
     def initialize_event_series_dict(self) -> None:
 
@@ -517,53 +517,75 @@ class EvolRelevantEventSeriesTabulator():
 
             # retrieve list of events from parent node
             if nd.parent_node is not None:
+                # and nd.parent_node.label in self._event_series_dict:
                 parent_nd = nd.parent_node
                 parent_nd_name = parent_nd.label
-                parent_event_series = \
-                    self._event_series_dict[parent_nd_name][it_idx]
 
-                # we will add events to those from the parent node
-                # (has to be deep copy!)
-                event_series = copy.deepcopy(parent_event_series)
+                is_root = parent_nd.num_child_nodes() == 1
+
+                # NOTE: CAREFUL! this call here creates an empty dictionary even
+                # if parent_nd_name is not a key in the outer _event_series_dict!
+                # so we make sure to check that this node is younger than the root,
+                # otherwise the following block adds the origin to the dictionary
+                # (we don't want that, because there is no range splitting at the
+                # origin)
+                if not is_root:
+                    parent_event_series = \
+                        self._event_series_dict[parent_nd_name][it_idx]
+
+                    # only if parent has a proper event series
+                    # (it may be an empty dictionary if the parent node has no
+                    # event series)
+                    if isinstance(parent_event_series, EvolRelevantEventSeries):
+                        # we will add events to those from the parent node
+                        # (has to be deep copy!)
+                        event_series = copy.deepcopy(parent_event_series)
 
             # do current node
             smap_on_tree = smap_coll.stoch_maps_tree_dict[it_idx]
 
-            # anagenetic
-            # NOTE: assumes stochastic maps are sorted in chronological order!!!
-            # (old first, young later)
-            if nd_name in smap_on_tree.anag_stoch_maps_dict:
-                anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
-
-                ############################################
-                # Further annotatation of range expansions #
-                # (dispersals)                             #
-                ############################################
-                for ana_smap in anagenetic_smaps_list:
-                    # first we disambiguate the source region
-                    self.disambiguate_range_expansion(ana_smap,
-                                                      it_idx)
-                    # then we annotate the over barrier status
-                    time_slice_idx = \
-                        self._geofeat_query.find_epoch_idx(ana_smap.age)
-                    conn_graph = \
-                        self._geofeat_query.conn_graph_list[time_slice_idx]
-                    from_region_idx = ana_smap.from_region_idx
-                    to_region_idx = ana_smap.region_gained_idx
-                    are_connected = \
-                        conn_graph.are_connected(from_region_idx,
-                                                 to_region_idx)
-                    ana_smap.over_barrier = not are_connected
-
-                event_series.add_events(anagenetic_smaps_list)
-
-            # cladogenetic (has to be the last one in the event series)
+            # only internal nodes (speciation!)
             if nd_name in smap_on_tree.clado_stoch_maps_dict:
                 clado_smap = smap_on_tree.clado_stoch_maps_dict[nd_name]
-                event_series.add_events(clado_smap)
 
-            # update or create value in dictionary
-            self._event_series_dict[nd_name][it_idx] = event_series
+                # only speciation events with range splitting
+                if clado_smap.to_state2_bit_patt is not None:
+                    # anagenetic
+                    # NOTE: assumes stochastic maps are sorted in chronological order!!!
+                    # (old first, young later)
+                    if nd_name in smap_on_tree.anag_stoch_maps_dict:
+                        anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
+
+                        ############################################
+                        # Further annotation of range expansions #
+                        # (dispersals)                             #
+                        ############################################
+                        for ana_smap in anagenetic_smaps_list:
+                            # first we disambiguate the source region
+                            self.disambiguate_range_expansion(ana_smap,
+                                                              it_idx)
+                            # then we annotate the over barrier status
+                            time_slice_idx = \
+                                self._geofeat_query.find_epoch_idx(ana_smap.age)
+                            conn_graph = \
+                                self._geofeat_query.conn_graph_list[time_slice_idx]
+
+                            if ana_smap.map_type == "expansion":
+                                from_region_idx = ana_smap.from_region_idx
+                                to_region_idx = ana_smap.region_gained_idx
+
+                                are_connected = \
+                                    conn_graph.are_connected(from_region_idx,
+                                                             to_region_idx)
+                                ana_smap.over_barrier = not are_connected
+
+                        event_series.add_events(anagenetic_smaps_list)
+
+                    # cladogenetic (has to be the last one in the event series)
+                    event_series.add_events(clado_smap)
+
+                # update or create value in dictionary
+                self._event_series_dict[nd_name][it_idx] = event_series
 
             # recur
             for ch_nd in nd.child_nodes():
@@ -572,113 +594,140 @@ class EvolRelevantEventSeriesTabulator():
         # iterating over each MCMC iteration when stochastic maps were logged
         for it_idx, smap in smap_coll.stoch_maps_tree_dict.items():
             ann_tr = smap.ann_tr
-            root_nd = ann_tr.root_node
+            seed_nd = smap.ann_tr.origin_node if smap.ann_tr.with_origin \
+                else smap.ann_tr.root_node
 
             # populate self._self._event_series_dict
-            # key: node name
-            # value: event series object
-            recursively_populate_event_series_dict(root_nd,
+            #
+            # key1: node name
+            # value1 iteration dict:
+            # key2: iteration index
+            # value2 event series object
+            recursively_populate_event_series_dict(seed_nd,
                                                    it_idx)
 
             # debugging
-            # for nd_label, it_event_series_dict in self._event_series_dict.items():
-            #     # if nd_label in ("nd6", "nd7", "nd8"):
-            #     print(nd_label)
-            #     for it_idx, event_series in it_event_series_dict.items():
-            #         for ev in event_series.event_list:
-            #             print(ev)
-            #     print("\n")
+            for nd_label, it_event_series_dict in self._event_series_dict.items():
+                # if nd_label in ("nd5"):
+                for it_idx, event_series in it_event_series_dict.items():
+                    if isinstance(event_series, EvolRelevantEventSeries):
+                        if it_idx == 1:
+                            print(nd_label)
+                            for ev in event_series.event_list:
+                                print(ev)
+                print("\n")
 
 
     def initialize_truncated_event_series_dict(self) -> None:
+        """Populate _truncated_event_series_dict
+
+        This method visits all event series (for all internal nodes
+        and all iterations), makes a deep copy of it, and truncates
+        it at the first split-relevant over-barrier dispersal
+        event.
+        """
+
         for nd_label, it_event_series_dict in self._event_series_dict.items():
             rda = RegionDispersalAncestry()
 
             for it_idx, event_series in it_event_series_dict.items():
-                smap_list = event_series.event_list
-                has_seen_first_split_relevant_over_barrier = False
-                # first element must be both split-relevant and over barrier
-                relevant_smap_idx_list = list()
+                # event_series will be an empty dictionary if range
+                # did not split at node -- we do not care about those!
+                # (even if subtending branch has maps!)
+                if isinstance(event_series, EvolRelevantEventSeries):
+                    smap_list = event_series.event_list
 
-                # root/origin will have an empty smap_list
-                if len(smap_list) > 0:
-                    # first we find out the mutually exclusive sets of regions
-                    range_split_smap = smap_list[-1] # last event is range split
-                    ch1_bp = range_split_smap.to_state_bit_patt
-                    ch2_bp = range_split_smap.to_state2_bit_patt
-                    ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
-                    ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
-                    if not ch1_set.isdisjoint(ch2_set):
-                        # print(ch1_set, ch2_set)
-                        exit(("Error during trunctation of event series. "
-                              "At range split, the two mutually exclusive ranges shared"
-                              "regions. Exiting..."))
+                    # we make deep copy because the annotation we carry out below
+                    # (.split_relevant) will be different for each node in the tree,
+                    # for the same dispersal event
+                    new_smap_list = [copy.deepcopy(smap) for smap in smap_list]
 
-                    # now we go through each dispersal and determine whether it is
-                    # relevant to the focal range split
-                    non_split_smap_list = smap_list[:-1]
-                    for smap_idx, smap in enumerate(non_split_smap_list):
-                        if smap.map_type == "expansion":
-                            from_region_idx = smap.from_region_idx
-                            to_region_idx = smap.region_gained_idx
+                    has_seen_first_split_relevant_over_barrier = False
+                    # first element must be both split-relevant and over barrier
+                    relevant_smap_idx_list = list()
 
-                            # dispersal involves a from- and a to- regions
-                            # that are being split between at speciation
-                            if (from_region_idx in ch1_set and to_region_idx in ch2_set) or \
-                               (from_region_idx in ch2_set and to_region_idx in ch1_set):
-                                    smap.split_relevant = True
+                    # root/origin will have an empty smap_list
+                    if len(smap_list) > 0:
+                        # first we find out the mutually exclusive sets of regions
+                        range_split_smap = new_smap_list[-1] # last event is range split
+                        ch1_bp = range_split_smap.to_state_bit_patt
+                        ch2_bp = range_split_smap.to_state2_bit_patt
+                        ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
+                        ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
 
-                                    if smap.over_barrier:
-                                        has_seen_first_split_relevant_over_barrier = True
+                        if not ch1_set.isdisjoint(ch2_set):
+                            exit(("Error during truncation of event series. "
+                                  "At range split, the two mutually exclusive ranges shared"
+                                  " regions. Exiting..."))
+
+                        # now we go through each dispersal and determine whether it is
+                        # relevant to the focal range split
+                        non_split_smap_list = smap_list[:-1]
+                        for smap_idx, smap in enumerate(non_split_smap_list):
+                            new_smap = copy.deepcopy(smap)
+
+                            if smap.map_type == "expansion":
+                                from_region_idx = smap.from_region_idx
+                                to_region_idx = smap.region_gained_idx
+
+                                # dispersal involves a from- and a to- regions
+                                # that are being split between at speciation
+                                if (from_region_idx in ch1_set and to_region_idx in ch2_set) or \
+                                   (from_region_idx in ch2_set and to_region_idx in ch1_set):
+                                        smap.split_relevant = True
+
+                                        if smap.over_barrier:
+                                            has_seen_first_split_relevant_over_barrier = True
+
+                                        if has_seen_first_split_relevant_over_barrier:
+                                            relevant_smap_idx_list.append(smap_idx)
+
+                                else:
+                                    smap.split_relevant = False
 
                                     if has_seen_first_split_relevant_over_barrier:
                                         relevant_smap_idx_list.append(smap_idx)
 
+                            # extinctions
                             else:
-                                smap.split_relevant = False
-
                                 if has_seen_first_split_relevant_over_barrier:
                                     relevant_smap_idx_list.append(smap_idx)
 
-                        # extinctions
-                        else:
-                            if has_seen_first_split_relevant_over_barrier:
-                                relevant_smap_idx_list.append(smap_idx)
+                    relevant_event_list = list()
+                    relevant_smap_idx_list.append(-1)
 
-                relevant_event_list = list()
-                relevant_smap_idx_list.append(-1)
+                    # debugging
+                    # print('nd_label', nd_label, 'relevant_smap_idx_list', relevant_smap_idx_list)
 
-                # debugging
-                # print('nd_label', nd_label, 'relevant_smap_idx_list', relevant_smap_idx_list)
+                    # getting only stochastic maps (shallow copies!) that matter and that
+                    # will form the truncated event series
+                    for relevant_smap_idx in relevant_smap_idx_list:
+                        if len(smap_list) > 0:
+                            relevant_event_list.append(smap_list[relevant_smap_idx])
 
-                # getting only stochastic maps (shallow copies!) that matter and that
-                # will form the truncated event series
-                for relevant_smap_idx in relevant_smap_idx_list:
-                    if len(smap_list) > 0:
-                        relevant_event_list.append(smap_list[relevant_smap_idx])
+                    # enter truncated event series into class member
+                    if len(relevant_event_list) > 0:
+                        truncated_event_series = \
+                            EvolRelevantEventSeries(event_list=relevant_event_list)
+                        self._truncated_event_series_dict[nd_label][it_idx] = \
+                            truncated_event_series
 
-                # enter truncated event series into class member
-                if len(relevant_event_list) > 0:
-                    truncated_event_series = \
-                        EvolRelevantEventSeries(event_list=relevant_event_list)
-                    self._truncated_event_series_dict[nd_label][it_idx] = \
-                        truncated_event_series
+                    # if there are no relevant stochastic maps, we use
+                    # the original event series, which is probably empty anyway
+                    else:
+                        self._truncated_event_series_dict[nd_label][it_idx] = \
+                            event_series
 
-                # if there are no relevant stochastic maps, we use
-                # the original event series, which is probably empty anyway
-                else:
-                    self._truncated_event_series_dict[nd_label][it_idx] = \
-                        event_series
-
-            # debugging
-            for nd_label, it_event_series_dict in self._truncated_event_series_dict.items():
-            # for nd_label, it_event_series_dict in self._event_series_dict.items():
-                # if nd_label in ("nd9"):
-                print(nd_label)
-                for it_idx, event_series in it_event_series_dict.items():
-                    for ev in event_series.event_list:
-                        print(ev)
-                print("\n")
+        # debugging
+        # for nd_label, it_event_series_dict in self._truncated_event_series_dict.items():
+        # # for nd_label, it_event_series_dict in self._event_series_dict.items():
+        #     # if nd_label in ("nd9"):
+        #     for it_idx, event_series in it_event_series_dict.items():
+        #         if it_idx == 2:
+        #             print(nd_label, 'it', it_idx)
+        #             for ev in event_series.event_list:
+        #                 print(ev)
+        #         print("\n")
 
                 # for ev in event_series.event_list:
                 #     if ev.map_type == "expansion":
@@ -728,32 +777,58 @@ def truncate_at_split_relevant_event(event_series: EvolRelevantEventSeries):
 
 if __name__ == "__main__":
 
-    ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree2.tre",
-                                          "read_tree",
-                                          node_names_attribute="index",
-                                          n_states=3,
-                                          in_file=True)]
+    # n_chars = 2
+    n_chars = 4
 
-    n_chars = 2
     state2bit_lookup = pjbio.State2BitLookup(n_chars, 2, geosse=True)
 
+    n_states = state2bit_lookup.n_states
+
+    # print(state2bit_lookup.bit2int_dict)
+    # '1000': 0
+    # '0100': 1
+    # '0010': 2
+    # '0001': 3
+    # '1100': 4
+    # '1010': 5
+    # '0110': 6
+    # '1001': 7
+    # '0101': 8
+    # '0011': 9
+    # '1110': 10
+    # '1101': 11
+    # '1011': 12
+    # '0111': 13
+    # '1111': 14
+
+    # ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree2.tre",
+    ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree3.tre",
+                                          "read_tree",
+                                          node_names_attribute="index",
+                                          n_states=n_states,
+                                          in_file=True)]
+
+    # node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv"
+    # pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree2_maps.tsv",
     smap_coll = \
-        pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree2_maps.tsv",
+        pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree3_maps.tsv",
                                          ann_tr_list,
                                          state2bit_lookup,
-                                         node_states_file_path="examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv",
+                                         node_states_file_path="examples/trees_maps_files/geosse_dummy_tree3_tip_states.tsv",
                                          stoch_map_attr_name="state")
 
-    frs = FromRegionSampler(
-        n_chars,
-        "examples/feature_files/two_regions_feature_set",
-        "epoch_",
-        "_rel_rates",
-        "m_d"
-    )
+    # frs = FromRegionSampler(
+    #     n_chars,
+    #     "examples/feature_files/two_regions_feature_set_event_series",
+    #     "epoch_",
+    #     "_rel_rates",
+    #     "m_d"
+    # )
 
-    feature_summary_fp = "examples/feature_files/two_regions_feature_set/feature_summary.csv"
-    age_summary_fp = "examples/feature_files/two_regions_feature_set/age_summary.csv"
+    # feature_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/feature_summary.csv"
+    # age_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/age_summary.csv"
+    feature_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/feature_summary.csv"
+    age_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/age_summary.csv"
 
     fc = pjfio.GeoFeatureCollection(
         feature_summary_fp,
@@ -771,6 +846,6 @@ if __name__ == "__main__":
         EvolRelevantEventSeriesTabulator(
             ann_tr_list,
             smap_coll,
-            fq,
-            from_region_sampler=frs
+            fq#,
+            #from_region_sampler=frs
         )
