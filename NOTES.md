@@ -210,6 +210,8 @@ python3 -m build --wheel
 ```
 
 These two commands will create a dist/ directory inside PhyloJunction/, and place a .tar.gz (containing all source .py/.pyi files, license, readme, setup files) and a wheel file inside.
+You can check the .tar.gz to see if all modules are in there.
+If one of them is missing, make sure an `__init__.py` file is inside the module's directory.
 
 Then to release to TestPyPI, do:
 
@@ -223,6 +225,14 @@ And to test the package, do:
 python3 -m pip install --index-url https://test.pypi.org/simple/ phylojunction
 ```
 
+### Next release
+
+When a new release must be made, in this order:
+1. Delete the files inside `dist/`,
+2. Change the version of the package in `setup.cfg`,
+3. Dun the build commands above again,
+4. Push to TestPyPI.
+
 ## Releasing PJ to PyPI
 
 To release to PyPI, we just change the twine command in the previous section to
@@ -235,7 +245,7 @@ To see where pip installs things:
 
 ```
 python3 -m pip list -v
-```
+``` 
 
 The PyPI link to PJ is: https://pypi.org/project/PhyloJunction/
 
@@ -249,7 +259,7 @@ You do so by creating a file `/home/foo/.local/share/applications/.desktop`, and
 
 ```
 [Desktop Entry]
-Version=1.0
+Version=0.0.2
 Name=PhyloJunction
 Comment=An environment for prototyping, teaching and learning with evolutionary models
 Exec=nohup pjgui &

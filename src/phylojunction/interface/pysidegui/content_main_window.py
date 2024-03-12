@@ -101,7 +101,7 @@ class ContentGUIMainWindow(object):
         self.left_menu_bottom_frame_layout.setSpacing(0)
 
         # version label #
-        self.left_menu_version_label = QLabel("v0.0.1")
+        self.left_menu_version_label = QLabel("v0.0.2")
         self.left_menu_version_label.setAlignment(Qt.AlignCenter)
         self.left_menu_version_label.setMinimumHeight(30)
         self.left_menu_version_label.setMaximumHeight(30)
