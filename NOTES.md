@@ -205,8 +205,8 @@ Then place the token inside $HOME/.pypirc, like so:
 Now from Phylojunction/ (make sure you have the `build` Python package installed):
 
 ```
-python3 -m build --sdist
-python3 -m build --wheel
+python3.11 -m build --sdist
+python3.11 -m build --wheel
 ```
 
 These two commands will create a dist/ directory inside PhyloJunction/, and place a .tar.gz (containing all source .py/.pyi files, license, readme, setup files) and a wheel file inside.
@@ -222,7 +222,7 @@ twine upload --repository testpypi dist/*
 And to test the package, do:
 
 ```
-python3 -m pip install --index-url https://test.pypi.org/simple/ phylojunction
+python3.11 -m pip install --index-url https://test.pypi.org/simple/ phylojunction
 ```
 
 ### Next release
