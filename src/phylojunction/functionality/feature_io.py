@@ -7,12 +7,19 @@ import typing as ty
 
 # pj imports
 import phylojunction.utility.helper_functions as pjh
+import phylojunction.functionality.evol_event as pjev
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
 
 
 class GeoGraph():
+    """
+    Parameters:
+        n_nodes (int):
+        node_set (set):
+        edge_set (set):
+    """
 
     _n_nodes: int
     _node_set: ty.Set[int]
@@ -41,6 +48,7 @@ class GeoGraph():
                  node1_idx: int,
                  node2_idx: int,
                  is_directed: bool = False) -> None:
+
         if not ((node1_idx in self._node_set) \
                 and (node2_idx in self._node_set)):
             # TODO: later add exception
@@ -94,6 +102,7 @@ class GeoGraph():
         tmp_comm_class_set_list = list()
 
         for from_node, to_node_set in self._edge_dict.items():
+
             # first we mark the nodes that have been visited
             visited_nodes_set.add(from_node)
             for to_node in to_node_set:
@@ -151,6 +160,44 @@ class GeoGraph():
             for node_idx in cc:
                 self._node_comm_class_dict[node_idx] = i
 
+
+    def over_barrier(self,
+                     node1_idx: int,
+                     node2_idx: int,
+                     directed: bool = False) -> bool:
+        """Return boolean for two regions depending on barrier existence
+
+        If two nodes (i.e., each node being a region) have an edge
+        between them, it means they are are connected directly, and
+        thus there is no barrier between them. If they are not
+        directly connected, there is a barrier between them.
+
+        When edge direction matters, only edges from node1 to node 2
+        are considered. Otherwise the edge on the opposite direction
+        is additionally considered.
+
+        Args:
+            node1_idx (int): Index of node 1 (region 1).
+            node2_idx (int): Index of node 2 (region 2).
+            directed (bool): If direction of connectivity edge
+                matters. Defaults to 'False'.
+
+        Returns:
+            (bool): True if two regions have a barrier between them.
+        """
+
+        if node1_idx == node2_idx:
+            exit("Can only compare different nodes. Exiting...")
+
+        barrier_exists = node2_idx not in self._edge_dict[node1_idx]
+
+        if directed:
+            return barrier_exists
+
+        else:
+            barrier_exists = barrier_exists or node1_idx not in self._edge_dict[node2_idx]
+            return barrier_exists
+
     def are_connected(self, node1_idx: int, node2_idx) -> bool:
         """Return boolean for two nodes in the same comm class.
 
@@ -187,6 +234,71 @@ class GeoGraph():
             str_representation += e_str + "\n"
 
         return str_representation
+
+
+class BarrierAppearance(pjev.EvolRelevantEvent):
+    """Barrier appearance event.
+
+    Parameters:
+        from_node_idx (int): Integer representation of source node
+            in barrier.
+        to_node_idx (int): Integer representation of target node
+            in barrier.
+    """
+
+    def __init__(self,
+                 n_chars: int,
+                 age: ty.Optional[float],
+                 from_node_idx: int,
+                 to_node_idx: int,
+                 time: ty.Optional[int] = None) -> None:
+
+        # initializing EvolRelevantEvent members
+        super().__init__(n_chars, age, time=time)
+
+        self.from_node_idx = from_node_idx
+        self.to_node_idx = to_node_idx
+
+    def __str__(self) -> str:
+        return "Barrier (at age = " + str(self.age) \
+            + ") between region " + str(self.from_node_idx) \
+            + " and " + str(self.to_node_idx)
+
+    def __lt__(self, other) -> bool:
+        return super().__lt__(other)
+
+
+class BarrierDisappearance(pjev.EvolRelevantEvent):
+    """Barrier disappearance event.
+
+    Parameters:
+        from_node_idx (int): Integer representation of source node
+            in barrier.
+        to_node_idx (int): Integer representation of target node
+            in barrier.
+    """
+
+    def __init__(self,
+                 n_chars: int,
+                 age: ty.Optional[float],
+                 from_node_idx: int,
+                 to_node_idx: int,
+                 time: ty.Optional[int] = None) -> None:
+
+        # initializing EvolRelevantEvent members
+        super().__init__(n_chars, age, time=time)
+
+        self.from_node_idx = from_node_idx
+        self.to_node_idx = to_node_idx
+
+    def __str__(self) -> str:
+        return "Connectivity restablished (at age = " \
+            + str(self.age) + ") between region " \
+            + str(self.from_node_idx) + " and " \
+            + str(self.to_node_idx)
+
+    def __lt__(self, other) -> bool:
+        return super().__lt__(other)
 
 
 class GeoFeatureRelationship(enum.Enum):
@@ -391,7 +503,7 @@ class GeoFeatureCollection():
         # starting class members off
         self.geofeat_list = list()
         self.epoch_age_end_list_young2old = [0.0]  # present epoch ends at 0.0
-        self.epoch_mid_age_list_young2old = [-math.inf]  # oldest epoch midpoint
+        self.epoch_mid_age_list_young2old = [math.inf]  # oldest epoch midpoint
         self.epoch_age_start_list_young2old = list()
         self.is_timehet = False
         self.feat_name_epochs_dict = pjh.autovivify(2)
@@ -583,7 +695,7 @@ class GeoFeatureCollection():
         for age_end in self.epoch_age_end_list_young2old[1:]:
             self.epoch_age_start_list_young2old.append(age_end)
 
-        self.epoch_age_start_list_young2old.append(-math.inf)
+        self.epoch_age_start_list_young2old.append(math.inf)
         self.epoch_age_start_list_old2young = \
             self.epoch_age_start_list_young2old[::-1]
 
@@ -702,6 +814,9 @@ class GeoFeatureQuery():
         geo_oldest_cond_bit_dict (dict):
         conn_graph_list (GeoGraph): List of connectivity graphs, one
             per epoch.
+        geo_cond_name (str): Name of geographic condition verified for
+            determining the bit value within or between regions (e.g.,
+            a barrier).
     """
 
     n_regions: int
@@ -723,17 +838,19 @@ class GeoFeatureQuery():
     # the bit pattern flipping, '01' (0 in epoch 1, 1 in epoch 2);
     # if no flips, no changes
     # DEPRECATED
-    # geo_cond_change_times_dict: \
-    #     ty.Dict[str,
-    #             ty.Union[ty.List[ty.List[float]],
-    #             ty.List[ty.List[ty.List[float]]]]]
+    geo_cond_change_times_dict: \
+        ty.Dict[str,
+                ty.Union[ty.List[ty.List[float]],
+                ty.List[ty.List[ty.List[float]]]]]
 
     # same as above, but with the bit flipping the other way around, '10'
     # DEPRECATED
-    # geo_cond_change_back_times_dict: \
-    #     ty.Dict[str,
-    #             ty.Union[ty.List[ty.List[float]],
-    #             ty.List[ty.List[ty.List[float]]]]]
+    geo_cond_change_back_times_dict: \
+        ty.Dict[str,
+                ty.Union[ty.List[ty.List[float]],
+                ty.List[ty.List[ty.List[float]]]]]
+
+    geo_cond_name: str
 
     # this member below helps us tell if geographic connectivity had
     # previously happened, e.g., maybe a barrier never "appears" during the
@@ -761,8 +878,8 @@ class GeoFeatureQuery():
 
         self.geo_cond_bit_dict = dict()
         self.geo_oldest_cond_bit_dict = dict()
-        # self.geo_cond_change_times_dict = dict()
-        # self.geo_cond_change_back_times_dict = dict()
+        self.geo_cond_change_times_dict = dict()
+        self.geo_cond_change_back_times_dict = dict()
         self.conn_graph_list = list()
 
     # class methods take 'cls' as first argument, and can know about class state
@@ -1084,7 +1201,9 @@ class GeoFeatureQuery():
         e.g., for 2 regions, 3 epochs {"altitude": ["010", "010"]}
         the 0's represent no geographic connectivity, while 1's
         represent connectivities (depending on the requirement
-        function provided by the user)
+        function provided by the user).
+
+        Populates self.geo_cond_name.
         
         Args:
             geo_cond_name (str): Name of the geographic
@@ -1100,12 +1219,14 @@ class GeoFeatureQuery():
                 is directed or not. Defaults to False.
         """
 
+        self.geo_cond_name = geo_cond_name
+
         self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
 
         self._populate_oldest_geo_cond_bit_dict(geo_cond_name)
 
         # DEPRECATED
-        # self._populate_geo_cond_change_times_dict(geo_cond_name)
+        self._populate_geo_cond_change_times_dict(geo_cond_name)
 
         self._populate_conn_graph_list(geo_cond_name, is_directed)
 
@@ -1155,10 +1276,10 @@ class GeoFeatureQuery():
                     # we had the departing '0', and use that position
                     # to grab the start of the epoch with the '1'
                     region2_times_list = \
-                        [age_starts_old2young[idx+1] for idx, (i, j) \
+                        [age_starts_old2young[idx + 1] for idx, (i, j) \
                            in enumerate(zip(region2_str,
                                             region2_str[1:])) \
-                                                if (i, j) == ('0', '1')]
+                         if (i, j) == ('0', '1')]
 
                     # now doing change back times ('10')
                     region2_back_times_list = \

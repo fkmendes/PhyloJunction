@@ -3,11 +3,11 @@ import math
 import enum
 import copy
 import random
-import collections
 import typing as ty
 import dendropy as dp
 from natsort import natsorted
 from numpy.random import choice
+from bisect import insort
 
 # pj imports
 import phylojunction.readwrite.pj_read as pjr
@@ -147,6 +147,10 @@ class FromRegionSampler():
             ty.List[ty.Dict[int, ty.List[ty.List[float]]]]:
         return self._time_slice_dict_list
 
+    @property
+    def n_char(self) -> int:
+        return self._n_char
+
     def sample_from_region_idx(self,
                                it_idx: int,
                                time_slice_idx: int,
@@ -264,7 +268,7 @@ class EvolRelevantEventSeries:
     _supported_hyp: Hypothesis
 
     def __init__(self,
-                 event_list: ty.List[pjev.EvolRelevantEvent] = [],
+                 event_list: ty.Optional[ty.List[pjev.EvolRelevantEvent]] = None,
                  series_type: str = "",
                  it_idx: int = -1) -> None:
 
@@ -273,8 +277,13 @@ class EvolRelevantEventSeries:
 
         self.health_check()
 
-        self._event_list = event_list
-        self._n_events = len(event_list)
+        if event_list is None:
+            self._event_list = list()
+
+        else:
+            self._event_list = event_list
+
+        self._n_events = len(self._event_list)
 
     def health_check(self) -> None:
         """Confirm validity of event list given series type."""
@@ -315,6 +324,7 @@ class EvolRelevantEventSeries:
     def add_events(self, event_or_events: \
             ty.Union[pjev.EvolRelevantEvent,
             ty.List[pjev.EvolRelevantEvent]]):
+
         if isinstance(event_or_events, pjev.EvolRelevantEvent):
             self._event_list.append(event_or_events)
 
@@ -326,7 +336,7 @@ class EvolRelevantEventSeries:
 
     @property
     def n_events(self) -> int:
-        return self._n_events
+        return len(self._event_list)
 
     @property
     def series_type(self) -> str:
@@ -378,6 +388,7 @@ class EvolRelevantEventSeriesTabulator():
 
     _hyp_support_dict: ty.Dict[Hypothesis, int]
     _from_region_sampler: FromRegionSampler
+    _n_char: int # number of regions
 
     def __init__(self,
                  ann_tr_list: ty.List[pjt.AnnotatedTree],
@@ -390,6 +401,7 @@ class EvolRelevantEventSeriesTabulator():
         self._truncated_event_series_dict = pjh.autovivify(2)
         self._region_dispersal_ancestry_dict = pjh.autovivify(2)
         self._from_region_sampler = from_region_sampler
+        self._n_char = from_region_sampler.n_char
 
         self._ann_tr_list = ann_tr_list
 
@@ -408,9 +420,15 @@ class EvolRelevantEventSeriesTabulator():
         self.initialize_event_series_dict()
 
         if verbose:
-            print("  ... finished building all event series.")
+            print("  ... finished reading stochastic maps.")
 
-        self.initialize_truncated_event_series_dict()
+        self.add_paleogeo_event_series_dict(
+            self._geofeat_query.geo_cond_name)
+
+        if verbose:
+            print("  ... finished reading paleogeographic events.")
+
+        # self.initialize_truncated_event_series_dict()
 
         if verbose:
             print("  ... finished truncating event series.")
@@ -486,13 +504,13 @@ class EvolRelevantEventSeriesTabulator():
                             to_region_idx)
 
                     # debugging
-                    print('bit pattern', bp,
-                          'potential_from_region_idx',
-                          potential_from_region_idx,
-                          'to_region_idx',
-                          to_region_idx,
-                          'sampled_idx',
-                          sampled_idx)
+                    # print('bit pattern', bp,
+                    #       'potential_from_region_idx',
+                    #       potential_from_region_idx,
+                    #       'to_region_idx',
+                    #       to_region_idx,
+                    #       'sampled_idx',
+                    #       sampled_idx)
 
                     # disambiguation!
                     smap.from_region_idx = sampled_idx
@@ -557,7 +575,7 @@ class EvolRelevantEventSeriesTabulator():
                         anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
 
                         ############################################
-                        # Further annotation of range expansions #
+                        # Further annotation of range expansions   #
                         # (dispersals)                             #
                         ############################################
                         for ana_smap in anagenetic_smaps_list:
@@ -607,28 +625,149 @@ class EvolRelevantEventSeriesTabulator():
                                                    it_idx)
 
             # debugging
-            for nd_label, it_event_series_dict in self._event_series_dict.items():
-                # if nd_label in ("nd5"):
-                for it_idx, event_series in it_event_series_dict.items():
-                    if isinstance(event_series, EvolRelevantEventSeries):
-                        if it_idx == 1:
-                            print(nd_label)
-                            for ev in event_series.event_list:
-                                print(ev)
-                print("\n")
+            # for nd_label, it_event_series_dict in self._event_series_dict.items():
+            #     # if nd_label in ("nd5"):
+            #     for it_idx, event_series in it_event_series_dict.items():
+            #         if isinstance(event_series, EvolRelevantEventSeries):
+            #             if it_idx == 1:
+            #                 print(nd_label)
+            #                 for ev in event_series.event_list:
+            #                     print(ev)
+            #     print("\n")
+
+
+    def add_paleogeo_event_series_dict(self,
+                                       geo_cond_name: str,
+                                       directed: bool = False) -> None:
+        """Update self.event_series_dict with paleogeographic events.
+
+        Only barriers that matter for a specific range split are
+        considered.
+
+        Args:
+            directed (bool): Flag specifying if connectivity cares
+                about edge direction or not. Defaults to 'False'.
+        """
+
+        cond_change_epoch_start_ages_mat = self._geofeat_query.\
+            geo_cond_change_times_dict[geo_cond_name]
+        cond_change_back_epoch_start_ages_mat = self._geofeat_query.\
+            geo_cond_change_back_times_dict[geo_cond_name]
+
+        for nd_label, it_event_series_dict in self._event_series_dict.items():
+            for it_idx, event_series in it_event_series_dict.items():
+                # event_series will be an empty dictionary if range
+                # did not split at node -- we do not care about those!
+                # (even if subtending branch has maps!)
+                if isinstance(event_series, EvolRelevantEventSeries):
+                    event_list = event_series.event_list
+
+                    # root/origin will have an empty smap_list
+                    if len(event_list) > 0:
+                        # first we find out the mutually exclusive sets of regions
+                        range_split_smap = event_list[-1]  # last event is range split
+                        range_split_age = range_split_smap.age
+                        ch1_bp = range_split_smap.to_state_bit_patt
+                        ch2_bp = range_split_smap.to_state2_bit_patt
+                        ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
+                        ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
+
+                        if not ch1_set.isdisjoint(ch2_set):
+                            exit(("Error during truncation of event series. "
+                                  "At range split, the two mutually exclusive ranges shared"
+                                  " regions. Exiting..."))
+
+                        # update event_list, going over connectivity graph for
+                        # each epoch, old to young
+                        for epoch_idx in range(self._geofeat_query.n_time_slices):
+                            epoch_start_age = self._geofeat_query.feat_coll.\
+                                epoch_age_start_list_old2young[epoch_idx]
+
+                            # if epoch starts after the range split at speciation,
+                            # we do not care about it
+                            if epoch_start_age < range_split_age:
+                                break
+
+                            this_epoch_conn_graph = \
+                                self._geofeat_query.conn_graph_list[epoch_idx]
+                            edge_set = this_epoch_conn_graph.edge_set
+
+                            # check if for at least one pair of nodes in
+                            # the splitting (mutually exclusive) set of
+                            # regions is connected in the connectivity
+                            # graph
+                            for from_region_idx in ch1_set:
+                                for to_region_idx in ch2_set:
+                                    e = (from_region_idx, to_region_idx)
+                                    rev_e = (to_region_idx, from_region_idx)
+
+                                    # if range is stable
+                                    if e in edge_set or \
+                                            (not directed and rev_e in edge_set):
+
+                                        # and if barrier disappeared in this epoch
+                                        # (note that we are looking at change_epoch instead
+                                        # of change_back because of the behavior of
+                                        # _populate_conn_graph_list() in GeoFeatureQuery,
+                                        # which assumes 1 means connectivity!)
+                                        if epoch_start_age in \
+                                                cond_change_epoch_start_ages_mat\
+                                                        [from_region_idx][to_region_idx]:
+                                            bd = pjfio.BarrierDisappearance(
+                                                self._n_char,
+                                                epoch_start_age,
+                                                from_region_idx,
+                                                to_region_idx
+                                            )
+
+                                            # add barrier disappearance as event
+                                            # according to its age (see __lt__ of
+                                            # EvolRelevantEvent)
+                                            insort(event_list, bd)
+
+                                    # if range has at least one barrier
+                                    if e not in edge_set or \
+                                            (not directed and rev_e not in edge_set):
+
+                                        # and if barrier appeared in this epoch
+                                        if epoch_start_age in \
+                                                cond_change_back_epoch_start_ages_mat\
+                                                        [from_region_idx][to_region_idx]:
+                                            ba = pjfio.BarrierAppearance(
+                                                self._n_char,
+                                                epoch_start_age,
+                                                from_region_idx,
+                                                to_region_idx
+                                            )
+
+                                            # add barrier appearance as event
+                                            # according to its age (see __lt__ of
+                                            # EvolRelevantEvent)
+                                            insort(event_list, ba)
+
+        for nd_label, it_event_series_dict in self._event_series_dict.items():
+            # if nd_label in ("nd5"):
+            for it_idx, event_series in it_event_series_dict.items():
+                if isinstance(event_series, EvolRelevantEventSeries):
+                    if it_idx == 1:
+                        print(nd_label)
+                        for ev in event_series.event_list:
+                            print(ev)
+            print("\n")
 
 
     def initialize_truncated_event_series_dict(self) -> None:
         """Populate _truncated_event_series_dict
 
         This method visits all event series (for all internal nodes
-        and all iterations), makes a deep copy of it, and truncates
-        it at the first split-relevant over-barrier dispersal
-        event.
+        and all iterations) and makes a deep copy of it. Then it
+        truncates each event series at the first split-relevant
+        over-barrier dispersal event after the last split-relevant
+        stable range.
         """
 
         for nd_label, it_event_series_dict in self._event_series_dict.items():
-            rda = RegionDispersalAncestry()
+            # rda = RegionDispersalAncestry()
 
             for it_idx, event_series in it_event_series_dict.items():
                 # event_series will be an empty dictionary if range
@@ -674,6 +813,7 @@ class EvolRelevantEventSeriesTabulator():
                                 # that are being split between at speciation
                                 if (from_region_idx in ch1_set and to_region_idx in ch2_set) or \
                                    (from_region_idx in ch2_set and to_region_idx in ch1_set):
+                                        # we annotate stoch map as split-relevant
                                         smap.split_relevant = True
 
                                         if smap.over_barrier:
@@ -777,8 +917,8 @@ def truncate_at_split_relevant_event(event_series: EvolRelevantEventSeries):
 
 if __name__ == "__main__":
 
-    # n_chars = 2
-    n_chars = 4
+    n_chars = 2
+    # n_chars = 4
 
     state2bit_lookup = pjbio.State2BitLookup(n_chars, 2, geosse=True)
 
@@ -801,34 +941,34 @@ if __name__ == "__main__":
     # '0111': 13
     # '1111': 14
 
-    # ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree2.tre",
-    ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree3.tre",
+    # ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree3.tre",
+    ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree2.tre",
                                           "read_tree",
                                           node_names_attribute="index",
                                           n_states=n_states,
                                           in_file=True)]
 
-    # node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv"
-    # pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree2_maps.tsv",
+    # node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree3_tip_states.tsv"
+    # pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree3_maps.tsv",
     smap_coll = \
-        pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree3_maps.tsv",
+        pjsmap.StochMapsOnTreeCollection("examples/trees_maps_files/geosse_dummy_tree2_maps.tsv",
                                          ann_tr_list,
                                          state2bit_lookup,
-                                         node_states_file_path="examples/trees_maps_files/geosse_dummy_tree3_tip_states.tsv",
+                                         node_states_file_path="examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv",
                                          stoch_map_attr_name="state")
 
-    # frs = FromRegionSampler(
-    #     n_chars,
-    #     "examples/feature_files/two_regions_feature_set_event_series",
-    #     "epoch_",
-    #     "_rel_rates",
-    #     "m_d"
-    # )
+    frs = FromRegionSampler(
+        n_chars,
+        "examples/feature_files/two_regions_feature_set_event_series",
+        "epoch_",
+        "_rel_rates",
+        "m_d"
+    )
 
-    # feature_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/feature_summary.csv"
-    # age_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/age_summary.csv"
-    feature_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/feature_summary.csv"
-    age_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/age_summary.csv"
+    feature_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/feature_summary.csv"
+    age_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/age_summary.csv"
+    # feature_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/feature_summary.csv"
+    # age_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/age_summary.csv"
 
     fc = pjfio.GeoFeatureCollection(
         feature_summary_fp,
@@ -837,7 +977,7 @@ if __name__ == "__main__":
     fq = pjfio.GeoFeatureQuery(fc)
 
     requirement_fn = \
-        pjfio.GeoFeatureQuery.cb_feature_equals_value_is_connected(fc, 0, feat_id=1)
+        pjfio.GeoFeatureQuery.cb_feature_equals_value_is_connected(fc, 1, feat_id=1)
 
     # all members, including graph, are populated here!
     fq.populate_geo_cond_member_dicts("land_bridge", requirement_fn)
@@ -846,6 +986,6 @@ if __name__ == "__main__":
         EvolRelevantEventSeriesTabulator(
             ann_tr_list,
             smap_coll,
-            fq#,
-            #from_region_sampler=frs
+            fq,
+            from_region_sampler=frs
         )

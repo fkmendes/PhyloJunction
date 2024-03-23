@@ -4,7 +4,9 @@
 
 The first thing you must do before you can start coding within the `PhyloJunction` framework
 is to set it up within an integrated development environment (IDE).
-The IDE of choice here is VSCode, a very popular, clean and fast IDE.
+The IDEs of choice here are VSCode or PyCharm, which arevery popular, clean and fast IDEs.
+
+### VS Code
 
 The first step is to go under "File" > "Open Folder..." and choose `PhyloJunction/`, the git repository root folder.
 If you click around for a bit, you will notice that the module files (`.py` files) are inside
@@ -54,7 +56,7 @@ Now inside `settings.json`, add this:
 }
 ```
 
-## Configuring unit tests (using unittest) on VSCode
+**Configuring unit tests (using unittest) on VSCode**
 
 If you have an Apple machine, the shortcut on VSCode is "CMD + Shift + P", "Python: Configure Tests".
 This will add to your `settings.json` file inside hidden folder `.vscode`.
@@ -79,6 +81,10 @@ Your `settings.json` will look like this:
 
 If VSCode refuses to find the tests, one thing that might be set up wrong is the Python interpreter VSCode is using.
 Unit tests usually have many dependencies -- if those dependencies are not found because the wrong interpreter is used (the native one that comes with the machine, say, instead of an interpreter installed with Homebrew), then the tests will not be found.
+
+### PyCharm
+
+Once you Open Project, you must tell PyCharm where the source files are: PyCharm > Settings > Project: PhyloJunction > Project Structure, the click on `src/` and click on the folder "Sources" icon.
 
 ## Type checking
 
@@ -150,7 +156,7 @@ If you are on an Apple machine that obstrusively curtails file system access, ru
 
 ```
 cd PhyloJunction/
-python3 -m pip install --user -e .
+python3.11 -m pip install --user -e .
 ```
 
 The `--user` flag is the way around said restrictions.
@@ -159,7 +165,7 @@ Remember to add this path to the PATH system variable if you want to call the ex
 Another option is to run the following command:
 
 ```
-python3 -m pip install --prefix ~/.local -e .
+python3.11 -m pip install --prefix ~/.local -e .
 ```
 
 Which creates (or writes inside) directories `bin/` (placing the executables therein) and `lib/python3.X/site-packages/` (placing the egg-link therein) inside `~/.local`.

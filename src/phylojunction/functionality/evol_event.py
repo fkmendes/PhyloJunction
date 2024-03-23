@@ -1,5 +1,4 @@
 import typing as ty
-import enum
 from abc import ABC, abstractmethod
 
 __author__ = "Fabio K. Mendes"
@@ -92,3 +91,6 @@ class EvolRelevantEvent(ABC):
 
     def char_status(self, char_pos_in_bit_patt) -> bool:
         return self._char_status_dict[char_pos_in_bit_patt]
+
+    def __lt__(self, other) -> bool:
+        return self._age > other._age
