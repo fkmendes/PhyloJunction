@@ -369,6 +369,8 @@ class EvolRelevantEventSeriesTabulator():
             and a list of EvolRelevantEventSeries objects as values.
         hyp_support_dict (dict): Dictionary with Hypothesis objects
             as keys, and counts (int) as values.
+        directed_edges (bool): Flag specifying if edges in connectivity
+            graph are to be treated as directed. Defaults to 'False'.
     """
 
     _ann_tr_list: ty.List[pjt.AnnotatedTree]
@@ -390,16 +392,20 @@ class EvolRelevantEventSeriesTabulator():
     _from_region_sampler: FromRegionSampler
     _n_char: int # number of regions
 
+    _directed_edges: bool
+
     def __init__(self,
                  ann_tr_list: ty.List[pjt.AnnotatedTree],
                  smap_collection: pjsmap.StochMapsOnTreeCollection,
                  geofeat_query: pjfio.GeoFeatureQuery,
                  from_region_sampler: ty.Optional[FromRegionSampler] = None,
+                 directed_edges: ty.Optional[bool] = False,
                  verbose: ty.Optional[bool] = False) -> None:
 
         self._event_series_dict = pjh.autovivify(2)
         self._truncated_event_series_dict = pjh.autovivify(2)
         self._region_dispersal_ancestry_dict = pjh.autovivify(2)
+
         self._from_region_sampler = from_region_sampler
         self._n_char = from_region_sampler.n_char
 
@@ -408,6 +414,8 @@ class EvolRelevantEventSeriesTabulator():
         self._smap_collection = smap_collection
 
         self._geofeat_query = geofeat_query
+
+        self._directed_edges = directed_edges
 
         # side-effect:
         # initializes self._event_series_dict
@@ -462,13 +470,15 @@ class EvolRelevantEventSeriesTabulator():
     def disambiguate_range_expansion(self,
                                      smap: pjsmap.StochMap,
                                      it_idx: int) -> None:
-        """
+        """Randomly disambiguate source region of range expansion.
 
         The side-effect of this method is to populate the
         member 'from_region_idx' of StochMap of RangeExpansion
         type.
 
-        This disambiguation is necessary because....
+        This disambiguation is necessary in cases where the source
+        range includes multiple atomic regions, e.g,. ABC -> ABCD.
+        We do not know if the dispersal to D came from A, B or C.
 
         Args:
             smap (StochMap): StochMap object instance, carrying all
@@ -481,6 +491,8 @@ class EvolRelevantEventSeriesTabulator():
                 must match!
         """
 
+        # this is already checked in the code calling this method,
+        # but doing it again just to be sure...
         if smap.map_type == "expansion":
             bp = smap.from_state_bit_patt
             to_region_idx = smap.region_gained_idx
@@ -519,6 +531,80 @@ class EvolRelevantEventSeriesTabulator():
                     # disambiguation!
                     smap.from_region_idx = \
                         random.choice(potential_from_region_idx)
+
+    def is_fragile_wrt_split(self,
+                             range1_idxs: ty.Set[int],
+                             range2_idxs: ty.Set[int],
+                             conn_graph: pjfio.GeoGraph,
+                             expanding_range_idxs: \
+                                     ty.Optional[ty.List[int]] = None) -> bool:
+        """Determine if splitting range is fragile.
+
+        Checks that every region in range1_idxs is in a different
+        communicating class from every region in range2_idxs.
+
+        Args:
+            range1_idxs (list): List of indices (int) of one of
+                ranges resulting from the split.
+            range2_idxs (list): List of indices (int) of the other
+                range resulting from the split.
+            conn_graph (GeoGraph): Connectivity graph, with each
+                node being a region, and each edge representing
+                the possibility of migration between two regions
+                (i.e., gene flow).
+            expanding_range_idxs (, optional). Defaults to None.
+        """
+
+        def find_edge_pairwise(range1_idxs: ty.Set[int],
+                               range2_idxs: ty.Set[int],
+                               conn_graph: pjfio.GeoGraph):
+
+            for region_idx1 in range1_idxs:
+                for region_idx2 in range2_idxs:
+                    edge_one_way = (region_idx1, region_idx2)
+                    edge_another_way = (region_idx2, region_idx1)
+
+                    # if a single edge is found between comm
+                    # classes, the range is not fragile
+                    if edge_one_way in conn_graph.edge_set or \
+                            edge_another_way in conn_graph.edge_set:
+                        return False
+
+            return True
+
+        # this part of the method finds out if splitting range
+        # is fragile at the cladogenetic event
+        #
+        # if there are no edges at all, the range must be fragile
+        if expanding_range_idxs is None:
+            if len(conn_graph.edge_set) == 0:
+                return True
+
+            # if there are edges, we check pairwise
+            is_fragile = \
+                find_edge_pairwise(range1_idxs,
+                               range2_idxs,
+                               conn_graph)
+            return is_fragile
+
+        # this part of the method is used to determine if
+        # a range prior to a dispersal is already fragile
+        # with respect to a splitting event happening in
+        # the future along this branch
+        else:
+            expanding_in_range1_idx = set([])
+            expanding_in_range2_idx = set([])
+
+            for region_idx in expanding_range_idxs:
+                if region_idx in range1_idxs:
+                    expanding_in_range1_idx.add(region_idx)
+
+                elif region_idx in range2_idxs:
+                    expanding_in_range1_idx.add(region_idx)
+
+            return find_edge_pairwise(expanding_in_range1_idx,
+                                  expanding_in_range2_idx,
+                                  conn_graph)
 
     def initialize_event_series_dict(self) -> None:
 
@@ -565,6 +651,36 @@ class EvolRelevantEventSeriesTabulator():
             # only internal nodes (speciation!)
             if nd_name in smap_on_tree.clado_stoch_maps_dict:
                 clado_smap = smap_on_tree.clado_stoch_maps_dict[nd_name]
+                clado_smap_time_slice_idx = \
+                    self._geofeat_query. \
+                        find_epoch_idx(clado_smap.age)
+                clado_conn_graph = \
+                    self._geofeat_query. \
+                        conn_graph_list[clado_smap_time_slice_idx]
+
+                ch1_bp = clado_smap.to_state_bit_patt  # child 1
+                ch2_bp = clado_smap.to_state2_bit_patt  # child 2
+                # get sets of region indices for the two mutually
+                # exclusive ranges
+                ch1_set = \
+                    set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
+                ch2_set = \
+                    set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
+
+                if not ch1_set.isdisjoint(ch2_set):
+                    exit(("Error during truncation of event series. "
+                          "At range split, the two mutually exclusive ranges shared"
+                          " regions. Exiting..."))
+
+                # annotate cladogenetic stochastic map depending on
+                # whether splitting range is or not fragile at splitting
+                # moment
+                splitting_range_is_fragile = \
+                    self.is_fragile_wrt_split(ch1_set,
+                                              ch2_set,
+                                              clado_conn_graph)
+                clado_smap.splitting_range_fragile = \
+                    splitting_range_is_fragile
 
                 # only speciation events with range splitting
                 if clado_smap.to_state2_bit_patt is not None:
@@ -572,30 +688,74 @@ class EvolRelevantEventSeriesTabulator():
                     # NOTE: assumes stochastic maps are sorted in chronological order!!!
                     # (old first, young later)
                     if nd_name in smap_on_tree.anag_stoch_maps_dict:
-                        anagenetic_smaps_list = smap_on_tree.anag_stoch_maps_dict[nd_name]
+                        anagenetic_smaps_list = \
+                            smap_on_tree.anag_stoch_maps_dict[nd_name]
 
                         ############################################
                         # Further annotation of range expansions   #
                         # (dispersals)                             #
                         ############################################
                         for ana_smap in anagenetic_smaps_list:
-                            # first we disambiguate the source region
-                            self.disambiguate_range_expansion(ana_smap,
-                                                              it_idx)
-                            # then we annotate the over barrier status
-                            time_slice_idx = \
-                                self._geofeat_query.find_epoch_idx(ana_smap.age)
-                            conn_graph = \
-                                self._geofeat_query.conn_graph_list[time_slice_idx]
+                            # gathering initial information to annotate
+                            # anagenetic stochastic map
+                            ana_smap_time_slice_idx = \
+                                self._geofeat_query.\
+                                    find_epoch_idx(ana_smap.age)
+                            ana_conn_graph = \
+                                self._geofeat_query.\
+                                    conn_graph_list[ana_smap_time_slice_idx]
 
                             if ana_smap.map_type == "expansion":
+                                # disambiguate the source region
+                                # (this updates from_region_idx inside stoch map)
+                                self.disambiguate_range_expansion(ana_smap,
+                                                                  it_idx)
+
                                 from_region_idx = ana_smap.from_region_idx
                                 to_region_idx = ana_smap.region_gained_idx
 
+                                # check if regions involved in dispersals
+                                # belong to the same communication class
+                                # (i.e., there is a path of connectivity
+                                # edges between them)
                                 are_connected = \
-                                    conn_graph.are_connected(from_region_idx,
+                                    ana_conn_graph.are_connected(from_region_idx,
                                                              to_region_idx)
-                                ana_smap.over_barrier = not are_connected
+                                ana_smap.within_comm_class = \
+                                    are_connected
+
+                                # check if dispersal was over barrier
+                                # (note that a dispersal may be over a
+                                # barrier, but still happen within a
+                                # communicating class)
+                                over_barrier = \
+                                    True if (from_region_idx, to_region_idx) \
+                                            not in ana_conn_graph.edge_set else \
+                                        False
+
+                                if not self._directed_edges:
+                                    over_barrier = \
+                                        over_barrier or \
+                                        (to_region_idx, from_region_idx) in \
+                                        ana_conn_graph.edge_set
+
+                                ana_smap.over_barrier = over_barrier
+
+                                # TODO: see if from_region_bit_patt is
+                                # fragile, and annotate ana_smap as
+                                # split_relevant_fragile_pre_dispersal = True
+                                # will need parent information to determine
+                                expanding_range_bp = ana_smap.from_state_bit_patt
+                                expanding_range_set = set([idx for idx, b \
+                                                  in enumerate(expanding_range_bp) if b == "1"])
+                                expanding_range_fragile = \
+                                    self.is_fragile_wrt_split(ch1_set,
+                                                              ch2_set,
+                                                              ana_conn_graph,
+                                                              expanding_range_set)
+
+                                ana_smap.previously_fragile_wrt_split = \
+                                    expanding_range_fragile
 
                         event_series.add_events(anagenetic_smaps_list)
 

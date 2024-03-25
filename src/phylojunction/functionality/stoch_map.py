@@ -155,10 +155,16 @@ class RangeExpansion(StochMap):
         region_gained_idx (int): Index of region that was added to the
             starting range (index is the position of the region in the
             bit pattern).
-        over_barrier (bool, optional): Flag specifying if dispersal was over a
-            barrier. Note that even though the dispersal may have been
-            over a barrier, it may not matter for a focal range-split
-            (speciation) event.
+        over_barrier (bool, optional): Flag specifying if the dispersal
+            was over a barrier. Note that even though the dispersal may
+            have been over a barrier, it may not matter for a focal
+            range-split (speciation) event. It may also involve regions
+            that belong to the same communicating class.
+        within_comm_class (bool, optional): Flag specifying if the
+            dispersal was among regions that belong to the same
+            communicating class. Note that even if regions do not belong
+            to the same class, the dispersal may not matter for a focal
+            range-split (speciation) event.
         split_relevant (bool, optional): Flag specified if dispersal
             matters for range split happening in the future.
         erased_by_extinction (bool, optional): Flag specifying if
@@ -169,13 +175,16 @@ class RangeExpansion(StochMap):
     str_representation: str
     size_of_expanding_range: int
     size_of_final_range: int
-    from_region_idx: ty.Optional[int]
+    # from_region_idx: ty.Optional[int]
     region_gained_idx: int
 
     # additional annotation for testing hypotheses
-    over_barrier: ty.Optional[bool]
-    split_relevant: ty.Optional[bool]
-    erased_by_extinction: ty.Optional[bool]
+    _from_region_idx: ty.Optional[int]
+    _over_barrier: ty.Optional[bool]
+    _within_comm_class: ty.Optional[bool]
+    _previously_fragile_wrt_split: ty.Optional[bool]
+    _split_relevant: ty.Optional[bool]
+    # erased_by_extinction: ty.Optional[bool]
 
     def __init__(self,
                  region_gained_idx: int,
@@ -203,7 +212,7 @@ class RangeExpansion(StochMap):
                          map_type="expansion",
                          time=time)
 
-        self.from_region_idx = from_region_idx
+        self._from_region_idx = from_region_idx
         self.region_gained_idx = region_gained_idx
         self.size_of_expanding_range = \
             sum(int(i) for i in from_state_bit_patt)
@@ -211,13 +220,16 @@ class RangeExpansion(StochMap):
             sum(int(i) for i in to_state_bit_patt)
 
         # additional annotation for testing hypotheses
-        self.over_barrier = None
-        self.split_relevant = None
-        self.erased_by_extinction = None
+        self._over_barrier = None
+        self._within_comm_class = None
+        self._previously_fragile_wrt_split = None
+        self._split_relevant = None
+
+        self._init_str_representation()
 
     def _init_str_representation(self) -> None:
         self.str_representation = \
-            "Range expansion / Dispersal (at age = " + str(self.age) + ")" \
+            ("Range expansion / Dispersal (at age = " + str(self.age) + ")" \
             + "\n  Node subtending range expansion: " + self.focal_node_name \
             + "\n    From state " + str(self.from_state) + ", bits \'" \
             + self.from_state_bit_patt + "\', " \
@@ -226,17 +238,79 @@ class RangeExpansion(StochMap):
             + self.to_state_bit_patt + "\', " \
             + "range size " + str(self.size_of_final_range) \
             + "\n    Dispersal from region (index): " + str(self.from_region_idx) \
-            + "\n    Region gained (index): " + str(self.region_gained_idx) \
-            + "\n  Dispersal over barrier: " + str(self.over_barrier) \
-            + ("\n  Dispersal relevant to split: ") + str(self.split_relevant)
+            + "\n    Region gained (index): " + str(self.region_gained_idx))
+
+    @property
+    def from_region_idx(self) -> int:
+        return self._from_region_idx
+
+    @property
+    def over_barrier(self) -> bool:
+        return self._over_barrier
+
+    @property
+    def within_comm_class(self) -> bool:
+        return self._within_comm_class
+
+    @property
+    def previously_fragile_wrt_split(self) -> bool:
+        return self._previously_fragile_wrt_split
+
+    @property
+    def split_relevant(self) -> bool:
+        return self._split_relevant
+
+    @from_region_idx.setter
+    def from_region_idx(self, val: int) -> None:
+        self._from_region_idx = val
+        self._update_str_representation_from_region_idx()
+
+    @over_barrier.setter
+    def over_barrier(self, val: bool) -> None:
+        self._over_barrier = val
+        self._update_str_representation_over_barrier()
+
+    @within_comm_class.setter
+    def within_comm_class(self, val: bool) -> None:
+        self._within_comm_class = val
+        self._update_str_representation_comm_class()
+
+    @previously_fragile_wrt_split.setter
+    def previously_fragile_wrt_split(self, val: bool) -> None:
+        self._previously_fragile_wrt_split = val
+        self._update_str_representation_previously_fragile()
+
+    @split_relevant.setter
+    def split_relevant(self, val: bool) -> None:
+        self._split_relevant = val
+        self._update_str_representation_split_relevant()
+
+    def _update_str_representation_from_region_idx(self) -> None:
+        self.str_representation += "\n    Dispersal from region (index): " \
+                                   + str(self._from_region_idx) \
+
+    def _update_str_representation_comm_class(self) -> None:
+        self.str_representation += "\n  Dispersal within comm. class: " \
+                                   + str(self._within_comm_class) \
+
+    def _update_str_representation_over_barrier(self) -> None:
+        self.str_representation += "\n  Dispersal over barrier: " \
+                                   + str(self._over_barrier)
+
+    def _update_str_representation_previously_fragile(self) -> None:
+        self.str_representation += \
+            "\n  Expanding range previously fragile (w.r.t. split): " \
+            + str(self._previously_fragile_wrt_split)
+
+    def _update_str_representation_split_relevant(self) -> None:
+        self.str_representation += \
+            + "\n  Dispersal relevant to split: " + str(self._split_relevant) \
 
     # setter
     def gained_region_is_lost_in_future(self):
         self.range_expansion_erased_by_extinction = True
 
     def __str__(self) -> str:
-        self._init_str_representation()
-
         return self.str_representation
 
 
@@ -337,6 +411,9 @@ class RangeSplitOrBirth(StochMap):
     # this is when, under GeoSSE, at an internal node
     # we have speciation within a region, e.g., AB -> AB,A
     range_split: bool  # used for printing only
+
+    # if splitting range was fragile across the split
+    _splitting_range_fragile: ty.Optional[bool]
     
     size_of_splitting_node_range: int
     size_of_child1_range: int
@@ -377,6 +454,7 @@ class RangeSplitOrBirth(StochMap):
         self.size_of_child1_range = \
             sum(int(i) for i in to_state_bit_patt)
         self.range_split = False
+        self._splitting_range_fragile = None
         
         self._init_str_representation()
 
@@ -388,7 +466,7 @@ class RangeSplitOrBirth(StochMap):
         self.to_state2_bit_patt = to_state2_bit_patt
         self.size_of_child2_range = \
             sum(int(i) for i in to_state2_bit_patt)
-        self._update_str_representation()
+        self._update_str_representation_child2()
         self.range_split = True
 
     def _init_str_representation(self) -> None:
@@ -403,13 +481,28 @@ class RangeSplitOrBirth(StochMap):
             + self.to_state_bit_patt + "\', " \
             + "range size " + str(self.size_of_child1_range) + ")"
     
-    def _update_str_representation(self) -> None:
+    def _update_str_representation_child2(self) -> None:
         self.str_representation += \
             "\n  Child 2 node: " + self.child2_node_name \
             + " (state " + str(self.to_state2) + ", bits \'" \
             + self.to_state2_bit_patt + "\', " \
             + "range size " + str(self.size_of_child2_range) + ")"
-        
+
+    def _update_str_representation_fragile(self) -> None:
+        self.str_representation += \
+            "\n  Splitting range is fragile: " \
+            + str(self._splitting_range_fragile)
+
+    @property
+    def splitting_range_fragile(self) -> bool:
+        return self._splitting_range_fragile
+
+    @splitting_range_fragile.setter
+    def splitting_range_fragile(self, is_fragile: bool) \
+            -> None:
+        self._splitting_range_fragile = is_fragile
+        self._update_str_representation_fragile()
+
     def __str__(self) -> str:
         if self.range_split:
             return self.str_representation
