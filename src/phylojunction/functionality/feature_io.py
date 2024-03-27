@@ -1223,9 +1223,9 @@ class GeoFeatureQuery():
 
         self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
 
-        self._populate_oldest_geo_cond_bit_dict(geo_cond_name)
-
         # DEPRECATED
+        # self._populate_oldest_geo_cond_bit_dict(geo_cond_name)
+
         self._populate_geo_cond_change_times_dict(geo_cond_name)
 
         self._populate_conn_graph_list(geo_cond_name, is_directed)
@@ -1264,8 +1264,14 @@ class GeoFeatureQuery():
 
             # between
             if type(region1_str_or_list) == list:
-                # old to young bit
+                # region2_str is a bit that will be in the order
+                # epochs are specified in the age summary file (which
+                # should be time index 1 -- top of file -- for the youngest
+                # epoch, and a larger time index for oldest epochs)
                 for region2_str in region1_str_or_list:
+                    # make it old -> young
+                    region2_str = region2_str[::-1]
+
                     # scanning the geographic condition bit pattern
                     # (sliding window of size 2) for a '01' string
                     # which indicates when the geographic condition
@@ -1275,6 +1281,7 @@ class GeoFeatureQuery():
                     # we get the position in the bit pattern where
                     # we had the departing '0', and use that position
                     # to grab the start of the epoch with the '1'
+                    # [age_starts_young2old[idx + 1] for idx, (i, j)
                     region2_times_list = \
                         [age_starts_old2young[idx + 1] for idx, (i, j) \
                            in enumerate(zip(region2_str,
@@ -1282,6 +1289,7 @@ class GeoFeatureQuery():
                          if (i, j) == ('0', '1')]
 
                     # now doing change back times ('10')
+                    # [age_starts_young2old[idx + 1] for idx, (i, j)
                     region2_back_times_list = \
                         [age_starts_old2young[idx + 1] for idx, (i, j) \
                          in enumerate(zip(region2_str,
@@ -1347,7 +1355,8 @@ class GeoFeatureQuery():
             # between
             if type(region1_str_or_list) == list:
                 for region2_str in region1_str_or_list:                    
-                    region2_oldest_bit = region2_str[0]
+                    # region2_oldest_bit = region2_str[0]
+                    region2_oldest_bit = region2_str[-1]
 
                     region1_oldest_bit_list.append(region2_oldest_bit)
 
@@ -1355,8 +1364,9 @@ class GeoFeatureQuery():
 
             # within
             else:
-                # old to young bit
-                region1_oldest_bit_list = region1_str_or_list[0]
+                # time directionality is given by user
+                # region1_oldest_bit_list = region1_str_or_list[0]
+                region1_oldest_bit_list = region1_str_or_list[-1]
 
                 self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
 
@@ -1384,6 +1394,15 @@ class GeoFeatureQuery():
             self.conn_graph_list.append(g)
 
     def find_epoch_idx(self, an_age: float) -> int:
+        """
+
+        Args:
+            an_age (float): The age of an event.
+
+        Returns:
+            (int): Index of epoch containing 'an_age' (with 0 being
+                present).
+        """
 
         time_slice_index = 0
         for time_slice_index in range(0, self.n_time_slices):

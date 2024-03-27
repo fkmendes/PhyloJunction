@@ -237,7 +237,6 @@ class RangeExpansion(StochMap):
             + "\n    To state " + str(self.to_state) + ", bits \'" \
             + self.to_state_bit_patt + "\', " \
             + "range size " + str(self.size_of_final_range) \
-            + "\n    Dispersal from region (index): " + str(self.from_region_idx) \
             + "\n    Region gained (index): " + str(self.region_gained_idx))
 
     @property
@@ -304,7 +303,7 @@ class RangeExpansion(StochMap):
 
     def _update_str_representation_split_relevant(self) -> None:
         self.str_representation += \
-            + "\n  Dispersal relevant to split: " + str(self._split_relevant) \
+            "\n  Dispersal relevant to split: " + str(self._split_relevant) \
 
     # setter
     def gained_region_is_lost_in_future(self):
@@ -335,6 +334,9 @@ class RangeContraction(StochMap):
     size_of_contracting_range: int
     size_of_final_range: int
     region_lost_idx: int
+
+    _previously_fragile_wrt_split: ty.Optional[bool]
+    _fragile_after_contr_wrt_split: ty.Optional[bool]
 
     def __init__(self,
                  region_lost_idx: int,
@@ -367,7 +369,28 @@ class RangeContraction(StochMap):
         self.size_of_final_range = \
             sum(int(i) for i in to_state_bit_patt)
 
+        self._previously_fragile_wrt_split = None
+        self._fragile_after_contr_wrt_split = None
+
         self._init_str_representation()
+
+    @property
+    def previously_fragile_wrt_split(self) -> bool:
+        return self._previously_fragile_wrt_split
+
+    @property
+    def fragile_after_contr_wrt_split(self) -> bool:
+        return self._fragile_after_contr_wrt_split
+
+    @previously_fragile_wrt_split.setter
+    def previously_fragile_wrt_split(self, val: bool) -> None:
+        self._previously_fragile_wrt_split = val
+        self._update_str_representation_previously_fragile()
+
+    @fragile_after_contr_wrt_split.setter
+    def fragile_after_contr_wrt_split(self, val: bool) -> None:
+        self._fragile_after_contr_wrt_split = val
+        self._update_str_representation_fragile_after_contr()
 
     def _init_str_representation(self) -> None:
         self.str_representation = \
@@ -380,6 +403,16 @@ class RangeContraction(StochMap):
             + self.to_state_bit_patt + "\', " \
             + "range size " + str(self.size_of_final_range) \
             + "\n    Region lost (index): " + str(self.region_lost_idx)
+
+    def _update_str_representation_previously_fragile(self) -> None:
+        self.str_representation += \
+            "\n  Contracting range previously fragile (w.r.t. split): " \
+            + str(self._previously_fragile_wrt_split)
+
+    def _update_str_representation_fragile_after_contr(self) -> None:
+        self.str_representation += \
+            "\n  Contracted range is fragile (w.r.t. split): " \
+            + str(self._fragile_after_contr_wrt_split)
 
     def __str__(self) -> str:
         return self.str_representation
@@ -911,14 +944,13 @@ class StochMapsOnTree():
         This function is called outside of StochMapsOnTree.
         It goes through the two stochastic maps dictionaries,
         and updates the AnnotatedTree member with respect to
-        its (i) node's attributes, and (ii) node_attr_dict member
+        its (i) node's attributes, and (ii) node_attr_dict member.
+
+        This function has no return and only side-effects.
 
         Args:
             stoch_map_attr_name (str): Name of the node attribute
                 the stochastic maps carry a value for (e.g., 'state')
-
-        Returns:
-            None, this function has a side-effect
         """
 
         # debugging
@@ -1263,6 +1295,8 @@ class StochMapsOnTreeCollection():
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
         
         sorted(self.sorted_it_idxs)
+
+        print("self.stoch_maps_tree_dict[1]", self.stoch_maps_tree_dict[1])
 
         #############################################
         # Make every SMOT update its tree's members #
