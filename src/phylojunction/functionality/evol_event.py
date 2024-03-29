@@ -49,6 +49,7 @@ class EvolRelevantEvent(ABC):
     _age: ty.Optional[float]
     _time: ty.Optional[float]
     _char_status_dict: ty.Dict[int, bool]
+    _short_str: str
 
     @abstractmethod
     def __init__(self,
@@ -68,6 +69,10 @@ class EvolRelevantEvent(ABC):
         self._char_status_dict = dict()
         for idx in range(n_chars):
             self._char_status_dict[idx] = False
+
+    @abstractmethod
+    def short_str(self) -> str:
+        pass
 
     @property
     def age(self) -> float:

@@ -90,6 +90,9 @@ class StochMap(pjev.EvolRelevantEvent):
         self.to_state2 = to_state2
         self.to_state2_bit_patt = to_state2_bit_patt
 
+    def short_str(self) -> str:
+        super().short_str()
+
 
 class NoChange(StochMap):
     """Stochastic map class for no-change.
@@ -182,7 +185,8 @@ class RangeExpansion(StochMap):
     _from_region_idx: ty.Optional[int]
     _over_barrier: ty.Optional[bool]
     _within_comm_class: ty.Optional[bool]
-    _previously_fragile_wrt_split: ty.Optional[bool]
+    _previously_unstable_wrt_split: ty.Optional[bool]
+    _stabilized_range_wrt_split: ty.Optional[bool]
     _split_relevant: ty.Optional[bool]
     # erased_by_extinction: ty.Optional[bool]
 
@@ -220,10 +224,11 @@ class RangeExpansion(StochMap):
             sum(int(i) for i in to_state_bit_patt)
 
         # additional annotation for testing hypotheses
-        self._over_barrier = None
-        self._within_comm_class = None
-        self._previously_fragile_wrt_split = None
-        self._split_relevant = None
+        self._over_barrier = ""
+        self._within_comm_class = ""
+        self._previously_unstable_wrt_split = ""
+        self._stabilized_range_wrt_split = ""
+        self._split_relevant = ""
 
         self._init_str_representation()
 
@@ -237,7 +242,15 @@ class RangeExpansion(StochMap):
             + "\n    To state " + str(self.to_state) + ", bits \'" \
             + self.to_state_bit_patt + "\', " \
             + "range size " + str(self.size_of_final_range) \
-            + "\n    Region gained (index): " + str(self.region_gained_idx))
+            + "\n    Region gained (index): " + str(self.region_gained_idx)) \
+            + "\n    Dispersal from region (index): " + str(self._from_region_idx) \
+            + "\n  Dispersal relevant to split: " + str(self._split_relevant) \
+            + "\n  Dispersal within comm. class: " + str(self._within_comm_class) \
+            + "\n  Dispersal over barrier: " + str(self._over_barrier) \
+            + "\n  Starting range unstable (w.r.t. split): " \
+            + str(self._previously_unstable_wrt_split) \
+            + "\n  Final range stable (w.r.t. split): " + str(self._stabilized_range_wrt_split)
+
 
     @property
     def from_region_idx(self) -> int:
@@ -253,7 +266,11 @@ class RangeExpansion(StochMap):
 
     @property
     def previously_fragile_wrt_split(self) -> bool:
-        return self._previously_fragile_wrt_split
+        return self._previously_unstable_wrt_split
+
+    @property
+    def stabilized_range_wrt_split(self) -> bool:
+        return self._stabilized_range_wrt_split
 
     @property
     def split_relevant(self) -> bool:
@@ -262,54 +279,66 @@ class RangeExpansion(StochMap):
     @from_region_idx.setter
     def from_region_idx(self, val: int) -> None:
         self._from_region_idx = val
-        self._update_str_representation_from_region_idx()
 
     @over_barrier.setter
     def over_barrier(self, val: bool) -> None:
         self._over_barrier = val
-        self._update_str_representation_over_barrier()
 
     @within_comm_class.setter
     def within_comm_class(self, val: bool) -> None:
         self._within_comm_class = val
-        self._update_str_representation_comm_class()
 
     @previously_fragile_wrt_split.setter
     def previously_fragile_wrt_split(self, val: bool) -> None:
-        self._previously_fragile_wrt_split = val
-        self._update_str_representation_previously_fragile()
+        self._previously_unstable_wrt_split = val
+
+    @stabilized_range_wrt_split.setter
+    def stabilized_range_wrt_split(self, val: bool) -> None:
+        self._stabilized_range_wrt_split = val
 
     @split_relevant.setter
     def split_relevant(self, val: bool) -> None:
         self._split_relevant = val
-        self._update_str_representation_split_relevant()
-
-    def _update_str_representation_from_region_idx(self) -> None:
-        self.str_representation += "\n    Dispersal from region (index): " \
-                                   + str(self._from_region_idx) \
-
-    def _update_str_representation_comm_class(self) -> None:
-        self.str_representation += "\n  Dispersal within comm. class: " \
-                                   + str(self._within_comm_class) \
-
-    def _update_str_representation_over_barrier(self) -> None:
-        self.str_representation += "\n  Dispersal over barrier: " \
-                                   + str(self._over_barrier)
-
-    def _update_str_representation_previously_fragile(self) -> None:
-        self.str_representation += \
-            "\n  Expanding range previously fragile (w.r.t. split): " \
-            + str(self._previously_fragile_wrt_split)
-
-    def _update_str_representation_split_relevant(self) -> None:
-        self.str_representation += \
-            "\n  Dispersal relevant to split: " + str(self._split_relevant) \
 
     # setter
     def gained_region_is_lost_in_future(self):
         self.range_expansion_erased_by_extinction = True
 
+    def short_str(self) -> str:
+        """Summarize stochastic map into short string.
+
+        This is an abstract method of EvolRelevantEvent.
+
+        Returns:
+            (str): Short string with all information on range expansion.
+        """
+        short_str = "d(" + str(self.age) + ")_"
+
+        split_relevant = \
+            "sr" if self._split_relevant else "si"
+        over_barrier = \
+            "ob" if self._over_barrier else "nb"
+        within_component = \
+            "wc" if self._within_comm_class else "oc"
+        prev = \
+            "un(" + self.from_state_bit_patt + ")" if \
+                self._previously_unstable_wrt_split else \
+                "st(" + self.from_state_bit_patt + ")"
+        final = \
+            "st(" + self.to_state_bit_patt + ")" if \
+                self._stabilized_range_wrt_split else \
+                "un(" + self.to_state_bit_patt + ")"
+        prev_final = prev + ">" + final
+
+        short_str += "|".join([split_relevant,
+                               over_barrier,
+                               within_component,
+                               prev_final])
+
+        return short_str
+
     def __str__(self) -> str:
+        self._init_str_representation()
         return self.str_representation
 
 
@@ -335,8 +364,8 @@ class RangeContraction(StochMap):
     size_of_final_range: int
     region_lost_idx: int
 
-    _previously_fragile_wrt_split: ty.Optional[bool]
-    _fragile_after_contr_wrt_split: ty.Optional[bool]
+    _previously_unstable_wrt_split: ty.Optional[bool]
+    _unstable_after_contr_wrt_split: ty.Optional[bool]
 
     def __init__(self,
                  region_lost_idx: int,
@@ -369,28 +398,52 @@ class RangeContraction(StochMap):
         self.size_of_final_range = \
             sum(int(i) for i in to_state_bit_patt)
 
-        self._previously_fragile_wrt_split = None
-        self._fragile_after_contr_wrt_split = None
+        self._previously_unstable_wrt_split = None
+        self._unstable_after_contr_wrt_split = None
 
         self._init_str_representation()
 
     @property
     def previously_fragile_wrt_split(self) -> bool:
-        return self._previously_fragile_wrt_split
+        return self._previously_unstable_wrt_split
 
     @property
     def fragile_after_contr_wrt_split(self) -> bool:
-        return self._fragile_after_contr_wrt_split
+        return self._unstable_after_contr_wrt_split
 
     @previously_fragile_wrt_split.setter
     def previously_fragile_wrt_split(self, val: bool) -> None:
-        self._previously_fragile_wrt_split = val
+        self._previously_unstable_wrt_split = val
         self._update_str_representation_previously_fragile()
 
     @fragile_after_contr_wrt_split.setter
     def fragile_after_contr_wrt_split(self, val: bool) -> None:
-        self._fragile_after_contr_wrt_split = val
+        self._unstable_after_contr_wrt_split = val
         self._update_str_representation_fragile_after_contr()
+
+    def short_str(self) -> str:
+        """Summarize stochastic map into short string.
+
+        This is an abstract method of EvolRelevantEvent.
+
+        Returns:
+            (str): Short string with all information on range expansion.
+        """
+        short_str = "e(" + str(self.age) + ")_"
+
+        prev = \
+            "un(" + self.from_state_bit_patt + ")" if \
+                self._previously_unstable_wrt_split else \
+                "st(" + self.from_state_bit_patt + ")"
+        final = \
+            "st(" + self.to_state_bit_patt + ")" if \
+                self._stabilized_range_wrt_split else \
+                "un("  + self.to_state_bit_patt + ")"
+        prev_final = prev + ">" + final
+
+        short_str += "|" + prev_final
+
+        return short_str
 
     def _init_str_representation(self) -> None:
         self.str_representation = \
@@ -406,13 +459,13 @@ class RangeContraction(StochMap):
 
     def _update_str_representation_previously_fragile(self) -> None:
         self.str_representation += \
-            "\n  Contracting range previously fragile (w.r.t. split): " \
-            + str(self._previously_fragile_wrt_split)
+            "\n  Starting range unstable (w.r.t. split): " \
+            + str(self._previously_unstable_wrt_split)
 
     def _update_str_representation_fragile_after_contr(self) -> None:
         self.str_representation += \
-            "\n  Contracted range is fragile (w.r.t. split): " \
-            + str(self._fragile_after_contr_wrt_split)
+            "\n  Final range unstable (w.r.t. split): " \
+            + str(self._unstable_after_contr_wrt_split)
 
     def __str__(self) -> str:
         return self.str_representation
@@ -446,7 +499,7 @@ class RangeSplitOrBirth(StochMap):
     range_split: bool  # used for printing only
 
     # if splitting range was fragile across the split
-    _splitting_range_fragile: ty.Optional[bool]
+    _splitting_range_unstable: ty.Optional[bool]
     
     size_of_splitting_node_range: int
     size_of_child1_range: int
@@ -487,7 +540,7 @@ class RangeSplitOrBirth(StochMap):
         self.size_of_child1_range = \
             sum(int(i) for i in to_state_bit_patt)
         self.range_split = False
-        self._splitting_range_fragile = None
+        self._splitting_range_unstable = None
         
         self._init_str_representation()
 
@@ -521,20 +574,47 @@ class RangeSplitOrBirth(StochMap):
             + self.to_state2_bit_patt + "\', " \
             + "range size " + str(self.size_of_child2_range) + ")"
 
-    def _update_str_representation_fragile(self) -> None:
+    def _update_str_representation_unstable(self) -> None:
         self.str_representation += \
-            "\n  Splitting range is fragile: " \
-            + str(self._splitting_range_fragile)
+            "\n  Splitting range unstable: " \
+            + str(self._splitting_range_unstable)
 
     @property
     def splitting_range_fragile(self) -> bool:
-        return self._splitting_range_fragile
+        return self._splitting_range_unstable
 
     @splitting_range_fragile.setter
-    def splitting_range_fragile(self, is_fragile: bool) \
+    def splitting_range_fragile(self, is_unstable: bool) \
             -> None:
-        self._splitting_range_fragile = is_fragile
-        self._update_str_representation_fragile()
+        self._splitting_range_unstable = is_unstable
+        self._update_str_representation_unstable()
+
+    def short_str(self) -> str:
+        """Summarize stochastic map into short string.
+
+        This is an abstract method of EvolRelevantEvent.
+
+        Returns:
+            (str): Short string with all information on range expansion.
+        """
+
+        short_str = "s(" + str(self.age) + ")_"
+
+        from_range = "un(" + self.from_state_bit_patt \
+            if self._splitting_range_unstable else \
+            "st(" + self.from_state_bit_patt
+        to_range = self.to_state_bit_patt + "_"
+        if self.to_state2_bit_patt:
+            to_range += self.to_state2_bit_patt + ")"
+
+        else:
+            to_range += self.to_state_bit_patt + ")"
+
+        range = from_range + ">" + to_range
+
+        short_str += range
+
+        return short_str
 
     def __str__(self) -> str:
         if self.range_split:
@@ -1295,8 +1375,6 @@ class StochMapsOnTreeCollection():
                 # print("just added map", iteration_idx, "n_forbidden =", self.stoch_maps_tree_dict[iteration_idx].n_forbidden_higher_order_anagenetic_maps)
         
         sorted(self.sorted_it_idxs)
-
-        print("self.stoch_maps_tree_dict[1]", self.stoch_maps_tree_dict[1])
 
         #############################################
         # Make every SMOT update its tree's members #

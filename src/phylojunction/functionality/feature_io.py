@@ -198,15 +198,20 @@ class GeoGraph():
             barrier_exists = barrier_exists or node1_idx not in self._edge_dict[node2_idx]
             return barrier_exists
 
-    def are_connected(self, node1_idx: int, node2_idx) -> bool:
+    def are_connected(self,
+                      node1_idx: int,
+                      node2_idx: int,
+                      range_bit_pattern: str = "") -> bool:
         """Return boolean for two nodes in the same comm class.
 
-        If two nodes are in the same communicating class, it means they
-        are connected in the connectivity graph.
+        If two nodes are in the same communicating class AND
+        the necessary (in-between) regions in the range are occupied,
+        it means they are connected in the connectivity graph.
 
         Args:
             node1_idx (int): Index of node 1 (region 1).
             node2_idx (int): Index of node 2 (region 2).
+            range_bit_pattern (str): Bit pattern of range
 
         Returns:
             (bool): If two nodes are connected
@@ -259,6 +264,11 @@ class BarrierAppearance(pjev.EvolRelevantEvent):
         self.from_node_idx = from_node_idx
         self.to_node_idx = to_node_idx
 
+    def short_str(self) -> str:
+        short_str = "b+(" + str(self.age) + ")"
+
+        return short_str
+
     def __str__(self) -> str:
         return "Barrier (at age = " + str(self.age) \
             + ") between region " + str(self.from_node_idx) \
@@ -290,6 +300,11 @@ class BarrierDisappearance(pjev.EvolRelevantEvent):
 
         self.from_node_idx = from_node_idx
         self.to_node_idx = to_node_idx
+
+    def short_str(self) -> str:
+        short_str = "b-(" + str(self.age) + ")"
+
+        return short_str
 
     def __str__(self) -> str:
         return "Connectivity restablished (at age = " \
@@ -807,11 +822,19 @@ class GeoFeatureQuery():
 
     Parameters:
         n_regions (int): Number of regions in the system.
-        n_epochs (int): Number of epochs for which one has geographic
-            features scored.
+        n_epochs (int): Number of time slices (i.e., epoch)  for which
+            one has geographic features scored.
         feat_col (GeoFeatureCollection):
-        geo_cond_bit_dict (dict):
-        geo_oldest_cond_bit_dict (dict):
+        geo_cond_bit_dict (dict): Dictionary with keys being the name of
+            a paleogeographical condition (e.g., 'land_bridge'), and
+            values being 1- or 2-D lists with bit patterns. Each bit
+            in the pattern corresponds to a time slice (i.e., epoch),
+            in whatever temporal order the user specifies in the feature
+            and age summary files (conventionally from young to old).
+            If the paleogeographical condition is a function of a
+            within-region feature, the value of the dictionary is a
+            list; if of a between-region feature, the value will be a
+            2-D list.
         conn_graph_list (GeoGraph): List of connectivity graphs, one
             per epoch.
         geo_cond_name (str): Name of geographic condition verified for
@@ -823,6 +846,7 @@ class GeoFeatureQuery():
     n_time_slices: int
 
     feat_coll: GeoFeatureCollection
+
     # bit patterns are in whatever order the time slices appear
     # in the user-specified feature summary file (according
     # to each time slice index)
@@ -837,14 +861,12 @@ class GeoFeatureQuery():
     # of geographic condition change as indicated by a bit in
     # the bit pattern flipping, '01' (0 in epoch 1, 1 in epoch 2);
     # if no flips, no changes
-    # DEPRECATED
     geo_cond_change_times_dict: \
         ty.Dict[str,
                 ty.Union[ty.List[ty.List[float]],
                 ty.List[ty.List[ty.List[float]]]]]
 
     # same as above, but with the bit flipping the other way around, '10'
-    # DEPRECATED
     geo_cond_change_back_times_dict: \
         ty.Dict[str,
                 ty.Union[ty.List[ty.List[float]],
@@ -852,6 +874,7 @@ class GeoFeatureQuery():
 
     geo_cond_name: str
 
+    # DEPRECATED
     # this member below helps us tell if geographic connectivity had
     # previously happened, e.g., maybe a barrier never "appears" during the
     # considered epochs, but that's because it appeared in the unobservable
@@ -864,9 +887,9 @@ class GeoFeatureQuery():
     # 'full' barrier between complex ranges, we need to know if the 'component'
     # barrier was/wasn't always there, so we can say the 'full' barrier is
     # manifested
-    geo_oldest_cond_bit_dict: ty.Dict[str,
-                                  ty.Union[ty.List[ty.List[str]],
-                                           ty.List[str]]]
+    # geo_oldest_cond_bit_dict: ty.Dict[str,
+    #                               ty.Union[ty.List[ty.List[str]],
+    #                                        ty.List[str]]]
 
     # connectivity graph list, one graph per epoch
     conn_graph_list: ty.List[GeoGraph]
@@ -1370,7 +1393,10 @@ class GeoFeatureQuery():
 
                 self.geo_oldest_cond_bit_dict[geo_cond_name].append(region1_oldest_bit_list)
 
-    def _populate_conn_graph_list(self, geo_cond_name: str, is_directed: bool=False):
+    def _populate_conn_graph_list(self,
+                                  geo_cond_name: str,
+                                  is_directed: bool = False,
+                                  user_young2old: bool = True):
         for idx, ep_age in \
                 enumerate(self.feat_coll.epoch_age_start_list_old2young):
 
@@ -1383,15 +1409,23 @@ class GeoFeatureQuery():
                             self.geo_cond_bit_dict[geo_cond_name]\
                                 [from_region_idx][to_region_idx]
 
-                        # geog condition is met in this epoch
+                        # geog condition is met in this time slice
                         if cond_change_bit_patt[idx] == '1':
                             # for now assume that condition met here means pair is connected
                             g.add_edge(from_region_idx, to_region_idx, is_directed=is_directed)
 
             g.populate_comm_class_members()
 
-            # one graph per epoch
-            self.conn_graph_list.append(g)
+            # one graph per epoch, and we want it from
+            # old to young (so if user provided young -> old, we want
+            # to reverse it)
+            if user_young2old:
+                self.conn_graph_list.insert(0, g)
+
+            else:
+                self.conn_graph_list.append(g)
+
+
 
     def find_epoch_idx(self, an_age: float) -> int:
         """
