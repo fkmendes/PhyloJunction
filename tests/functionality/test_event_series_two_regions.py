@@ -89,13 +89,16 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
     def test_event_list_it1(self) -> None:
         """Test two-region, 5-taxon tree event list."""
 
-        nd6_exp = ("d(4.75)_sr|nb|wc|st(10)>st(11)"
+        nd6_exp = ("s(5.0)_st(10>10_10)"
+                   "d(4.75)_sr|nb|wc|st(10)>st(11)"
                    "b+(4.25)"
                    "s(4.0)_un(11>10_01)")
-        nd8_exp = ("b+(4.25)"
+        nd8_exp = ("s(5.0)_st(10>10_10)"
+                   "b+(4.25)"
                    "d(3.25)_sr|ob|oc|st(10)>un(11)"
                    "s(3.0)_un(11>10_01)")
-        nd7_exp = ("b+(4.25)"
+        nd7_exp = ("s(5.0)_st(10>10_10)"
+                   "b+(4.25)"
                    "d(3.25)_sr|ob|oc|st(10)>un(11)"
                    "s(3.0)_un(11>10_01)"
                    "d(2.75)_sr|ob|oc|st(01)>un(11)"
@@ -123,20 +126,20 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                             elif nd_label == "nd8":
                                 nd8_obs += ev.short_str()
 
-        self.assertEqual(nd6_obs, nd6_exp)
-        self.assertEqual(nd7_obs, nd7_exp)
-        self.assertEqual(nd8_obs, nd8_exp)
+        self.assertEqual(nd6_exp, nd6_obs)
+        self.assertEqual(nd7_exp, nd7_obs)
+        self.assertEqual(nd8_exp, nd8_obs)
 
     def test_trunc_event_list_it1(self) -> None:
         """Test two-region, 5-taxon tree truncated event list."""
 
-        nd6_exp = ("d(4.75)_sr|nb|wc|st(10)>st(11)"
-                   "b+(4.25)"
+        nd6_exp = ("b+(4.25)"
                    "s(4.0)_un(11>10_01)")
-        nd8_exp = ("b+(4.25)"
+        nd8_exp = ("s(5.0)_st(10>10_10)"
+                   "b+(4.25)"
                    "d(3.25)_sr|ob|oc|st(10)>un(11)"
                    "s(3.0)_un(11>10_01)")
-        nd7_exp = "b-(1.5)s(1.0)_st(11>10_01)"
+        nd7_exp = "s(1.0)_st(11>10_01)"
 
         nd6_obs = str()
         nd8_obs = str()
@@ -159,8 +162,12 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                             elif nd_label == "nd8":
                                 nd8_obs += ev.short_str()
 
-    def test_hyp(self) -> None:
-        """Test two-region, 5-taxon tree hypothesis."""
+        self.assertEqual(nd6_exp, nd6_obs)
+        self.assertEqual(nd8_exp, nd8_obs)
+        self.assertEqual(nd7_exp, nd7_obs)
+
+    def test_hyp_ann(self) -> None:
+        """Test two-region, 5-taxon tree hypothesis annotation."""
 
         nd6_exp = str("Vicariance")
         nd8_exp = str("Founder event")
@@ -184,9 +191,87 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                     elif nd_label == "nd8":
                         nd8_obs = str(event_series.supported_hyp)
 
-        self.assertEqual(nd6_obs, nd6_exp)
-        self.assertEqual(nd8_obs, nd8_exp)
-        self.assertEqual(nd7_obs, nd7_exp)
+        self.assertEqual(nd6_exp, nd6_obs)
+        self.assertEqual(nd8_exp, nd8_obs)
+        self.assertEqual(nd7_exp, nd7_obs)
+
+    def test_node_count_supporting_hyp_dict(self) -> None:
+        """Test two-region, 5-taxon tree, hypothesis node count."""
+
+        wr_exp = 1
+        amb_exp = 1
+        fe_exp = 1
+        sbe_exp = 0
+        vic_exp = 1
+
+        it_idx = 1
+        hsd = self.est.node_count_supporting_hyp_dict[it_idx]
+
+        wr_obs = 0
+        amb_obs = 0
+        fe_obs = 0
+        sbe_obs = 0
+        vic_obs = 0
+        for hyp, node_count in hsd.items():
+            if hyp == "Within-region speciation":
+                wr_obs = node_count
+
+            elif hyp == "Ambiguous":
+                amb_obs = node_count
+
+            elif hyp == "Founder event":
+                fe_obs = node_count
+
+            elif hyp == "Speciation by extinction":
+                sbe_obs = node_count
+
+            elif hyp == "Vicariance":
+                vic_obs = node_count
+
+        self.assertEqual(wr_exp, wr_obs)
+        self.assertEqual(amb_exp, amb_obs)
+        self.assertEqual(fe_exp, fe_obs)
+        self.assertEqual(sbe_exp, sbe_obs)
+        self.assertEqual(vic_exp, vic_obs)
+
+    def test_hyp_support_by_node_dict(self) -> None:
+        """Test two-region, 5-taxon tree, node hypothesis."""
+
+        nd6_exp = \
+            {'Vicariance': 1,
+             'Founder event': 0,
+             'Speciation by extinction': 0,
+             'Ambiguous': 0,
+             'Within-region speciation': 0}
+        nd7_exp = \
+            {'Vicariance': 0,
+             'Founder event': 0,
+             'Speciation by extinction': 0,
+             'Ambiguous': 1,
+             'Within-region speciation': 0}
+        nd8_exp = \
+            {'Vicariance': 0,
+             'Founder event': 1,
+             'Speciation by extinction': 0,
+             'Ambiguous': 0,
+             'Within-region speciation': 0}
+        nd9_exp = \
+            {'Vicariance': 0,
+             'Founder event': 0,
+             'Speciation by extinction': 0,
+             'Ambiguous': 0,
+             'Within-region speciation': 1}
+
+        nd6_obs = self.est.hyp_support_by_node_dict["nd6"]
+        nd7_obs = self.est.hyp_support_by_node_dict["nd7"]
+        nd8_obs = self.est.hyp_support_by_node_dict["nd8"]
+        nd9_obs = self.est.hyp_support_by_node_dict["nd9"]
+
+        self.assertEqual(nd6_exp, nd6_obs)
+        self.assertEqual(nd7_exp, nd7_obs)
+        self.assertEqual(nd8_exp, nd8_obs)
+        self.assertEqual(nd9_exp, nd9_obs)
+
 
 if __name__ == "__main__":
     # From PhyloJunction/
@@ -199,6 +284,6 @@ if __name__ == "__main__":
     #
     # or
     #
-    # $ python3 -m unittest tests.functionality.test_event_series_two_regions.TestEventSeriesTwoRegions.test_it1
+    # $ python3 -m unittest tests.functionality.test_event_series_two_regions.TestEventSeriesTwoRegions.test_hyp_support_by_node_dict
 
     unittest.main()

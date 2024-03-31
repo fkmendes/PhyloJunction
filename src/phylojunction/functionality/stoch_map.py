@@ -437,7 +437,7 @@ class RangeContraction(StochMap):
                 "st(" + self.from_state_bit_patt + ")"
         final = \
             "st(" + self.to_state_bit_patt + ")" if \
-                self._stabilized_range_wrt_split else \
+                self._unstable_after_contr_wrt_split else \
                 "un("  + self.to_state_bit_patt + ")"
         prev_final = prev + ">" + final
 
@@ -1418,27 +1418,27 @@ class StochMapsOnTreeCollection():
                 nd_idx_list = stoch_maps_on_tree \
                     .identical_clado_stoch_maps_dict[it_idx]
                 identical_cladogenetic_maps_dict[it_idx] = nd_idx_list
- 
-        if len(nonwidespread_cladogenetic_maps_dict) > 0 \
-            or len(identical_cladogenetic_maps_dict) > 0:
-                clado_issue_str = ("\nWARNING: Cladogenetic stochastic maps "
-                                   "had issues:\n\n")
-                
-                clado_issue_str += ("\nIterations with repeated entries"
-                                    " (and the affected nodes)\n")
-                
-                for it_idx, nd_list \
-                        in identical_cladogenetic_maps_dict.items():
-                    clado_issue_str += str(it_idx) \
-                        + "\t" + ", ".join(i for i in nd_list) + "\n"
-                    
-                clado_issue_str += ("\nIterations with non-widespread parent ranges"
-                                    " (and the affected nodes)\n")
-                
-                for it_idx, nd_list \
-                        in nonwidespread_cladogenetic_maps_dict.items():
-                    clado_issue_str += str(it_idx) \
-                        + "\t" + ", ".join(i for i in nd_list) + "\n"
+
+        # len(nonwidespread_cladogenetic_maps_dict) > 0
+        if  len(identical_cladogenetic_maps_dict) > 0:
+            clado_issue_str = ("\nWARNING: Cladogenetic stochastic maps "
+                               "had issues:\n\n")
+
+            clado_issue_str += ("\nIterations with repeated entries"
+                                " (and the affected nodes)\n")
+
+            for it_idx, nd_list \
+                    in identical_cladogenetic_maps_dict.items():
+                clado_issue_str += str(it_idx) \
+                    + "\t" + ", ".join(i for i in nd_list) + "\n"
+
+            # clado_issue_str += ("\nIterations with non-widespread parent ranges"
+            #                     " (and the affected nodes)\n")
+            #
+            # for it_idx, nd_list \
+            #         in nonwidespread_cladogenetic_maps_dict.items():
+            #     clado_issue_str += str(it_idx) \
+            #         + "\t" + ", ".join(i for i in nd_list) + "\n"
         
         if clado_issue_str != "":
             print(clado_issue_str)

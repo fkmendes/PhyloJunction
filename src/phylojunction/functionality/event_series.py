@@ -16,7 +16,6 @@ import phylojunction.functionality.evol_event as pjev
 import phylojunction.functionality.stoch_map as pjsmap
 import phylojunction.functionality.biogeo as pjbio
 import phylojunction.functionality.feature_io as pjfio
-import phylojunction.utility.exception_classes as ec
 import phylojunction.utility.helper_functions as pjh
 
 __author__ = "Fabio K. Mendes"
@@ -28,6 +27,7 @@ class Hypothesis(enum.Enum):
     FOUNDER_EVENT = "Founder event"
     SPECIATION_BY_EXT = "Speciation by extinction"
     AMBIGUOUS = "Ambiguous"
+    WITHIN_REGION = "Within-region speciation"
 
     def __str__(self) -> str:
         return str(self.value)
@@ -397,19 +397,20 @@ class EvolRelevantEventSeriesTabulator():
     # key of outer dict: node label
     # key of inner dict is the iteration index
     _event_series_dict: ty.Dict[str, ty.Dict[int, EvolRelevantEventSeries]]
-    # # same as above, but event series is truncated at its oldest end
-    # # at the first destabilizer dispersal
-    # _truncated_event_series_dict: ty.Dict[str, ty.Dict[int, EvolRelevantEventSeries]]
 
     # key of outer dict: node label
     # key of inner dict is the iteration index
     _region_dispersal_ancestry_dict: ty.Dict[str, ty.Dict[int, RegionDispersalAncestry]]
 
-    _hyp_support_dict: ty.Dict[Hypothesis, int]
     _from_region_sampler: FromRegionSampler
     _n_char: int # number of regions
 
     _directed_edges: bool
+
+    # iteration, hyp str, node count
+    _node_count_supporting_hyp_dict: ty.Dict[int, ty.Dict[str, int]]
+    # node label, hyp str, iteration count
+    _hyp_support_by_node_dict: ty.Dict[str, ty.Dict[str, int]]
 
     def __init__(self,
                  ann_tr_list: ty.List[pjt.AnnotatedTree],
@@ -420,19 +421,20 @@ class EvolRelevantEventSeriesTabulator():
                  verbose: ty.Optional[bool] = False) -> None:
 
         self._event_series_dict = pjh.autovivify(2)
-        # self._truncated_event_series_dict = pjh.autovivify(2)
         self._region_dispersal_ancestry_dict = pjh.autovivify(2)
-
         self._from_region_sampler = from_region_sampler
         self._n_char = from_region_sampler.n_char
-
         self._ann_tr_list = ann_tr_list
-
         self._smap_collection = smap_collection
-
         self._geofeat_query = geofeat_query
-
         self._directed_edges = directed_edges
+
+        self._node_count_supporting_hyp_dict = pjh.autovivify(2)
+        for it_idx in smap_collection.sorted_it_idxs:
+            for hyp in Hypothesis:
+                self._node_count_supporting_hyp_dict[it_idx][str(hyp)] = 0
+
+        self._hyp_support_by_node_dict = pjh.autovivify(2)
 
         # side-effect:
         # initializes self._event_series_dict
@@ -455,7 +457,7 @@ class EvolRelevantEventSeriesTabulator():
             if verbose:
                 print("  ... finished reading paleogeographic events.")
 
-        self.update_trunc_event_series()
+        self.populate_trunc_event_series()
 
         if verbose:
             print("  ... finished truncating event series.")
@@ -464,7 +466,7 @@ class EvolRelevantEventSeriesTabulator():
 
         if verbose:
             print(("  ... finished classifying event series according"
-                   " to the hypothesis they support"))
+                   " to the hypothesis they support."))
 
     def disambiguate_range_expansion(self,
                                      smap: pjsmap.StochMap,
@@ -853,12 +855,9 @@ class EvolRelevantEventSeriesTabulator():
             smap_on_tree = self._smap_collection.stoch_maps_tree_dict[it_idx]
             nd_name = nd.label
             event_series = EvolRelevantEventSeries()
-            parent_nd_name = ""
-            parent_anagenetic_smaps_list: ty.List[pjsmap.StochMap] = list()
 
             # retrieve list of events from parent node
             if nd.parent_node is not None:
-                # and nd.parent_node.label in self._event_series_dict:
                 parent_nd = nd.parent_node
                 parent_nd_name = parent_nd.label
 
@@ -911,11 +910,6 @@ class EvolRelevantEventSeriesTabulator():
                     ch2_set = \
                         set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
 
-                # if not ch1_set.isdisjoint(ch2_set):
-                #     exit(("Error during truncation of event series. "
-                #           "At range split, the two mutually exclusive ranges shared"
-                #           " regions. Exiting..."))
-
                 # only speciation events with range splitting
                 # if clado_smap.to_state2_bit_patt is not None:
                 # cladogenetic
@@ -956,8 +950,8 @@ class EvolRelevantEventSeriesTabulator():
 
                     event_series.add_events(anagenetic_smaps_list)
 
-                    # cladogenetic (has to be the last one in the event series)
-                    event_series.add_events(clado_smap)
+                # cladogenetic (has to be the last one in the event series)
+                event_series.add_events(clado_smap)
 
                     # debugging
                     # if it_idx == 3 and nd_name in ("nd5", "nd7"):
@@ -988,7 +982,6 @@ class EvolRelevantEventSeriesTabulator():
             recursively_populate_event_series_dict(seed_nd,
                                                    it_idx)
 
-
     def add_paleogeo_event_series_dict(self,
                                        geo_cond_name: str,
                                        directed: bool = False,
@@ -1005,10 +998,41 @@ class EvolRelevantEventSeriesTabulator():
             user_young2old (bool): Defaults to 'False'.
         """
 
+        def insort_barrier_disappearance(from_region_idx,
+                                         to_region_idx,
+                                         event_list):
+            bd = pjfio.BarrierDisappearance(
+                self._n_char,
+                epoch_start_age,
+                from_region_idx,
+                to_region_idx
+            )
+
+            # add barrier disappearance as event
+            # according to its age (see __lt__ of
+            # EvolRelevantEvent)
+            insort(event_list, bd)
+
+        def insort_barrier(from_region_idx,
+                           to_region_idx,
+                           event_list):
+            ba = pjfio.BarrierAppearance(
+                self._n_char,
+                epoch_start_age,
+                from_region_idx,
+                to_region_idx
+            )
+
+            # add barrier appearance as event
+            # according to its age (see __lt__ of
+            # EvolRelevantEvent)
+            insort(event_list, ba)
+
         conn_gained_epoch_start_ages_mat = self._geofeat_query.\
             geo_cond_change_times_dict[geo_cond_name]
         conn_lost_epoch_start_ages_mat = self._geofeat_query.\
             geo_cond_change_back_times_dict[geo_cond_name]
+        n_regions = len(conn_gained_epoch_start_ages_mat)
 
         for nd_label, it_event_series_dict in self._event_series_dict.items():
             for it_idx, event_series in it_event_series_dict.items():
@@ -1022,19 +1046,8 @@ class EvolRelevantEventSeriesTabulator():
                     if len(event_list) > 0:
                         # first we find out the mutually exclusive sets of regions
                         range_split_smap = event_list[-1]  # last event is range split
+                        assert isinstance(range_split_smap, pjsmap.RangeSplitOrBirth)
                         range_split_age = range_split_smap.age
-                        ch1_bp = range_split_smap.to_state_bit_patt
-                        ch2_bp = range_split_smap.to_state2_bit_patt
-                        ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
-
-                        ch2_set = ch1_set
-                        if ch2_bp is not None:
-                            ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
-
-                        # if not ch1_set.isdisjoint(ch2_set):
-                        #     exit(("Error during truncation of event series. "
-                        #           "At range split, the two mutually exclusive ranges shared"
-                        #           " regions. Exiting..."))
 
                         # update event_list, going over connectivity graph for
                         # each epoch, and we want old to young (conn_graph_list must also
@@ -1057,76 +1070,52 @@ class EvolRelevantEventSeriesTabulator():
 
                             this_epoch_conn_graph = \
                                 self._geofeat_query.conn_graph_list[epoch_idx]
-                            edge_set = this_epoch_conn_graph.edge_set
 
-                            # check if for at least one pair of nodes in
-                            # the splitting (mutually exclusive) set of
-                            # regions is connected in the connectivity
-                            # graph
-                            for from_region_idx in ch1_set:
-                                for to_region_idx in ch2_set:
-                                    e = (from_region_idx, to_region_idx)
-                                    rev_e = (to_region_idx, from_region_idx)
+                            for from_region_idx in range(n_regions):
+                                # if graph is undirected, we do not care
+                                # about one of the halves of the matrix containing
+                                # the times of connectivity change
+                                inner_loop_idxs = \
+                                    range(n_regions) if directed \
+                                        else range((from_region_idx+1), n_regions)
 
-                                    # if range is stable
-                                    if e in edge_set or \
-                                            (not directed and rev_e in edge_set):
+                                for to_region_idx in inner_loop_idxs:
+                                    if directed and from_region_idx == to_region_idx:
+                                        continue
 
-                                        # and if barrier disappeared in this epoch
-                                        # (note that we are looking at change_epoch instead
-                                        # of change_back because of the behavior of
-                                        # _populate_conn_graph_list() in GeoFeatureQuery,
-                                        # which assumes 1 means connectivity!)
-                                        if epoch_start_age in \
-                                                conn_gained_epoch_start_ages_mat\
-                                                        [from_region_idx][to_region_idx]:
-                                            bd = pjfio.BarrierDisappearance(
-                                                self._n_char,
-                                                epoch_start_age,
-                                                from_region_idx,
-                                                to_region_idx
-                                            )
+                                    elif epoch_start_age in \
+                                            conn_gained_epoch_start_ages_mat\
+                                                    [from_region_idx][to_region_idx]:
+                                        # initialize BarrierDisappearance object and add
+                                        # it according to its age (see __lt__ of
+                                        # EvolRelevantEvent)
+                                        insort_barrier_disappearance(from_region_idx,
+                                                                     to_region_idx,
+                                                                     event_list)
 
-                                            # add barrier disappearance as event
-                                            # according to its age (see __lt__ of
-                                            # EvolRelevantEvent)
-                                            insort(event_list, bd)
+                                    elif epoch_start_age in \
+                                        conn_lost_epoch_start_ages_mat\
+                                            [from_region_idx][to_region_idx]:
+                                        # initialize Barrier object and add
+                                        # it according to its age (see __lt__ of
+                                        # EvolRelevantEvent)
+                                        insort_barrier(from_region_idx,
+                                                       to_region_idx,
+                                                       event_list)
 
-                                    # if range has at least one barrier
-                                    if e not in edge_set or \
-                                            (not directed and rev_e not in edge_set):
-
-                                        # and if barrier appeared in this epoch
-                                        if epoch_start_age in \
-                                                conn_lost_epoch_start_ages_mat\
-                                                        [from_region_idx][to_region_idx]:
-                                            ba = pjfio.BarrierAppearance(
-                                                self._n_char,
-                                                epoch_start_age,
-                                                from_region_idx,
-                                                to_region_idx
-                                            )
-
-                                            # add barrier appearance as event
-                                            # according to its age (see __lt__ of
-                                            # EvolRelevantEvent)
-                                            insort(event_list, ba)
-
-    def update_trunc_event_series(self) -> None:
+    def populate_trunc_event_series(self) -> None:
         """Populate _truncated_event_series_dict
 
         This method visits all event series (for all internal nodes
-        and all iterations) and makes a deep copy of it. Then it
-        truncates each event series at the first split-relevant
-        over-barrier dispersal event after the last split-relevant
-        stable range.
+        and all iterations) and makes a deep copy of it for truncation.
+        Then it truncates that deep copy right after specific events:
+            (i) First range expansion (dispersal) event that re-stabi-
+            zes a splitting (!) range (if speciation is within region,
+            no truncation is carried out);
+            (ii) First barrier disappearance that reconnects a splitting
+            (!) range (again, if speciation is within-region, no
+            truncation is carried out).
         """
-
-        # truncated event series data structure
-        #
-        # it    splitting_nd_idx    event_abbrev_csv_list   hyp
-        #  1    5   b+_0_1,d_0_1_o_r,b-_0_1 vicariance
-        #  2    5   ... founder-event
 
         for nd_label, it_event_series_dict in self._event_series_dict.items():
             for it_idx, event_series in it_event_series_dict.items():
@@ -1139,125 +1128,88 @@ class EvolRelevantEventSeriesTabulator():
                     break
 
                 event_list = event_series.event_list
+                rev_event_list = [ev for ev in reversed(event_list)]
+                range_split_smap = event_list[-1]
+                assert (isinstance(range_split_smap, pjsmap.RangeSplitOrBirth))
 
+                # gathering splitting range info
+                ch1_bp = range_split_smap.to_state_bit_patt
+                ch2_bp = range_split_smap.to_state2_bit_patt
+                ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
+                ch2_set = ch1_set
+                if ch2_bp is not None:
+                    ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
+
+                # now preparing truncated event list
+                #
                 # we make deep copy because the annotation we carry out below
                 # (.split_relevant) will be different for each node in the tree,
                 # for the same dispersal event
                 trunc_event_list = [copy.deepcopy(event) for event in event_list]
-
                 self.event_series_dict[nd_label][it_idx].\
                     trunc_event_list = trunc_event_list
 
                 # now we update truncated list
                 if len(event_list) > 1:
-                    for ev_idx, ev in enumerate(event_list):
-                        # barrier disappearance is always split-relevant,
-                        # but we must check if the actual range was made
-                        # stable by the barrier disappearance (connectivity
-                        # changes are irrelevant if a species is occupying
-                        # a single region, for example)
-                        #
-                        # we need to know the range right at the moment of
-                        # re-connection due to a barrier disappearing
-                        know_range_before = False
-                        range_before_bp = str()
+                    truncate_here = False
 
-                        if ev_idx == 0:
-                            # there are no stoch maps older than this paleogeo
-                            # event, so we need to find the to_range_bit_patt
-                            # of a younger stoch map
-                            for next_ev_idx in range((ev_idx + 1), len(event_list)):
-                                next_ev = event_list[next_ev_idx]
+                    for ev_idx, ev in enumerate(rev_event_list):
+                        ############################################
+                        # Truncation case 1: a split-irrelevant    #
+                        # dispersal happens, but it reconnects the #
+                        # splitting (if within-region speciation,  #
+                        # it does not matter, no truncation!)      #
+                        # components                               #
+                        ############################################
+                        if isinstance(ev, pjsmap.RangeExpansion) and \
+                                ev.stabilized_range_wrt_split and \
+                                ch2_bp is not None:
+                            truncate_here = True
 
-                                # could be anagenetic, cladogenetic or no change!
-                                if isinstance(next_ev,
-                                              pjsmap.StochMap):
-                                    range_before_bp = next_ev.from_state_bit_patt
-                                    know_range_before = True
-
-                        elif ev_idx > 0:
-                            # first we try to find a stochastic map happening
-                            # before the paleogeographic event
-                            for rev_ev_idx in range((ev_idx-1), 0, -1):
-                                prev_ev = event_list[rev_ev_idx]
-
-                                if isinstance(prev_ev, (pjsmap.RangeExpansion,
-                                                        pjsmap.RangeContraction,
-                                                        pjsmap.NoChange)):
-                                    range_before_bp = prev_ev.to_state_bit_patt
-                                    know_range_before = True
-                                    break
-
-                                elif isinstance(prev_ev, pjsmap.RangeSplitOrBirth):
-                                    # could not find range before if we have
-                                    # a speciation event right before paleogeo
-                                    # event -- can't know if to use left or right
-                                    # 'to_range' bit pattern
-                                    break
-
-                            # if we could not find a stochastic map before the
-                            # paleogeo event, it must be because we're deep in the
-                            # tree, or the previous event was a range split and the
-                            # 'to' range is ambiguous (no idea if left or right)
-                            #
-                            # we must now try to see what the 'from' range is of
-                            # the next stochastic map
-                            if not know_range_before:
-                                for next_ev_idx in range((ev_idx+1), len(event_list)):
-                                    next_ev = event_list[next_ev_idx]
-
-                                    # could be anagenetic, cladogenetic or no change!
-                                    if isinstance(next_ev,
-                                                  pjsmap.StochMap):
-                                        range_before_bp = next_ev.from_state_bit_patt
-                                        know_range_before = True
-
-                        # Truncation #
-                        truncate_here = False
-
-                        ###########################################
-                        # Truncation case 1: a barrier disappears #
-                        ###########################################
-
-                        # if a barrier disappears, we need to know that
-                        # the reconnected regions
-                        if isinstance(ev, pjfio.BarrierDisappearance):
-                            assert(range_before_bp)
-                            occ_regions_idxs = \
-                                set([idx for idx, b in \
-                                     enumerate(range_before_bp) if b == "1"])
-
+                        #############################################
+                        # Truncation case 2: a barrier disappears;  #
+                        # this only matters if range is splitting   #
+                        # during speciation, and if the reconnected #
+                        # regions are on opposing sides of the      #
+                        # split                                     #
+                        #############################################
+                        elif isinstance(ev, pjfio.BarrierDisappearance):
+                            # pair of regions reconnected by barrier disappearing
                             reg1_idx = ev.from_node_idx
                             reg2_idx = ev.to_node_idx
 
-                            # if the 2 regions reconnected by the
-                            # barrier disappearance (which is split-relevant,
-                            # so no need to check!) are occupied, then
-                            # we have a stable range (even if the range is not
-                            # fully connected!)
-                            if reg1_idx in occ_regions_idxs and \
-                                reg2_idx in occ_regions_idxs:
-                                truncate_here = True
-
-                        ############################################
-                        # Truncation case 2: a split-irrelevant    #
-                        # dispersal happens, but it reconnects the #
-                        # splitting components                     #
-                        ############################################
-
-                        elif isinstance(ev, pjsmap.RangeExpansion):
-                            if ev.stabilized_range_wrt_split:
+                            # if barrier disappearing is split-relevant
+                            # (if split is within-region, we will never get inside
+                            # this if block)
+                            if (reg1_idx in ch1_set and reg2_idx in ch2_set) or \
+                                    (reg1_idx in ch2_set and reg2_idx in ch1_set) and \
+                                    ch2_bp is not None:
                                 truncate_here = True
 
                         # actually truncate!
                         if truncate_here:
                             event_series.trunc_event_list = \
-                                trunc_event_list[ev_idx:]
+                                trunc_event_list[len(trunc_event_list)-ev_idx:]
+                            break
+
 
     def annotate_event_series_hypothesis(self) -> None:
-        """Look at truncated event series and annotate hypothesis."""
+        """Look at truncated event series and annotate hypothesis.
+
+        Side-effect:
+            (i)   Annotates event series 'supported_hyp' member
+            (ii)  Populates self._node_count_supporting_hyp_dict
+            (iii) Populates self._hyp_support_by_node_dict
+        """
 
         for nd_label, it_event_series_dict in self._event_series_dict.items():
+
+            # start populating class member
+            self._hyp_support_by_node_dict[nd_label] = dict()
+            for hyp in Hypothesis:
+                hyp_str = str(hyp)
+                self._hyp_support_by_node_dict[nd_label][hyp_str] = 0
+
             for it_idx, event_series in it_event_series_dict.items():
                 # root or origin may not have event series,
                 # in which case event_series will be empty dictionary
@@ -1270,20 +1222,40 @@ class EvolRelevantEventSeriesTabulator():
                 destabilizing_extinction = False
                 first_destabilizing_event = ""
 
-                # no events means speciation within region
+                # this should never be the case, because there should always
+                # be at least one speciation event, and then no-change smaps
+                # in the anagenetic sequence
                 if n_events == 0:
-                    event_series.supported_hyp = Hypothesis.AMBIGUOUS
+                    exit("ERROR: Did not find any events for " + nd_label \
+                         + ". Something is weird about the stochastic map file.")
 
-                    # debugging
-                    # print("annotating ambiguous for ", nd_label, "it", it_idx)
-
-                # at least one event means speciation between regions
+                # at least one event means at least speciation happened
                 else:
                     clado_smap = trunc_event_list[-1]
+                    if not isinstance(clado_smap, pjsmap.RangeSplitOrBirth):
+                        exit("ERROR: Last event in event series was not"
+                             "a speciation event. Something is wrong.")
 
-                    # if splitting range is stable, nothing special happened
-                    if not clado_smap.splitting_range_fragile:
+                    # range does not split during speciation
+                    if clado_smap.to_state2_bit_patt is None:
+                        event_series.supported_hyp = Hypothesis.WITHIN_REGION
+                        self._node_count_supporting_hyp_dict[it_idx]\
+                            [str(Hypothesis.WITHIN_REGION)] += 1
+                        self._hyp_support_by_node_dict[nd_label]\
+                            [str(Hypothesis.WITHIN_REGION)] += 1
+
+                        # next iteration, same node!
+                        continue
+
+                    # range does split during speciation
+                    #
+                    # but range is stable, so we cannot tell what happened
+                    elif not clado_smap.splitting_range_fragile:
                         event_series.supported_hyp = Hypothesis.AMBIGUOUS
+                        self._node_count_supporting_hyp_dict[it_idx]\
+                            [str(Hypothesis.AMBIGUOUS)] += 1
+                        self._hyp_support_by_node_dict[nd_label]\
+                            [str(Hypothesis.AMBIGUOUS)] += 1
 
                         # debugging
                         # print("range is stable, annotating ambiguous for ", nd_label, "it", it_idx)
@@ -1291,6 +1263,7 @@ class EvolRelevantEventSeriesTabulator():
                         # next iteration, same node!
                         continue
 
+                    # more than just range split event at the end
                     elif n_events > 1:
                         #########################################
                         # Scanning events                       #
@@ -1327,6 +1300,10 @@ class EvolRelevantEventSeriesTabulator():
                     if first_destabilizing_event == "e" and not \
                             destabilizing_dispersal:
                         event_series.supported_hyp = Hypothesis.SPECIATION_BY_EXT
+                        self._node_count_supporting_hyp_dict[it_idx]\
+                            [str(Hypothesis.SPECIATION_BY_EXT)] += 1
+                        self._hyp_support_by_node_dict[nd_label]\
+                            [str(Hypothesis.SPECIATION_BY_EXT)] += 1
 
                         # debugging
                         # print("annotating sp by ext for ", nd_label, "it", it_idx)
@@ -1334,6 +1311,10 @@ class EvolRelevantEventSeriesTabulator():
                     elif first_destabilizing_event == "d" and not \
                             destabilizing_extinction:
                         event_series.supported_hyp = Hypothesis.FOUNDER_EVENT
+                        self._node_count_supporting_hyp_dict[it_idx]\
+                            [str(Hypothesis.FOUNDER_EVENT)] += 1
+                        self._hyp_support_by_node_dict[nd_label]\
+                            [str(Hypothesis.FOUNDER_EVENT)] += 1
 
                         # debugging
                         # print("annotating founder event for ", nd_label, "it", it_idx)
@@ -1341,27 +1322,33 @@ class EvolRelevantEventSeriesTabulator():
                     # range was already unstable when either destabilizing dispersal
                     # or destabilizing extinction happened
                     elif first_destabilizing_event == "":
-                        if destabilizing_dispersal and not \
-                                destabilizing_extinction:
+                        if (destabilizing_dispersal and not \
+                                destabilizing_extinction) or \
+                                (not destabilizing_dispersal and \
+                                        destabilizing_extinction):
                             event_series.supported_hyp = Hypothesis.AMBIGUOUS
+                            self._node_count_supporting_hyp_dict[it_idx]\
+                                [str(Hypothesis.AMBIGUOUS)] += 1
+                            self._hyp_support_by_node_dict[nd_label]\
+                                [str(Hypothesis.AMBIGUOUS)] += 1
 
                             # debugging
                             # print("annotating vic for ", nd_label, "it", it_idx)
 
-                        elif not destabilizing_dispersal and \
-                                destabilizing_extinction:
-                            event_series.supported_hyp = Hypothesis.AMBIGUOUS
-
                         elif not destabilizing_dispersal and not \
                                 destabilizing_extinction:
                             event_series.supported_hyp = Hypothesis.VICARIANCE
+                            self._node_count_supporting_hyp_dict[it_idx]\
+                                [str(Hypothesis.VICARIANCE)] += 1
+                            self._hyp_support_by_node_dict[nd_label]\
+                                [str(Hypothesis.VICARIANCE)] += 1
 
                     else:
                         # debugging
                         print("first_destabilizing_event", first_destabilizing_event)
                         print("destabilizing_dispersal", destabilizing_dispersal)
                         print("destabilizing_extinction", destabilizing_extinction)
-                        exit("found truncated event series that I do not know how to parse")
+                        exit("Error: Found truncated event series that cannot be classified.")
 
 
     @property
@@ -1369,8 +1356,14 @@ class EvolRelevantEventSeriesTabulator():
         return self._event_series_dict
 
     @property
-    def hyp_support_dict(self) -> ty.Dict[Hypothesis, int]:
-        return self._hyp_support_dict
+    def node_count_supporting_hyp_dict(self) -> \
+            ty.Dict[int, ty.Dict[str, int]]:
+        return self._node_count_supporting_hyp_dict
+
+    @property
+    def hyp_support_by_node_dict(self) -> \
+            ty.Dict[str, ty.Dict[int, str]]:
+        return self._hyp_support_by_node_dict
 
 
 ##################################
@@ -1408,8 +1401,9 @@ if __name__ == "__main__":
     # '0111': 13
     # '1111': 14
 
-    # ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree2.tre",
-    ann_tr_list = [pjr.read_nwk_tree_str("examples/trees_maps_files/geosse_dummy_tree3.tre",
+    tree_fp = "examples/trees_maps_files/geosse_dummy_tree3.tre"
+    # tree_fp = "examples/trees_maps_files/geosse_dummy_tree2.tre"
+    ann_tr_list = [pjr.read_nwk_tree_str(tree_fp,
                                           "read_tree",
                                           node_names_attribute="index",
                                           n_states=n_states,
@@ -1465,13 +1459,17 @@ if __name__ == "__main__":
     # in epoch_age_2_rel_rates, make iteration 1's A -> C 666 to force scenario (ii)
     it_to_look_at = [3]
     for nd_label, it_event_series_dict in est.event_series_dict.items():
+        print(nd_label)
+
         for it_idx, event_series in it_event_series_dict.items():
             if isinstance(event_series, EvolRelevantEventSeries):
                 if it_idx in it_to_look_at:
-                    print(nd_label)
-                    # for ev in event_series.trunc_event_list:
-                    for ev in event_series.event_list:
+                    for ev in event_series.trunc_event_list:
+                    # for ev in event_series.event_list:
                         # print(ev)
                         print(ev.short_str())
                     print(event_series)
         print("\n")
+
+    # print(est.node_count_supporting_hyp_dict[1])
+    # print(est.hyp_support_by_node_dict["nd7"])
