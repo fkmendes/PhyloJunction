@@ -27,12 +27,16 @@ class StochMap(pjev.EvolRelevantEvent):
             target biogeographic range).
         to_state_bit_pattern (str): Bit pattern representation of
             target state (i.e., target biogeographic range).
+        to_state_idx_set (set): Set of indices corresponding to the
+            position of '1's in 'to_state_bit_patt', for child 1.
         to_state2 (int): Integer representation of second target state
             if stochastic map is cladogenetic (i.e., second target
             biogeographic range).
         to_state2_bit_pattern (str): Bit pattern representation of
             second target state if stochastic map is cladogenetic
             (i.e., second target biogeographic range).
+        to_state2_idx_set (set): Set of indices corresponding to the
+            position of '1's in 'to_state_bit_patt', for child 2.
         focal_node_name (str): Name of the node subtending the branch
             along which the stochastic map was placed.
         parent_node_name (str): Name of the node parent to the focal
@@ -49,8 +53,10 @@ class StochMap(pjev.EvolRelevantEvent):
     from_state_bit_patt: str
     to_state: int
     to_state_bit_patt: str
+    to_state_idx_set: ty.Set[int]
     to_state2: int
     to_state2_bit_patt: str
+    to_state2_idx_set: ty.Set[int]
     focal_node_name: str
     parent_node_name: str
     child_node_name: str
@@ -69,8 +75,10 @@ class StochMap(pjev.EvolRelevantEvent):
                  child_node_name: str,
                  map_type: ty.Optional[str] = None,
                  time: ty.Optional[int] = None,
+                 to_state_idx_set: ty.Optional[ty.Set[int]] = None,
                  to_state2: ty.Optional[int] = None,
                  to_state2_bit_patt: ty.Optional[str] = None,
+                 to_state2_idx_set: ty.Optional[ty.Set[int]] = None,
                  child2_node_name: ty.Optional[str] = None) -> None:
 
         # initializing EvolRelevantEvent members
@@ -81,6 +89,7 @@ class StochMap(pjev.EvolRelevantEvent):
         self.from_state_bit_patt = from_state_bit_patt
         self.to_state = to_state
         self.to_state_bit_patt = to_state_bit_patt
+        self.to_state_idx_set = to_state_idx_set
         self.focal_node_name = focal_node_name
         self.parent_node_name = parent_node_name
         self.child_node_name = child_node_name
@@ -89,6 +98,7 @@ class StochMap(pjev.EvolRelevantEvent):
         self.child2_node_name = child2_node_name
         self.to_state2 = to_state2
         self.to_state2_bit_patt = to_state2_bit_patt
+        self.to_state2_idx_set = to_state2_idx_set
 
     def short_str(self) -> str:
         super().short_str()
@@ -520,6 +530,16 @@ class RangeSplitOrBirth(StochMap):
                  to_state2_bit_patt: ty.Optional[str] = None,
                  time: ty.Optional[float] = None) -> None:
 
+        to_state_idx_set = \
+            set([idx for idx, b in \
+                 enumerate(to_state_bit_patt) if b == "1"])
+
+        to_state2_idx_set = to_state_idx_set
+        if to_state2_bit_patt is not None:
+            to_state2_idx_set = \
+                set([idx for idx, b in \
+                     enumerate(to_state2_bit_patt) if b == "1"])
+
         super().__init__(n_regions,
                          age,
                          from_state,
@@ -529,9 +549,11 @@ class RangeSplitOrBirth(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
+                         to_state_idx_set=to_state_idx_set,
                          child2_node_name=child2_node_name,
                          to_state2=to_state2,
                          to_state2_bit_patt=to_state2_bit_patt,
+                         to_state2_idx_set=to_state2_idx_set,
                          map_type="range_split",
                          time=time)
         
@@ -550,6 +572,9 @@ class RangeSplitOrBirth(StochMap):
 
         self.to_state2 = to_state2
         self.to_state2_bit_patt = to_state2_bit_patt
+        self.to_state2_idx_set = \
+            set([idx for idx, b in enumerate(to_state2_bit_patt) \
+                if b == "1"])
         self.size_of_child2_range = \
             sum(int(i) for i in to_state2_bit_patt)
         self._update_str_representation_child2()

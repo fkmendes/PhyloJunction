@@ -251,6 +251,11 @@ class BarrierAppearance(pjev.EvolRelevantEvent):
             in barrier.
     """
 
+    from_node_idx: int
+    to_node_idx: int
+    destabilized_range: ty.Optional[str]
+    range_bit_patt: ty.Optional[str]
+
     def __init__(self,
                  n_chars: int,
                  age: ty.Optional[float],
@@ -263,16 +268,36 @@ class BarrierAppearance(pjev.EvolRelevantEvent):
 
         self.from_node_idx = from_node_idx
         self.to_node_idx = to_node_idx
+        self.destabilized_range = None
+        self.range_bit_patt = None
 
     def short_str(self) -> str:
-        short_str = "b+(" + str(self.age) + ")"
+        short_str = "b+(" + str(self.age) + ")" \
+                    + "_reg(" + str(self.from_node_idx) + "|" \
+                    + str(self.to_node_idx) + ")"
+
+        if self.destabilized_range is not None and \
+                self.range_bit_patt is not None:
+            short_str += "_" + self.destabilized_range \
+                + "(" + self.range_bit_patt + ")"
 
         return short_str
 
     def __str__(self) -> str:
-        return "Barrier (at age = " + str(self.age) \
+        str_representation = \
+            "Barrier (at age = " + str(self.age) \
             + ") between region " + str(self.from_node_idx) \
             + " and " + str(self.to_node_idx)
+
+        if self.destabilized_range is not None and \
+                self.range_bit_patt is not None:
+            str1 = "\n  Destabilized range (" + self.range_bit_patt + "): "
+            str2 = "True" if self.destabilized_range == "destab" \
+                else "N/A"
+            suffix = str1 + str2
+            str_representation += suffix
+
+        return str_representation
 
     def __lt__(self, other) -> bool:
         return super().__lt__(other)
@@ -288,6 +313,11 @@ class BarrierDisappearance(pjev.EvolRelevantEvent):
             in barrier.
     """
 
+    from_node_idx: int
+    to_node_idx: int
+    restabilized_range: ty.Optional[str]
+    range_bit_patt: ty.Optional[str]  # range at time of event
+
     def __init__(self,
                  n_chars: int,
                  age: ty.Optional[float],
@@ -300,17 +330,37 @@ class BarrierDisappearance(pjev.EvolRelevantEvent):
 
         self.from_node_idx = from_node_idx
         self.to_node_idx = to_node_idx
+        self.restabilized_range = None
+        self.range_bit_patt = None
 
     def short_str(self) -> str:
-        short_str = "b-(" + str(self.age) + ")"
+        short_str = "b-(" + str(self.age) + ")" \
+            + "_reg(" + str(self.from_node_idx) + "|" \
+            + str(self.to_node_idx) + ")"
+
+        if self.restabilized_range is not None and \
+                self.range_bit_patt is not None:
+            short_str += "_" + self.restabilized_range \
+                + "(" + self.range_bit_patt + ")"
 
         return short_str
 
     def __str__(self) -> str:
-        return "Connectivity restablished (at age = " \
+        str_representation = \
+            "Connectivity restablished (at age = " \
             + str(self.age) + ") between region " \
             + str(self.from_node_idx) + " and " \
             + str(self.to_node_idx)
+
+        if self.restabilized_range is not None and \
+                self.range_bit_patt is not None:
+            str1 = "\n  Restabilized range (" + self.range_bit_patt + "): "
+            str2 = "True" if self.restabilized_range == "stab" \
+                else "N/A"
+            suffix = str1 + str2
+            str_representation += suffix
+
+        return str_representation
 
     def __lt__(self, other) -> bool:
         return super().__lt__(other)

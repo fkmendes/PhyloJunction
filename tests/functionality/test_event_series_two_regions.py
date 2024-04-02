@@ -89,22 +89,24 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
     def test_event_list_it1(self) -> None:
         """Test two-region, 5-taxon tree event list."""
 
+        nd9_exp = ("s(5.0)_st(10>10_10)")
         nd6_exp = ("s(5.0)_st(10>10_10)"
                    "d(4.75)_sr|nb|wc|st(10)>st(11)"
-                   "b+(4.25)"
+                   "b+(4.25)_reg(0|1)_destab(11)"
                    "s(4.0)_un(11>10_01)")
         nd8_exp = ("s(5.0)_st(10>10_10)"
-                   "b+(4.25)"
+                   "b+(4.25)_reg(0|1)_N/A(10)"
                    "d(3.25)_sr|ob|oc|st(10)>un(11)"
                    "s(3.0)_un(11>10_01)")
         nd7_exp = ("s(5.0)_st(10>10_10)"
-                   "b+(4.25)"
+                   "b+(4.25)_reg(0|1)_N/A(10)"
                    "d(3.25)_sr|ob|oc|st(10)>un(11)"
                    "s(3.0)_un(11>10_01)"
                    "d(2.75)_sr|ob|oc|st(01)>un(11)"
-                   "b-(1.5)"
+                   "b-(1.5)_reg(0|1)_stab(11)"
                    "s(1.0)_st(11>10_01)")
 
+        nd9_obs = str()
         nd6_obs = str()
         nd8_obs = str()
         nd7_obs = str()
@@ -117,7 +119,10 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                 if isinstance(event_series, pjev.EvolRelevantEventSeries):
                     if it_idx in it_to_look_at:
                         for ev in event_series.event_list:
-                            if nd_label == "nd6":
+                            if nd_label == "nd9":
+                                nd9_obs += ev.short_str()
+
+                            elif nd_label == "nd6":
                                 nd6_obs += ev.short_str()
 
                             elif nd_label == "nd7":
@@ -126,6 +131,7 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                             elif nd_label == "nd8":
                                 nd8_obs += ev.short_str()
 
+        self.assertEqual(nd9_exp, nd9_obs)
         self.assertEqual(nd6_exp, nd6_obs)
         self.assertEqual(nd7_exp, nd7_obs)
         self.assertEqual(nd8_exp, nd8_obs)
@@ -133,14 +139,16 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
     def test_trunc_event_list_it1(self) -> None:
         """Test two-region, 5-taxon tree truncated event list."""
 
-        nd6_exp = ("b+(4.25)"
+        nd9_exp = "s(5.0)_st(10>10_10)"
+        nd6_exp = ("b+(4.25)_reg(0|1)_destab(11)"
                    "s(4.0)_un(11>10_01)")
         nd8_exp = ("s(5.0)_st(10>10_10)"
-                   "b+(4.25)"
+                   "b+(4.25)_reg(0|1)_N/A(10)"
                    "d(3.25)_sr|ob|oc|st(10)>un(11)"
                    "s(3.0)_un(11>10_01)")
         nd7_exp = "s(1.0)_st(11>10_01)"
 
+        nd9_obs = str()
         nd6_obs = str()
         nd8_obs = str()
         nd7_obs = str()
@@ -153,7 +161,10 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                 if isinstance(event_series, pjev.EvolRelevantEventSeries):
                     if it_idx in it_to_look_at:
                         for ev in event_series.trunc_event_list:
-                            if nd_label == "nd6":
+                            if nd_label == "nd9":
+                                nd9_obs += ev.short_str()
+
+                            elif nd_label == "nd6":
                                 nd6_obs += ev.short_str()
 
                             elif nd_label == "nd7":
@@ -162,6 +173,7 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                             elif nd_label == "nd8":
                                 nd8_obs += ev.short_str()
 
+        self.assertEqual(nd9_exp, nd9_obs)
         self.assertEqual(nd6_exp, nd6_obs)
         self.assertEqual(nd8_exp, nd8_obs)
         self.assertEqual(nd7_exp, nd7_obs)
@@ -169,10 +181,12 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
     def test_hyp_ann(self) -> None:
         """Test two-region, 5-taxon tree hypothesis annotation."""
 
+        nd9_exp = str("Within-region speciation")
         nd6_exp = str("Vicariance")
         nd8_exp = str("Founder event")
         nd7_exp = str("Ambiguous")
 
+        nd9_obs = str()
         nd6_obs = str()
         nd8_obs = str()
         nd7_obs = str()
@@ -182,7 +196,10 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                 # event_series of root will be an empty dictionary, need
                 # to check
                 if isinstance(event_series, pjev.EvolRelevantEventSeries):
-                    if nd_label == "nd6":
+                    if nd_label == "nd9":
+                        nd9_obs = str(event_series.supported_hyp)
+
+                    elif nd_label == "nd6":
                         nd6_obs = str(event_series.supported_hyp)
 
                     elif nd_label == "nd7":
@@ -191,6 +208,7 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                     elif nd_label == "nd8":
                         nd8_obs = str(event_series.supported_hyp)
 
+        self.assertEqual(nd9_exp, nd9_obs)
         self.assertEqual(nd6_exp, nd6_obs)
         self.assertEqual(nd8_exp, nd8_obs)
         self.assertEqual(nd7_exp, nd7_obs)
@@ -237,6 +255,12 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
     def test_hyp_support_by_node_dict(self) -> None:
         """Test two-region, 5-taxon tree, node hypothesis."""
 
+        nd9_exp = \
+            {'Vicariance': 0,
+             'Founder event': 0,
+             'Speciation by extinction': 0,
+             'Ambiguous': 0,
+             'Within-region speciation': 1}
         nd6_exp = \
             {'Vicariance': 1,
              'Founder event': 0,
@@ -262,11 +286,12 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
              'Ambiguous': 0,
              'Within-region speciation': 1}
 
+        nd9_obs = self.est.hyp_support_by_node_dict["nd9"]
         nd6_obs = self.est.hyp_support_by_node_dict["nd6"]
         nd7_obs = self.est.hyp_support_by_node_dict["nd7"]
         nd8_obs = self.est.hyp_support_by_node_dict["nd8"]
-        nd9_obs = self.est.hyp_support_by_node_dict["nd9"]
 
+        self.assertEqual(nd9_exp, nd9_obs)
         self.assertEqual(nd6_exp, nd6_obs)
         self.assertEqual(nd7_exp, nd7_obs)
         self.assertEqual(nd8_exp, nd8_obs)
