@@ -46,7 +46,7 @@ class TestEventSeriesFourRegions(unittest.TestCase):
                 stoch_map_attr_name="state")
 
         param_log_dir = \
-            "examples/feature_files/four_regions_feature_set_event_series"
+            "examples/feature_files/feature_set_event_series_ABCD"
 
         frs = pjev.FromRegionSampler(
             n_chars,
@@ -57,10 +57,10 @@ class TestEventSeriesFourRegions(unittest.TestCase):
         )
 
         feature_summary_fp = \
-            ("examples/feature_files/four_regions_feature_set_event_series/"
+            ("examples/feature_files/feature_set_event_series_ABCD/"
              "feature_summary.csv")
         age_summary_fp = \
-            ("examples/feature_files/four_regions_feature_set_event_series/"
+            ("examples/feature_files/feature_set_event_series_ABCD/"
              "/age_summary.csv")
 
         fc = pjfio.GeoFeatureCollection(
@@ -144,7 +144,7 @@ class TestEventSeriesFourRegions(unittest.TestCase):
                    "b+(4.0)_reg(1|3)_destab(1101)"
                    "s(3.25)_st(1101>1101_1101)"
                    "b+(3.0)_reg(0|3)_destab(1101)"
-                   "e(2.5)_|st(1101)>un(1100)"
+                   "e(2.5)_un(1101)>st(1100)"
                    "b+(2.0)_reg(1|2)_N/A(1100)"
                    "d(1.5)_sr|ob|oc|st(1100)>un(1110)"
                    "d(0.75)_si|nb|wc|un(1110)>un(1111)"
@@ -153,9 +153,9 @@ class TestEventSeriesFourRegions(unittest.TestCase):
                    "b+(4.0)_reg(1|3)_destab(1101)"
                    "s(3.25)_st(1101>1101_1101)"
                    "b+(3.0)_reg(0|3)_destab(1101)"
-                   "e(2.5)_|st(1101)>st(1001)"
-                   "b+(2.0)_reg(1|2)_N/A(1001)"
-                   "d(1.5)_si|nb|wc|un(1001)>un(1011)"
+                   "d(2.75)_si|nb|wc|un(1101)>st(1111)"
+                   "e(2.5)_st(1111)>un(1011)"
+                   "b+(2.0)_reg(1|2)_N/A(1011)"
                    "d(0.75)_si|nb|wc|un(1011)>un(1111)"
                    "s(0.25)_un(1111>1100_0011)")
 
@@ -289,22 +289,12 @@ class TestEventSeriesFourRegions(unittest.TestCase):
         nd7_exp = ("b+(5.0)_reg(0|2)_N/A(1101)"
                    "b+(4.0)_reg(1|3)_N/A(1101)"
                    "s(3.25)_st(1101>1101_1101)")
-        nd5_exp = ("b+(5.0)_reg(0|2)_N/A(1101)"
-                   "b+(4.0)_reg(1|3)_destab(1101)"
-                   "s(3.25)_st(1101>1101_1101)"
-                   "b+(3.0)_reg(0|3)_destab(1101)"
-                   "e(2.5)_|st(1101)>un(1100)"
-                   "b+(2.0)_reg(1|2)_N/A(1100)"
+        nd5_exp = ("b+(2.0)_reg(1|2)_N/A(1100)"
                    "d(1.5)_sr|ob|oc|st(1100)>un(1110)"
                    "d(0.75)_si|nb|wc|un(1110)>un(1111)"
                    "s(0.25)_un(1111>1100_0011)")
-        nd6_exp = ("b+(5.0)_reg(0|2)_N/A(1101)"
-                   "b+(4.0)_reg(1|3)_destab(1101)"
-                   "s(3.25)_st(1101>1101_1101)"
-                   "b+(3.0)_reg(0|3)_destab(1101)"
-                   "e(2.5)_|st(1101)>st(1001)"
-                   "b+(2.0)_reg(1|2)_N/A(1001)"
-                   "d(1.5)_si|nb|wc|un(1001)>un(1011)"
+        nd6_exp = ("e(2.5)_st(1111)>un(1011)"
+                   "b+(2.0)_reg(1|2)_N/A(1011)"
                    "d(0.75)_si|nb|wc|un(1011)>un(1111)"
                    "s(0.25)_un(1111>1100_0011)")
 

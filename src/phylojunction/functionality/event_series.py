@@ -265,13 +265,24 @@ class EvolRelevantEventSeries:
     truncating it depending on what the user specifies.
 
     Parameters:
-        event_list (list):
-        n_events (int):
-        it_idx (int):
-        trunc_event_list (list):
+        n_regions (int): Number of discrete (unsplittable) regions in
+            the system.
+        event_list (list): List of EvolRelevantEvent objects.
+        n_events (int): Number of EvolRelevantEvent objects.
+        it_idx (int): Index of iteration whose stochastic maps are
+            being used to populate the list of events.
+        trunc_event_list (list): Same as 'event_list', but truncated at
+            the youngest possible event where the range of a lineage
+            is stable with respect to a split. Truncation is not
+            mandatory, and this class member may be identical to
+            'event_list'.
     """
 
-    _event_list: ty.List[pjev.EvolRelevantEvent]
+    _n_regions: int
+    # ? (unknown), 'si_d' (split-irrelevant dispersal), 'sr_dd' (destabilizing dispersal)
+    _region_origin_status: ty.Optional[ty.List[str]]
+
+    _event_list: ty.Optional[ty.List[pjev.EvolRelevantEvent]]
     _n_events: int
     _it_idx: int  # MCMC iteration from which we get an event
 
@@ -279,11 +290,17 @@ class EvolRelevantEventSeries:
     # by external functions
     _trunc_event_list: ty.List[pjev.EvolRelevantEvent]
     _trunc_n_events: int
-    _supported_hyp: Hypothesis
+    _supported_hyp: ty.Optional[Hypothesis]
 
     def __init__(self,
+                 n_regions: ty.Optional[int] = None,
                  event_list: ty.Optional[ty.List[pjev.EvolRelevantEvent]] = None,
                  it_idx: int = -1) -> None:
+
+        self._n_regions = n_regions
+        self._region_origin_status = list()
+        if n_regions is not None:
+            self._region_origin_status = ["N/A" for i in range(n_regions)]
 
         self._it_idx = it_idx
 
@@ -308,6 +325,9 @@ class EvolRelevantEventSeries:
     #         if not isinstance(last_event, pjsmap.RangeSplitOrBirth):
     #             raise ec.SequenceInvalidLastError(type(last_event))
 
+    @property
+    def n_regions(self) -> int:
+        return self._n_regions
 
     @property
     def event_list(self) -> ty.List[pjev.EvolRelevantEvent]:
@@ -336,6 +356,38 @@ class EvolRelevantEventSeries:
         else:
             exit("Cannot add event to event series. Exiting...")
 
+    def update_region_status(self,
+                             from_region_idx: int,
+                             to_region_idx: ty.Optional[int] = None,
+                             status: ty.Optional[str] = None) -> None:
+
+        from_status = self._region_origin_status[from_region_idx]
+
+        # if there is a to_region, it is a range dispersal
+        if to_region_idx is not None:
+            # if a status is provided, it is because the parent
+            # region had unknown status, or we want to force the
+            # status of the new region (it is a split-relevant
+            # destabilizing dispersal!)
+            if status is not None:
+                self._region_origin_status[to_region_idx] = status
+
+            # otherwise, the new region inherits the status of its
+            # parent region
+            else:
+                self._region_origin_status[to_region_idx] = from_status
+
+        # to_region_idx is None -> range contraction!
+        else:
+            self._region_origin_status[from_region_idx] = "N/A"
+
+    def one_srdd_region(self) -> bool:
+        for reg_idx, disp_anc in enumerate(self._region_origin_status):
+            if disp_anc == "srdd":
+                return True
+
+        return False
+
     @property
     def n_events(self) -> int:
         return len(self._event_list)
@@ -345,8 +397,16 @@ class EvolRelevantEventSeries:
     #     return self._series_type
 
     @property
+    def region_origin_status(self) -> ty.List[str]:
+        return self._region_origin_status
+
+    @property
     def supported_hyp(self) -> Hypothesis:
         return self._supported_hyp
+
+    @n_regions.setter
+    def n_regions(self, val: int) -> None:
+        self._n_regions = val
 
     @supported_hyp.setter
     def supported_hyp(self, a_hyp: Hypothesis) -> None:
@@ -358,18 +418,24 @@ class EvolRelevantEventSeries:
         self._update_str_representation_hyp(hyp2replace)
 
     def _update_str_representation_hyp(self, hyp2replace: str = "") -> None:
-        if hyp2replace not in (None, ""):
-            self._str_representation = \
-                self._str_representation.replace(hyp2replace,
-                                                 self._supported_hyp.value)
-            # debugging
-            # print("replacing", hyp2replace, "with", self._supported_hyp.value)
+        if self._supported_hyp is not None:
+            if hyp2replace not in (None, ""):
+                self._str_representation = \
+                    self._str_representation.replace(hyp2replace,
+                                                     self._supported_hyp.value)
+                # debugging
+                # print("replacing", hyp2replace, "with", self._supported_hyp.value)
+
+            else:
+                self._str_representation += "\n  Supported hypothesis: " \
+                                            + self._supported_hyp.value
 
         else:
-            self._str_representation += "\n  Supported hypothesis: " \
-                                        + self._supported_hyp.value
+            exit("I don't have a supported hypothesis, something is wrong")
 
     def __str__(self) -> str:
+        if self._supported_hyp is None:
+            exit("I don't have a supported hypothesis, something is wrong")
         return self._str_representation
 
 
@@ -582,11 +648,11 @@ class EvolRelevantEventSeriesTabulator():
 
         return False
 
-    def is_fragile_wrt_split(self,
-                             splitting_range1_idxs: ty.Set[int],
-                             splitting_range2_idxs: ty.Set[int],
-                             conn_graph: pjfio.GeoGraph,
-                             range_idxs: \
+    def is_unstable_wrt_split(self,
+                              splitting_range1_idxs: ty.Set[int],
+                              splitting_range2_idxs: ty.Set[int],
+                              conn_graph: pjfio.GeoGraph,
+                              range_idxs: \
                                      ty.Optional[ty.List[int]] = None) \
             -> bool:
         """Determine if splitting range is fragile.
@@ -645,14 +711,18 @@ class EvolRelevantEventSeriesTabulator():
                 find_edge_pairwise(splitting_range1_idxs,
                                    splitting_range2_idxs,
                                    conn_graph)
-            is_fragile = not at_least_one_edge
+            is_unstable = not at_least_one_edge
 
-            return is_fragile
+            return is_unstable
 
         # this part of the method is used to determine if
-        # a range prior to a dispersal is already fragile
+        #
+        # (i) a range prior to a dispersal is already unstable
         # with respect to a splitting event happening in
         # the future along this branch
+        #
+        # (ii) a contracted range is on just one side of the
+        # split, which by definition makes it stable
         elif range_idxs is not None:
             range1_idx = set([])
             range2_idx = set([])
@@ -673,18 +743,18 @@ class EvolRelevantEventSeriesTabulator():
             if len(range1_idx) == 0 or \
                 len(range2_idx) == 0:
 
-                is_fragile = False
+                is_unstable = False
 
-                return is_fragile
+                return is_unstable
 
             at_least_one_edge = \
                 find_edge_pairwise(range1_idx,
                                    range2_idx,
                                    conn_graph)
 
-            is_fragile = not at_least_one_edge
+            is_unstable = not at_least_one_edge
 
-            return is_fragile
+            return is_unstable
 
 
     def initialize_event_series_dict(self) -> None:
@@ -692,7 +762,8 @@ class EvolRelevantEventSeriesTabulator():
         def parse_range_expansion(ch1_set,
                                   ch2_set,
                                   ana_smap,
-                                  ana_conn_graph):
+                                  ana_conn_graph) -> None:
+
             # disambiguate the source region
             # (this updates from_region_idx inside stoch map)
             self.disambiguate_range_expansion(ana_smap,
@@ -741,75 +812,73 @@ class EvolRelevantEventSeriesTabulator():
 
             # see if pre-dispersal range is fragile,
             # and annotate ana_smap accordingly
-            expanding_range_bp = ana_smap.from_state_bit_patt
-            expanding_range_set = \
-                set([idx for idx, b \
-                     in enumerate(expanding_range_bp) if b == "1"])
-            expanding_range_fragile = \
-                self.is_fragile_wrt_split(ch1_set,
-                                          ch2_set,
-                                          ana_conn_graph,
-                                          expanding_range_set)
+            # expanding_range_bp = ana_smap.from_state_bit_patt
+            # expanding_range_set = \
+            #     set([idx for idx, b \
+            #          in enumerate(expanding_range_bp) if b == "1"])
+            expanding_range_set = ana_smap.from_state_idx_set
+            expanding_range_unstable = \
+                self.is_unstable_wrt_split(ch1_set,
+                                           ch2_set,
+                                           ana_conn_graph,
+                                           expanding_range_set)
 
-            ana_smap.previously_fragile_wrt_split = \
-                expanding_range_fragile
+            ana_smap.previously_unstable_wrt_split = \
+                expanding_range_unstable
 
             # see if post-dispersal range is stable,
             # and annotate ana_smap accordingly
-            expanded_range_bp = ana_smap.to_state_bit_patt
-            expanded_range_set = \
-                set([idx for idx, b \
-                     in enumerate(expanded_range_bp) if b == "1"])
-            expanded_range_fragile = \
-                self.is_fragile_wrt_split(ch1_set,
-                                          ch2_set,
-                                          ana_conn_graph,
-                                          expanded_range_set)
+            # expanded_range_bp = ana_smap.to_state_bit_patt
+            # expanded_range_set = \
+            #     set([idx for idx, b \
+            #          in enumerate(expanded_range_bp) if b == "1"])
+            expanded_range_set = ana_smap.to_state_idx_set
+            expanded_range_unstable = \
+                self.is_unstable_wrt_split(ch1_set,
+                                           ch2_set,
+                                           ana_conn_graph,
+                                           expanded_range_set)
 
             ana_smap.stabilized_range_wrt_split = \
-                not expanded_range_fragile
-
+                not expanded_range_unstable
 
         def parse_range_contraction(ch1_set,
                                     ch2_set,
                                     ana_smap,
-                                    ana_conn_graph,
-                                    ana_conn_graph_prev_time_slice):
+                                    ana_conn_graph) -> None:
+
             # check if range before contraction
             # was unstable (and annotate ana_smap
             # accordingly)
-            pre_contr_range_bp = ana_smap.from_state_bit_patt
-            pre_contr_range_set = \
-                set([idx for idx, b \
-                     in enumerate(pre_contr_range_bp) if b == "1"])
-            pre_contr_range_fragile = \
-                self.is_fragile_wrt_split(ch1_set,
-                                          ch2_set,
-                                          ana_conn_graph_prev_time_slice,
-                                          pre_contr_range_set)
-            ana_smap.previously_fragile_wrt_split = \
-                pre_contr_range_fragile
+            pre_contr_range_set = ana_smap.from_state_idx_set
+            pre_contr_range_unstable = \
+                self.is_unstable_wrt_split(ch1_set,
+                                           ch2_set,
+                                           ana_conn_graph,
+                                           pre_contr_range_set)
+            ana_smap.previously_unstable_wrt_split = \
+                pre_contr_range_unstable
 
             # check if range after contraction
             # was unstable (and annotate ana_smap
             # accordingly)
-            post_contr_range_bp = ana_smap.to_state_bit_patt
-            post_contr_range_set = \
-                set([idx for idx, b \
-                     in enumerate(post_contr_range_bp) if b == "1"])
-            post_contr_range_fragile = \
-                self.is_fragile_wrt_split(ch1_set,
-                                          ch2_set,
-                                          ana_conn_graph,
-                                          post_contr_range_set)
-            ana_smap.fragile_after_contr_wrt_split = \
-                post_contr_range_fragile
+            post_contr_range_set = ana_smap.to_state_idx_set
+            post_contr_range_unstable = \
+                self.is_unstable_wrt_split(ch1_set,
+                                           ch2_set,
+                                           ana_conn_graph,
+                                           post_contr_range_set)
+            ana_smap.unstable_after_contr_wrt_split = \
+                post_contr_range_unstable
 
             # NOTE:
             # if range is stable before the contraction and unstable
-            # after, then this is 'speciation by extinction'
+            # after, then this can contribute to 'speciation by extinction'
 
-        def do_anagenetic_smap(ch1_set, ch2_set, ana_smap) -> None:
+        def do_anagenetic_smap(ch1_set: ty.Set[int],
+                               ch2_set: ty.Set[int],
+                               ana_smap: pjsmap.StochMap,
+                               event_series: EvolRelevantEventSeries) -> None:
             # gathering initial information to annotate
             # anagenetic stochastic map
 
@@ -827,20 +896,11 @@ class EvolRelevantEventSeriesTabulator():
                     conn_graph_list[ana_smap_time_slice_idx]
 
             if ana_smap.map_type == "contraction":
-                # to determine if the contraction may have led
-                # to speciation, we need to look at the connectivity
-                # graph in the previous time slice as well
-                ana_conn_graph_prev_time_slice = \
-                    self._geofeat_query. \
-                        conn_graph_list[ana_smap_time_slice_idx - 1]
-
                 parse_range_contraction(
                     ch1_set,
                     ch2_set,
                     ana_smap,
-                    ana_conn_graph,
-                    ana_conn_graph_prev_time_slice
-                )
+                    ana_conn_graph)
 
             if ana_smap.map_type == "expansion":
                 parse_range_expansion(
@@ -860,7 +920,7 @@ class EvolRelevantEventSeriesTabulator():
             # do current node
             smap_on_tree = self._smap_collection.stoch_maps_tree_dict[it_idx]
             nd_name = nd.label
-            event_series = EvolRelevantEventSeries()
+            event_series = EvolRelevantEventSeries(n_regions=self._n_char)
 
             # retrieve list of events from parent node
             if nd.parent_node is not None:
@@ -923,14 +983,14 @@ class EvolRelevantEventSeriesTabulator():
                 # cladogenetic
                 #
                 # annotate cladogenetic stochastic map depending on
-                # whether splitting range is or not fragile at splitting
+                # whether splitting range is or not unstable at splitting
                 # moment
-                splitting_range_is_fragile = \
-                    self.is_fragile_wrt_split(ch1_set,
-                                              ch2_set,
-                                              clado_conn_graph)
-                clado_smap.splitting_range_fragile = \
-                    splitting_range_is_fragile
+                splitting_range_is_unstable = \
+                    self.is_unstable_wrt_split(ch1_set,
+                                               ch2_set,
+                                               clado_conn_graph)
+                clado_smap.splitting_range_unstable = \
+                    splitting_range_is_unstable
 
                 # anagenetic
                 # NOTE: assumes stochastic maps are sorted in chronological order!!!
@@ -945,7 +1005,10 @@ class EvolRelevantEventSeriesTabulator():
                         smap_on_tree.anag_stoch_maps_dict[nd_name]
 
                     for ana_smap in anagenetic_smaps_list:
-                        do_anagenetic_smap(ch1_set, ch2_set, ana_smap)
+                        do_anagenetic_smap(ch1_set,
+                                           ch2_set,
+                                           ana_smap,
+                                           event_series)
 
                     # annotating parent events as well
                     for parent_ana_smap in event_series.event_list:
@@ -954,7 +1017,8 @@ class EvolRelevantEventSeriesTabulator():
                                        pjsmap.RangeContraction)):
                             do_anagenetic_smap(ch1_set,
                                                ch2_set,
-                                               parent_ana_smap)
+                                               parent_ana_smap,
+                                               event_series)
 
                     event_series.add_events(anagenetic_smaps_list)
 
@@ -1202,7 +1266,7 @@ class EvolRelevantEventSeriesTabulator():
 
                                 continue
 
-                            # if paleogeo eventis split-relevant
+                            # if paleogeo event is split-relevant
                             if (reg1_idx in ch1_set and reg2_idx in ch2_set) or \
                                     (reg1_idx in ch2_set and reg2_idx in ch1_set) and \
                                     ch1_set != ch2_set:
@@ -1248,12 +1312,6 @@ class EvolRelevantEventSeriesTabulator():
                 # gathering splitting range info
                 ch1_set = range_split_smap.to_state_idx_set
                 ch2_set = range_split_smap.to_state2_idx_set
-                # ch1_bp = range_split_smap.to_state_bit_patt
-                # ch2_bp = range_split_smap.to_state2_bit_patt
-                # ch1_set = set([idx for idx, b in enumerate(ch1_bp) if b == "1"])
-                # ch2_set = ch1_set
-                # if ch2_bp is not None:
-                #     ch2_set = set([idx for idx, b in enumerate(ch2_bp) if b == "1"])
 
                 # now preparing truncated event list
                 #
@@ -1303,6 +1361,16 @@ class EvolRelevantEventSeriesTabulator():
                             #         ch2_bp is not None:
                             truncate_here = True
 
+                        #############################################
+                        # Truncation case 3: a range contraction    #
+                        # happens, and the new range is entirely on #
+                        # one side (of the left child, say) of the  #
+                        # splitting range                           #
+                        #############################################
+                        elif isinstance(ev, pjsmap.RangeContraction) and \
+                                not ev.unstable_after_contr_wrt_split:
+                            truncate_here = True
+
                         # actually truncate!
                         if truncate_here:
                             event_series.trunc_event_list = \
@@ -1337,6 +1405,7 @@ class EvolRelevantEventSeriesTabulator():
                 n_events = len(trunc_event_list)
                 destabilizing_dispersal = False
                 destabilizing_extinction = False
+                destabilizing_barrier = False
                 first_destabilizing_event = ""
 
                 # this should never be the case, because there should always
@@ -1367,7 +1436,7 @@ class EvolRelevantEventSeriesTabulator():
                     # range does split during speciation
                     #
                     # but range is stable, so we cannot tell what happened
-                    elif not clado_smap.splitting_range_fragile:
+                    elif not clado_smap.splitting_range_unstable:
                         event_series.supported_hyp = Hypothesis.AMBIGUOUS
                         self._node_count_supporting_hyp_dict[it_idx]\
                             [str(Hypothesis.AMBIGUOUS)] += 1
@@ -1389,6 +1458,39 @@ class EvolRelevantEventSeriesTabulator():
                         for ev in trunc_event_list:
                             # dispersal (range expansion)
                             if isinstance(ev, pjsmap.RangeExpansion):
+                                #######################################
+                                # Set 'status' member of event series #
+                                #######################################
+                                from_region_idx = ev.from_region_idx
+                                to_region_idx = ev.region_gained_idx
+                                current_status = event_series.region_origin_status[from_region_idx]
+
+                                # first we gather the new status in case we need to use it
+                                new_status = ""
+                                if ev.split_relevant and ev.over_barrier and \
+                                        not ev.stabilized_range_wrt_split:
+                                    # split-relevant destabilizing dispersal (even if it is not the
+                                    # first event to destabilize the range -- it may be an event
+                                    # "contributing" instability)
+                                    new_status = "srdd"
+
+                                if not ev.split_relevant:
+                                    # split-irrelevant dispersal
+                                    new_status = "sid"
+
+                                # now we see if we actually have to set the (new) status in the
+                                # first place, or if the gained region can inherit it from its
+                                # "parent" region
+                                if current_status == "N/A" or new_status == "srdd":
+                                    event_series.update_region_status(from_region_idx,
+                                                                      to_region_idx,
+                                                                      new_status)
+
+                                elif new_status == "sid":
+                                    event_series.update_region_status(from_region_idx,
+                                                                      to_region_idx)
+                                ###### done with 'status' member ######
+
                                 if ev.split_relevant and \
                                         not ev.stabilized_range_wrt_split:
                                     # we have seen a destabilizing dispersal!
@@ -1397,52 +1499,74 @@ class EvolRelevantEventSeriesTabulator():
                                     # if destabilizing dispersal is the
                                     # first destabilizing event and range
                                     # was not previously unstable
-                                    if not ev.previously_fragile_wrt_split and \
+                                    if not ev.previously_unstable_wrt_split and \
                                             first_destabilizing_event == "":
                                         first_destabilizing_event = "d"
 
                             # extinction (range contraction)
                             elif isinstance(ev, pjsmap.RangeContraction):
-                                if ev.fragile_after_contr_wrt_split:
+                                #######################################
+                                # Set 'status' member of event series #
+                                #######################################
+                                region_lost_idx = ev.region_lost_idx
+                                event_series.update_region_status(region_lost_idx)
+                                ###### done with 'status' member ######
+
+                                if not ev.previously_unstable_wrt_split and \
+                                        ev.unstable_after_contr_wrt_split:
                                     destabilizing_extinction = True
 
-                                    if not ev.previously_fragile_wrt_split and \
-                                            first_destabilizing_event == "":
+                                    if first_destabilizing_event == "":
                                         first_destabilizing_event = "e"
+
+                            elif isinstance(ev, pjfio.BarrierAppearance):
+                                if ev.destabilized_range == "destab":
+                                    destabilizing_barrier = True
 
                     ################
                     # Classifying! #
                     ################
 
-                    if first_destabilizing_event == "e" and not \
-                            destabilizing_dispersal:
-                        event_series.supported_hyp = Hypothesis.SPECIATION_BY_EXT
-                        self._node_count_supporting_hyp_dict[it_idx]\
-                            [str(Hypothesis.SPECIATION_BY_EXT)] += 1
-                        self._hyp_support_by_node_dict[nd_label]\
-                            [str(Hypothesis.SPECIATION_BY_EXT)] += 1
+                    if not destabilizing_barrier:
+                        if first_destabilizing_event == "e" and not \
+                                destabilizing_dispersal and not \
+                                event_series.one_srdd_region():
+                            event_series.supported_hyp = Hypothesis.SPECIATION_BY_EXT
+                            self._node_count_supporting_hyp_dict[it_idx]\
+                                [str(Hypothesis.SPECIATION_BY_EXT)] += 1
+                            self._hyp_support_by_node_dict[nd_label]\
+                                [str(Hypothesis.SPECIATION_BY_EXT)] += 1
 
-                        # debugging
-                        # print("annotating sp by ext for ", nd_label, "it", it_idx)
+                            # debugging
+                            # print("annotating sp by ext for ", nd_label, "it", it_idx)
 
-                    elif first_destabilizing_event == "d" and not \
-                            destabilizing_extinction:
-                        event_series.supported_hyp = Hypothesis.FOUNDER_EVENT
-                        self._node_count_supporting_hyp_dict[it_idx]\
-                            [str(Hypothesis.FOUNDER_EVENT)] += 1
-                        self._hyp_support_by_node_dict[nd_label]\
-                            [str(Hypothesis.FOUNDER_EVENT)] += 1
+                        elif (first_destabilizing_event == "d" or event_series.one_srdd_region()) and not \
+                                destabilizing_extinction:
+                            event_series.supported_hyp = Hypothesis.FOUNDER_EVENT
+                            self._node_count_supporting_hyp_dict[it_idx]\
+                                [str(Hypothesis.FOUNDER_EVENT)] += 1
+                            self._hyp_support_by_node_dict[nd_label]\
+                                [str(Hypothesis.FOUNDER_EVENT)] += 1
 
-                        # debugging
-                        # print("annotating founder event for ", nd_label, "it", it_idx)
+                        elif (first_destabilizing_event == "e" and \
+                              event_series.one_srdd_region()) or \
+                              (first_destabilizing_event == "d" and \
+                              destabilizing_extinction):
+                            event_series.supported_hyp = Hypothesis.AMBIGUOUS
+                            self._node_count_supporting_hyp_dict[it_idx]\
+                                [str(Hypothesis.AMBIGUOUS)] += 1
+                            self._hyp_support_by_node_dict[nd_label]\
+                                [str(Hypothesis.AMBIGUOUS)] += 1
 
-                    # range was already unstable when either destabilizing dispersal
-                    # or destabilizing extinction happened
-                    elif first_destabilizing_event == "":
-                        if (destabilizing_dispersal and not \
-                                destabilizing_extinction) or \
-                                (not destabilizing_dispersal and \
-                                        destabilizing_extinction):
+                            # debugging
+                            # print("annotating founder event for ", nd_label, "it", it_idx)
+
+                    # a destabilizing barrier formed
+                    # OR
+                    # range was already unstable when either destabilizing
+                    # dispersal or destabilizing extinction happened
+                    elif destabilizing_barrier or first_destabilizing_event == "":
+                        if event_series.one_srdd_region() or destabilizing_extinction:
                             event_series.supported_hyp = Hypothesis.AMBIGUOUS
                             self._node_count_supporting_hyp_dict[it_idx]\
                                 [str(Hypothesis.AMBIGUOUS)] += 1
@@ -1452,8 +1576,9 @@ class EvolRelevantEventSeriesTabulator():
                             # debugging
                             # print("annotating vic for ", nd_label, "it", it_idx)
 
-                        elif not destabilizing_dispersal and not \
-                                destabilizing_extinction:
+                        elif not event_series.one_srdd_region() and not \
+                                destabilizing_extinction and not \
+                                event_series.one_srdd_region():
                             event_series.supported_hyp = Hypothesis.VICARIANCE
                             self._node_count_supporting_hyp_dict[it_idx]\
                                 [str(Hypothesis.VICARIANCE)] += 1
@@ -1518,7 +1643,8 @@ if __name__ == "__main__":
     # '0111': 13
     # '1111': 14
 
-    tree_fp = "examples/trees_maps_files/geosse_dummy_tree3.tre"
+    tree_fp = "examples/trees_maps_files/geosse_dummy_tree4.tre"
+    # tree_fp = "examples/trees_maps_files/geosse_dummy_tree3.tre"
     # tree_fp = "examples/trees_maps_files/geosse_dummy_tree2.tre"
     ann_tr_list = [pjr.read_nwk_tree_str(tree_fp,
                                           "read_tree",
@@ -1526,8 +1652,10 @@ if __name__ == "__main__":
                                           n_states=n_states,
                                           in_file=True)]
 
-    node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree3_tip_states.tsv"
-    stoch_maps_file_path = "examples/trees_maps_files/geosse_dummy_tree3_maps.tsv"
+    node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree4_tip_states.tsv"
+    stoch_maps_file_path = "examples/trees_maps_files/geosse_dummy_tree4_maps.tsv"
+    # node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree3_tip_states.tsv"
+    # stoch_maps_file_path = "examples/trees_maps_files/geosse_dummy_tree3_maps.tsv"
     # node_states_file_path = "examples/trees_maps_files/geosse_dummy_tree2_tip_states.tsv"
     # stoch_maps_file_path = "examples/trees_maps_files/geosse_dummy_tree2_maps.tsv"
     smap_coll = \
@@ -1537,8 +1665,9 @@ if __name__ == "__main__":
                                          node_states_file_path=node_states_file_path,
                                          stoch_map_attr_name="state")
 
-    # param_log_dir = "examples/feature_files/two_regions_feature_set_event_series"
-    param_log_dir = "examples/feature_files/four_regions_feature_set_event_series"
+    # param_log_dir = "examples/feature_files/feature_set_event_series_AB"
+    # param_log_dir = "examples/feature_files/feature_set_event_series_ABCD"
+    param_log_dir = "examples/feature_files/feature_set_event_series_ABCD_tricky"
     frs = FromRegionSampler(
         n_chars,
         param_log_dir,
@@ -1547,10 +1676,12 @@ if __name__ == "__main__":
         "m_d"
     )
 
-    # feature_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/feature_summary.csv"
-    # age_summary_fp = "examples/feature_files/two_regions_feature_set_event_series/age_summary.csv"
-    feature_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/feature_summary.csv"
-    age_summary_fp = "examples/feature_files/four_regions_feature_set_event_series/age_summary.csv"
+    # feature_summary_fp = "examples/feature_files/feature_set_event_series_AB/feature_summary.csv"
+    # age_summary_fp = "examples/feature_files/feature_set_event_series_AB/age_summary.csv"
+    # feature_summary_fp = "examples/feature_files/feature_set_event_series_ABCD/feature_summary.csv"
+    # age_summary_fp = "examples/feature_files/feature_set_event_series_ABCD/age_summary.csv"
+    feature_summary_fp = "examples/feature_files/feature_set_event_series_ABCD_tricky/feature_summary.csv"
+    age_summary_fp = "examples/feature_files/feature_set_event_series_ABCD_tricky/age_summary.csv"
 
     fc = pjfio.GeoFeatureCollection(
         feature_summary_fp,
@@ -1581,12 +1712,12 @@ if __name__ == "__main__":
         for it_idx, event_series in it_event_series_dict.items():
             if isinstance(event_series, EvolRelevantEventSeries):
                 if it_idx in it_to_look_at:
-                    for ev in event_series.trunc_event_list:
-                    # for ev in event_series.event_list:
+                    # for ev in event_series.trunc_event_list:
+                    for ev in event_series.event_list:
                         # print(ev)
                         print(ev.short_str())
                     print(event_series)
         print("\n")
 
     # print(est.node_count_supporting_hyp_dict[1])
-    # print(est.hyp_support_by_node_dict["nd7"])
+    # print(est.hyp_support_by_node_dict["nd5"])

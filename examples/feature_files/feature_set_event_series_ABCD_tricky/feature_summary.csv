@@ -1,0 +1,7 @@
+time_index,feature_index,feature_relationship,feature_type,feature_path,name
+1,1,between,categorical,examples/feature_files/feature_set_event_series_ABCD_tricky/age1/cb1_1.csv,cb_1
+2,1,between,categorical,examples/feature_files/feature_set_event_series_ABCD_tricky/age2/cb2_1.csv,cb_1
+3,1,between,categorical,examples/feature_files/feature_set_event_series_ABCD_tricky/age3/cb3_1.csv,cb_1
+4,1,between,categorical,examples/feature_files/feature_set_event_series_ABCD_tricky/age4/cb4_1.csv,cb_1
+5,1,between,categorical,examples/feature_files/feature_set_event_series_ABCD_tricky/age5/cb5_1.csv,cb_1
+6,1,between,categorical,examples/feature_files/feature_set_event_series_ABCD_tricky/age6/cb6_1.csv,cb_1

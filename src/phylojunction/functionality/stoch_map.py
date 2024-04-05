@@ -23,6 +23,8 @@ class StochMap(pjev.EvolRelevantEvent):
             source biogeographic range).
         from_state_bit_patt (str): Bit pattern representation of
             source state (i.e., source biogeographic range).
+        from_state_idx_set (set): Set of indices corresponding to the
+            position of '1's in the 'from_state_bit_patt'.
         to_state (int): Integer representation of target state (i.e.,
             target biogeographic range).
         to_state_bit_pattern (str): Bit pattern representation of
@@ -51,6 +53,7 @@ class StochMap(pjev.EvolRelevantEvent):
 
     from_state: int
     from_state_bit_patt: str
+    from_state_idx_set: ty.Set[int]
     to_state: int
     to_state_bit_patt: str
     to_state_idx_set: ty.Set[int]
@@ -75,6 +78,7 @@ class StochMap(pjev.EvolRelevantEvent):
                  child_node_name: str,
                  map_type: ty.Optional[str] = None,
                  time: ty.Optional[int] = None,
+                 from_state_idx_set: ty.Optional[ty.Set[int]] = None,
                  to_state_idx_set: ty.Optional[ty.Set[int]] = None,
                  to_state2: ty.Optional[int] = None,
                  to_state2_bit_patt: ty.Optional[str] = None,
@@ -87,6 +91,7 @@ class StochMap(pjev.EvolRelevantEvent):
         self.map_type = map_type
         self.from_state = from_state
         self.from_state_bit_patt = from_state_bit_patt
+        self.from_state_idx_set = from_state_idx_set
         self.to_state = to_state
         self.to_state_bit_patt = to_state_bit_patt
         self.to_state_idx_set = to_state_idx_set
@@ -213,7 +218,15 @@ class RangeExpansion(StochMap):
                  child_node_name: str,
                  from_region_idx: ty.Optional[int] = None,
                  time: ty.Optional[float] = None):
-        
+
+        from_state_idx_set = \
+            set([idx for idx, b in \
+                 enumerate(from_state_bit_patt) if b == "1"])
+
+        to_state_idx_set = \
+            set([idx for idx, b in \
+                 enumerate(to_state_bit_patt) if b == "1"])
+
         super().__init__(n_regions,
                          age,
                          from_state,
@@ -223,6 +236,8 @@ class RangeExpansion(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
+                         from_state_idx_set=from_state_idx_set,
+                         to_state_idx_set=to_state_idx_set,
                          map_type="expansion",
                          time=time)
 
@@ -275,7 +290,7 @@ class RangeExpansion(StochMap):
         return self._within_comm_class
 
     @property
-    def previously_fragile_wrt_split(self) -> bool:
+    def previously_unstable_wrt_split(self) -> bool:
         return self._previously_unstable_wrt_split
 
     @property
@@ -298,8 +313,8 @@ class RangeExpansion(StochMap):
     def within_comm_class(self, val: bool) -> None:
         self._within_comm_class = val
 
-    @previously_fragile_wrt_split.setter
-    def previously_fragile_wrt_split(self, val: bool) -> None:
+    @previously_unstable_wrt_split.setter
+    def previously_unstable_wrt_split(self, val: bool) -> None:
         self._previously_unstable_wrt_split = val
 
     @stabilized_range_wrt_split.setter
@@ -389,7 +404,15 @@ class RangeContraction(StochMap):
                  parent_node_name: str,
                  child_node_name: str,
                  time: ty.Optional[float] = None) -> None:
-        
+
+        from_state_idx_set = \
+            set([idx for idx, b in \
+                 enumerate(from_state_bit_patt) if b == "1"])
+
+        to_state_idx_set = \
+            set([idx for idx, b in \
+                 enumerate(to_state_bit_patt) if b == "1"])
+
         super().__init__(n_regions,
                          age,
                          from_state,
@@ -399,6 +422,8 @@ class RangeContraction(StochMap):
                          focal_node_name,
                          parent_node_name,
                          child_node_name,
+                         from_state_idx_set=from_state_idx_set,
+                         to_state_idx_set=to_state_idx_set,
                          map_type="contraction",
                          time=time)
 
@@ -414,22 +439,22 @@ class RangeContraction(StochMap):
         self._init_str_representation()
 
     @property
-    def previously_fragile_wrt_split(self) -> bool:
+    def previously_unstable_wrt_split(self) -> bool:
         return self._previously_unstable_wrt_split
 
     @property
-    def fragile_after_contr_wrt_split(self) -> bool:
+    def unstable_after_contr_wrt_split(self) -> bool:
         return self._unstable_after_contr_wrt_split
 
-    @previously_fragile_wrt_split.setter
-    def previously_fragile_wrt_split(self, val: bool) -> None:
+    @previously_unstable_wrt_split.setter
+    def previously_unstable_wrt_split(self, val: bool) -> None:
         self._previously_unstable_wrt_split = val
-        self._update_str_representation_previously_fragile()
+        self._update_str_representation_previously_unstable()
 
-    @fragile_after_contr_wrt_split.setter
-    def fragile_after_contr_wrt_split(self, val: bool) -> None:
+    @unstable_after_contr_wrt_split.setter
+    def unstable_after_contr_wrt_split(self, val: bool) -> None:
         self._unstable_after_contr_wrt_split = val
-        self._update_str_representation_fragile_after_contr()
+        self._update_str_representation_unstable_after_contr()
 
     def short_str(self) -> str:
         """Summarize stochastic map into short string.
@@ -446,12 +471,12 @@ class RangeContraction(StochMap):
                 self._previously_unstable_wrt_split else \
                 "st(" + self.from_state_bit_patt + ")"
         final = \
-            "st(" + self.to_state_bit_patt + ")" if \
+            "un(" + self.to_state_bit_patt + ")" if \
                 self._unstable_after_contr_wrt_split else \
-                "un("  + self.to_state_bit_patt + ")"
+                "st("  + self.to_state_bit_patt + ")"
         prev_final = prev + ">" + final
 
-        short_str += "|" + prev_final
+        short_str += prev_final
 
         return short_str
 
@@ -467,12 +492,12 @@ class RangeContraction(StochMap):
             + "range size " + str(self.size_of_final_range) \
             + "\n    Region lost (index): " + str(self.region_lost_idx)
 
-    def _update_str_representation_previously_fragile(self) -> None:
+    def _update_str_representation_previously_unstable(self) -> None:
         self.str_representation += \
             "\n  Starting range unstable (w.r.t. split): " \
             + str(self._previously_unstable_wrt_split)
 
-    def _update_str_representation_fragile_after_contr(self) -> None:
+    def _update_str_representation_unstable_after_contr(self) -> None:
         self.str_representation += \
             "\n  Final range unstable (w.r.t. split): " \
             + str(self._unstable_after_contr_wrt_split)
@@ -605,11 +630,11 @@ class RangeSplitOrBirth(StochMap):
             + str(self._splitting_range_unstable)
 
     @property
-    def splitting_range_fragile(self) -> bool:
+    def splitting_range_unstable(self) -> bool:
         return self._splitting_range_unstable
 
-    @splitting_range_fragile.setter
-    def splitting_range_fragile(self, is_unstable: bool) \
+    @splitting_range_unstable.setter
+    def splitting_range_unstable(self, is_unstable: bool) \
             -> None:
         self._splitting_range_unstable = is_unstable
         self._update_str_representation_unstable()

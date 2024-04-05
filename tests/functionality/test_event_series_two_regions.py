@@ -46,7 +46,7 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
                 stoch_map_attr_name="state")
 
         param_log_dir = \
-            "examples/feature_files/two_regions_feature_set_event_series"
+            "examples/feature_files/feature_set_event_series_AB"
 
         frs = pjev.FromRegionSampler(
             n_chars,
@@ -57,10 +57,10 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
         )
 
         feature_summary_fp = \
-            ("examples/feature_files/two_regions_feature_set_event_series/"
+            ("examples/feature_files/feature_set_event_series_AB/"
              "feature_summary.csv")
         age_summary_fp = \
-            ("examples/feature_files/two_regions_feature_set_event_series/"
+            ("examples/feature_files/feature_set_event_series_AB/"
              "/age_summary.csv")
 
         fc = pjfio.GeoFeatureCollection(

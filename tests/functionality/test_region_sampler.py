@@ -13,7 +13,7 @@ class TestRegionSampler(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.frs = pjes.FromRegionSampler(
             2,
-            "examples/feature_files/two_regions_feature_set_event_series",
+            "examples/feature_files/feature_set_event_series_AB",
             "epoch_",
             "_rel_rates",
             "m_d"

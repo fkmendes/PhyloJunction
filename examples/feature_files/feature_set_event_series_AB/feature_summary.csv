@@ -1,0 +1,4 @@
+time_index,feature_index,feature_relationship,feature_type,feature_path,name
+1,1,between,categorical,examples/feature_files/feature_set_event_series_AB/age1/cb1_1.csv,cb_1
+2,1,between,categorical,examples/feature_files/feature_set_event_series_AB/age2/cb2_1.csv,cb_1
+3,1,between,categorical,examples/feature_files/feature_set_event_series_AB/age3/cb3_1.csv,cb_1
