@@ -198,7 +198,7 @@ class AnnotatedTree(dp.Tree):
             alternative_root_label: str = "",
             condition_on_obs_both_sides_root: bool = False,
             max_age: ty.Optional[float] = None,
-            slice_t_ends: ty.Optional[ty.List[float]] = [],
+            slice_t_ends: ty.Optional[ty.List[float]] = None,
             slice_age_ends: ty.Optional[ty.List[float]] = None,
             sa_lineage_dict:
             ty.Optional[
@@ -271,6 +271,12 @@ class AnnotatedTree(dp.Tree):
             dict((int(s), 0) for s in range(0, self.state_count, 1))
         self.sa_state_count_dict = \
             dict((int(s), 0) for s in range(0, self.state_count, 1))
+        ## ambiguous states
+        self.state_count_dict[-1] = 0
+        self.extant_terminal_state_count_dict[-1] = 0
+        self.extant_terminal_sampled_state_count_dict[-1] = 0
+        self.extinct_terminal_state_count_dict[-1] = 0
+        self.sa_state_count_dict[-1] = 0
         # TODO: later deal with this
 
         # TODO: add argument for node_attr_dict (when attrs are passed in
@@ -824,22 +830,28 @@ class AnnotatedTree(dp.Tree):
         # iterate over all terminal nodes, including nodes
         # that are not really terminal (direct ancestors),
         # but that are nonetheless implemented as such
-        for nd in self.tree.leaf_node_iter():            
+        for nd in self.tree.leaf_node_iter():
+            # dealing with ambiguous states '?' passed as string
+            # to newick reader
+            st = -1
+            if nd.state in self.state_count_dict:
+                st = nd.state
+
             # now we count
-            self.state_count_dict[nd.state] += 1
+            self.state_count_dict[st] += 1
 
             if nd.alive:
-                self.extant_terminal_state_count_dict[nd.state] += 1
+                self.extant_terminal_state_count_dict[st] += 1
 
                 if nd.sampled:
-                    self.extant_terminal_sampled_state_count_dict[nd.state] += 1
+                    self.extant_terminal_sampled_state_count_dict[st] += 1
 
             else:
                 if nd.is_sa:
-                    self.sa_state_count_dict[nd.state] += 1
+                    self.sa_state_count_dict[st] += 1
                 
                 else:
-                    self.extinct_terminal_state_count_dict[nd.state] += 1    
+                    self.extinct_terminal_state_count_dict[st] += 1
 
     def _populate_node_age_height_dicts(
             self,

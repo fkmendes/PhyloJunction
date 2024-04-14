@@ -1705,15 +1705,15 @@ if __name__ == "__main__":
 
     # looking at things
     # in epoch_age_2_rel_rates, make iteration 1's A -> C 666 to force scenario (ii)
-    it_to_look_at = [3]
+    it_to_look_at = [2]
     for nd_label, it_event_series_dict in est.event_series_dict.items():
         print(nd_label)
 
         for it_idx, event_series in it_event_series_dict.items():
             if isinstance(event_series, EvolRelevantEventSeries):
                 if it_idx in it_to_look_at:
-                    # for ev in event_series.trunc_event_list:
-                    for ev in event_series.event_list:
+                    for ev in event_series.trunc_event_list:
+                    # for ev in event_series.event_list:
                         # print(ev)
                         print(ev.short_str())
                     print(event_series)

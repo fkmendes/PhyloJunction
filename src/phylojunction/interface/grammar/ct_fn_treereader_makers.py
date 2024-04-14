@@ -83,7 +83,7 @@ def make_tree_reader(ct_fn_name: str,
                 node_name_attr = extracted_val[0].replace('"', '')
 
     return CtFnTreeReader(n_samples,
-                        n_repl,
-                        tr_fp_or_str,
-                        node_name_attr,
-                        in_file)
+                          n_repl,
+                          tr_fp_or_str,
+                          node_name_attr,
+                          in_file)
