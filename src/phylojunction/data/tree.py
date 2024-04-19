@@ -1157,17 +1157,17 @@ class AnnotatedTree(dp.Tree):
             # print(int_node_lists_to_merge)
 
             for sublist in int_node_lists_to_merge:
-                # must be the case b/c of how int_node_lists_to_merge is built
+                # must be the 1st entry b/c of how int_node_lists_to_merge is built
                 # (first item is necessarily the youngest, as older
                 # consecutively pruned internal nodes are appended to end of
                 # list)
                 youngest_int_nd_name = sublist[0]
                 found_child_to_paste_to = False
 
-                for leaf_nd in self.tree_reconstructed.leaf_node_iter():
-                    leaf_node_name = leaf_nd.label
+                for nd2merge_with in self.tree_reconstructed.preorder_node_iter():
+                    nd2merge_with_name = nd2merge_with.label
                     complete_tr_leaf_nd = \
-                        self.tree.find_node_with_label(leaf_node_name)
+                        self.tree.find_node_with_label(nd2merge_with_name)
                     complete_tr_leaf_nd_parent_name = \
                         complete_tr_leaf_nd.parent_node.label
 
@@ -1176,7 +1176,13 @@ class AnnotatedTree(dp.Tree):
                         found_child_to_paste_to = True
 
                         # debugging
-                        # print(youngest_int_nd_name, "is pasted to", leaf_node_name)
+                        # print(youngest_int_nd_name, "is pasted to", nd2merge_with_name)
+
+                        # first we check if that node already had its list
+                        # of attribute transitions, because if not, we must
+                        # create one
+                        if nd2merge_with_name not in self.rec_tr_at_dict:
+                            self.rec_tr_at_dict[nd2merge_with_name] = list()
 
                         # merge of AttributeTransition's!
                         for int_nd_name in sublist:
@@ -1186,13 +1192,27 @@ class AnnotatedTree(dp.Tree):
                                     reversed(self.rec_tr_at_dict[int_nd_name])
 
                                 for at2merge in int_nd_to_merge_at_list:
-                                    self.rec_tr_at_dict[leaf_node_name].\
+                                    self.rec_tr_at_dict[nd2merge_with_name].\
                                         insert(0, at2merge)
 
                 if not found_child_to_paste_to:
-                    exit(("Could not find a reconstructed tree leaf to"
-                          "paste the attribute transitions of pruned"
-                          "internal node" + youngest_int_nd_name))
+                    tr_str = \
+                        self.tree.as_string(
+                            schema="newick",
+                            suppress_internal_taxon_labels=True,
+                            suppress_internal_node_labels=False,
+                            suppress_rooting=True)
+                    print(tr_str)
+                    tr_rec_str = \
+                        self.tree_reconstructed.as_string(
+                        schema="newick",
+                        suppress_internal_taxon_labels=True,
+                        suppress_internal_node_labels=False,
+                        suppress_rooting=True)
+                    print(tr_rec_str)
+                    exit(("Could not find a reconstructed tree leaf to "
+                          "paste the attribute transitions of pruned "
+                          "internal node " + youngest_int_nd_name))
 
             # remove internal nodes that are not in the rec tree
             rec_tr_nd_names = \
