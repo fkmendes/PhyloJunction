@@ -12,12 +12,23 @@ def recursively_do_node(nd: dp.Node,
                         nd_age_dict: ty.Dict[str, float],
                         pars: ty.Tuple[np.matrix, np.ndarray],
                         n_states: int,
-                        dn_es: np.ndarray,
                         log_norm_factors: ty.List[float]) -> np.ndarray:
 
+    # get parameters
     qs, mus, lambdas = pars
-    t_start = 0
-    t_end = nd.edge_length
+
+    # get node inf
+    nd_name = nd.label
+    nd_age = nd_age_dict(nd_name)
+
+    # get integration interval info
+
+    # MBT
+    t_start = nd_age
+    t_end = nd.edge_length + nd_age
+    # simple BiSSE
+    # t_start = 0
+    # t_end = nd.edge_length
 
     children_ds_es: ty.List[np.ndarray] = list()
 
@@ -30,20 +41,28 @@ def recursively_do_node(nd: dp.Node,
                                     nd_age_dict,
                                     pars,
                                     n_states,
-                                    dn_es,
                                     log_norm_factors)
             children_ds_es.append(ch_ds_es)
-
-    n_ch_ds_es = len(children_ds_es)
 
     ######################
     # Doing current node #
     ######################
 
+    # debugging
+    # print("doing nd", nd.label)
+
+    # new Ds and Es for every node, terminal or internal
+    ds_es = np.zeros(2 * n_states)
+
     # if internal node
     # (combine children if neither is a direct ancestor)
-    if n_ch_ds_es == 2:
+    if nd.num_child_nodes() == 2:
         left_ds_es, right_ds_es = children_ds_es
+
+        # debugging
+        # print("ds_es (before combining)\n", ds_es)
+        # print("left_ds_es", left_ds_es)
+        # print("right_ds_es", right_ds_es)
 
         for i in range(n_states):
             # combine Ds
@@ -67,22 +86,41 @@ def recursively_do_node(nd: dp.Node,
         else:
             st = int(st)
             # obs D is 1, Es remain zero
-            ds_es[nd.state] = 1
+            ds_es[st] = 1
 
-    ds_es = \
-        pjbisse.solve_bisse_ds_es(ds_es,
+    # debugging
+    # print("ds_es (after combining if internal)", ds_es)
+    # print("t_start", t_start, "t_end", t_end)
+
+    # if not root, we have a branch to integrate over
+    if nd.parent_node is not None:
+        # ds_es = \
+        #     pjbisse.solve_bisse_ds_es(ds_es,
+        #                               t_start,
+        #                               t_end,
+        #                               qs,
+        #                               mus,
+        #                               lambdas,
+        #                               verbose=False)
+
+        ds_es = \
+            pjmbt.solve_mbt_ds_es(ds_es,
                                   t_start,
                                   t_end,
                                   qs,
                                   mus,
-                                  lambdas)
+                                  lambdas,
+                                  verbose=False)
 
-    norm_factor = np.sum(ds_es)
+        norm_factor = np.sum(ds_es)
 
-    # normalize ds_es
-    ds_es /= norm_factor
+        # normalize ds_es
+        ds_es /= norm_factor
 
-    log_norm_factors.append(math.log(norm_factor))
+        log_norm_factors.append(math.log(norm_factor))
+
+    # debugging
+    # print("returned ds_es", ds_es, "\n")
 
     return ds_es, log_norm_factors
 
@@ -99,7 +137,7 @@ def prune_mbt(ann_tr: AnnotatedTree,
 
     # initialize ds_es and log_norm_factors
     ds_es = np.zeros(2 * n_states)
-    log_norm_factors: ty.List[float] = list
+    log_norm_factors: ty.List[float] = list()
 
     # get origin or root node
     seed_nd = ann_tr.origin_node if ann_tr.with_origin \
@@ -114,18 +152,25 @@ def prune_mbt(ann_tr: AnnotatedTree,
                             nd_age_dict,
                             pars,
                             n_states,
-                            ds_es,
                             log_norm_factors)
 
     # TODO: now do stuff at root depending on conditioning
-    log_lk = 0.0
-    for i in range(n_states):
-        log_lik += pi[i] * ds_es[i]
+    lk = 0.0
 
+    # looking at Ds
+    for i in range(n_states):
+        lk += pi[i] * ds_es[i]
+
+    log_lk = math.log(lk)
+
+    # put back normalization factors
+    # print("log-norm factor sum", sum(log_norm_factors))
     log_lk += sum(log_norm_factors)
 
     if cond_on_survival:
         pass
+
+    return log_lk
 
 
 if __name__ == "__main__":
@@ -136,7 +181,7 @@ if __name__ == "__main__":
     # Initializing tree #
     #####################
     # '?' signalizes ambiguous state (represented as '-1' inside AnnotatedTree's dict members)
-    tr_str = "((A:1.0[&state=?],B:1.0[&state=?])nd1:1.0[&state=?],C:2.0[&state=?])root[&state=?];"
+    tr_str = "((A:0.0001[&state=1],B:0.0001[&state=0])nd1:0.0001[&state=?],C:0.0002[&state=0])root[&state=?];"
     dp_tree = dp.Tree.get(data=tr_str, schema="newick")
 
     # preparing DendroPy tree to be fed into AnnotatedTree
@@ -174,9 +219,9 @@ if __name__ == "__main__":
     # Initializing parameters #
     ###########################
 
-    qs = np.matrix([[-1.1, 0.1], [0.1, -0.95]])
-    mus = np.array([.25, .35])
-    lambdas = np.array([.75, .5])
+    qs = np.matrix([[-2., .9], [.001, -.2]])
+    mus = np.array([.1, .1])
+    lambdas = np.array([1.0, .099])
     pi = np.array([.5, .5])
     pars = (qs, mus, lambdas, pi)
 
@@ -184,8 +229,14 @@ if __name__ == "__main__":
     # Get likelihood! #
     ###################
 
-    prune_mbt(ann_tr,
-              pars,
-              n_states,
-              cond_on_survival=True,
-              correct_tip_shuffling=False)
+    log_lk = \
+        prune_mbt(ann_tr,
+                  pars,
+                  n_states,
+                  cond_on_survival=True,
+                  correct_tip_shuffling=False)
+
+    print("Final log-lk =", log_lk)
+
+    # tr_str = "((A:0.0001[&state=1],B:0.0001[&state=0])nd1:0.0001[&state=?],C:0.0002[&state=0])root[&state=?];"
+    # log-lk = -10.00966707670628

@@ -1,5 +1,6 @@
 import typing as ty
 import numpy as np
+import math
 from scipy.integrate import solve_ivp
 
 __author__ = "Fabio K. Mendes"
@@ -81,8 +82,8 @@ def solve_bisse_ds_es(ds_es, t_start, t_end, qs, mus, lambdas,
                   ds_es,
                   method='RK45',
                   args=pars,
-                  rtol=1e-4,
-                  atol=1e-4,
+                  rtol=1e-8,
+                  atol=1e-8,
                   t_eval=[t_end])  # OdeResult object!
 
     ds_es_arr = ds_es.y[:,0]

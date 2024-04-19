@@ -138,7 +138,6 @@ class TestMacroEvolEvent(unittest.TestCase):
             6.0,
             "Total rate at time 100.0 should be 6.0.")
 
-
     def test_total_rate_single_epoch_bisse(self):
         """
         Test if global and state-conditioned total rates are correctly calculated
@@ -184,13 +183,11 @@ class TestMacroEvolEvent(unittest.TestCase):
             2.25,
             "Total rate of state 1 at time 100.0 should be 2.25.")
 
-
     def test_total_rate_two_epochs(self):
         """
         Test if total rate is correctly computed for two epochs
         """
         pass
-
 
     def test_event_sampling_bd(self):
         """
@@ -233,7 +230,6 @@ class TestMacroEvolEvent(unittest.TestCase):
             expected_proportion_event_1,
             msg="Proportion of event is off by more than 0.01",
             delta=0.01)
-
 
     def test_event_sampling_bisse(self):
         """
@@ -302,11 +298,12 @@ class TestMacroEvolEvent(unittest.TestCase):
             msg="Proportion of event is off by more than 0.01",
             delta=0.01)
 
-
     def test_sampling_probability_bisse(self):
+        pass
         # print(self.bisse_state_dep_prob_handler.state_dep_prob_manager.state_dep_params_dict[0])
-        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 0, 0))
-        print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 1, 0))
+        # print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 0, 0))
+        # print(self.bisse_state_dep_prob_handler.randomly_decide_taxon_sampling_at_time_at_state(0.0, 1, 0))
+
 
 if __name__ == '__main__':
     # Assuming you opened the PhyloJunction/ (repo root) folder

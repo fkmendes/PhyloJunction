@@ -80,6 +80,7 @@ class DnSSE(pgm.DistrForSampling):
                        clado_state_transition_dict: ty.Dict[str, AttributeTransition],
                        untargetable_node_set: ty.Set[str],
                        cumulative_node_count: int,
+                       node_index: int,
                        sse_birth_rate_object: sseobj.DiscreteStateDependentRate,
                        event_t: float,
                        debug=False) -> ty.Tuple[dp.Node, int]: ...
@@ -107,6 +108,7 @@ class DnSSE(pgm.DistrForSampling):
                                  sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
                                  untargetable_node_set: ty.Set[str],
                                  cumulative_sa_count: int,
+                                 node_index: int,
                                  event_t: float,
                                  debug: bool = False) -> int: ...
     def _execute_event(self,
@@ -120,6 +122,7 @@ class DnSSE(pgm.DistrForSampling):
                        untargetable_node_set: ty.Set[str],
                        cumulative_node_count: int,
                        cumulative_sa_count: int,
+                       node_index: int,
                        event_t: float,
                        debug: bool = False) -> ty.Tuple[dp.Node, int, int]: ...
     def _annotate_sampled(self,

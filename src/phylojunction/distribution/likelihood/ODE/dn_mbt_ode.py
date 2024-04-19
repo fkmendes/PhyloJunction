@@ -16,14 +16,15 @@ def mbt_bisse_d_eqn(t, ds_es, ds_es_buffer, qs, mus, b):
     # to prevent allocating more memory, but this makes the
     # numbers be slightly different from those of the pure BiSSE
     # ODEs (in the 5th decimal place!)
-
     es = ds_es[2:]  # grab last two elements
     ds_es_buffer[2:] = mbt_e_eqn(es, qs, mus, b)
     # another option
     # ds = mbt_e_eqn(es, qs, mus, b)
 
     ds = ds_es[:2]  # grab first two elements
-    ds_es_buffer[:2] = np.ravel(np.matmul(qs, ds) + np.matmul(b, np.kron(es, ds))) \
+    ds_es_buffer[:2] = np.ravel(
+        np.matmul(qs, ds) + np.matmul(b, np.kron(es, ds))
+    ) \
                        + np.matmul(b, np.kron(ds, es))
     # another option
     # es = np.ravel(np.matmul(qs, ds) + np.matmul(b, np.kron(es, ds))) \
@@ -54,10 +55,13 @@ def solve_mbt_ds_es(ds_es, t_start, t_end, ds_es_buffer, qs, mus, b,
                   ds_es,
                   method='RK45',
                   args=pars,
-                  rtol=1e-1,
-                  atol=1e-1,
-                  t_eval=[t_start + t_end])
+                  rtol=1e-10,
+                  atol=1e-10,
+                  t_eval=[0, .00002, .00004, .00006, t_end])
+         #, t_eval=[t_start + t_end])
 
+    print(ds_es.t)
+    print(ds_es.y)
     ds_es_arr = ds_es.y[:,0]
 
     if verbose:

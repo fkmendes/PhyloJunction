@@ -537,8 +537,10 @@ class DnSSE(pgm.DistrForSampling):
             ##################################################################
             # brosc: before-root-origin-single-child                         #
             # Node that might be necessary for tying process off if a        #
-            # peciation never happens before the process either dies, or     #
-            # reaches stop condition                                         #
+            # speciation never happens before the process either dies, or    #
+            # reaches stop condition. It receives the same index as the      #
+            # origin because, unless an ancestor is sampled, the brosc node  #
+            # is essentially the origin -- it is a trick to tie off the tree #
             #                                                                #
             # Note: brosc can become an SA lineage node if ancestor sampling #
             # happens, but a root is never born                              #
@@ -553,6 +555,8 @@ class DnSSE(pgm.DistrForSampling):
                                 edge_length=0.0)
             brosc_node.state = a_start_state
             brosc_node.annotations.add_bound_attribute("state")
+            brosc_node.index = cumulative_node_count  # brosc_node is
+            brosc_node.annotations.add_bound_attribute("index")
             brosc_node.sampled = True
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
@@ -564,6 +568,8 @@ class DnSSE(pgm.DistrForSampling):
                                 edge_length=0.0)
             origin_node.state = a_start_state
             origin_node.annotations.add_bound_attribute("state")
+            origin_node.index = cumulative_node_count
+            origin_node.annotations.add_bound_attribute("index")
             origin_node.alive = True
             origin_node.sampled = False
             origin_node.is_sa = False
@@ -586,6 +592,8 @@ class DnSSE(pgm.DistrForSampling):
                                 edge_length=0.0)
             root_node.state = a_start_state
             root_node.annotations.add_bound_attribute("state")
+            root_node.index = cumulative_node_count
+            root_node.annotations.add_bound_attribute("index")
             root_node.alive = False
             root_node.sampled = False
             root_node.is_sa = False
@@ -596,6 +604,7 @@ class DnSSE(pgm.DistrForSampling):
 
             # we will actually start off with the
             # left and right nodes being targetable
+            cumulative_node_count += 1
             left_node = dp.Node(taxon=dp.Taxon(label="nd1"),
                                 label="nd1",
                                 edge_length=0.0)
@@ -606,10 +615,12 @@ class DnSSE(pgm.DistrForSampling):
             left_node.sampled = True
             left_node.state = root_node.state  # get state from parent (root)
             left_node.annotations.add_bound_attribute("state")
+            left_node.index = cumulative_node_count
+            left_node.annotations.add_bound_attribute("index")
             root_node.add_child(left_node)
             state_representation_dict[left_node.state].add(left_node.label)
-            cumulative_node_count += 1
 
+            cumulative_node_count += 1
             right_node = dp.Node(taxon=dp.Taxon(label="nd2"),
                                 label="nd2",
                                 edge_length=0.0)
@@ -620,9 +631,10 @@ class DnSSE(pgm.DistrForSampling):
             right_node.sampled = True
             right_node.state = root_node.state  # get state from parent (root)
             right_node.annotations.add_bound_attribute("state")
+            right_node.index = cumulative_node_count
+            right_node.annotations.add_bound_attribute("index")
             root_node.add_child(right_node)
             state_representation_dict[right_node.state].add(right_node.label)
-            cumulative_node_count += 1
 
             # now make tree #
             # will remain a "is_leaf() == True" until we add children
@@ -699,6 +711,7 @@ class DnSSE(pgm.DistrForSampling):
             clado_state_transition_dict: ty.Dict[str, AttributeTransition],
             untargetable_node_set: ty.Set[str],
             cumulative_node_count: int,
+            node_index: int,
             sse_birth_rate_object: sseobj.DiscreteStateDependentRate,
             event_t: float,
             debug=False) -> ty.Tuple[dp.Node, int]:
@@ -714,8 +727,8 @@ class DnSSE(pgm.DistrForSampling):
             (iii) self.sa_lineage_dict
             (iv)  self.state_transition_dict
             (v)   self.clado_state_transition_dict
-            (vi)   self.root_is_born
-            (vii)  self.untargetable_node_set
+            (vi)  self.root_is_born
+            (vii) self.untargetable_node_set
 
         Args:
             tr_namespace (dendropy.TaxonNamespace): Dendropy object
@@ -741,8 +754,10 @@ class DnSSE(pgm.DistrForSampling):
                 AttributeTransition objects.
             untargetable_node_set (str): Set of Node labels that
                 cannot be targeted for events anymore (went extinct).
-            cumulative_node_count (int): Total number of nodes in the
-                tree (to be used in labeling).
+            cumulative_node_count (int): Total number of non-direct
+                ancestor nodes in the tree (to be used in labeling).
+            node_index (int): Total node count to be used to number
+                nodes (used in their 'index' attribute).
             sse_birth_rate_object (DiscreteStateDependentRate): SSE
                 rate parameter object holding the departing/arriving
                 states.
@@ -769,12 +784,17 @@ class DnSSE(pgm.DistrForSampling):
         # Special case: first speciation event (root must created) #
         ############################################################
         if chosen_node.label in ("origin", "brosc"):
+            node_index += 1
             root_node = dp.Node(taxon=dp.Taxon(label="root"),
                                 label="root")
             # root takes origin or brosc state
             root_node.state = chosen_node.state
-
             root_node.annotations.add_bound_attribute("state")
+
+            # adding index (origin and brosc will have index 0, so root should be 1)
+            root_node.index = node_index
+            root_node.annotations.add_bound_attribute("index")
+
             # we will pick the root as the first event
             root_node.alive = False
             root_node.sampled = False
@@ -857,6 +877,7 @@ class DnSSE(pgm.DistrForSampling):
 
         # normal birth event code (assuming only bifurcations)
         cumulative_node_count += 1
+        node_index += 1
         left_label = "nd" + str(cumulative_node_count)
         left_child = dp.Node(
             taxon=dp.Taxon(label=left_label),
@@ -870,11 +891,14 @@ class DnSSE(pgm.DistrForSampling):
         left_child.sampled = True
         left_child.state = left_arriving_state
         left_child.annotations.add_bound_attribute("state")
+        left_child.index = node_index
+        left_child.annotations.add_bound_attribute("index")
         state_representation_dict[left_child.state].add(
             left_child.label
         )
 
         cumulative_node_count += 1
+        node_index += 1
         right_label = "nd" + str(cumulative_node_count)
         right_child = dp.Node(
             taxon=dp.Taxon(label=right_label),
@@ -888,6 +912,8 @@ class DnSSE(pgm.DistrForSampling):
         right_child.sampled = True
         right_child.state = right_arriving_state
         right_child.annotations.add_bound_attribute("state")
+        right_child.index = node_index
+        right_child.annotations.add_bound_attribute("index")
         state_representation_dict[right_child.state].add(
             right_child.label
         )
@@ -974,7 +1000,7 @@ class DnSSE(pgm.DistrForSampling):
                 [chosen_node.label],
                 debug=debug)
 
-        return last_node2speciate, cumulative_node_count
+        return last_node2speciate, cumulative_node_count, node_index
 
     def _execute_death(
             self,
@@ -1197,8 +1223,9 @@ class DnSSE(pgm.DistrForSampling):
             sa_lineage_dict: ty.Dict[str, ty.List[SampledAncestor]],
             untargetable_node_set: ty.Set[str],
             cumulative_sa_count: int,
+            node_index: int,
             event_t: float,
-            debug: bool = False) -> int:
+            debug: bool = False) -> ty.Tuple[int]:
         """Execute sampling of direct lineage ancestor.
 
         This method has both side-effects and a return. The
@@ -1226,8 +1253,10 @@ class DnSSE(pgm.DistrForSampling):
                 of SampledAncestor objects.
             untargetable_node_set (str): Set of Node labels that
                 cannot be targeted for events anymore (went extinct).
-            cumulative_sa_count (int): Total number of nodes in the
-                tree (to be used in labeling).
+            cumulative_sa_count (int): Total number of direct ancestor
+                nodes in the tree (to be used in labeling).
+            node_index (int): Total node count to be used to number
+                nodes (used in their 'index' attribute).
             event_t (float): Time of ancestor sampling event taking
                 place.
             debug (bool): If 'True', prints debugging messages.
@@ -1256,16 +1285,19 @@ class DnSSE(pgm.DistrForSampling):
             # the brosc node being added -- we must add event_t as the brosc node edge_length (other
             # nodes are always added with edge_length = 0.0, and have their edges extended when a new
             # event takes place)
+            node_index += 1
             brosc_node = dp.Node(taxon=dp.Taxon(label="brosc"),
                                  label="brosc",
                                  edge_length=event_t)
             brosc_node.state = chosen_node.state
+            brosc_node.annotations.add_bound_attribute("state")
+            brosc_node.index = node_index
+            brosc_node.annotations.add_bound_attribute("index")
             brosc_node.alive = True
             brosc_node.sampled = True
             brosc_node.is_sa = False
             brosc_node.is_sa_dummy_parent = False
             brosc_node.is_sa_lineage = True
-            brosc_node.annotations.add_bound_attribute("state")
             # this node is alive and can be selected
             state_representation_dict[chosen_node.state].add(brosc_node.label)
             tr_namespace.add_taxon(brosc_node.taxon)
@@ -1282,9 +1314,10 @@ class DnSSE(pgm.DistrForSampling):
 
             # print("\n\nMust have a sampled ancestor before the root!")
 
-        # doing lineage that remains alive
         parent_label = chosen_node.label  # (parent's label will change below)
         parent_state = chosen_node.state
+
+        # doing lineage that remains alive
         left_child = dp.Node(taxon=dp.Taxon(label=parent_label),
                              label=parent_label,
                              edge_length=0.0)
@@ -1300,6 +1333,7 @@ class DnSSE(pgm.DistrForSampling):
 
         # doing sampled ancestor
         cumulative_sa_count += 1
+        node_index += 1
         right_label = "sa" + str(cumulative_sa_count)
         right_child = dp.Node(taxon=dp.Taxon(label=right_label),
                               label=right_label,
@@ -1311,6 +1345,8 @@ class DnSSE(pgm.DistrForSampling):
         right_child.sampled = False
         right_child.state = chosen_node.state  # gets parent's state
         right_child.annotations.add_bound_attribute("state")
+        right_child.index = node_index
+        right_child.annotations.add_bound_attribute("index")
         # state_representation_dict[right_child.state].add(right_child.label)
         # I don't think sampled ancestor represents state
         # the way we're implementing sampled ancestors here,
@@ -1352,7 +1388,7 @@ class DnSSE(pgm.DistrForSampling):
         # cannot pick parent!
         untargetable_node_set.add(chosen_node.label)
 
-        return cumulative_sa_count
+        return cumulative_sa_count, node_index
 
     def _execute_event(
             self,
@@ -1366,8 +1402,9 @@ class DnSSE(pgm.DistrForSampling):
             untargetable_node_set: ty.Set[str],
             cumulative_node_count: int,
             cumulative_sa_count: int,
+            node_index: int,
             event_t: float,
-            debug: bool = False) -> ty.Tuple[dp.Node, int, int]:
+            debug: bool = False) -> ty.Tuple[dp.Node, int]:
         """Execute event on chosen node.
 
         This method calls the correct event executer depending on which
@@ -1401,15 +1438,21 @@ class DnSSE(pgm.DistrForSampling):
                 of SampledAncestor objects.
             untargetable_node_set (set): Set of Node labels that
                 cannot be targeted for events anymore (went extinct).
+            cumulative_node_count (int): Total number of non-direct
+                ancestor nodes in the tree (to be used in labeling).
+            cumulative_sa_count (int): Total number of direct ancestor
+                nodes in the tree (to be used in labeling).
+            node_index (int): Total node count to be used to number
+                nodes (used in their 'index' attribute).
             event_t (float): Time of event taking place.
             debug (bool): If 'True', prints debugging messages.
                 Defaults to False.
 
         Returns:
-            (tuple): Tuple with three objects, the last node to
-            speciate (dendropy.Node) and the tree's cumulative node
-            count (int) and cumulative direct (sampled) ancestor count
-            (int).
+            (tuple): Tuple with four objects, the last node to
+            speciate (dendropy.Node), the tree's non-direct ancestor
+            cumulative node count (int), cumulative direct (sampled)
+            ancestor count (int), and total node count (int).
         """
 
         macroevol_event = sse_rate_object.event
@@ -1426,7 +1469,7 @@ class DnSSE(pgm.DistrForSampling):
            macroevol_event == sseobj.MacroevolEvent.BW_SPECIATION or \
                 macroevol_event == sseobj.MacroevolEvent.ASYM_SPECIATION:
 
-            last_chosen_node, cumulative_node_count = \
+            last_chosen_node, cumulative_node_count, node_index = \
                 self._execute_birth(
                     tr_namespace,
                     chosen_node,
@@ -1436,6 +1479,7 @@ class DnSSE(pgm.DistrForSampling):
                     clado_state_transition_dict,
                     untargetable_node_set,
                     cumulative_node_count,
+                    node_index,
                     sse_rate_object,
                     event_t,
                     debug=debug)
@@ -1462,7 +1506,7 @@ class DnSSE(pgm.DistrForSampling):
                 debug=debug)
 
         elif macroevol_event == sseobj.MacroevolEvent.ANCESTOR_SAMPLING:
-            cumulative_sa_count = \
+            cumulative_sa_count, node_index = \
                 self._execute_sample_ancestor(
                     tr_namespace,
                     chosen_node,
@@ -1470,10 +1514,11 @@ class DnSSE(pgm.DistrForSampling):
                     sa_lineage_dict,
                     untargetable_node_set,
                     cumulative_sa_count,
+                    node_index,
                     event_t,
                     debug=debug)
 
-        return last_chosen_node, cumulative_node_count, cumulative_sa_count
+        return last_chosen_node, cumulative_node_count, cumulative_sa_count, node_index
 
     def _annotate_sampled(
             self,
@@ -1622,9 +1667,11 @@ class DnSSE(pgm.DistrForSampling):
         clado_state_transition_dict: \
             ty.Dict[str, AttributeTransition] = dict()
 
-        # germinate the tree #
-        tr: dp.Tree
-        brosc_node: dp.Node  # will be None if tree starts at root
+        ######################
+        # Germinate the tree #
+        ######################
+        tr: dp.Tree = None
+        brosc_node: dp.Node = None # will be None if tree starts at root
         root_is_born: bool = False
         tr, brosc_node, cumulative_node_count, root_is_born = \
             self._germinate_tree(start_state,
@@ -1632,6 +1679,7 @@ class DnSSE(pgm.DistrForSampling):
                                  state_representation_dict,
                                  untargetable_node_set)
         self.root_is_born = root_is_born
+        node_index: int = cumulative_node_count
 
         # need these counts initialized for sampling first event
         living_nodes = [nd for nd in tr if nd.alive]
@@ -1715,7 +1763,7 @@ class DnSSE(pgm.DistrForSampling):
                         sa_lineage_node_labels)
 
                     # if origin is the only node (root always has children),
-                    # we slap finish node at end of process
+                    # we tie off the process with a 'finish' node (the brosc node)
                     if self.with_origin and tr.seed_node.alive and \
                             len(tr.seed_node.child_nodes()) == 0:
                         # we make origin edge length the max age of the tree
@@ -1767,7 +1815,7 @@ class DnSSE(pgm.DistrForSampling):
                         sa_lineage_node_labels)
 
                     # if origin is the only node (root always has children)
-                    # we slap brosc node at end of process
+                    # we tie off the process with a 'finish' node (the brosc node)
                     if self.with_origin and tr.seed_node.alive and \
                             len(tr.seed_node.child_nodes()) == 0:
                         brosc_node.edge_length = t_stop
@@ -1841,7 +1889,10 @@ class DnSSE(pgm.DistrForSampling):
                 # are called, so we do not need to traverse the tree and
                 # update living_nodes all the time (below, in step (9))
                 # print("dn_discrete_sse.py: at (5.3)")
-                last_chosen_node, cumulative_node_count, cumulative_sa_count \
+                (last_chosen_node,
+                 cumulative_node_count,
+                 cumulative_sa_count,
+                 node_index) \
                     = self._execute_event(
                         tr.taxon_namespace,
                         sse_rate_param,
@@ -1853,6 +1904,7 @@ class DnSSE(pgm.DistrForSampling):
                         untargetable_node_set,
                         cumulative_node_count,
                         cumulative_sa_count,
+                        node_index,
                         latest_t,
                         debug=self.debug
                     )

@@ -10,7 +10,7 @@ class AttributeTransition():
     from_state: int
     to_state: int  # if happening at speciation, child 1
     to_state2: int  # if happening at speciation, child 2
-    at_speciation: bool
+    at_speciation: ty.Optional[bool]
 
     # (i) if object stored in an AnnotatedTree's at_dict, this is
     # the node subtending a branch (note that this transition may be

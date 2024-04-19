@@ -188,6 +188,9 @@ def run_example_manual_tree_building(ax: matplotlib.pyplot.Axes) -> None:
     def build_tree() -> pjtr.AnnotatedTree:
         origin_node = dp.Node(taxon=dp.Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.state = 0
+        origin_node.annotations.add_bound_attribute("state")
+        origin_node.index = 0
+        origin_node.annotations.add_bound_attribute("index")
         origin_node.alive = False
         origin_node.sampled = False
         origin_node.is_sa = False
@@ -196,6 +199,9 @@ def run_example_manual_tree_building(ax: matplotlib.pyplot.Axes) -> None:
 
         dummy_node = dp.Node(taxon=dp.Taxon(label="dummy1"), label="dummy1", edge_length=1.0)
         dummy_node.state = 0
+        dummy_node.annotations.add_bound_attribute("state")
+        dummy_node.index = 1
+        dummy_node.annotations.add_bound_attribute("index")
         dummy_node.alive = False
         dummy_node.sampled = False
         dummy_node.is_sa = False
@@ -207,6 +213,9 @@ def run_example_manual_tree_building(ax: matplotlib.pyplot.Axes) -> None:
         # right child of dummy_node
         sa_node = dp.Node(taxon=dp.Taxon(label="sa1"), label="sa1", edge_length=0.0)
         sa_node.state = 0
+        sa_node.annotations.add_bound_attribute("state")
+        sa_node.index = 2
+        sa_node.annotations.add_bound_attribute("index")
         sa_node.alive = False
         sa_node.sampled = True
         sa_node.is_sa = True
@@ -216,6 +225,9 @@ def run_example_manual_tree_building(ax: matplotlib.pyplot.Axes) -> None:
         # left child of dummy node
         root_node = dp.Node(taxon=dp.Taxon(label="root"), label="root", edge_length=0.5)
         root_node.state = 1
+        root_node.annotations.add_bound_attribute("state")
+        root_node.index = 3
+        root_node.annotations.add_bound_attribute("index")
         root_node.alive = False
         root_node.sampled = False
         root_node.is_sa = False
@@ -228,6 +240,9 @@ def run_example_manual_tree_building(ax: matplotlib.pyplot.Axes) -> None:
         # left child of root node
         extant_sp1 = dp.Node(taxon=dp.Taxon(label="sp1"), label="sp1", edge_length=0.25)
         extant_sp1.state = 2
+        extant_sp1.annotations.add_bound_attribute("state")
+        extant_sp1.index = 4
+        extant_sp1.annotations.add_bound_attribute("index")
         extant_sp1.alive = False
         extant_sp1.sampled = False
         extant_sp1.is_sa = False
@@ -237,6 +252,9 @@ def run_example_manual_tree_building(ax: matplotlib.pyplot.Axes) -> None:
         # right child of root node
         extant_sp2 = dp.Node(taxon=dp.Taxon(label="sp2"), label="sp2", edge_length=0.5)
         extant_sp2.state = 3
+        extant_sp2.annotations.add_bound_attribute("state")
+        extant_sp2.index = 5
+        extant_sp2.annotations.add_bound_attribute("index")
         extant_sp2.alive = True
         extant_sp2.sampled = True
         extant_sp2.is_sa = False
@@ -448,9 +466,9 @@ if __name__ == "__main__":
     # example_to_run = 1
     # example_to_run = 2
     # example_to_run = 3
-    # example_to_run = 4
+    example_to_run = 4
     # example_to_run = 5
-    example_to_run = 6
+    # example_to_run = 6
         
     if example_to_run == 1:
         dag_obj = run_example_yule_string()

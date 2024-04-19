@@ -1,5 +1,6 @@
 import os
 import typing as ty
+import dendropy as dp
 import numpy as np
 import pandas as pd  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
@@ -8,6 +9,7 @@ import pickle
 
 # pj imports
 from phylojunction.data.tree import AnnotatedTree
+from phylojunction.data.attribute_transition import AttributeTransition
 import phylojunction.pgm.pgm as pgm
 import phylojunction.interface.cmdbox.cmd_parse as cmdp
 
@@ -165,6 +167,189 @@ def initialize_tree_dataframe(
 
     return return_df
 
+def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph) -> pd.DataFrame:
+    """Initialize pandas DataFrame's for holding stochastic maps.
+
+    Each dataframe will hold stochastic maps for all nodes for all
+    (replicate) trees in a single sample. Each iteration will
+    correspond to a single replicate.
+
+    Returns:
+
+    """
+
+    def recursively_collect_smaps(nd: dp.Node,
+                                  at_dict: ty.Dict[str, ty.List[AttributeTransition]],
+                                  clado_at_dict: ty.Dict[str, AttributeTransition],
+                                  complete_tr_age: float,
+                                  node_ages_dict: ty.Dict[str, float],
+                                  smap_str: str,
+                                  it_idx_str: str) -> str:
+
+        # if origin, we move on
+        # if nd.parent_node is None:
+
+        ###################
+        # Collecting info #
+        ###################
+
+        nd_name = nd.label
+        br_start_time = str(node_ages_dict[nd_name])
+        br_end_time = str(br_start_time + str(nd.edge_length))
+
+        ###################
+        # Getting indices #
+        ###################
+
+        nd_idx = None
+        try:
+            nd_idx = str(nd.index)
+
+        except AttributeError:
+            exit("In order to write stochastic maps, nodes must have 'index' attribute. Exiting...")
+
+        parent_idx = "NA" if \
+            (nd.parent_node is None or nd.parent_node.index is None) \
+            else str(nd.parent_node.index)
+
+        ch_idxs = ["NA", "NA"]
+        if nd.num_child_nodes() == 2:
+            # overwrite ch_idxs if nd has children
+            for i, ch_nd in enumerate(nd.child_node_iter()):
+                ch_idxs[i] = str(ch_nd.index)
+
+            #####################################
+            # Collect cladogenetic smaps if any #
+            #####################################
+
+            if nd_name in clado_at_dict:
+                clado_at_str = it_idx_str + "\t" + nd_idx + "\t"
+                clado_at = clado_at_dict[nd_name]
+                clado_at_from_state = str(clado_at.from_state)
+                clado_at_to_state = str(clado_at.to_state)
+                clado_at_to_state2 = str(clado_at.to_state2)
+
+                # add this node's stochastic map string
+                smap_str += clado_at_str + "\t" + br_start_time + "\t" \
+                            + br_end_time + "\t" + clado_at_from_state \
+                            + "\t" + clado_at_to_state + "\t" \
+                            + clado_at_to_state2 + "\t" + br_start_time \
+                            + "\tcladogenetic\t" + parent_idx + "\t" \
+                            + "\t".join(ch_idxs) + "\n"
+
+        #######################################
+        # Now collect anagenetic smaps if any #
+        #######################################
+
+        if nd_name in at_dict:
+            for at in at_dict[nd_name]:
+                ana_at_str = it_idx_str + "\t" + nd_idx + "\t"
+                at_global_time = at.global_time
+                at_age = str(complete_tr_age - at_global_time)
+                at_from_state = str(at.from_state)
+                at_to_state = str(at.to_state)
+
+                # print("nd idx", nd_idx)
+                # print("ch indices", "\t".join(ch_idxs))
+                # print("parent idx", parent_idx)
+
+                ana_at_str += br_start_time + "\t" + br_end_time + "\t" \
+                    + at_from_state + "\t" + at_to_state + "\t" \
+                    + at_age + "\tanagenetic\t" + parent_idx + "\t" \
+                    + "\t".join(ch_idxs) + "\n"
+
+                # add this node's stochastic map string
+                smap_str += ana_at_str
+
+        ###########################
+        # Recur if nd is internal #
+        ###########################
+
+        for ch_nd in nd.child_node_iter():
+            smap_str = \
+                recursively_collect_smaps(ch_nd,
+                                          at_dict,
+                                          clado_at_dict,
+                                          complete_tr_age,
+                                          node_ages_dict,
+                                          smap_str,
+                                          it_idx_str)
+
+        return smap_str
+
+
+    return_df = pd.DataFrame(columns=["iteration",
+                                      "node_index",
+                                      "branch_start_time",
+                                      "branch_end_time",
+                                      "start_state",
+                                      "end_state",
+                                      "transition_time",
+                                      "transition_type"
+                                      "parent_index",
+                                      "child1_index",
+                                      "child2_index"])
+
+    for node_name, node_dag in dag_obj.name_node_dict.items():
+        node_val = node_dag.value
+
+        if isinstance(node_val, list):
+            if isinstance(node_val[0], AnnotatedTree):
+                rv_name = node_dag.node_name
+                node_val = node_dag.value  # list
+                n_samples = node_dag.sample_size
+                n_repl = node_dag.repl_size
+
+                assert(len(node_val) == (n_samples * n_repl))
+
+                processed_repls = 0
+                it_idx_str = "1"
+                sample_smap_str = ""
+                for ann_tr_repl in node_val:
+                    # TODO: prune repl and enter info in df
+                    seed_nd = \
+                        ann_tr_repl.origin_node if ann_tr_repl.with_origin \
+                            else ann_tr_repl.root_node
+                    node_ages_dict = ann_tr_repl.node_ages_dict
+                    complete_tr_age = ann_tr_repl.seed_age
+                    rec_tr = ann_tr_repl.extract_reconstructed_tree()
+                    at_dict = ann_tr_repl.at_dict
+                    clado_at_dict = ann_tr_repl.clado_at_dict
+
+                    # if we are done with a batch of replicates, we reset everything
+                    if processed_repls >= n_repl:
+                        processed_repls = 0
+                        it_idx_str = "1"
+                        sample_smap_str = ""
+
+                    print("ABOUT TO RECUR processed_repls", processed_repls, "it_idx_str", it_idx_str)
+
+                    sample_smap_str = recursively_collect_smaps(seed_nd,
+                                                         at_dict,
+                                                         clado_at_dict,
+                                                         complete_tr_age,
+                                                         node_ages_dict,
+                                                         sample_smap_str,
+                                                         it_idx_str)
+
+                    # debugging
+                    print(sample_smap_str)
+
+                    # we are still going through all replicates within a sample... increment!
+                    if processed_repls < n_repl:
+                        processed_repls += 1
+                        it_idx_str = str(processed_repls + 1)
+                        print("AFTER RECURRING processed_repls", processed_repls, "it_idx_str", it_idx_str)
+
+
+
+
+
+
+
+
+
+
 
 def prep_data_df(
         dag_obj: pgm.DirectedAcyclicGraph,
@@ -188,12 +373,11 @@ def prep_data_df(
 
     # tree nodes (one dataframe per different tree node)
 
-    # { "[tr_node_name1].tsv": pd.DataFrame with newick strings,
-    # for all replicates and samples, "[tr_node_name2].tsv": ... }
+    # { "[tr_node_name1].tsv": pd.DataFrame with newick strings all repls and samples,
+    # "[tr_node_name2].tsv": ... }
     tree_value_df_dict: ty.Dict[str, pd.DataFrame] = dict()
 
-    # { "[tr_node_name1].tsv": pd.DataFrame with newick strings
-    # (reconstructed trees), for all replicates and samples,
+    # { "[tr_node_name1].tsv": pd.DataFrame with newick strings (rec. trees) all repls and samples,
     # "[tr_node_name2].tsv": ... }
     tree_rec_value_df_dict: ty.Dict[str, pd.DataFrame] = dict()
 
