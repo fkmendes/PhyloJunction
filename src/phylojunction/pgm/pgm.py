@@ -359,7 +359,8 @@ class NodeDAG(ABC):
                           start: int,
                           end: int,
                           repl_idx: int = 0,
-                          is_tree: bool = False) -> str:
+                          is_tree: bool = False,
+                          display_reconstructed: bool = False) -> str:
         """Get string representation of values within specific range."""     
 
         if isinstance(self._value, np.ndarray):
@@ -380,7 +381,11 @@ class NodeDAG(ABC):
 
                 # tree, and repl_idx is always 0
                 else:
-                    return str(self._value[start + repl_idx])
+                    if display_reconstructed:
+                        return str(self._value[start + repl_idx])
+
+                    else:
+                        return self._value[start + repl_idx].rec_str()
 
             # single element in value
             else:
@@ -442,7 +447,8 @@ class NodeDAG(ABC):
                   sample_idx: int = 0,
                   repl_idx: int = 0,
                   repl_size: int = 1,
-                  branch_attr: ty.Optional[str] = "state") -> None:
+                  branch_attr: ty.Optional[str] = "state",
+                  draw_reconstructed: ty.Optional[bool] = False) -> None:
         pass
 
     @abstractmethod
@@ -656,7 +662,8 @@ class StochasticNodeDAG(NodeDAG):
                   sample_idx: int = 0,
                   repl_idx: int = 0,
                   repl_size: int = 1,
-                  branch_attr: str = "state") -> None:
+                  branch_attr: str = "state",
+                  draw_reconstructed: ty.Optional[bool] = False) -> None:
         """Plot node (side-effect) on provided Axes object
 
         Args:
@@ -669,6 +676,9 @@ class StochasticNodeDAG(NodeDAG):
                 to plot at a time. Defaults to 1.
             branch_attr (str, optional): If tree, which branch attribute
                 to color branch according to. Defaults to 'state'.
+            draw_reconstructed (bool, optional): Flag specifying if to
+                draw reconstructed tree instead of complete tree.
+                Defaults to 'False'.
         """
 
         # if list
@@ -680,12 +690,15 @@ class StochasticNodeDAG(NodeDAG):
                     isinstance(self.value[sample_idx * repl_size + repl_idx],
                                pjtr.AnnotatedTree):
                     if self.value[0].state_count > 1:
-                        self.value[sample_idx * repl_size + repl_idx] \
-                            .plot_node(axes, node_attr=branch_attr)
+                        self.value[sample_idx * repl_size + repl_idx]\
+                            .plot_node(axes,
+                                       node_attr=branch_attr,
+                                       draw_reconstructed=draw_reconstructed)
 
                     else:
                         self.value[sample_idx * repl_size + repl_idx] \
-                            .plot_node(axes)
+                            .plot_node(axes,
+                                       draw_reconstructed=draw_reconstructed)
 
             # not a tree
             else:

@@ -176,7 +176,7 @@ class TestDataDump(unittest.TestCase):
 
         self.assertEqual(
             [
-                "scalar_rvs_1repl.csv",
+                "scalar_rvs_repl1.csv",
                 "trs_complete.tsv",
                 "trs_annotated_complete.tsv",
                 "trs_reconstructed.tsv",
@@ -535,6 +535,7 @@ class TestDataDump(unittest.TestCase):
             last_rec_tr_seed_node_label + "\t",
             csvstring_dump_tree_internal_nd_states_str_dict_list[0]
         )
+
 
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder

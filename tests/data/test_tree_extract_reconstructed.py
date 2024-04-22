@@ -630,10 +630,10 @@ class TestExtractReconstructedTree(unittest.TestCase):
         """
         Test extraction of rec. tree from complete tree (no origin).
 
-        Tree has one observable taxon, a sampled ancestor.
-        
-        We don't know how to print a single observable node, so 
-        reconstructed-tree strings should always be empty.
+        Tree has one observable taxon, on one side of the root, a
+        sampled ancestor. Test checks that the reconstructed tree
+        is either a single taxon string, or an empty string (when
+        taxa are required on both sides of the root).
 
         To see it on icytree:
         ((sa1:0.0,sp1:0.5)dummy1:1.0,sp2:1.25)root:0.0;
@@ -727,6 +727,8 @@ class TestExtractReconstructedTree(unittest.TestCase):
             schema="newick",
             suppress_internal_taxon_labels=True,
             suppress_internal_node_labels=True)
+
+        # debugging
         # print(tr_rec_str1)
 
         tr_rec_str2 = tr_rec2.as_string(
@@ -741,7 +743,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
                 suppress_annotations=True),
                 ("((sa1:0.0,sp1:0.5)dummy1_dummy1:1.0,sp2:1.25)"
                  "root_root:0.0;\n"))
-        self.assertEqual(tr_rec_str1, ";\n")
+        self.assertEqual(tr_rec_str1, "(sa1:1.0):0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
     def test_extract_reconstructed_tree_all_extinct_no_sa(self):
@@ -974,6 +976,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
                          "(sp2:1.0,(sp3:0.5,sp4:0.5)nd2:0.5)nd1:0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
+    # THIS FAILS
     def test_extract_reconstructed_tree_origin_sa_before_root_tree_dies(self):
         """
         Test extraction of reconstructed tree from complete tree (has origin)
@@ -1200,6 +1203,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         self.assertEqual(tr_rec_str1, "(sa1:0.0,brosc:1.0)dummy1:0.0;\n")
         self.assertEqual(tr_rec_str2, ";\n")
 
+    # THIS FAILS
     def test_extract_reconstructed_tree_origin_sa_before_root_tree_two_survive(self):
         """
         Test extraction of rec. tree from complete tree (has origin).
@@ -1725,7 +1729,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
             self.assertEqual(tr_rec_str2, ";\n")
 
     def test_make_at_dict_reflect_rec_tree_origin_two_extinct(self) -> None:
-        """Test method that updates 'at_dict' for reconstructed tree."""
+        """Test method that updates 'rec_tr_at_dict' for reconstructed tree."""
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.state = 2  # AB
@@ -1997,6 +2001,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
         # check that the right nodes are in the rec tree's at_dict
         nd_names_in_rec_tr_at_dict = set(rec_tr_at_dict.keys())
         exp_nd_names_in_rec_tr_at_dict = {"sp2", "sp5"}
+
         self.assertEqual(nd_names_in_rec_tr_at_dict,
                          exp_nd_names_in_rec_tr_at_dict)
 
@@ -2012,8 +2017,11 @@ class TestExtractReconstructedTree(unittest.TestCase):
                 global_times
 
         self.assertEqual(at_times_dict_for_testing,
-                         {"sp2": [2.0, 2.5, 3.0, 4.0],
-                         "sp5": [2.0, 2.5, 3.0, 4.0]})
+                         {"sp2": [1.0, 1.5, 2.0, 3.0],
+                         "sp5": [1.0, 1.5, 2.0, 3.0]})
+
+
+
 
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder

@@ -78,12 +78,19 @@ class AnnotatedTree(dp.Tree):
             origin and the root. Will be 0.0 if no origin node.
         root_age (float): Age of root node, if there is one, otherwise
             0.0.
+        rec_tr_root_age (float): Age of root node of reconstructed tree.
         node_heights_dict (dict): Dictionary that holds the heights of
             all nodes in the tree. Keys are node labels, values are
             floats.
+        rec_node_heights_dict (dict): Dictionary that holds the heights
+            of all nodes in the reconstructed tree. Keys are node
+            labels, values are floats.
         node_ages_dict (dict): Dictionary that holds the ages of all
             nodes in the tree. Keys are node labels, values are
             floats.
+        rec_node_ages_dict (dict): Dictionary that holds the ages of
+            all nodes in the reconstructed tree. Keys are node labels,
+            values are floats.
         slice_t_ends (float): List of floats with the end times for
             specified time slices (epochs). If not provided by user
             Upon instantiation of class, will be 'None'.
@@ -161,8 +168,11 @@ class AnnotatedTree(dp.Tree):
     origin_age: ty.Optional[float]
     origin_edge_length: float
     root_age: float  # can be None
+    rec_tr_root_age: float  # can be None
     node_heights_dict: ty.Dict[str, float]
+    rec_node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
+    rec_node_ages_dict: ty.Dict[str, float]
     slice_t_ends: ty.Optional[ty.List[float]]
     slice_age_ends: ty.Optional[ty.List[float]]
 
@@ -190,6 +200,9 @@ class AnnotatedTree(dp.Tree):
 
     # for plotting #
     sa_lineage_dict: \
+        ty.Optional[
+            ty.Dict[str, ty.List[pjsa.SampledAncestor]]]  # can be None
+    rec_tr_sa_lineage_dict: \
         ty.Optional[
             ty.Dict[str, ty.List[pjsa.SampledAncestor]]]  # can be None
 
@@ -233,9 +246,6 @@ class AnnotatedTree(dp.Tree):
             at_dict:
             ty.Optional[
                 ty.Dict[str, ty.List[pjat.AttributeTransition]]] = None,
-            rec_tr_at_dict:
-            ty.Optional[
-                ty.Dict[str, ty.List[pjat.AttributeTransition]]] = None,
             clado_at_dict:
             ty.Optional[ty.Dict[str, pjat.AttributeTransition]] = None,
             tree_died: ty.Optional[bool] = None,
@@ -262,8 +272,8 @@ class AnnotatedTree(dp.Tree):
         
         # initializing tree members
         self.origin_node = None
-        self.origin_node = None
         self.root_node = None
+        self.rec_tr_root_node = None  # populated by 'extract_reconstructed_tree'
         self.rec_tr_root_node_label = None  # populated by 'extract_reconstructed_tree'
         self.brosc_node = None
         self.alternative_root_label = alternative_root_label
@@ -287,7 +297,9 @@ class AnnotatedTree(dp.Tree):
         self.seed_age = self.tree.max_distance_from_root()
         self.max_age = max_age
         self.node_heights_dict = dict()
+        self.rec_node_heights_dict = dict()
         self.node_ages_dict = dict()
+        self.rec_node_ages_dict = dict()
         self.slice_t_ends = slice_t_ends
         self.slice_age_ends = slice_age_ends
 
@@ -334,8 +346,9 @@ class AnnotatedTree(dp.Tree):
 
         # for plotting and counting nodes
         self.sa_lineage_dict = sa_lineage_dict
+        self.rec_tr_sa_lineage_dict = copy.deepcopy(sa_lineage_dict)
         self.at_dict = at_dict
-        self.rec_tr_at_dict = rec_tr_at_dict
+        self.rec_tr_at_dict = copy.deepcopy(at_dict)
         self.clado_at_dict = clado_at_dict
 
         # node counting
@@ -368,6 +381,9 @@ class AnnotatedTree(dp.Tree):
         # initializes (side-effect):
         # (i)  self.node_heights_dict
         # (ii) self.node_ages_dict
+        # or
+        # (iii) self.rec_node_heights_dict
+        # (iii) self.rec_node_ages_dict
         self._populate_node_age_height_dicts()
 
         # prepare for dendropy's Nexus printing
@@ -888,13 +904,19 @@ class AnnotatedTree(dp.Tree):
 
     def _populate_node_age_height_dicts(
             self,
-            unit_branch_lengths: bool = False) -> None:
+            unit_branch_lengths: bool = False,
+            do_reconstructed_tree: bool = False) -> None:
         """Recursively populate class members with nodes' ages.
         
-        This method has the side-effect of populating two class members,
-        node_ages_dict and node_heights_dict, whose keys are node names
-        (str) and values (float) are their ages and heights,
-        respectively.
+        Side-effects:
+            (i)   Populate self.node_ages_dict
+            (ii)  Populate self.node_heights_dict
+            or
+            (iii) Populate self.rec_node_ages_dict
+            (iv)  Populate self.rec_node_heights_dict
+
+        Thse two dictionaries have their keys being node names (str)
+        and values (float) are their ages and heights, respectively.
 
         The age of the origin is maximal, and the height of the extant
         terminal nodes is maximal (and the same as the origin's age).
@@ -906,25 +928,47 @@ class AnnotatedTree(dp.Tree):
         # self.node_heights_dict AND self.node_ages_dict { node label (str): node age (float, ... }
         def recur_node_ages_height(nd,
                                    remaining_height,
-                                   tree_lvl) -> None:
+                                   tree_lvl,
+                                   do_reconstructed_tree) -> None:
 
             for ch_nd in nd.child_nodes():
                 recur_node_ages_height(ch_nd,
                                        remaining_height - ch_nd.edge_length,
-                                       tree_lvl + 1)
+                                       tree_lvl + 1,
+                                       do_reconstructed_tree)
 
             nd_name: str = get_node_name(nd)
 
             if unit_branch_lengths:
-                self.node_heights_dict[nd_name] = tree_lvl
+                if do_reconstructed_tree:
+                    self.rec_node_heights_dict[nd_name] = tree_lvl
+
+                else:
+                    self.node_heights_dict[nd_name] = tree_lvl
             
             else:
-                self.node_ages_dict[nd_name] = remaining_height
-                self.node_heights_dict[nd_name] = \
-                    self.seed_age - remaining_height
+                if do_reconstructed_tree:
+                    self.rec_node_ages_dict[nd_name] = remaining_height
+                    self.rec_node_heights_dict[nd_name] = \
+                        self.rec_tr_root_age - remaining_height
+
+                else:
+                    self.node_ages_dict[nd_name] = remaining_height
+                    self.node_heights_dict[nd_name] = \
+                        self.seed_age - remaining_height
 
         # tree_lvl starts at 0
-        recur_node_ages_height(self.tree.seed_node, self.seed_age, 0)
+        if do_reconstructed_tree:
+            recur_node_ages_height(self.rec_tr_root_node,
+                                   self.rec_tr_root_age,
+                                   0,
+                                   do_reconstructed_tree)
+
+        else:
+            recur_node_ages_height(self.tree.seed_node,
+                                   self.seed_age,
+                                   0,
+                                   do_reconstructed_tree)
 
     def _prepare_taxon_namespace_for_nexus_printing(self) -> None:
         """Clean up taxon namespace for printing.
@@ -1070,8 +1114,8 @@ class AnnotatedTree(dp.Tree):
         else:
             return False
 
-    def make_at_dict_reflect_rec_tree(self, rec_tree_root_nd: dp.Node) -> None:
-        """Initialize 'rec_tr_at_dict' member.
+    def update_rec_tr_at_dict(self, rec_tree_root_nd: dp.Node) -> None:
+        """Update 'rec_tr_at_dict' member.
 
         The 'at_dict' member of the AnnotatedTree, when defined, will by
         default host the state transitions of every node of the complete
@@ -1139,9 +1183,6 @@ class AnnotatedTree(dp.Tree):
                 return False, [], final_res_list  # nd is not sampled
 
         if self.at_dict is not None:
-            # initialize 'rec_tr_at_dict'
-            self.rec_tr_at_dict = copy.deepcopy(self.at_dict)
-
             ###########################################
             # Recursively find all groups of internal #
             # nodes whose attribute transitions we    #
@@ -1154,46 +1195,58 @@ class AnnotatedTree(dp.Tree):
                                                 int_node_lists_to_merge)
 
             # debugging
-            # print(int_node_lists_to_merge)
+            # print("int_node_lists_to_merge", int_node_lists_to_merge)
 
             for sublist in int_node_lists_to_merge:
                 # must be the 1st entry b/c of how int_node_lists_to_merge is built
                 # (first item is necessarily the youngest, as older
                 # consecutively pruned internal nodes are appended to end of
                 # list)
-                youngest_int_nd_name = sublist[0]
+                youngest_int_nd_name = sublist[0]  # in complete tree
                 found_child_to_paste_to = False
 
+                # look for the node in rec tree to merge
                 for nd2merge_with in self.tree_reconstructed.preorder_node_iter():
                     nd2merge_with_name = nd2merge_with.label
+
+                    # we find the same node in the complete tree
                     complete_tr_leaf_nd = \
                         self.tree.find_node_with_label(nd2merge_with_name)
-                    complete_tr_leaf_nd_parent_name = \
-                        complete_tr_leaf_nd.parent_node.label
 
-                    if youngest_int_nd_name == \
-                            complete_tr_leaf_nd_parent_name:
-                        found_child_to_paste_to = True
+                    # complete_tr_leaf_nd cannot be a node without a parent,
+                    # like a root (when it seeds a tree) or the origin; in
+                    # such cases, there's nothing older than that node
+                    # to merge to anyway
+                    if complete_tr_leaf_nd.parent_node is not None:
+                        # ... and get its parent node's name
+                        complete_tr_leaf_nd_parent_name = \
+                            complete_tr_leaf_nd.parent_node.label
 
-                        # debugging
-                        # print(youngest_int_nd_name, "is pasted to", nd2merge_with_name)
+                        # if the youngest complete tr internal node to merge
+                        # is the parent of 'nd2merge_with'
+                        if youngest_int_nd_name == \
+                                complete_tr_leaf_nd_parent_name:
+                            found_child_to_paste_to = True
 
-                        # first we check if that node already had its list
-                        # of attribute transitions, because if not, we must
-                        # create one
-                        if nd2merge_with_name not in self.rec_tr_at_dict:
-                            self.rec_tr_at_dict[nd2merge_with_name] = list()
+                            # debugging
+                            # print(youngest_int_nd_name, "is pasted to", nd2merge_with_name)
 
-                        # merge of AttributeTransition's!
-                        for int_nd_name in sublist:
-                            if int_nd_name in self.rec_tr_at_dict:
-                                # reverse so it becomes old to young!
-                                int_nd_to_merge_at_list = \
-                                    reversed(self.rec_tr_at_dict[int_nd_name])
+                            # first we check if that node already had its list
+                            # of attribute transitions, because if not, we must
+                            # create one
+                            if nd2merge_with_name not in self.rec_tr_at_dict:
+                                self.rec_tr_at_dict[nd2merge_with_name] = list()
 
-                                for at2merge in int_nd_to_merge_at_list:
-                                    self.rec_tr_at_dict[nd2merge_with_name].\
-                                        insert(0, at2merge)
+                            # merge of AttributeTransition's!
+                            for int_nd_name in sublist:
+                                if int_nd_name in self.rec_tr_at_dict:
+                                    # reverse so it becomes old to young!
+                                    int_nd_to_merge_at_list = \
+                                        reversed(self.rec_tr_at_dict[int_nd_name])
+
+                                    for at2merge in int_nd_to_merge_at_list:
+                                        self.rec_tr_at_dict[nd2merge_with_name].\
+                                            insert(0, at2merge)
 
                 if not found_child_to_paste_to:
                     tr_str = \
@@ -1223,6 +1276,77 @@ class AnnotatedTree(dp.Tree):
                         nd.label in self.rec_tr_at_dict:
                     del self.rec_tr_at_dict[nd.label]
 
+    def update_rec_tr_sa_lineage_dict(self) -> None:
+        """Update 'rec_tr_sa_lineage_dict' member.
+
+        The 'rec_tr_sa_lineage_dict' member of the AnnotatedTree, when
+        initialized, will be identical to the complete tree's
+        'sa_lineage_dict'. But with the pruning of the complete tree
+        into the reconstructed tree, some of the internal nodes whose
+        names are keys inside 'sa_lineage_dict' are pruned (because one
+        of their children lineages dies off). Their SampledAncestor's
+        associated instances must then be passed down to their surviving
+        lineages (which then must also be annotated with
+        'is_sa_lineage == True').
+
+        Args:
+            rec_tree_root_nd (DendroPy.Node): Node that roots the
+                reconstructed tree.
+        """
+
+        def recur_to_find_rec_tr_node(nd: dp.Node) -> str:
+            rec_tr_nd_name = str()
+
+            if self.tree_reconstructed.find_node_with_label(nd.label) is not None:
+                return nd.label
+
+            for ch_nd in nd.child_node_iter():
+                rec_tr_nd_name = recur_to_find_rec_tr_node(ch_nd)
+
+                if rec_tr_nd_name != "":
+                    return rec_tr_nd_name
+
+            return rec_tr_nd_name  # when finish recursion must return
+
+        # find which nodes in 'sa_lineage_dict' got pruned
+        if self.sa_lineage_dict is not None:
+            for nd_label in self.sa_lineage_dict:
+                # see if internal node exists in rec tree
+                int_nd_rec_tr = \
+                    self.tree_reconstructed.find_node_with_label(nd_label)
+
+                # could not find internal node in rec tree
+                if int_nd_rec_tr is None:
+                    int_nd_complete_tr = \
+                        self.tree.find_node_with_label(nd_label)
+
+                    # we now recur from this node until we find an sa lineage
+                    # node in the reconstructed tree
+                    #
+                    # if node that is not in rec tree is a tip, this means
+                    # this tip was pruned from the rec tree, so then the SA
+                    # is actually a tip SA -- no need to
+                    # update 'rec_tree_sa_lineage_dict'
+                    if not int_nd_complete_tr.is_leaf():
+                        rec_tr_nd_name = recur_to_find_rec_tr_node(int_nd_complete_tr)
+
+                        rec_tr_nd = \
+                            self.tree_reconstructed.find_node_with_label(rec_tr_nd_name)
+                        rec_tr_nd.is_sa_lineage = True
+
+                        # now update list of SAs
+                        #
+                        # if rec_tr_nd was not an SA lineage, we make it so
+                        if rec_tr_nd_name not in self.rec_tr_sa_lineage_dict:
+                            self.rec_tr_sa_lineage_dict[rec_tr_nd_name] = \
+                                self.sa_lineage_dict[nd_label]
+
+                        else:
+                            to_insert = copy.deepcopy(self.sa_lineage_dict[nd_label])
+                            to_insert.extend(
+                                self.rec_tr_sa_lineage_dict[rec_tr_nd_name]
+                            )
+                            self.rec_tr_sa_lineage_dict = to_insert
 
 
     def extract_reconstructed_tree(
@@ -1238,10 +1362,11 @@ class AnnotatedTree(dp.Tree):
         
         The method deep-copies self.tree, which is of type
         dendropy.Tree, populates it appropriately and then returns it.
-        One important step is the population of the reconstructed tree's
-        'at_dict' member, which will be different from the complete
-        tree's. This population is carried out by
-        'init_rec_tree_at_dict'.
+        One important step is the update of the reconstructed tree's
+        'rec_tr_at_dict' and 'rec_sa_lineage_dict' members, which will
+        be different from the complete tree's. These updates are carried
+        out by 'update_rec_tree_at_dict' and
+        'update_rec_sa_lineage_dict'.
 
         When populating the reconstructed tree, this method effectively
         prunes extinct taxa, and re-roots the resulting tree at the 
@@ -1249,7 +1374,9 @@ class AnnotatedTree(dp.Tree):
         sampled at the present and direct ancestors.
 
         Side-effect on the complete tree's AnnotatedTree object:
-            (i) Populates self.rec_tr_root_node
+            (i)   Populates self.rec_tr_root_node
+            (ii)  Populates self.rec_tr_at_dict
+            (iii) Populates self.rec_tr_sa_lineage_dict
 
         Args:
             require_obs_both_sides (bool, optional): Flag specifying
@@ -1273,15 +1400,23 @@ class AnnotatedTree(dp.Tree):
         # have labels and taxon labels for internal nodes!
         self.tree_reconstructed = copy.deepcopy(self.tree)
 
+        # get initial members
+        self.rec_tr_root_node = self.tree_reconstructed.seed_node
+        self.rec_tr_root_node_label = self.rec_tr_root_node.label
+        self.rec_tr_root_age = self.node_ages_dict[self.rec_tr_root_node_label]
+
         # if tree went extinct, return empty new tree
-        if (self.n_extant_terminal_nodes + self.n_sa_nodes) <= 1:
+        # if (self.n_extant_terminal_nodes + self.n_sa_nodes) <= 1:
+        if (self.n_extant_sampled_terminal_nodes + self.n_sa_nodes) == 0:
             return dp.Tree()
 
         # filter_fn = lambda nd: \
         #     nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
 
         def filter_fn(nd):
-            return nd.is_sa or (nd.is_leaf() and nd.sampled)
+            return nd.is_sa or \
+                   (nd.is_leaf() and nd.alive and nd.sampled) or \
+                   nd.is_sa_dummy_parent
             # return nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
 
         # prune tree of non-sampled tips #
@@ -1293,7 +1428,6 @@ class AnnotatedTree(dp.Tree):
         #####################################
 
         # getting all root information #
-        root_node: dp.Node = dp.Node()
         root_node_distance_from_seed = 0.0
         smallest_distance = 0.0
 
@@ -1309,7 +1443,7 @@ class AnnotatedTree(dp.Tree):
                 root_node.distance_from_root()
             smallest_distance = root_node_distance_from_seed
 
-        int_node_deeper_than_root: dp.Node = dp.Node()
+        int_node_deeper_than_root: dp.Node = None
 
         # we will now grab the internal node that is deeper
         # than the root, and also the furthest away from it
@@ -1373,13 +1507,29 @@ class AnnotatedTree(dp.Tree):
             # nodes; either way, we re-root at the node we found
             # to be the deepest in the tree except for the origin
             if root_node is None:
-                self.tree_reconstructed \
-                    .reroot_at_node(int_node_deeper_than_root)
 
-                # populate AnnotatedTree's rec_tr_root_node_label
-                self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                # root_node got pruned because one of its children went extinct,
+                # and there is nothing deeper than the root other than the origin
+                # (no SAs!) -- the origin must now become this rec tree's root
+                if int_node_deeper_than_root is None:
+                    only_surviving_node = self.tree_reconstructed.seed_node # this will be tip node
+                    self.tree_reconstructed.seed_node = self.rec_tr_root_node
+                    self.tree_reconstructed.seed_node.add_child(only_surviving_node)
+                    print("self.tree_reconstructed", self.tree_reconstructed.as_string(schema="newick"))
 
-                int_node_deeper_than_root.edge_length = 0.0
+                # there is an internal node deeper than the root that is
+                # younger than the origin -- we root there!
+                else:
+                    self.tree_reconstructed \
+                        .reroot_at_node(int_node_deeper_than_root)
+
+                    # populate AnnotatedTree's rec tr members
+                    self.rec_tr_root_node = int_node_deeper_than_root
+                    self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                    self.rec_tr_root_age = \
+                        self.node_ages_dict[int_node_deeper_than_root.label]
+
+                    int_node_deeper_than_root.edge_length = 0.0
             # so there must be a
             # sampled ancestor before the root, so we need to re-root
             # above complete tree's root
@@ -1390,16 +1540,18 @@ class AnnotatedTree(dp.Tree):
                 # if internal nodes in tree do not have a label because
                 # they were read in as Newick strings instead of simulated
                 # by PJ
-                if int_node_deeper_than_root.label == "None":
+                if int_node_deeper_than_root is not None and \
+                        int_node_deeper_than_root.label == "None":
                     self.tree_reconstructed.reroot_at_node(
                         int_node_deeper_than_root)
 
                     # populate AnnotatedTree's rec tree members
                     self.rec_tr_root_node = int_node_deeper_than_root
                     self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                    self.rec_tr_root_age = \
+                        self.node_ages_dict[int_node_deeper_than_root.label]
 
                     # getting origin and removing it if possible
-                    origin_node_rec: dp.Node = dp.Node()
                     if self.origin_node:
                         origin_node_rec = self.tree_reconstructed. \
                             find_node_with_label("origin")
@@ -1441,6 +1593,8 @@ class AnnotatedTree(dp.Tree):
                         # populate AnnotatedTree's rec tree members
                         self.rec_tr_root_node = rec_mrca_node
                         self.rec_tr_root_node_label = rec_mrca_node.label
+                        self.rec_tr_root_age = \
+                            self.node_ages_dict[rec_mrca_node.label]
 
                         rec_mrca_node.edge_length = 0.0
 
@@ -1451,6 +1605,8 @@ class AnnotatedTree(dp.Tree):
                         # populate AnnotatedTree's rec tree members
                         self.rec_tr_root_node = root_node
                         self.rec_tr_root_node_label = root_node.label
+                        self.rec_tr_root_age = \
+                            self.node_ages_dict[root_node.label]
 
         # conditioning on sampled (observed) taxa on both sides of root
         else:
@@ -1479,19 +1635,65 @@ class AnnotatedTree(dp.Tree):
                     self.tree_reconstructed \
                         .reroot_at_node(int_node_deeper_than_root)
 
-                    # populate AnnotatedTree's rec_tr_root_node
-                    self.rec_tr_root_node_label = int_node_deeper_than_root
+                    # populate AnnotatedTree's rec tree members
+                    print("here3")
+                    self.rec_tr_root_node = int_node_deeper_than_root
+                    self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                    self.rec_tr_root_age = \
+                        self.node_ages_dict[int_node_deeper_than_root.label]
 
                     # we remove the branch subtending the dummy node
                     int_node_deeper_than_root.edge_length = 0.0
 
-        ######################
-        # Updating 'at_dict' #
-        ######################
+        ####################################
+        # Updating                         #
+        #     (i)  'rec_tr_at_dict'        #
+        #     (ii) 'rec_tr_sa_lineage_dict #
+        ####################################
 
         complete_tr_nd_that_roots_rec_tr = \
             self.tree.find_node_with_label(self.rec_tr_root_node_label)
-        self.make_at_dict_reflect_rec_tree(complete_tr_nd_that_roots_rec_tr)
+
+        self.update_rec_tr_at_dict(complete_tr_nd_that_roots_rec_tr)
+
+        # now we need to check which internal nodes that were sa_lineages
+        # ("is_sa_lineage" == True) were pruned because one of its descendant
+        # lineages died -- these internal nodes must have its SAs placed as
+        # SAs of their surviving descendant
+        #
+        # TODO: update self.rec_tr_sa_linage as described above
+        self.update_rec_tr_sa_lineage_dict()
+
+        # we need to adjust 'global_time' of all AttributeTransitions
+        # and SampledAncestors to reflect the new global_time = 0,
+        # which is the reconstructed tree's root time
+        #
+        # this is also required so that tree plotting is in agreement with
+        # self.rec_node_ages_dict and self.rec_node_heights_dict (see
+        # below)
+        global_time_offset = self.seed_age - self.rec_tr_root_age
+        if self.rec_tr_at_dict is not None:
+            for nd_name, at_list in self.rec_tr_at_dict.items():
+                for at in at_list:
+                    at.global_time -= global_time_offset
+
+        if self.rec_tr_sa_lineage_dict is not None:
+            for nd_name, sa_list in self.rec_tr_sa_lineage_dict.items():
+                for sa in sa_list:
+                    sa.global_time -= global_time_offset
+
+        ##################################################
+        # Populating rec tree node ages and heights dict #
+        ##################################################
+
+        self._populate_node_age_height_dicts(do_reconstructed_tree=True)
+
+        print("at end of extraction")
+        print("complete", self.tree.as_string(schema="newick"))
+        for nd in self.tree.preorder_node_iter():
+            print("nd", nd.label, "is sa lineage", nd.is_sa_lineage)
+        print(self.sa_lineage_dict)
+        # print("rec", self.tree_reconstructed.as_string(schema="newick"))
 
         return self.tree_reconstructed
    
@@ -1550,9 +1752,19 @@ class AnnotatedTree(dp.Tree):
             suppress_annotations=False,
             suppress_internal_taxon_labels=True)
 
+    def rec_str(self) -> str:
+        if not self.tree_reconstructed:
+            self.extract_reconstructed_tree()
+
+        return self.tree_reconstructed.as_string(
+            schema="newick",
+            suppress_annotations=False,
+            suppress_internal_taxon_labels=True)
+
     def plot_node(self,
                   axes: plt.Axes,
                   node_attr: str = "state",
+                  draw_reconstructed: ty.Optional[bool] = False,
                   **kwargs) -> None:
         """Draw tree on provided Axes instance.
 
@@ -1565,15 +1777,26 @@ class AnnotatedTree(dp.Tree):
             node_attr (str): Name of the attribute according to which
                 one wants to color the AnnotatedTree's branches with.
                 Defaults to 'state'.
+            draw_reconstructed (bool, optional): Whether we are drawing
+                the reconstructed tree instead of the complete tree.
+                Defaults to 'False'.
         """
 
+        if draw_reconstructed and not self.tree_reconstructed:
+            self.extract_reconstructed_tree()
+
         if not node_attr:
-            plot_ann_tree(self, axes)
+            plot_ann_tree(self,
+                          axes,
+                          draw_reconstructed=draw_reconstructed)
 
         else:
             self.populate_nd_attr_dict([node_attr])
 
-            plot_ann_tree(self, axes, attr_of_interest=node_attr)
+            plot_ann_tree(self,
+                          axes,
+                          attr_of_interest=node_attr,
+                          draw_reconstructed=draw_reconstructed)
 
     def get_stats_dict(self) -> ty.Dict[str, ty.Union[int, float]]:
         """Get dictionary with AnnotatedTree's summary stats.
@@ -1721,7 +1944,8 @@ def get_node_name(nd: dp.Node) -> str:
 
 def get_x_coord_from_nd_heights(ann_tr: AnnotatedTree,
                                 use_age: bool = False,
-                                unit_branch_lengths: bool = False) \
+                                unit_branch_lengths: bool = False,
+                                draw_reconstructed: bool = False) \
                                     -> ty.Dict[str, float]:
     """Return x-coordinates for all nodes in tree.
     
@@ -1733,12 +1957,21 @@ def get_x_coord_from_nd_heights(ann_tr: AnnotatedTree,
             are drawing.
         use_age (bool): Flag specifying if to use node age or not.
             Defaults to 'False'.
-        unit_branch_lengths (bool): If branch lengths are all 1.0
-            (currently not used). Defaults to 'False'.
+        unit_branch_lengths (bool, optional): If branch lengths are all
+            1.0 (currently not used). Defaults to 'False'.
+        draw_reconstructed (bool, optional): Whether we are drawing the
+            reconstructed tree instead of the complete tree. Defaults
+            to 'False'.
     """
 
     if use_age and not unit_branch_lengths:
+        if draw_reconstructed:
+            return ann_tr.rec_node_ages_dict
+
         return ann_tr.node_ages_dict
+
+    if draw_reconstructed:
+        return ann_tr.rec_node_heights_dict
 
     return ann_tr.node_heights_dict
 
@@ -1771,50 +2004,84 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
     # we define an inner recursive function
     # for obtaining y-coords at internal nodes
     def recursively_calculate_height(nd: dp.Node) -> None:
-        children: ty.List[dp.Node] = list()
 
+        # list children of node so we can find its y-coordinate
+        children: ty.List[dp.Node] = list()
         if sa_along_branches:
-            children = [ch for ch in nd.child_nodes() if not ch.is_sa]
+            if not draw_reconstructed:
+                children = [ch for ch in nd.child_nodes() if not ch.is_sa]
+
+            # drawing reconstructed tree
+            else:
+                # if node is not the dummy parent of an SA node, but it
+                # has an SA child, it means this SA child is a tip node
+                # and we do not want to ignore it
+                if not nd.is_sa_dummy_parent:
+                    found_sa = False
+
+                    for ch in nd.child_nodes():
+                        if ch.is_sa:
+                            found_sa = True
+                            break
+
+                    # SA is a tip node, we care about it
+                    if found_sa:
+                        children = [ch for ch in nd.child_nodes()]
+
+                    # this is a regular internal node, we do not
+                    # care about SAs (placing along lineages!)
+                    else:
+                        children = [ch for ch in nd.child_nodes() if not ch.is_sa]
+
+                # if node is a dummy parent, it means it hasn't been pruned,
+                # so the SA node is not a tip node -- we can ignore the SA!
+                elif nd.is_sa_dummy_parent:
+                    children = [ch for ch in nd.child_nodes() if not ch.is_sa]
 
         else:
             children = [ch for ch in nd.child_nodes()]
 
-        if len(children) > 0:
+        n_children = len(children)
+        if n_children > 0:
+            nd_effectively_dummy = False
+            found_sa = 0
+            found_non_sa = 0
+            # recur!
             for ch_nd in children:
                 if ch_nd not in y_coords:
                     recursively_calculate_height(ch_nd)
 
+                if ch_nd.is_sa:
+                    found_sa += 1
+
+                elif not ch_nd.is_sa:
+                    found_non_sa += 1
+
+            # if (found_sa == 1 and found_non_sa == 1) or len(children) == 1:
+            #     nd_effectively_dummy = True
+
             # origin (and dummy nodes if user wants to place SA nodes along branches)
-            if (start_at_origin and nd == ann_tr.origin_node) \
-                    or (sa_along_branches and nd.is_sa_dummy_parent):
+            #(sa_along_branches and nd.is_sa_dummy_parent):
+            if (start_at_origin and \
+                    (nd == ann_tr.origin_node or \
+                     ann_tr.rec_tr_root_node.num_child_nodes() == 1)) or \
+                    (sa_along_branches and nd.is_sa_dummy_parent):
                 y_coords[get_node_name(nd)] = \
                     y_coords[get_node_name(children[0])]
 
-            # root and all others (assume bifurcation)
-            else:
+            # root and bifurcating internal nodes
+            # elif n_children == 2 and not nd.is_sa_dummy_parent:
+            elif n_children == 2 and not nd.is_sa_dummy_parent:
                 y_coords[get_node_name(nd)] = \
                     (y_coords[get_node_name(children[0])]
                      + y_coords[get_node_name(children[1])]) / 2.0
 
+
+    # start_at_origin = start_at_origin
+    # if draw_reconstructed:
+    #     start_at_origin = False
+
     # now we will get the y-coords
-    #
-    # we start by obtaining the max height of graph,
-    # which is given by number of observable nodes
-    maxheight: int = 0
-    if sa_along_branches:
-        maxheight = ann_tr.n_extant_terminal_nodes \
-            + ann_tr.n_extinct_terminal_nodes
-
-    else:
-        if not draw_reconstructed:
-            maxheight = ann_tr.n_extant_terminal_nodes \
-                + ann_tr.n_extinct_terminal_nodes + ann_tr.n_sa_nodes
-
-        else:
-            maxheight = ann_tr.n_extant_sampled_terminal_nodes \
-                        + ann_tr.n_sa_nodes
-
-    # grab all terminal node names
     leaf_names = list()
     tr2look = ann_tr.tree
     node2recur = ann_tr.tree.seed_node
@@ -1822,10 +2089,73 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
         tr2look = ann_tr.tree_reconstructed
         node2recur = ann_tr.rec_tr_root_node
 
+    print("rec tree", tr2look.as_string(schema="newick"))
+    print("  its seed node is", tr2look.seed_node)
+
+    # get SA nodes on a lineage that went extinct
+    n_sa_tip_nodes = 0
+    for a_nd in tr2look.internal_nodes():
+        n_a_nd_chs = 0
+        one_ch_is_sa = False
+
+        for a_nd_ch in a_nd.child_nodes():
+            n_a_nd_chs += 1
+
+            if a_nd_ch.is_sa:
+                one_ch_is_sa = True
+
+        # if one_ch_is_sa and (n_a_nd_chs == 1 or a_nd == node2recur):
+        if one_ch_is_sa and not a_nd.is_sa_dummy_parent:
+            n_sa_tip_nodes += 1
+
+    print("\n\nn_sa_tip_nodes", n_sa_tip_nodes)
+
+    # now we need the max height of graph,
+    # which is given by number of observable nodes
+    maxheight: int = 0
+    if sa_along_branches:
+        if not draw_reconstructed:
+            maxheight = ann_tr.n_extant_terminal_nodes \
+                        + ann_tr.n_extinct_terminal_nodes
+
+        else:
+            maxheight = ann_tr.n_extant_sampled_terminal_nodes \
+                + n_sa_tip_nodes
+
+    else:
+        if not draw_reconstructed:
+            maxheight = ann_tr.n_extant_terminal_nodes \
+                        + ann_tr.n_extinct_terminal_nodes + ann_tr.n_sa_nodes
+
+        else:
+            maxheight = ann_tr.n_extant_sampled_terminal_nodes \
+                        + ann_tr.n_sa_nodes
+
+    # now grab all relevant terminal node names (some SAs and extant)
     for nd in tr2look.leaf_node_iter():
-        # if user wants to place SA nodes on branches,
-        # we must ignore SA nodes here
         if sa_along_branches and nd.is_sa:
+            # we do care about SAs if the lineage
+            # descending from them dies off,
+            # even when placing SAs along branches
+            if draw_reconstructed:
+                # if nd.parent_node == ann_tr.rec_tr_root_node:
+                #     leaf_names.append(get_node_name(nd))
+
+                # SA node is a tip and its original dummy
+                # parent was pruned!
+                if not nd.parent_node.is_sa_dummy_parent:
+                    leaf_names.append(get_node_name(nd))
+
+                # if dummy node only has the SA as child,
+                # we care about this SA
+                # elif nd.parent_node.is_sa_dummy_parent and \
+                #         nd.parent_node.num_child_nodes() == 1:
+                #     leaf_names.append(get_node_name(nd))
+
+            # if user wants to place SA nodes on branches
+            # of the complete tree, or of the rec tree but
+            # the lineage descending from the SA is alive,
+            # we must ignore the SA node here
             continue
 
         leaf_names.append(get_node_name(nd))
@@ -1835,6 +2165,8 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
         {leaf_name: float(maxheight - i + 1)
          for i, leaf_name
          in enumerate(reversed(leaf_names))}
+
+    print("\n\n\nmaxheight", maxheight, "leaf_names", leaf_names, "y_coords before recurring", y_coords, "\nstarting recursion from", node2recur)
     
     # now take care of all internal nodes recursively
     recursively_calculate_height(node2recur)
@@ -1861,7 +2193,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         use_age (bool): Flag specifying if age or time is being
             used.
         start_at_origin (bool): Flag specifying if drawing starts
-            at the origin node.
+            at the origin node. Defaults to 'False'.
         attr_of_interest (str): Name of the attribute according to
             which states we are coloring tree branches. Defaults to
             'state'.
@@ -1886,12 +2218,19 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     ####################################################
     # Setting up flags and checking tree content is OK #
     ####################################################
-    if not draw_reconstructed:
-        if ann_tr.origin_node:
-            start_at_origin = True  # scoped to draw_tree()
 
-    else:
+    start_at_origin = start_at_origin
+
+    # drawing reconstructed tree
+    if draw_reconstructed:
         start_at_origin = False
+
+        if ann_tr.rec_tr_root_node.num_child_nodes() == 1:
+            start_at_origin = True
+
+    # drawing complete tree
+    elif ann_tr.origin_node:
+        start_at_origin = True  # scoped to draw_tree()
 
     if sa_along_branches and not ann_tr.sa_lineage_dict:
         # throw plotting exception, cannot plot sa along branches
@@ -1899,8 +2238,14 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         pass
 
     # grabbing key coordinates for drawing tree
-    x_coords = get_x_coord_from_nd_heights(ann_tr,
-                                           use_age=use_age)
+    #
+    # if drawing reconstructed tree, the first x coordinate
+    # will be the root of the reconstructed tree
+    x_coords = \
+        get_x_coord_from_nd_heights(ann_tr,
+                                    use_age=use_age,
+                                    draw_reconstructed=draw_reconstructed)
+
     y_coords = \
         get_y_coord_from_n_obs_nodes(ann_tr,
                                      start_at_origin=start_at_origin,
@@ -1917,6 +2262,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
     # side-effect:
     # populates: horizontal_linecollections
     #            vertical_linecollections
+
     def _draw_clade_lines(x_end: float = 0.0,
                           use_linecollection: bool = False,
                           orientation: str = "horizontal",
@@ -2073,9 +2419,13 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
         from_x_here_to_this_x: float = 0.0  # default (present moment)
         # draws from origin/root_node to root_node x
-        if use_age and nd in (ann_tr.origin_node, ann_tr.root_node):
-            if isinstance(ann_tr.root_age, float):
+        if use_age and nd in \
+                (ann_tr.origin_node, ann_tr.root_node, ann_tr.rec_tr_root_node):
+            if not draw_reconstructed and isinstance(ann_tr.root_age, float):
                 from_x_here_to_this_x = ann_tr.root_age
+
+            elif draw_reconstructed and isinstance(ann_tr.rec_tr_root_age, float):
+                from_x_here_to_this_x = ann_tr.rec_tr_root_age
 
         #################################
         # Draw horizontal line (branch) #
@@ -2119,7 +2469,12 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
             sas: ty.List[pjsa.SampledAncestor] = []
             if isinstance(ann_tr.sa_lineage_dict, dict):
-                sas = ann_tr.sa_lineage_dict[nd_name]
+                if draw_reconstructed:
+                    sas = ann_tr.rec_tr_sa_lineage_dict[nd_name]
+
+                # drawing complete tree
+                else:
+                    sas = ann_tr.sa_lineage_dict[nd_name]
 
             for sa in sas:
                 sa_x: float = sa.global_time
@@ -2151,9 +2506,10 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             ################################################
             # Draw a vertical line connecting two children #
             ################################################
-            # not origin
+            # not complete tree's nor rec tree's origin
             if not start_at_origin or \
-                (ann_tr.origin_node and nd != ann_tr.origin_node):
+                    ((ann_tr.origin_node and nd != ann_tr.origin_node) and \
+                     (ann_tr.rec_tr_root_node.num_child_nodes() > 1 and nd != ann_tr.rec_tr_root_node)):
 
                 # must be either (1) placing SA along branch, and then NOT a dummy, or
                 # or             (2) regular plotting, AND have two children
@@ -2181,10 +2537,22 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             # Draw descendents #
             ####################
             for child_nd in children:
-                # if user wants to place SA nodes along branches, we must
-                # ignore them here
+                # if user wants to place SA nodes along branches
                 if sa_along_branches and child_nd.is_sa:
-                    continue
+                    # if drawing complete tree, all SA nodes must be ignored
+                    # because they will always be along branches
+                    if not draw_reconstructed:
+                        continue
+
+                    # if drawing reconstructed tree, some SA will be along branches
+                    # while others will be tips! we want to ignroe just the former!
+                    #
+                    # if parent is dummy and has 2 children, it means the SA is NOT
+                    # a tip (i.e., is not along a lineage that went extinct), so we
+                    # ignore it
+                    else:
+                        if nd.is_sa_dummy_parent and len(children) > 1:
+                            continue
 
                 # segment_colors[-1] is the color of the (parent!) node whose
                 # children we are visiting

@@ -388,7 +388,8 @@ class GUIMainWindow(QMainWindow):
             do_all_samples,
             sample_idx=None,
             repl_idx=0,
-            repl_size=1):
+            repl_size=1,
+            display_reconstructed=False):
 
         display_node_dag_value_str = str()
         display_node_dag_stat_str = str()
@@ -416,7 +417,8 @@ class GUIMainWindow(QMainWindow):
                     start,
                     end,
                     repl_idx=repl_idx,
-                    is_tree=is_tree)
+                    is_tree=is_tree,
+                    display_reconstructed=display_reconstructed)
 
             # summary stats
             display_node_dag_stat_str = \
@@ -450,7 +452,8 @@ class GUIMainWindow(QMainWindow):
             do_all_samples,
             sample_idx=None,
             repl_idx=0,
-            repl_size=1):
+            repl_size=1,
+            draw_reconstructed=False):
         """
         Plot DAG node on 'node_display_fig_axes' (Axes object) scoped to 'call_gui()',
         then update canvas with new plot
@@ -463,7 +466,8 @@ class GUIMainWindow(QMainWindow):
                                    node_dag,
                                    sample_idx=sample_idx,
                                    repl_idx=repl_idx,
-                                   repl_size=repl_size)
+                                   repl_size=repl_size,
+                                   draw_reconstructed=draw_reconstructed)
 
             # when not a tree
             else:
@@ -535,6 +539,9 @@ class GUIMainWindow(QMainWindow):
             do_all_samples = \
                 self.ui.ui_pages.all_samples_radio.isChecked()
 
+            do_reconstructed = \
+                self.ui.ui_pages.reconstructed_tree_check.isChecked()
+
             #################################
             # Collect information from spin #
             #################################
@@ -550,7 +557,8 @@ class GUIMainWindow(QMainWindow):
                                        do_all_samples,
                                        sample_idx=sample_idx,
                                        repl_idx=repl_idx,
-                                       repl_size=repl_size)
+                                       repl_size=repl_size,
+                                       display_reconstructed=do_reconstructed)
 
             self.selected_node_plot(fig_obj,
                                     fig_axes,
@@ -558,7 +566,8 @@ class GUIMainWindow(QMainWindow):
                                     do_all_samples,
                                     sample_idx=sample_idx,
                                     repl_idx=repl_idx,
-                                    repl_size=repl_size)
+                                    repl_size=repl_size,
+                                    draw_reconstructed=do_reconstructed)
 
         # no nodes to do
         else:
@@ -971,13 +980,15 @@ class GUIMainWindow(QMainWindow):
             node_dag,
             sample_idx=None,
             repl_idx=0,
-            repl_size=1) -> None:
+            repl_size=1,
+            draw_reconstructed=False) -> None:
 
         return node_dag.plot_node(
             axes,
             sample_idx=sample_idx,
             repl_idx=repl_idx,
-            repl_size=repl_size)
+            repl_size=repl_size,
+            draw_reconstructed=draw_reconstructed)
 
     def draw_violin(self):
         thing_to_compare: str = ""

@@ -375,6 +375,13 @@ QListWidget::item:selected{
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="reconstructed_tree_check">
+            <property name="text">
+             <string>Reconstructed</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="spacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
