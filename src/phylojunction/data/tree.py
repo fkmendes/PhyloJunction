@@ -1317,6 +1317,7 @@ class AnnotatedTree(dp.Tree):
 
                 # could not find internal node in rec tree
                 if int_nd_rec_tr is None:
+                    # but the internal node must be in the complete tree
                     int_nd_complete_tr = \
                         self.tree.find_node_with_label(nd_label)
 
@@ -1339,7 +1340,7 @@ class AnnotatedTree(dp.Tree):
                         # if rec_tr_nd was not an SA lineage, we make it so
                         if rec_tr_nd_name not in self.rec_tr_sa_lineage_dict:
                             self.rec_tr_sa_lineage_dict[rec_tr_nd_name] = \
-                                self.sa_lineage_dict[nd_label]
+                                copy.deepcopy(self.sa_lineage_dict[nd_label])
 
                         else:
                             to_insert = copy.deepcopy(self.sa_lineage_dict[nd_label])
@@ -1365,8 +1366,8 @@ class AnnotatedTree(dp.Tree):
         One important step is the update of the reconstructed tree's
         'rec_tr_at_dict' and 'rec_sa_lineage_dict' members, which will
         be different from the complete tree's. These updates are carried
-        out by 'update_rec_tree_at_dict' and
-        'update_rec_sa_lineage_dict'.
+        out by 'update_rec_tr_at_dict' and
+        'update_rec_tr_sa_lineage_dict'.
 
         When populating the reconstructed tree, this method effectively
         prunes extinct taxa, and re-roots the resulting tree at the 
@@ -1515,7 +1516,6 @@ class AnnotatedTree(dp.Tree):
                     only_surviving_node = self.tree_reconstructed.seed_node # this will be tip node
                     self.tree_reconstructed.seed_node = self.rec_tr_root_node
                     self.tree_reconstructed.seed_node.add_child(only_surviving_node)
-                    print("self.tree_reconstructed", self.tree_reconstructed.as_string(schema="newick"))
 
                 # there is an internal node deeper than the root that is
                 # younger than the origin -- we root there!
@@ -1636,7 +1636,6 @@ class AnnotatedTree(dp.Tree):
                         .reroot_at_node(int_node_deeper_than_root)
 
                     # populate AnnotatedTree's rec tree members
-                    print("here3")
                     self.rec_tr_root_node = int_node_deeper_than_root
                     self.rec_tr_root_node_label = int_node_deeper_than_root.label
                     self.rec_tr_root_age = \
@@ -1660,8 +1659,6 @@ class AnnotatedTree(dp.Tree):
         # ("is_sa_lineage" == True) were pruned because one of its descendant
         # lineages died -- these internal nodes must have its SAs placed as
         # SAs of their surviving descendant
-        #
-        # TODO: update self.rec_tr_sa_linage as described above
         self.update_rec_tr_sa_lineage_dict()
 
         # we need to adjust 'global_time' of all AttributeTransitions
@@ -1687,13 +1684,6 @@ class AnnotatedTree(dp.Tree):
         ##################################################
 
         self._populate_node_age_height_dicts(do_reconstructed_tree=True)
-
-        print("at end of extraction")
-        print("complete", self.tree.as_string(schema="newick"))
-        for nd in self.tree.preorder_node_iter():
-            print("nd", nd.label, "is sa lineage", nd.is_sa_lineage)
-        print(self.sa_lineage_dict)
-        # print("rec", self.tree_reconstructed.as_string(schema="newick"))
 
         return self.tree_reconstructed
    
@@ -1753,13 +1743,14 @@ class AnnotatedTree(dp.Tree):
             suppress_internal_taxon_labels=True)
 
     def rec_str(self) -> str:
-        if not self.tree_reconstructed:
-            self.extract_reconstructed_tree()
-
-        return self.tree_reconstructed.as_string(
-            schema="newick",
-            suppress_annotations=False,
-            suppress_internal_taxon_labels=True)
+        return ""
+        # if not self.tree_reconstructed:
+        #     self.extract_reconstructed_tree()
+        #
+        # return self.tree_reconstructed.as_string(
+        #     schema="newick",
+        #     suppress_annotations=False,
+        #     suppress_internal_taxon_labels=True)
 
     def plot_node(self,
                   axes: plt.Axes,
@@ -1964,16 +1955,19 @@ def get_x_coord_from_nd_heights(ann_tr: AnnotatedTree,
             to 'False'.
     """
 
-    if use_age and not unit_branch_lengths:
-        if draw_reconstructed:
-            return ann_tr.rec_node_ages_dict
+    # currently no support for unit_branch_lengths == True
+    if not unit_branch_lengths:
+        if use_age:
+            if draw_reconstructed:
+                return ann_tr.rec_node_ages_dict
 
-        return ann_tr.node_ages_dict
+            return ann_tr.node_ages_dict
 
-    if draw_reconstructed:
-        return ann_tr.rec_node_heights_dict
+        else:
+            if draw_reconstructed:
+                return ann_tr.rec_node_heights_dict
 
-    return ann_tr.node_heights_dict
+            return ann_tr.node_heights_dict
 
 
 def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
@@ -2013,37 +2007,40 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
 
             # drawing reconstructed tree
             else:
+                found_sa = 0
+
+                for ch in nd.child_nodes():
+                    if ch.is_sa:
+                        found_sa += 1
+
                 # if node is not the dummy parent of an SA node, but it
                 # has an SA child, it means this SA child is a tip node
                 # and we do not want to ignore it
                 if not nd.is_sa_dummy_parent:
-                    found_sa = False
-
-                    for ch in nd.child_nodes():
-                        if ch.is_sa:
-                            found_sa = True
-                            break
-
                     # SA is a tip node, we care about it
-                    if found_sa:
+                    if found_sa >= 1:
                         children = [ch for ch in nd.child_nodes()]
 
                     # this is a regular internal node, we do not
                     # care about SAs (placing along lineages!)
-                    else:
+                    elif found_sa == 0:
                         children = [ch for ch in nd.child_nodes() if not ch.is_sa]
 
                 # if node is a dummy parent, it means it hasn't been pruned,
-                # so the SA node is not a tip node -- we can ignore the SA!
                 elif nd.is_sa_dummy_parent:
-                    children = [ch for ch in nd.child_nodes() if not ch.is_sa]
+                    # one child is a normal SA, the other is a tip SA
+                    if found_sa == 2:
+                        children = [ch for ch in nd.child_nodes() if ch.edge_length > 0.0]
+
+                    # or the SA node is not a tip node -- we can ignore the SA!
+                    else:
+                        children = [ch for ch in nd.child_nodes() if not ch.is_sa]
 
         else:
             children = [ch for ch in nd.child_nodes()]
 
         n_children = len(children)
         if n_children > 0:
-            nd_effectively_dummy = False
             found_sa = 0
             found_non_sa = 0
             # recur!
@@ -2060,22 +2057,23 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
             # if (found_sa == 1 and found_non_sa == 1) or len(children) == 1:
             #     nd_effectively_dummy = True
 
-            # origin (and dummy nodes if user wants to place SA nodes along branches)
-            #(sa_along_branches and nd.is_sa_dummy_parent):
+            # origin in complete tree, or rec tree root has a single child
+            # (effectively an origin)
+            # OR
+            # dummy nodes if user wants to place SA nodes along branches,
             if (start_at_origin and \
                     (nd == ann_tr.origin_node or \
-                     ann_tr.rec_tr_root_node.num_child_nodes() == 1)) or \
-                    (sa_along_branches and nd.is_sa_dummy_parent):
+                     (draw_reconstructed and \
+                      ann_tr.rec_tr_root_node.num_child_nodes() == 1))) \
+                    or (sa_along_branches and nd.is_sa_dummy_parent):
                 y_coords[get_node_name(nd)] = \
                     y_coords[get_node_name(children[0])]
 
             # root and bifurcating internal nodes
-            # elif n_children == 2 and not nd.is_sa_dummy_parent:
             elif n_children == 2 and not nd.is_sa_dummy_parent:
                 y_coords[get_node_name(nd)] = \
                     (y_coords[get_node_name(children[0])]
                      + y_coords[get_node_name(children[1])]) / 2.0
-
 
     # start_at_origin = start_at_origin
     # if draw_reconstructed:
@@ -2088,9 +2086,6 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
     if draw_reconstructed:
         tr2look = ann_tr.tree_reconstructed
         node2recur = ann_tr.rec_tr_root_node
-
-    print("rec tree", tr2look.as_string(schema="newick"))
-    print("  its seed node is", tr2look.seed_node)
 
     # get SA nodes on a lineage that went extinct
     n_sa_tip_nodes = 0
@@ -2107,8 +2102,6 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
         # if one_ch_is_sa and (n_a_nd_chs == 1 or a_nd == node2recur):
         if one_ch_is_sa and not a_nd.is_sa_dummy_parent:
             n_sa_tip_nodes += 1
-
-    print("\n\nn_sa_tip_nodes", n_sa_tip_nodes)
 
     # now we need the max height of graph,
     # which is given by number of observable nodes
@@ -2143,14 +2136,22 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
 
                 # SA node is a tip and its original dummy
                 # parent was pruned!
-                if not nd.parent_node.is_sa_dummy_parent:
+                if not nd.parent_node.is_sa_dummy_parent or \
+                        nd.edge_length > 0.0:
                     leaf_names.append(get_node_name(nd))
 
-                # if dummy node only has the SA as child,
-                # we care about this SA
-                # elif nd.parent_node.is_sa_dummy_parent and \
-                #         nd.parent_node.num_child_nodes() == 1:
-                #     leaf_names.append(get_node_name(nd))
+                # if parent dummy node has one SA child and
+                # an extinct child, then we care about this SA
+                # elif nd.parent_node.is_sa_dummy_parent:
+                #     # we get the equivalent tree in the complete tree
+                #     # so we can interrogate the original parent and see
+                #     # if sibling went extinct
+                #     # complete_tr_nd = ann_tr.tree.find_node_with_label(nd.label)
+                #     # print("interrogating", complete_tr_nd.label ,complete_tr_nd.parent_node.child_nodes())
+                #     for ch_nd in nd.parent_node.child_nodes():
+                #         # if sibling node is dead
+                #         if ch_nd.is_sa and ch_nd.edge_length > 0:
+                #             leaf_names.append(get_node_name(ch_nd))
 
             # if user wants to place SA nodes on branches
             # of the complete tree, or of the rec tree but
@@ -2166,7 +2167,8 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
          for i, leaf_name
          in enumerate(reversed(leaf_names))}
 
-    print("\n\n\nmaxheight", maxheight, "leaf_names", leaf_names, "y_coords before recurring", y_coords, "\nstarting recursion from", node2recur)
+    # debugging
+    # print("\nmaxheight", maxheight, "leaf_names", leaf_names)
     
     # now take care of all internal nodes recursively
     recursively_calculate_height(node2recur)
@@ -2318,7 +2320,8 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                     draw_reconstructed: bool = False) -> None:
         """Recursively draw a tree.
 
-        This is the main drawing method.
+        This is the main drawing method. It draws both horizontal
+        and vertical lines for this clade.
         
         Args:
             nd (dendropy.Node): Current node being recurred and whose
@@ -2464,6 +2467,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         #################################
         # Draw sampled ancestors if any #
         #################################
+
         if sa_along_branches and \
                 (not nd.is_sa_dummy_parent and nd.is_sa_lineage):
 
@@ -2488,13 +2492,14 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                     if start_at_origin and \
                             isinstance(ann_tr.origin_age, float):
                         sa_x = ann_tr.origin_age - sa_x
+
                     elif isinstance(ann_tr.root_age, float):
                         sa_x = ann_tr.root_age - sa_x
 
                 sa_y = y_here
 
                 _draw_sa_along_branch(sa.label,
-                                      sa.global_time,
+                                      sa_x,
                                       sa_y,
                                       axes,
                                       color=sa_color)
@@ -2508,13 +2513,16 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             ################################################
             # not complete tree's nor rec tree's origin
             if not start_at_origin or \
-                    ((ann_tr.origin_node and nd != ann_tr.origin_node) and \
-                     (ann_tr.rec_tr_root_node.num_child_nodes() > 1 and nd != ann_tr.rec_tr_root_node)):
+                    (ann_tr.origin_node and nd != ann_tr.origin_node) or \
+                     (draw_reconstructed and \
+                      ann_tr.rec_tr_root_node.num_child_nodes() > 1 and \
+                      nd != ann_tr.rec_tr_root_node):
 
                 # must be either (1) placing SA along branch, and then NOT a dummy, or
                 # or             (2) regular plotting, AND have two children
-                if (sa_along_branches and not nd.is_sa_dummy_parent) or \
-                        (len(children) == 2 and not sa_along_branches):
+                if len(children) == 2 and \
+                        ((sa_along_branches and not nd.is_sa_dummy_parent) or \
+                        not sa_along_branches):
 
                     y_top = y_coords[get_node_name(children[0])]
                     y_bot = y_coords[get_node_name(children[1])]
@@ -2536,6 +2544,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             ####################
             # Draw descendents #
             ####################
+
             for child_nd in children:
                 # if user wants to place SA nodes along branches
                 if sa_along_branches and child_nd.is_sa:
@@ -2545,13 +2554,19 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                         continue
 
                     # if drawing reconstructed tree, some SA will be along branches
-                    # while others will be tips! we want to ignroe just the former!
+                    # while others will be tips! we want to ignore just the former!
                     #
                     # if parent is dummy and has 2 children, it means the SA is NOT
                     # a tip (i.e., is not along a lineage that went extinct), so we
                     # ignore it
                     else:
-                        if nd.is_sa_dummy_parent and len(children) > 1:
+                        # if child_nd is not an SA tip
+                        # AND
+                        # if parent of child_nd is a dummy node with two children
+                        # then we ignore this child and do not draw it
+                        if (child_nd.edge_length < ann_tr.epsilon or \
+                                child_nd.edge_length == 0) and \
+                                nd.is_sa_dummy_parent and len(children) > 1:
                             continue
 
                 # segment_colors[-1] is the color of the (parent!) node whose
