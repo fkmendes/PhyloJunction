@@ -9,8 +9,15 @@ class SampledAncestor():
     label: str
     # label of node on whose subtending branch the SA is attached
     lineage_node_label: str
+
     # SA's (forward) occurrence time (i.e., origin or root = 0.0)
+    # but note that this will be of either the complete OR the
+    # reconstructed process!!!
     global_time: float
+
+    # SA's (backward) occurrence time (i.e., present time = 0.0)
+    age: float
+
     state: int
 
     # time to lineage node (node defining the branch on which the
@@ -24,12 +31,14 @@ class SampledAncestor():
                  label: str,
                  lineage_node_label: str,
                  global_time: float,
+                 age: float = None,
                  state: int = 0,
                  time_to_lineage_node: float = -1.0) -> None:
 
         self.label = label
         self.lineage_node_label = lineage_node_label
         self.global_time = global_time
+        self.age = age
         self.state = state
         self.time_to_lineage_node = time_to_lineage_node
         self.str_representation = \

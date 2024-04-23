@@ -382,10 +382,12 @@ class NodeDAG(ABC):
                 # tree, and repl_idx is always 0
                 else:
                     if display_reconstructed:
-                        return str(self._value[start + repl_idx])
+                        tr = self._value[start + repl_idx]
+                        return tr.rec_str()
 
+                    # string representation of complete tree (__str__())
                     else:
-                        return self._value[start + repl_idx].rec_str()
+                        return str(self._value[start + repl_idx])
 
             # single element in value
             else:

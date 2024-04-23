@@ -322,8 +322,6 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph) -> pd.DataFrame:
                         it_idx_str = "1"
                         sample_smap_str = ""
 
-                    print("ABOUT TO RECUR processed_repls", processed_repls, "it_idx_str", it_idx_str)
-
                     sample_smap_str = recursively_collect_smaps(seed_nd,
                                                          at_dict,
                                                          clado_at_dict,
@@ -333,13 +331,12 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph) -> pd.DataFrame:
                                                          it_idx_str)
 
                     # debugging
-                    print(sample_smap_str)
+                    # print(sample_smap_str)
 
                     # we are still going through all replicates within a sample... increment!
                     if processed_repls < n_repl:
                         processed_repls += 1
                         it_idx_str = str(processed_repls + 1)
-                        print("AFTER RECURRING processed_repls", processed_repls, "it_idx_str", it_idx_str)
 
 
 
@@ -583,13 +580,14 @@ def prep_data_df(
                 #         suppress_internal_node_labels=True).strip("\""))
 
                 # reconstructed trees #
-                # suppress_rooting=False guarantees that
+                # suppress_rooting=True guarantees that
                 # [&R] is not added to tree Newick string as
                 # a result of re-rooting the reconstructed tree
                 rec_tree_list = []
                 rec_tree_ann_list = []
                 for ith_val in node_val:
-                    ith_rec_tree = ith_val.extract_reconstructed_tree()
+                    ith_rec_tree = \
+                        ith_val.extract_reconstructed_tree(plotting_overhead=False)
 
                     rec_tree_list.append(
                         ith_rec_tree.as_string(

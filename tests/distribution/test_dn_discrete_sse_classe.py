@@ -92,7 +92,6 @@ class TestClaSSETrees(unittest.TestCase):
 
         cls.sse_stash = sseobj.SSEStash(event_handler)
 
-
     def test_tree_size_state_count_max_taxa_classe(self):
         """
         Test if ClaSSE (GeoSSE) trees simulated with PJ have similar
@@ -363,11 +362,12 @@ class TestClaSSETrees(unittest.TestCase):
                 + str(a_delta) + ") out of 100 times.",
             delta=a_delta)
 
-
     def test_tree_size_state_count_max_t_classe(self):
-        """
-        Test if ClaSSE (GeoSSE) trees simulated here have similar root ages and number of tips for the three states 
-        (A, B, AB) as ClaSSE trees simulated with diversitree
+        """Test if ClaSSE (GeoSSE) trees match diversitree's.
+
+        Check that PJ simulated ClaSSE trees have similar root ages and
+        number of tips for the three states (A, B, AB) as ClaSSE trees
+        simulated with diversitree.
 
         Note: condition_on_speciation=False to match diversitree!
         """

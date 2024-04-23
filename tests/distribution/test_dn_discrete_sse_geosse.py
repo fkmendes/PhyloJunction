@@ -92,7 +92,6 @@ class TestGeoSSETrees(unittest.TestCase):
 
         cls.sse_stash = sseobj.SSEStash(event_handler)
 
-
     def test_tree_size_state_count_max_t_geosse(self):
         """
         Test if GeoSSE trees simulated with PJ have similar root ages
@@ -365,7 +364,6 @@ class TestGeoSSETrees(unittest.TestCase):
                 "+ stderr_divtree) apart " + str(exp_count) + " (+/- " \
                 + str(a_delta) + ") out of 100 times.",
             delta=a_delta)
-    
 
     def test_tree_size_state_count_max_t_geosse_reconstructed(self):
         """
@@ -529,7 +527,9 @@ class TestGeoSSETrees(unittest.TestCase):
         global_mean_n3 = 0.0
         global_mean_root_age = 0.0
         for i, batch in enumerate(sim_batches):            
-            rec_trs = [ann_tr.extract_reconstructed_tree() for ann_tr in batch]
+            rec_trs = \
+                [ann_tr.extract_reconstructed_tree(plotting_overhead=False) \
+                 for ann_tr in batch]
 
             # note that we're matching diversitree's state coding:
             # 0=AB, 1=A, 2=B
@@ -644,7 +644,6 @@ class TestGeoSSETrees(unittest.TestCase):
                 + "+ stderr_divtree) apart " + str(exp_count) + " (+/- " \
                 + str(a_delta) + ") out of 100 times.",
             delta=a_delta)
-
 
     def test_tree_size_state_count_max_t_geosse_reconstructed_rejection(self):
         """
@@ -810,7 +809,9 @@ class TestGeoSSETrees(unittest.TestCase):
         global_mean_n3 = 0.0
         global_mean_root_age = 0.0
         for i, batch in enumerate(sim_batches):
-            rec_trs = [ann_tr.extract_reconstructed_tree() for ann_tr in batch]
+            rec_trs = \
+                [ann_tr.extract_reconstructed_tree(plotting_overhead=False) \
+                 for ann_tr in batch]
             rec_n1s, rec_n2s, rec_n3s, rec_root_ages = [], [], [], []
             
             for rec_tr in rec_trs:

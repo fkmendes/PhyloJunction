@@ -43,7 +43,6 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
 
         cls.sse_stash = sseobj.SSEStash(event_handler)
 
-
     def test_tree_size_stop_condition_origin_fbd(self):
         """
         Test if fossilized birth-death trees have correct number of
@@ -80,7 +79,6 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
 
         self.assertEqual(tr_sizes, stop_condition_value)
 
-
     def test_tree_size_stop_condition_root_fbd(self):
         """
         Test if fossilized birth-death trees have correct number of
@@ -115,7 +113,6 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
 
         self.assertEqual(tr_sizes, stop_condition_value)
 
-    
     def test_tree_height_stop_condition_origin_fbd(self):
         """
         Test if fossilized birth-death trees have correct tree height,
@@ -153,7 +150,6 @@ class TestSSEStopConditionsFBD(unittest.TestCase):
 
         for idx, tr_size in enumerate(tr_sizes):
             self.assertAlmostEqual(tr_size, stop_condition_value[idx], delta=1e-12)
-
 
     def test_tree_height_stop_condition_root_fbd(self):
         """

@@ -114,6 +114,7 @@ class TestTreePrinting(unittest.TestCase):
             ann_tr_sa_with_root_survives_max_age.tree.as_string(schema="nexus", suppress_internal_taxon_labels=True),
             expected_nexus_string)
 
+
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder
     # on VSCode and that you want to run this as a standalone script,

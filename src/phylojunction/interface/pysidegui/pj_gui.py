@@ -553,13 +553,6 @@ class GUIMainWindow(QMainWindow):
             # Now do node #
             ###############
 
-            self.selected_node_display(node_dag,
-                                       do_all_samples,
-                                       sample_idx=sample_idx,
-                                       repl_idx=repl_idx,
-                                       repl_size=repl_size,
-                                       display_reconstructed=do_reconstructed)
-
             self.selected_node_plot(fig_obj,
                                     fig_axes,
                                     node_dag,
@@ -568,6 +561,13 @@ class GUIMainWindow(QMainWindow):
                                     repl_idx=repl_idx,
                                     repl_size=repl_size,
                                     draw_reconstructed=do_reconstructed)
+
+            self.selected_node_display(node_dag,
+                                       do_all_samples,
+                                       sample_idx=sample_idx,
+                                       repl_idx=repl_idx,
+                                       repl_size=repl_size,
+                                       display_reconstructed=do_reconstructed)
 
         # no nodes to do
         else:

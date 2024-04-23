@@ -16,7 +16,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
     def test_obs_both_sides_root_with_origin_true(self):
         """
-        Test method .is_extant_or_sa_on_both_sides_complete_tr_root.
+        Test method .is_extant_or_sa_on_both_sides_complete_tr_root().
         
         Tests if AnnotatedTree's method verifies that complete tree
         has one observed taxon on both sides of its root.
@@ -113,7 +113,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
     def test_obs_both_sides_root_with_origin_true_larger(self):
         """
-        Test method .is_extant_or_sa_on_both_sides_complete_tr_root.
+        Test method .is_extant_or_sa_on_both_sides_complete_tr_root().
         
         Tests if AnnotatedTree's method verifies that complete tree
         has one observed taxon on both sides of its root.
@@ -256,7 +256,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
     def test_obs_both_sides_root_with_origin_false(self):
         """
-        Test method .is_extant_or_sa_on_both_sides_complete_tr_root.
+        Test method .is_extant_or_sa_on_both_sides_complete_tr_root().
 
         Tests if AnnotatedTree's method verifies that complete tree
         does not have one observed taxon on both sides of its root.
@@ -367,7 +367,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
     def test_extract_reconstructed_tree_two_extant_one_extinct_one_sa(self):
         """
-        Test extraction of reconstructed tree from complete tree (no origin)
+        Test extraction of reconstructed tree from complete tree (no origin).
 
         Tree has two extant taxa (sp1 and sp3), one extinct taxon (sp2), one sampled ancestor.
         There are observable taxa on both sides of the tree, so conditioning on that
@@ -477,27 +477,47 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         # print(ann_tr.tree.as_string(schema="newick", suppress_annotations=True))
 
-        tr_rec1 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr.extract_reconstructed_tree(require_obs_both_sides=True)
+        tr_rec1 = \
+            ann_tr.extract_reconstructed_tree(plotting_overhead=False,
+                                              require_obs_both_sides=False)
+        tr_rec2 = \
+            ann_tr.extract_reconstructed_tree(plotting_overhead=False,
+                                              require_obs_both_sides=True)
 
-        tr_rec_str1 = tr_rec1.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True, suppress_rooting=True)
-        tr_rec_str2 = tr_rec2.as_string(schema="newick", suppress_internal_taxon_labels=True, suppress_internal_node_labels=True, suppress_rooting=True)
+        tr_rec_str1 = \
+            tr_rec1.as_string(schema="newick",
+                              suppress_internal_taxon_labels=True,
+                              suppress_internal_node_labels=True,
+                              suppress_rooting=True)
+        tr_rec_str2 = \
+            tr_rec2.as_string(schema="newick",
+                              suppress_internal_taxon_labels=True,
+                              suppress_internal_node_labels=True,
+                              suppress_rooting=True)
 
-        self.assertEqual(ann_tr.tree.as_string(schema="newick", suppress_annotations=True), "((sa1:0.0,sp1:1.0)dummy1_dummy1:1.0,(sp2:1.0,sp3:1.25)nd1_nd1:0.75)root_root:0.0;\n")
-        self.assertEqual(tr_rec_str1, "((sa1:0.0,sp1:1.0):1.0,sp3:2.0):0.0;\n")
-        self.assertEqual(tr_rec_str2, "((sa1:0.0,sp1:1.0):1.0,sp3:2.0):0.0;\n")
+        self.assertEqual(
+            ann_tr.tree.as_string(schema="newick", suppress_annotations=True),
+            ("((sa1:0.0,sp1:1.0)dummy1_dummy1:1.0,(sp2:1.0,sp3:1.25)nd1_nd1:0.75)"
+             "root_root:0.0;\n"))
+        self.assertEqual(
+            tr_rec_str1,
+            "((sa1:0.0,sp1:1.0):1.0,sp3:2.0):0.0;\n")
+        self.assertEqual(
+            tr_rec_str2,
+            "((sa1:0.0,sp1:1.0):1.0,sp3:2.0):0.0;\n")
 
     def test_extract_reconstructed_tree_one_extant_two_extinct_one_sa(self):
         """
-        Test extraction of reconstructed tree from complete tree (no origin)
+        Test extraction of rec tree from complete tree (no origin).
 
-        Tree has two extant taxa (sp1 and sp3), one extinct taxon (sp2), one sampled ancestor.
+        Tree has two extant taxa (sp1 and sp3), one extinct taxon (sp2),
+        one sampled ancestor.
         
-        Without conditioning on having observed taxa on both sides of the tree,
-        we get a stich with a bead in the middle.
+        Without conditioning on having observed taxa on both sides of
+        the tree, we get a stich with a bead in the middle.
         
-        If conditioning on having observed taxa on both sides of the tree,
-        the reconstructed-tree string should be empty.
+        If conditioning on having observed taxa on both sides of the
+        tree, the reconstructed-tree string should be empty.
 
         To see it on icytree: ((sa1:0.0,sp1:0.75):1.0,(sp2:0.8,sp3:0.8):0.75):0.0;
         """
@@ -602,8 +622,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
+        tr_rec1 = \
+            ann_tr1.extract_reconstructed_tree(plotting_overhead=False,
+                                               require_obs_both_sides=False)
+        tr_rec2 = \
+            ann_tr2.extract_reconstructed_tree(plotting_overhead=False,
+                                               require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
             schema="newick",
@@ -720,8 +744,12 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         ann_tr2 = copy.deepcopy(ann_tr1)
 
-        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
+        tr_rec1 = \
+            ann_tr1.extract_reconstructed_tree(plotting_overhead=False,
+                                               require_obs_both_sides=False)
+        tr_rec2 = \
+            ann_tr2.extract_reconstructed_tree(plotting_overhead=False,
+                                               require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
             schema="newick",
@@ -748,7 +776,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
     def test_extract_reconstructed_tree_all_extinct_no_sa(self):
         """
-        Test extraction of rec tree from complete tree (no origin).
+        Test extraction of rec. tree from complete tree (no origin).
 
         Tree has died, string for reconstructed tree should be empty.
         """
@@ -807,8 +835,10 @@ class TestExtractReconstructedTree(unittest.TestCase):
         ann_tr2 = copy.deepcopy(ann_tr1)
 
         tr_rec1 = ann_tr1.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=False)
         tr_rec2 = ann_tr2.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
@@ -947,11 +977,11 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         ann_tr2 = copy.deepcopy(ann_tr1)
 
-        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
-
         tr_rec1 = ann_tr1.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=False)
         tr_rec2 = ann_tr2.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
@@ -978,7 +1008,7 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
     def test_extract_reconstructed_tree_origin_sa_before_root_tree_dies(self):
         """
-        Test extraction of rec tree from complete tree (has origin).
+        Test extraction of rec. tree from complete tree (has origin).
 
         The complete tree has only one observable taxon (an SA) and then dies.
         Tree has one observable taxon (an SA) before the root, and then
@@ -1065,8 +1095,10 @@ class TestExtractReconstructedTree(unittest.TestCase):
         ann_tr2 = copy.deepcopy(ann_tr1)
 
         tr_rec1 = ann_tr1.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=False)
         tr_rec2 = ann_tr2.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
@@ -1175,11 +1207,16 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         ann_tr2 = copy.deepcopy(ann_tr1)
 
-        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=False))
+        # print(ann_tr1.tree.as_string(schema="newick",
+        #                              suppress_annotations=True,
+        #                              suppress_internal_node_labels=False,
+        #                              suppress_internal_taxon_labels=False))
 
         tr_rec1 = ann_tr1.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=False)
         tr_rec2 = ann_tr2.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
@@ -1329,8 +1366,10 @@ class TestExtractReconstructedTree(unittest.TestCase):
         #     suppress_internal_taxon_labels=True))
 
         tr_rec1 = ann_tr1.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=False)
         tr_rec2 = ann_tr2.extract_reconstructed_tree(
+            plotting_overhead=False,
             require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
@@ -1347,17 +1386,17 @@ class TestExtractReconstructedTree(unittest.TestCase):
             suppress_rooting=True)
         # print(tr_rec_str2)
 
-        # self.assertEqual(
-        #     ann_tr1.tree.as_string(
-        #         schema="newick",
-        #         suppress_annotations=True,
-        #         suppress_internal_taxon_labels=True),
-        #         ("((sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:1.0)"
-        #          "origin:0.0;\n"))
-        # self.assertEqual(tr_rec_str1,
-        #                  "(sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:0.0;\n")
-        # self.assertEqual(tr_rec_str2,
-        #                  "(sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:0.0;\n")
+        self.assertEqual(
+            ann_tr1.tree.as_string(
+                schema="newick",
+                suppress_annotations=True,
+                suppress_internal_taxon_labels=True),
+                ("((sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:1.0)"
+                 "origin:0.0;\n"))
+        self.assertEqual(tr_rec_str1,
+                         "(sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:0.0;\n")
+        self.assertEqual(tr_rec_str2,
+                         "(sa1:0.0,(sp1:1.0,sp2:1.0)root:1.0)dummy1:0.0;\n")
 
     def test_extract_reconstructed_tree_origin_one_root_side_dies_three_survive(self):
         """
@@ -1490,10 +1529,17 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         ann_tr2 = copy.deepcopy(ann_tr1)
 
-        # print(ann_tr1.tree.as_string(schema="newick", suppress_annotations=True, suppress_internal_node_labels=False, suppress_internal_taxon_labels=True))
+        # print(ann_tr1.tree.as_string(schema="newick",
+        #                              suppress_annotations=True,
+        #                              suppress_internal_node_labels=False,
+        #                              suppress_internal_taxon_labels=True))
 
-        tr_rec1 = ann_tr1.extract_reconstructed_tree(require_obs_both_sides=False)
-        tr_rec2 = ann_tr2.extract_reconstructed_tree(require_obs_both_sides=True)
+        tr_rec1 = ann_tr1.extract_reconstructed_tree(
+            plotting_overhead=False,
+            require_obs_both_sides=False)
+        tr_rec2 = ann_tr2.extract_reconstructed_tree(
+            plotting_overhead=False,
+            require_obs_both_sides=True)
 
         tr_rec_str1 = tr_rec1.as_string(
             schema="newick",
@@ -1698,8 +1744,10 @@ class TestExtractReconstructedTree(unittest.TestCase):
             #     suppress_internal_taxon_labels=True))
 
             tr_rec1 = ann_tr1.extract_reconstructed_tree(
+                plotting_overhead=False,
                 require_obs_both_sides=False)
             tr_rec2 = ann_tr2.extract_reconstructed_tree(
+                plotting_overhead=False,
                 require_obs_both_sides=True)
 
             tr_rec_str1 = tr_rec1.as_string(
@@ -1967,7 +2015,9 @@ class TestExtractReconstructedTree(unittest.TestCase):
 
         # updates rec tree-related members in 'ann_tr'
         tr_rec = \
-            ann_tr.extract_reconstructed_tree(require_obs_both_sides=False)
+            ann_tr.extract_reconstructed_tree(
+                plotting_overhead=True,
+                require_obs_both_sides=False)
 
         # tr_rec_str = \
         #     tr_rec.as_string(
@@ -2022,8 +2072,6 @@ class TestExtractReconstructedTree(unittest.TestCase):
                          "sp5": [1.0, 1.5, 2.0, 3.0]})
 
 
-
-
 if __name__ == "__main__":
     # Assuming you opened the PhyloJunction/ (repo root) folder
     # on VSCode and that you want to run this as a standalone script,
@@ -2042,14 +2090,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/data/test_tree_extract_reconstructed.py
+    # $ python3.11 tests/data/test_tree_extract_reconstructed.py
     # 
     # or
     #
-    # $ python3 -m tests.data.test_tree_extract_reconstructed
+    # $ python3.11 -m tests.data.test_tree_extract_reconstructed
     #
     # or 
     #
-    # $ python3 -m unittest tests.data.test_tree_extract_reconstructed.TestExtractReconstructedTree.test_extract_reconstructed_tree_origin_one_root_side_dies_three_survive_sa_before_root
+    # $ python3.11 -m unittest tests.data.test_tree_extract_reconstructed.TestExtractReconstructedTree.test_extract_reconstructed_tree_origin_one_root_side_dies_three_survive_sa_before_root
 
     unittest.main()
