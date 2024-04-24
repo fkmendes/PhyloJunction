@@ -118,7 +118,16 @@ class Ui_PJGUIPages(object):
 "")
         self.node_list.setObjectName("node_list")
         self.node_list_vert_layout.addWidget(self.node_list)
-        self.clear_model = PJClearPGMQPushButton(self.gridLayoutWidget)
+        self.redraw_node = PJReDrawQPushButton(self.gridLayoutWidget)
+        self.redraw_node.setMinimumSize(QtCore.QSize(195, 25))
+        self.redraw_node.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.redraw_node.setMouseTracking(True)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.redraw_node.setIcon(icon)
+        self.redraw_node.setObjectName("redraw_node")
+        self.node_list_vert_layout.addWidget(self.redraw_node)
+        self.clear_model = PJClearDAGQPushButton(self.gridLayoutWidget)
         self.clear_model.setEnabled(True)
         self.clear_model.setMinimumSize(QtCore.QSize(195, 25))
         self.clear_model.setMaximumSize(QtCore.QSize(195, 16777215))
@@ -126,9 +135,9 @@ class Ui_PJGUIPages(object):
         self.clear_model.setStyleSheet("QPushButton:hover {\n"
 "    color: #ec4a8a;\n"
 "}")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.clear_model.setIcon(icon)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.clear_model.setIcon(icon1)
         self.clear_model.setIconSize(QtCore.QSize(20, 20))
         self.clear_model.setObjectName("clear_model")
         self.node_list_vert_layout.addWidget(self.clear_model)
@@ -631,6 +640,7 @@ class Ui_PJGUIPages(object):
         self.random_seed_prefix_label.setText(_translate("PJGUIPages", "Random seed:"))
         self.settings_label.setText(_translate("PJGUIPages", "Output configuration"))
         self.model_label.setText(_translate("PJGUIPages", "Model nodes"))
+        self.redraw_node.setText(_translate("PJGUIPages", "Redraw"))
         self.clear_model.setText(_translate("PJGUIPages", " Clear model"))
         self.one_sample_radio.setText(_translate("PJGUIPages", "One sample"))
         self.all_samples_radio.setText(_translate("PJGUIPages", "All samples"))
@@ -656,7 +666,7 @@ class Ui_PJGUIPages(object):
         self.coverage_node_label.setText(_translate("PJGUIPages", "Non-det. nodes"))
         self.compare_stats_label_2.setText(_translate("PJGUIPages", "Summary statistics"))
 from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import MatplotlibWidget
-from phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons import PJClearPGMQPushButton
+from phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons import PJClearDAGQPushButton, PJReDrawQPushButton
 
 
 if __name__ == "__main__":

@@ -12,7 +12,6 @@ __email__ = "f.mendes@wustl.edu"
 
 class TestReconstructedTreePrint(unittest.TestCase):
 
-    # THIS ONE FAILS
     def test_one_lineage_left_rec_tr_plot(self) -> None:
         """Test plot objects of FBD tree with one surviving taxon.
 

@@ -292,7 +292,30 @@ QListWidget::item:selected{
            </widget>
           </item>
           <item>
-           <widget class="PJClearPGMQPushButton" name="clear_model">
+           <widget class="PJReDrawQPushButton" name="redraw_node">
+            <property name="minimumSize">
+             <size>
+              <width>195</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>Redraw</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../images/icons/draw.svg</normaloff>../images/icons/draw.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="PJClearDAGQPushButton" name="clear_model">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1546,7 +1569,12 @@ color: red;</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PJClearPGMQPushButton</class>
+   <class>PJReDrawQPushButton</class>
+   <extends>QPushButton</extends>
+   <header>phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons</header>
+  </customwidget>
+  <customwidget>
+   <class>PJClearDAGQPushButton</class>
    <extends>QPushButton</extends>
    <header>phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons</header>
   </customwidget>

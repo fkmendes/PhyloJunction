@@ -189,21 +189,55 @@ class PJWhiteBackgroundQPushButton(QPushButton):
         super().mouseReleaseEvent(event)
 
 
-class PJClearPGMQPushButton(PJWhiteBackgroundQPushButton):
+class PJClearDAGQPushButton(PJWhiteBackgroundQPushButton):
 
-    clear_pgm_normal: QIcon
+    clear_dag_normal: QIcon
     clear_pgm_over: QIcon
     clear_pgm_pressed: QIcon
 
     def __init__(self, *a, **kw):
-        clear_pgm_normal = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"))
-        clear_pgm_over = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_over.svg"))
-        clear_pgm_pressed = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_pressed.svg"))
+        clear_dag_normal = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"))
+        clear_dag_over = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_over.svg"))
+        clear_dag_pressed = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_pressed.svg"))
         
         super().__init__(
-            icon_normal=clear_pgm_normal,
-            icon_over=clear_pgm_over,
-            icon_pressed=clear_pgm_pressed
+            icon_normal=clear_dag_normal,
+            icon_over=clear_dag_over,
+            icon_pressed=clear_dag_pressed
+        )
+
+    def enterEvent(self, event):
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        super().leaveEvent(event)
+
+    def mousePressEvent(self, event):
+        # need to handle the original event
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        # need to handle the original event
+        super().mouseReleaseEvent(event)
+
+
+class PJReDrawQPushButton(PJWhiteBackgroundQPushButton):
+    clear_redraw_normal: QIcon
+    clear_redraw_over: QIcon
+    clear_redraw_pressed: QIcon
+
+    def __init__(self, *a, **kw):
+        clear_redraw_normal = QIcon(
+            QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw.svg"))
+        clear_redraw_over = QIcon(
+            QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw_over.svg"))
+        clear_redraw_pressed = QIcon(
+            QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw_pressed.svg"))
+
+        super().__init__(
+            icon_normal=clear_redraw_normal,
+            icon_over=clear_redraw_over,
+            icon_pressed=clear_redraw_pressed
         )
 
     def enterEvent(self, event):

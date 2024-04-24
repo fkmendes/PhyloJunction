@@ -220,6 +220,11 @@ class GUIMainWindow(QMainWindow):
             )
         )
 
+        # redraw selected node button #
+        self.ui.ui_pages.redraw_node.clicked.connect(
+            lambda clear_model:
+            self.redraw_selected_node())
+
         # clear model button #
         self.ui.ui_pages.clear_model.clicked.connect(
             lambda clear_model:
@@ -1282,172 +1287,6 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.sample_idx_spin.blockSignals(False)
         self.ui.ui_pages.repl_idx_spin.blockSignals(False)
 
-    # def init_and_refresh_radio_spin_working(self, node_dag, sample_size, repl_size):
-
-    #     def _prepare_for_tree():
-    #         # radio #
-    #         # we always look one tree at a time
-    #         self.ui.ui_pages.all_samples_radio.setChecked(False)
-    #         self.ui.ui_pages.all_samples_radio.setCheckable(False)
-    #         self.ui.ui_pages.all_samples_radio.setDisabled(True)
-
-    #         self.ui.ui_pages.one_sample_radio.setEnabled(True)
-    #         self.ui.ui_pages.one_sample_radio.setCheckable(True)
-    #         self.ui.ui_pages.one_sample_radio.setChecked(True)
-
-    #         # spin #
-    #         self.ui.ui_pages.sample_idx_spin.setEnabled(True)
-    #         self.ui.ui_pages.sample_idx_spin.setMinimum(1)
-    #         self.ui.ui_pages.sample_idx_spin.setValue(1)
-    #         self.ui.ui_pages.repl_idx_spin.setEnabled(True)
-    #         self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-    #         self.ui.ui_pages.repl_idx_spin.setValue(1)
-
-    #     # necessary to avoid infinite recursion
-    #     # otherwise GUI calls spin button actions
-    #     # as their values are adjusted below
-    #     self.ui.ui_pages.sample_idx_spin.blockSignals(True)
-    #     self.ui.ui_pages.repl_idx_spin.blockSignals(True)
-
-    #     ###################
-    #     # Stochastic node #
-    #     ###################
-
-    #     if node_dag.is_sampled:
-    #         # tree #
-    #         if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
-    #             _prepare_for_tree()
-
-    #         # non-tree
-    #         else:
-    #             # if it's the first click selecting node
-    #             if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
-    #                     not self.ui.ui_pages.one_sample_radio.isEnabled():
-
-    #                 self.ui.ui_pages.all_samples_radio.setEnabled(True)
-    #                 self.ui.ui_pages.all_samples_radio.setCheckable(True)
-    #                 self.ui.ui_pages.one_sample_radio.setEnabled(True)
-    #                 self.ui.ui_pages.one_sample_radio.setCheckable(True)
-
-    #                 # radio #
-    #                 # one sample is the default
-    #                 self.ui.ui_pages.one_sample_radio.setChecked(True)
-
-    #                 # spin #
-    #                 self.ui.ui_pages.sample_idx_spin.setMinimum(1)
-    #                 self.ui.ui_pages.sample_idx_spin.setValue(1)
-    #                 self.ui.ui_pages.sample_idx_spin.setEnabled(True)
-
-    #                 self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-    #                 self.ui.ui_pages.repl_idx_spin.setValue(1)
-    #                 self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-
-    #             else:
-    #                 # looking at all samples,
-    #                 # we bunch samples and replicates
-    #                 # together
-    #                 if self.ui.ui_pages.all_samples_radio.isChecked():
-    #                     self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-    #                     self.ui.ui_pages.repl_idx_spin.setValue(1)
-    #                     self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-
-    #                     self.ui.ui_pages.sample_idx_spin.setMinimum(1)
-    #                     self.ui.ui_pages.sample_idx_spin.setValue(1)
-    #                     self.ui.ui_pages.sample_idx_spin.setDisabled(True)
-
-    #                 # looking at one sample at a time,
-    #                 # we bunch replicates together
-    #                 else:
-    #                     self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-    #                     self.ui.ui_pages.repl_idx_spin.setValue(1)
-    #                     self.ui.ui_pages.repl_idx_spin.setMaximum(repl_size)
-    #                     self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-
-    #                     self.ui.ui_pages.sample_idx_spin.setEnabled(True)
-    #                     self.ui.ui_pages.sample_idx_spin.setMinimum(1)
-    #                     self.ui.ui_pages.sample_idx_spin.setMaximum(sample_size)
-
-    #     ##################################
-    #     # Constant or deterministic node #
-    #     ##################################
-
-    #     # cannot circle through replicates
-    #     # because no 2D-nesting when
-    #     # assigning constants (and no
-    #     # repls in deterministic nodes)
-    #     else:
-    #         # NOTE: we need to both disable
-    #         # and uncheck so that the radio
-    #         # button is totally reset and
-    #         # turned off
-            
-    #         # non-deterministic node because
-    #         # .value will not be list if so
-    #         if isinstance(node_dag.value, list):
-    #             # tree #
-    #             if isinstance(node_dag.value[0], pjdt.AnnotatedTree):
-    #                 _prepare_for_tree()
-
-    #             # non-tree
-    #             else:
-    #                 # radio #
-    #                 # if it's the first click selecting node
-    #                 if not self.ui.ui_pages.all_samples_radio.isEnabled() and \
-    #                         not self.ui.ui_pages.one_sample_radio.isEnabled():
-    #                     self.ui.ui_pages.all_samples_radio.setEnabled(True)
-    #                     self.ui.ui_pages.all_samples_radio.setCheckable(True)
-    #                     self.ui.ui_pages.all_samples_radio.setChecked(True)
-    #                     self.ui.ui_pages.one_sample_radio.setEnabled(True)
-    #                     self.ui.ui_pages.one_sample_radio.setChecked(False)
-    #                 # self.ui.ui_pages.one_sample_radio.setCheckable(False)
-    #                 # self.ui.ui_pages.one_sample_radio.setDisabled(True)
-
-    #                 # if deterministic
-    #                 # neither all nor one sample
-    #                 # is checkable
-    #                 # if sample_size == 0:
-    #                 #     self.ui.ui_pages.all_samples_radio.setChecked(False)
-    #                 #     self.ui.ui_pages.all_samples_radio.setCheckable(False)
-    #                 #     self.ui.ui_pages.all_samples_radio.setDisabled(True)
-
-    #                 # if not deterministic,
-    #                 # we can see all samples
-    #                 # at once
-    #                 if sample_size > 0:
-    #                     self.ui.ui_pages.all_samples_radio.setEnabled(True)
-    #                     self.ui.ui_pages.all_samples_radio.setCheckable(True)
-    #                     self.ui.ui_pages.all_samples_radio.setChecked(True)
-
-    #                 # spin #
-    #                 # ... and should not be able to circulate through
-    #                 # samples and replicates
-    #                 self.ui.ui_pages.sample_idx_spin.setMinimum(1)
-    #                 self.ui.ui_pages.sample_idx_spin.setValue(1)
-    #                 self.ui.ui_pages.sample_idx_spin.setDisabled(True)
-    #                 self.ui.ui_pages.repl_idx_spin.setMinimum(1)
-    #                 self.ui.ui_pages.repl_idx_spin.setValue(1)
-    #                 self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-
-    #         # deterministic node, type of .value is not list,
-    #         # we disable everything
-    #         elif sample_size == 0:
-    #             self.ui.ui_pages.one_sample_radio.setChecked(False)
-    #             self.ui.ui_pages.one_sample_radio.setCheckable(False)
-    #             self.ui.ui_pages.one_sample_radio.setDisabled(True)
-    #             self.ui.ui_pages.all_samples_radio.setChecked(False)
-    #             self.ui.ui_pages.all_samples_radio.setCheckable(False)
-    #             self.ui.ui_pages.all_samples_radio.setDisabled(True)
-    #             self.ui.ui_pages.sample_idx_spin.setMinimum(0)
-    #             self.ui.ui_pages.sample_idx_spin.setValue(0)
-    #             self.ui.ui_pages.sample_idx_spin.setDisabled(True)
-    #             self.ui.ui_pages.repl_idx_spin.setMinimum(0)
-    #             self.ui.ui_pages.repl_idx_spin.setValue(0)
-    #             self.ui.ui_pages.repl_idx_spin.setDisabled(True)
-
-    #     # need to unblock signals from here on
-    #     self.ui.ui_pages.sample_idx_spin.blockSignals(False)
-    #     self.ui.ui_pages.repl_idx_spin.blockSignals(False)
-
     def refresh_node_lists(self):
         # pgm page node list #
         pgm_node_list = \
@@ -1488,6 +1327,10 @@ class GUIMainWindow(QMainWindow):
 
         cmd_hist_str = self.gui_modeling.cmd_log().lstrip()
         self.ui.ui_pages.cmd_log_textbox.setText(cmd_hist_str)
+
+    def redraw_selected_node(self):
+        if self.ui.ui_pages.node_list.currentItem() is not None:
+            self.do_selected_node_dag_page()
 
     def clean_disable_everything(self, user_reset=False):
         if user_reset:
@@ -1575,10 +1418,6 @@ class GUIMainWindow(QMainWindow):
         self.ui.ui_pages.sample_idx_spin.setMinimum(0)
         self.ui.ui_pages.sample_idx_spin.setValue(0)
         self.ui.ui_pages.sample_idx_spin.setDisabled(True)
-
-        print("\ninside all_samples_clicked()")
-        print("  all_samples = " + str(self.ui.ui_pages.all_samples_radio.isChecked()))
-        print("  one_sample = " + str(self.ui.ui_pages.one_sample_radio.isChecked()))
 
         self.refresh_selected_node_display_plot_radio()
 

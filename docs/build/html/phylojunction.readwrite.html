@@ -435,6 +435,16 @@ These contains tree simulated data.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.prep_trees_rb_smap_dfs">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">prep_trees_rb_smap_dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_trees_rb_smap_dfs" title="Link to this definition"></a></dt>
+<dd><p>Initialize pandas DataFrame’s for holding stochastic maps.</p>
+<p>Each dataframe will hold stochastic maps for all nodes for all
+(replicate) trees in a single sample. Each iteration will
+correspond to a single replicate.</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.write_data_df">
 <span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">write_data_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfile_handle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.write_data_df" title="Link to this definition"></a></dt>
 <dd><p>Write a pandas DataFrame to output file stream</p>
