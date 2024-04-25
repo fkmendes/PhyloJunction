@@ -1778,7 +1778,10 @@ class TestExtractReconstructedTree(unittest.TestCase):
             self.assertEqual(tr_rec_str2, ";\n")
 
     def test_make_at_dict_reflect_rec_tree_origin_two_extinct(self) -> None:
-        """Test method that updates 'rec_tr_at_dict' for reconstructed tree."""
+        """Test method that updates 'rec_tr_at_dict' for reconstructed tree.
+
+        See also test_tree_plotting.test_harder_geosse_rec_tr()
+        """
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.state = 2  # AB
@@ -1994,12 +1997,46 @@ class TestExtractReconstructedTree(unittest.TestCase):
             "sp5": [at4, at5]
         }
 
+        # internal_node2
+        clado_at1 = pjat.AttributeTransition("state",
+                                             subtending_node_label="nd5",
+                                             global_time=3.0,
+                                             from_state=2,
+                                             to_state=0,
+                                             to_state2=1)
+        clado_at2 = pjat.AttributeTransition("state",
+                                             subtending_node_label="nd7",
+                                             global_time=3.0,
+                                             from_state=2,
+                                             to_state=0,
+                                             to_state2=1)
+        clado_at3 = pjat.AttributeTransition("state",
+                                             subtending_node_label="nd6",
+                                             global_time=2.0,
+                                             from_state=2,
+                                             to_state=0,
+                                             to_state2=1)
+        clado_at4 = pjat.AttributeTransition("state",
+                                             subtending_node_label="nd8",
+                                             global_time=2.0,
+                                             from_state=2,
+                                             to_state=0,
+                                             to_state2=1)
+        clado_at_dict = {
+            "nd5": [clado_at1],
+            "nd7": [clado_at2],
+            "nd6": [clado_at3],
+            "nd8": [clado_at4]
+        }
+
+
         total_state_count = 3
         max_age = 5.0
         ann_tr = pjtr.AnnotatedTree(
             tr_complete,
             total_state_count,
             at_dict=at_dict,
+            clado_at_dict=clado_at_dict,
             start_at_origin=True,
             max_age=max_age,
             epsilon=1e-12)
@@ -2027,26 +2064,6 @@ class TestExtractReconstructedTree(unittest.TestCase):
         #     suppress_rooting=True)
         # print(tr_rec_str)
 
-        # fig = matplotlib.pyplot.figure()
-        # ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
-        # ax.patch.set_alpha(0.0)
-        # ax.xaxis.set_ticks([])
-        # ax.yaxis.set_ticks([])
-        # ax.spines['left'].set_visible(False)
-        # ax.spines['bottom'].set_visible(False)
-        # ax.spines['right'].set_visible(False)
-        # ax.spines['top'].set_visible(False)
-
-        # plotting complete or rec tree
-        # draw_reconstructed = True
-        # pjtr.plot_ann_tree(ann_tr,
-        #                    ax,
-        #                    use_age=False,
-        #                    sa_along_branches=False,
-        #                    attr_of_interest="state",
-        #                    draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()
-
         rec_tr_at_dict = ann_tr.rec_tr_at_dict
 
         # check that the right nodes are in the rec tree's at_dict
@@ -2070,6 +2087,8 @@ class TestExtractReconstructedTree(unittest.TestCase):
         self.assertEqual(at_times_dict_for_testing,
                          {"sp2": [1.0, 1.5, 2.0, 3.0],
                          "sp5": [1.0, 1.5, 2.0, 3.0]})
+
+        self.assertEqual({}, ann_tr.rec_tr_clado_at_dict)
 
 
 if __name__ == "__main__":

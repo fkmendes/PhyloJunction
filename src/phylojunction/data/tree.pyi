@@ -25,6 +25,7 @@ class AnnotatedTree(dp.Tree):
     origin_age: ty.Optional[float]
     origin_edge_length: float
     root_age: float
+    rec_tr_root_age: ty.Optional[float]
     node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
     slice_t_ends: ty.Optional[ty.List[float]]

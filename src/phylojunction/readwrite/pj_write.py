@@ -306,14 +306,17 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph) -> pd.DataFrame:
                 it_idx_str = "1"
                 sample_smap_str = ""
                 for ann_tr_repl in node_val:
-                    # TODO: prune repl and enter info in df
-                    seed_nd = \
-                        ann_tr_repl.origin_node if ann_tr_repl.with_origin \
-                            else ann_tr_repl.root_node
-                    node_ages_dict = ann_tr_repl.node_ages_dict
-                    complete_tr_age = ann_tr_repl.seed_age
+                    # method call updates ann_tr_repl's members
                     rec_tr = ann_tr_repl.extract_reconstructed_tree()
-                    at_dict = ann_tr_repl.at_dict
+                    root_node = ann_tr_repl.rec_tr_root_node
+                    root_age = ann_tr_repl.rec_tr_root_age
+                    node_ages_dict = ann_tr_repl.rec_node_ages_dict
+                    at_dict = ann_tr_repl.rec_tr_at_dict
+
+                    if rec_tr is None:
+                        print(("Could not find a reconstructed tree. "
+                              "Exiting..."))
+
                     clado_at_dict = ann_tr_repl.clado_at_dict
 
                     # if we are done with a batch of replicates, we reset everything
@@ -322,10 +325,11 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph) -> pd.DataFrame:
                         it_idx_str = "1"
                         sample_smap_str = ""
 
-                    sample_smap_str = recursively_collect_smaps(seed_nd,
-                                                         at_dict,
+                    sample_smap_str = \
+                        recursively_collect_smaps(root_node,
+                                                  at_dict,
                                                          clado_at_dict,
-                                                         complete_tr_age,
+                                                         root_age,
                                                          node_ages_dict,
                                                          sample_smap_str,
                                                          it_idx_str)

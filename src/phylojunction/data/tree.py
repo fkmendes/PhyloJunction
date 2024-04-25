@@ -226,6 +226,8 @@ class AnnotatedTree(dp.Tree):
     # dictionary of cladogenetic attribute transitions
     clado_at_dict: \
         ty.Optional[ty.Dict[str, pjat.AttributeTransition]]  # can be None
+    rec_tr_clado_at_dict: \
+        ty.Optional[ty.Dict[str, pjat.AttributeTransition]]  # can be None
 
     # to deal with effectively zero floats
     epsilon: float
@@ -350,6 +352,7 @@ class AnnotatedTree(dp.Tree):
         self.at_dict = at_dict
         self.rec_tr_at_dict = copy.deepcopy(at_dict)
         self.clado_at_dict = clado_at_dict
+        self.rec_tr_clado_at_dict = copy.deepcopy(clado_at_dict)
 
         # node counting
         self.n_extant_terminal_nodes = 0
@@ -1115,13 +1118,17 @@ class AnnotatedTree(dp.Tree):
             return False
 
     def update_rec_tr_at_dict(self, rec_tree_root_nd: dp.Node) -> None:
-        """Update 'rec_tr_at_dict' member.
+        """Update 'rec_tr_at_dict' and 'rec_clado-at_dict' members.
 
         The 'at_dict' member of the AnnotatedTree, when defined, will by
         default host the state transitions of every node of the complete
-        tree. This method initializes 'rec_trat_dict' so that it reflects the
-        reconstructed tree -- it is only called when necessary,
-        by the 'extract_reconstructed_tree' method.
+        tree. This method initializes 'rec_tr_at_dict' so that it
+        reflects the reconstructed tree -- it is only called when
+        necessary, by the 'extract_reconstructed_tree' method.
+
+        Member 'rec_tr_clado_at_dict' is also updated. Internal nodes
+        undergoing cladogenetic changes that are in the complete tree
+        but not in the reconstructed tree are removed.
         """
 
         def recur_grabbing_int_nds_to_merge(
@@ -1275,6 +1282,25 @@ class AnnotatedTree(dp.Tree):
                         nd.label not in rec_tr_nd_names and \
                         nd.label in self.rec_tr_at_dict:
                     del self.rec_tr_at_dict[nd.label]
+
+        ##############################
+        # Updating rec_clado_at_dict #
+        ##############################
+
+        if self.clado_at_dict is not None:
+            complete_tr_clado_at_dict_nd_name_set = \
+                {nd_name for nd_name in self.clado_at_dict.keys()}
+
+            rec_tr_int_nd_label_set = \
+                {ind.label \
+                 for ind in self.tree_reconstructed.preorder_internal_node_iter()}
+
+            in_complete_not_in_rec_set = \
+                complete_tr_clado_at_dict_nd_name_set - rec_tr_int_nd_label_set
+
+            for nd_name in in_complete_not_in_rec_set:
+                del self.rec_tr_clado_at_dict[nd_name]
+
 
     def update_rec_tr_sa_lineage_dict(self) -> None:
         """Update 'rec_tr_sa_lineage_dict' member.
@@ -2568,8 +2594,6 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
                     y_top = y_coords[get_node_name(children[0])]
                     y_bot = y_coords[get_node_name(children[1])]
-
-                    print("nd", nd_name, "color", segment_colors)
 
                     # last color in segment_colors will
                     # match the state of the node whose
