@@ -24,6 +24,7 @@ import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.utility.helper_functions as pjh
 import phylojunction.utility.exception_classes as ec
 import phylojunction.data.tree as pjdt
+from phylojunction.interface.pysidegui.images.icons import resources
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -1330,7 +1331,7 @@ class GUIMainWindow(QMainWindow):
 
     def redraw_selected_node(self):
         if self.ui.ui_pages.node_list.currentItem() is not None:
-            self.do_selected_node_dag_page()
+            self.do_selected_node_dag_page(spin_buttons_clicked=True)
 
     def clean_disable_everything(self, user_reset=False):
         if user_reset:

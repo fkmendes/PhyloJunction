@@ -1,0 +1,11 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file>icon_clear.svg</file>
+        <file>icon_clear_over.svg</file>
+        <file>icon_clear_pressed.svg</file>
+        <file>draw.svg</file>
+        <file>draw_pressed.svg</file>
+        <file>draw_over.svg</file>
+    </qresource>
+</RCC>

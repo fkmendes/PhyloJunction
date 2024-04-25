@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/phylojunction/interface/pysidegui/pjguipages/pjgui_pages.ui'
+# Form implementation generated from reading ui file 'pjgui_pages.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
@@ -9,7 +9,6 @@
 
 
 from PySide6 import QtCore, QtGui, QtWidgets
-
 
 class Ui_PJGUIPages(object):
     def setupUi(self, PJGUIPages):
@@ -123,7 +122,7 @@ class Ui_PJGUIPages(object):
         self.redraw_node.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.redraw_node.setMouseTracking(True)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/draw.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.redraw_node.setIcon(icon)
         self.redraw_node.setObjectName("redraw_node")
         self.node_list_vert_layout.addWidget(self.redraw_node)
@@ -136,7 +135,7 @@ class Ui_PJGUIPages(object):
 "    color: #ec4a8a;\n"
 "}")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.clear_model.setIcon(icon1)
         self.clear_model.setIconSize(QtCore.QSize(20, 20))
         self.clear_model.setObjectName("clear_model")
@@ -667,13 +666,3 @@ class Ui_PJGUIPages(object):
         self.compare_stats_label_2.setText(_translate("PJGUIPages", "Summary statistics"))
 from phylojunction.interface.pysidegui.pjguiwidgets.matplotlibwidget import MatplotlibWidget
 from phylojunction.interface.pysidegui.pjguiwidgets.pj_buttons import PJClearDAGQPushButton, PJReDrawQPushButton
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    PJGUIPages = QtWidgets.QStackedWidget()
-    ui = Ui_PJGUIPages()
-    ui.setupUi(PJGUIPages)
-    PJGUIPages.show()
-    sys.exit(app.exec_())

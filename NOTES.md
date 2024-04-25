@@ -313,7 +313,7 @@ PhyloJunction has two functional GUIs:
 (1) with PySimpleGUI (`src/interface/pj_gui.py`), and
 (2) with PySide6 (`src/pysidegui/pj_gui_pyside`).
 
-The GUI built with PySimpleGUI was coded entirely by hand.
+The GUI built with PySimpleGUI was coded entirely by hand, and is out-of-date at this point.
 
 The GUI built with PySide6 had its main structure coded by hand (`pysidegui/content_main_window.py`), but then individual pages built with Qt Creator / Qt Designer (an app for automating PySide6 GUI development).
 These individual pages are saved as a single `.ui` file (pjguipages/pjgui_pages.ui) that can be translated to a `.py` file with Qt Creator / Qt Designer (Form > View Python Code) or a command line tool:
@@ -335,7 +335,7 @@ You also need to point `gui_pages.py` to PJ's matplotlib widget
 from PySide6 import QtCore, QtGui, QtWidgets
 ```
 
-## Qt Creator / Qt Designer
+### Qt Creator / Qt Designer
 
 This can be a finnicky program, so here are a few notes.
 
@@ -358,6 +358,52 @@ For "Header file", you want to put the entire Python path to the custom class, a
 E.g., `phylojunction.interface.pysidegui.pjguiwidgets.file_defining_class`
 
 pyuic5 or pyuic6 creates a .py from Qt Creator's ui, it will place import statements at the bottom of the file, so that your module can see the classes used by the custom widgets.
+
+### Resources 
+
+Certain types of data files like icon images for the GUI must be listed in a `.qrc` resource file, like so:
+
+```
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file>icon_clear.svg</file>
+        <file>icon_clear_over.svg</file>
+        <file>icon_clear_pressed.svg</file>
+        <file>draw.svg</file>
+        <file>draw_pressed.svg</file>
+        <file>draw_over.svg</file>
+    </qresource>
+</RCC>
+```
+
+The above content is file `resource.qrc` inside `pysidegui/images/icons`. 
+This resource file must then be converted into a `.py` file, like so:
+
+```
+pyside6-rcc resources.qrc -o resources.py
+```
+
+To make these images visible to the GUI, we need to import the resource file in two locations.
+First, in `pj_buttons.py`, we need to set the paths to images like so:
+
+```
+clear_dag_normal = QIcon(QPixmap(":/icon_clear.svg"))
+clear_dag_over = QIcon(QPixmap(":/icon_clear_over.svg"))
+clear_dag_pressed = QIcon(QPixmap(":/icon_clear_pressed.svg"))
+```
+
+The above code specifies the path to the icon for clearing the DAG.
+The `:/` syntax makes use of the resource file.
+
+Then we must edit the `gui_pages.py` file produced by QtCreator:
+
+```
+icon.addPixmap(QtGui.QPixmap(":/draw.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+icon1.addPixmap(QtGui.QPixmap(":/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+```
+
+The above code allows the icons for those buttons to appear wherever the GUI is called from.
 
 ## Documentation
 

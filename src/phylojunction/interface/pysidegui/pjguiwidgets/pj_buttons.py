@@ -4,7 +4,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtCore import Qt, QRect
 from PySide6.QtGui import QPainter, QPixmap, QIcon, QEnterEvent
-
+# from phylojunction.interface.pysidegui.images.icons import resources
 
 my_dir_path = Path(__file__)
 
@@ -60,7 +60,9 @@ class PJPushButton(QPushButton):
             is_active=is_menu_active
         )
 
-
+    # text_color = "white",
+    # btn_color = "#20639B",
+    # btn_hover="#1a4971"
     def set_style(
         self,
         text_padding=55,
@@ -156,7 +158,7 @@ class PJWhiteBackgroundQPushButton(QPushButton):
     def __init__(self, *args, **kwargs):
         # super(ClearPGMPushButton, self).__init__(*a, **kw)
         super().__init__()
-        self.icon_dir_path = os.path.join(my_dir_path.parent.parent, "images/icons")
+        # self.icon_dir_path = os.path.join(my_dir_path.parent.parent, "images/icons")
         self.icon_normal = kwargs.get("icon_normal", "")
         self.icon_over = kwargs.get("icon_over", "")
         self.icon_pressed = kwargs.get("icon_pressed", "")
@@ -196,9 +198,11 @@ class PJClearDAGQPushButton(PJWhiteBackgroundQPushButton):
     clear_pgm_pressed: QIcon
 
     def __init__(self, *a, **kw):
-        clear_dag_normal = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear.svg"))
-        clear_dag_over = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_over.svg"))
-        clear_dag_pressed = QIcon(QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/icon_clear_pressed.svg"))
+        self.icon_dir_path = \
+            os.path.join(my_dir_path.parent.parent, "images/icons/")
+        clear_dag_normal = QIcon(QPixmap(":/icon_clear.svg"))
+        clear_dag_over = QIcon(QPixmap(":/icon_clear_over.svg"))
+        clear_dag_pressed = QIcon(QPixmap(":/icon_clear_pressed.svg"))
         
         super().__init__(
             icon_normal=clear_dag_normal,
@@ -227,17 +231,16 @@ class PJReDrawQPushButton(PJWhiteBackgroundQPushButton):
     clear_redraw_pressed: QIcon
 
     def __init__(self, *a, **kw):
-        clear_redraw_normal = QIcon(
-            QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw.svg"))
-        clear_redraw_over = QIcon(
-            QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw_over.svg"))
-        clear_redraw_pressed = QIcon(
-            QPixmap("src/phylojunction/interface/pysidegui/pjguipages/../images/icons/draw_pressed.svg"))
+        self.icon_dir_path = \
+            os.path.join(my_dir_path.parent.parent, "images/icons/")
+        redraw_normal = QIcon(QPixmap(":/draw.svg"))
+        redraw_over = QIcon(QPixmap(":/draw_over.svg"))
+        redraw_pressed = QIcon(QPixmap(":/draw_pressed"))
 
         super().__init__(
-            icon_normal=clear_redraw_normal,
-            icon_over=clear_redraw_over,
-            icon_pressed=clear_redraw_pressed
+            icon_normal=redraw_normal,
+            icon_over=redraw_over,
+            icon_pressed=redraw_pressed
         )
 
     def enterEvent(self, event):

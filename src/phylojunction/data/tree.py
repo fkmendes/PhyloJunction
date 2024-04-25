@@ -2334,7 +2334,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                     use_age: bool,
                     start_at_origin: bool,
                     keep_it_black: bool = False,
-                    draw_reconstructed: bool = False) -> None:
+                    draw_reconstructed: bool = False):
         """Recursively draw a clade.
 
         This is the main drawing method. It draws both horizontal
@@ -2392,8 +2392,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
             at_dict = ann_tr.rec_tr_at_dict
 
         if at_dict is not None and not keep_it_black:
-            # if branch subtending nd (i.e., branch starting at nd and going
-            # into the past) underwent an attribute transition
+            # if branch subtending node 'nd' underwent a transition
             if nd_name in at_dict:
                 # we get the list of attribute transitions (which goes from
                 # old to young, i.e., from low time to high time)
@@ -2401,22 +2400,26 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
                 # iterating over attr transitions, from old to young
                 for idx, at in enumerate(attr_trs):
-                    # x_starts will go from low numbers to high numbers,
-                    # i.e., old to young
-                    x_starts.append(at.global_time)
-                    x_heres.append(at.global_time)
 
-                    # x_starts.append(attr_trs[-(idx+1)].global_time)
-                    # x_heres.append(attr_trs[-(idx+1)].global_time)
-                    
-                    # when segment_colors is initialized, its first entry
+                    # must not be the root of the reconstructed tree
+                    # (otherwise we end up with an unwanted root edge)
+                    if nd != ann_tr.rec_tr_root_node:
+                        # x_starts will go from low numbers to high numbers,
+                        # i.e., old to young
+                        x_starts.append(at.global_time)
+                        x_heres.append(at.global_time)
+
+                    # we still want the colors of the transitions happening
+                    # on the branch subtending the rec tree's root
+                    #
+                    # NOTE: when segment_colors is initialized, its first entry
                     # is the color of nd (which is the node subtending (!)
                     # the branch along which attribute transitions have
                     # happened
                     #
                     # this means that the first entry of segment_colors
                     # corresponds to the youngest state (actually, its color)
-                    # 
+                    #
                     # but because segment_colors has to match x_starts, we
                     # need to orient segment_colros so that it has older
                     # states (color) first, and then younget states
@@ -2565,6 +2568,8 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
                     y_top = y_coords[get_node_name(children[0])]
                     y_bot = y_coords[get_node_name(children[1])]
+
+                    print("nd", nd_name, "color", segment_colors)
 
                     # last color in segment_colors will
                     # match the state of the node whose
