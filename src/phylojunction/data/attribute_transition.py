@@ -26,9 +26,14 @@ class AttributeTransition():
     # (parent can be dummy node)
     subtending_or_speciating_node_label: str
 
-    # (forward) occurrence time of attribute change
-    # (i.e., origin or root = 0.0)
+    # attr transition (forward) occurrence time (i.e., origin or root = 0.0)
+    # but note that this will be of either the complete OR the
+    # reconstructed process!!!
     global_time: float
+
+    # attribute transition occurrence time (i.e., present time = 0.0)
+    age: float
+
     str_representation: str
 
     def __init__(self,
@@ -37,14 +42,17 @@ class AttributeTransition():
                  global_time: float,
                  from_state: int,
                  to_state: int,
+                 age: ty.Optional[float] = None,
                  to_state2: ty.Optional[int] = None,
                  at_speciation: bool = False) -> None:
 
         self.attr_label = attr_label
         self.subtending_or_speciating_node_label = subtending_node_label
         self.global_time = global_time
+        self.age = age
         self.from_state = from_state
         self.to_state = to_state
+        self.to_state2 = to_state2
         self.at_speciation = at_speciation
 
         self.str_representation = \

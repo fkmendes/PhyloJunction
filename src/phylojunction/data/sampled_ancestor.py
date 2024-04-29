@@ -31,7 +31,7 @@ class SampledAncestor():
                  label: str,
                  lineage_node_label: str,
                  global_time: float,
-                 age: float = None,
+                 age: ty.Optional[float] = None,
                  state: int = 0,
                  time_to_lineage_node: float = -1.0) -> None:
 

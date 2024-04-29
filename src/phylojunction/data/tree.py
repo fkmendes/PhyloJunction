@@ -392,6 +392,10 @@ class AnnotatedTree(dp.Tree):
         # prepare for dendropy's Nexus printing
         self._prepare_taxon_namespace_for_nexus_printing()
 
+        # updates ages of attribute transitions (side-effect):
+        # (i) at_dict
+        self._add_at_ages()
+
     def _check_input_health(self) -> None:
         """Check the validity of some of initialization arguments.
         
@@ -986,6 +990,14 @@ class AnnotatedTree(dp.Tree):
                 if not nd.is_leaf():
                     self.tree.taxon_namespace.remove_taxon(nd.taxon)
 
+    def _add_at_ages(self) -> None:
+        """Add age member values for attribute transitions in at_dict"""
+
+        if self.at_dict is not None:
+            for nd_name, at_list in self.rec_tr_at_dict.items():
+                for at in at_list:
+                    at.age = self.seed_age - at.global_time
+
     def is_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
         """Verify one or more sampled nodes exist on both root sides.
 
@@ -1301,7 +1313,6 @@ class AnnotatedTree(dp.Tree):
             for nd_name in in_complete_not_in_rec_set:
                 del self.rec_tr_clado_at_dict[nd_name]
 
-
     def update_rec_tr_sa_lineage_dict(self) -> None:
         """Update 'rec_tr_sa_lineage_dict' member.
 
@@ -1374,7 +1385,6 @@ class AnnotatedTree(dp.Tree):
                                 self.rec_tr_sa_lineage_dict[rec_tr_nd_name]
                             )
                             self.rec_tr_sa_lineage_dict = to_insert
-
 
     def extract_reconstructed_tree(
             self,
@@ -1704,6 +1714,13 @@ class AnnotatedTree(dp.Tree):
                 for nd_name, at_list in self.rec_tr_at_dict.items():
                     for at in at_list:
                         at.global_time -= global_time_offset
+                        at.age = self.rec_tr_root_age - at.global_time
+
+            if self.rec_tr_clado_at_dict is not None:
+                for nd_name, clado_at_list in self.rec_tr_clado_at_dict.items():
+                    for clado_at in clado_at_list:
+                        clado_at.global_time -= global_time_offset
+                        clado_at.age = self.rec_tr_root_age - clado_at.global_time
 
             if self.rec_tr_sa_lineage_dict is not None:
                 for nd_name, sa_list in self.rec_tr_sa_lineage_dict.items():
@@ -2447,8 +2464,8 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                     # corresponds to the youngest state (actually, its color)
                     #
                     # but because segment_colors has to match x_starts, we
-                    # need to orient segment_colros so that it has older
-                    # states (color) first, and then younget states
+                    # need to orient segment_colors so that it has older
+                    # states (color) first, and then youngest states
                     #
                     # this is why we reverse the indexing and add 1
                     segment_colors.insert(0, color_map[attr_trs[-(idx+1)].from_state])

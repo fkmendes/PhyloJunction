@@ -794,7 +794,8 @@ class DeterministicNodeDAG(NodeDAG):
                   sample_idx: ty.Optional[int] = 0,
                   repl_idx: ty.Optional[int] = 0,
                   repl_size: ty.Optional[int] = 1,
-                  branch_attr: ty.Optional[str] = "state") -> None:
+                  branch_attr: ty.Optional[str] = "state",
+                  draw_reconstructed: ty.Optional[bool] = False) -> None:
 
         # if list
         if super().__len__() >= 1 and isinstance(self.value, list):
