@@ -282,7 +282,7 @@ We can look at some of these commands individually:</p>
 </ul>
 <p>And this is the DAG such script instantiates:</p>
 <figure class="align-center" id="id4" style="width: 100%">
-<a class="reference internal image-reference" href="../_images/bd_graphical_model_manual.png"><img alt="../_images/bd_graphical_model_manual.png" src="../_images/bd_graphical_model_manual.png" style="width: 257.6px; height: 458.40000000000003px;" /></a>
+<a class="reference internal image-reference" href="../_images/bd_graphical_model_manual.png"><img alt="../_images/bd_graphical_model_manual.png" src="../_images/bd_graphical_model_manual.png" style="width: 251.20000000000002px; height: 459.6px;" /></a>
 <figcaption>
 <p><span class="caption-text"><strong>Figure 2.</strong> Factor graph representing the time-homogenous birth-death model specified in example script 1.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
 </figcaption>
@@ -516,7 +516,7 @@ All distributions support replication (i.e., plating in the DAG) and take as arg
 On this page you will find examples of how to invoke the available distributions (using the <em>phylojunction</em> language) when building a model.</p>
 <section id="uniform">
 <h4>Uniform<a class="headerlink" href="#uniform" title="Link to this heading"></a></h4>
-<p>The function for assigning a uniform (<code class="docutils literal notranslate"><span class="pre">uniform</span></code>) distribution to a variable has four parameters:</p>
+<p>The function for assigning a uniform (<code class="docutils literal notranslate"><span class="pre">uniform</span></code>) distribution to a random variable has four parameters:</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">n</span></code> (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.</div>
@@ -534,7 +534,7 @@ On this page you will find examples of how to invoke the available distributions
 </section>
 <section id="exponential">
 <h4>Exponential<a class="headerlink" href="#exponential" title="Link to this heading"></a></h4>
-<p>The function for assigning a exponential (<code class="docutils literal notranslate"><span class="pre">exponential</span></code>) distribution to a variable has four parameters:</p>
+<p>The function for assigning a exponential (<code class="docutils literal notranslate"><span class="pre">exponential</span></code>) distribution to a random variable has four parameters:</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">n</span></code> (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.</div>
@@ -552,7 +552,7 @@ On this page you will find examples of how to invoke the available distributions
 </section>
 <section id="gamma">
 <h4>Gamma<a class="headerlink" href="#gamma" title="Link to this heading"></a></h4>
-<p>The function for assigning a gamma (<code class="docutils literal notranslate"><span class="pre">gamma</span></code>) distribution to a variable has five parameters:</p>
+<p>The function for assigning a gamma (<code class="docutils literal notranslate"><span class="pre">gamma</span></code>) distribution to a random variable has five parameters:</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">n</span></code> (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.</div>
@@ -571,7 +571,7 @@ On this page you will find examples of how to invoke the available distributions
 </section>
 <section id="normal">
 <h4>Normal<a class="headerlink" href="#normal" title="Link to this heading"></a></h4>
-<p>The function for assigning a normal (<code class="docutils literal notranslate"><span class="pre">normal</span></code>) distribution to a variable has four parameters:</p>
+<p>The function for assigning a normal (<code class="docutils literal notranslate"><span class="pre">normal</span></code>) distribution to a random variable has four parameters:</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">n</span></code> (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.</div>
@@ -589,13 +589,13 @@ On this page you will find examples of how to invoke the available distributions
 </section>
 <section id="log-normal">
 <h4>Log-normal<a class="headerlink" href="#log-normal" title="Link to this heading"></a></h4>
-<p>The function for assigning a log-normal (<code class="docutils literal notranslate"><span class="pre">lognormal</span></code>) distribution to a variable has five parameters:</p>
+<p>The function for assigning a log-normal (<code class="docutils literal notranslate"><span class="pre">lognormal</span></code>) distribution to a random variable has five parameters:</p>
 <blockquote>
 <div><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">n</span></code> (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">nr</span></code> (integer, optional): Number of replicates to draw per sample. Defaults to 1.</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">mean</span></code> (real, required): Mean (location) of distribution.</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">sd</span></code> (positive real, required): Standard deviation (scale) of distribution.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">meanlog</span></code> (real, required): Mean (location) of distribution over the logarithm of the random variable.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">sdlog</span></code> (positive real, required): Standard deviation (scale) of distribution over the logarithm of the random variable.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">log_space</span></code> (string boolean, optional): Whether the value of <code class="docutils literal notranslate"><span class="pre">mean</span></code> is in log-space. Defaults to “true”.</div>
 </div>
 </div></blockquote>
@@ -716,7 +716,7 @@ The parameters of this function are:</p>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">min_rec_taxa</span></code> (positive integer, optional): Minimum number of sampled (extant and sampled ancestors) nodes the tree should have. Defaults to 0.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">max_rec_taxa</span></code> (positive integer, optional): Maximum number of sampled (extant and sampled ancestors) nodes the tree should have. Defaults to 1e12.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">abort_at_alive_count</span></code> (positive integer, optional): The count of a tree’s living nodes (irrespective of node sampling) at which point the tree is considered too large for simulation to continue. Trees can grow out of control when <code class="docutils literal notranslate"><span class="pre">stop=&quot;age&quot;</span></code> and one of the rates allows it to grow too big before the stopping condition is met. This parameter can be used to throw away such trees and preventing PhyloJunction from crashing. Defaults to 1e12.</div>
-<div class="line"><code class="docutils literal notranslate"><span class="pre">runtime_limit</span></code> (positive integer, optional): Maximum number of minutes to wait until all samples are drawn. Sampling is aborted at this point. Defaults to 5.</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">runtime_limit</span></code> (positive integer, optional): Maximum number of seconds to wait until all samples are drawn. Sampling is aborted at this point. Defaults to 300.</div>
 <div class="line"><code class="docutils literal notranslate"><span class="pre">max_n_attempts</span></code> (positive integer, optional): Maximum number of (failed) attempts before sampling is aborted. Defaults to 200.</div>
 </div>
 </div></blockquote>

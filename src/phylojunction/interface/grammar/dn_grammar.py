@@ -20,7 +20,7 @@ class PJDnGrammar():
     dn_grammar_dict: ty.Dict[str, ty.Tuple[str, ...]] = \
         {
             "lognormal":
-            tuple(["n", "nr", "mean", "sd", "log_space"]),
+            tuple(["n", "nr", "meanlog", "sdlog", "log_space"]),
             "normal":
             tuple(["n", "nr", "mean", "sd"]),
             "exponential":
@@ -131,7 +131,7 @@ class PJDnGrammar():
                             raise ec.ParseRequireIntegerError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
-                    elif arg == "mean":
+                    elif arg == "meanlog":
                         try:
                             ln_mean = [float(v) for v in extracted_val_list]
 
@@ -139,7 +139,7 @@ class PJDnGrammar():
                             raise ec.ParseRequireNumericError(
                                 dnpar.DnNormal.DN_NAME, arg)
 
-                    elif arg == "sd":
+                    elif arg == "sdlog":
                         try:
                             ln_sd = [float(v) for v in extracted_val_list]
 
@@ -157,7 +157,7 @@ class PJDnGrammar():
                             ln_log_space = False
 
             # making sure essential parameters of distribution have been specified
-            for par_obj, par_name in ((ln_mean, "mean"), (ln_sd, "sd")):
+            for par_obj, par_name in ((ln_mean, "meanlog"), (ln_sd, "sdlog")):
                 if not par_obj:
                     raise ec.ParseMissingParameterError(par_name)
 

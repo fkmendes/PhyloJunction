@@ -54,7 +54,7 @@ class DnSSE(pgm.DistrForSampling):
                  max_rec_taxa: int = int(1e12),
                  abort_at_alive_count: int = int(1e12),
                  epsilon: float = 1e-12,
-                 runtime_limit: int = 5,
+                 runtime_limit: int = 300,
                  max_n_failed_attempts: int = 100,
                  rng_seed: ty.Optional[int] = None,
                  debug: ty.Optional[bool] = False,

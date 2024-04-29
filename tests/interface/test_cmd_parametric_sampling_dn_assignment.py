@@ -35,7 +35,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertGreater(1.0, max(a_node_dag.value))
         self.assertEqual(1, dag_obj.n_nodes)
 
-
     def test_sampling_unif_vectorized_assignment(self):
         """
         Test if uniform (with vectorized inputs) sampling distribution
@@ -65,7 +64,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
             self.assertTrue(tup[0] <= a_node_dag.value[idx * 2] < tup[1])
             self.assertTrue(tup[0] <= a_node_dag.value[idx * 2 + 1] < tup[1])
         self.assertEqual(2, dag_obj.n_nodes)
-        
 
     def test_sampling_exp_assignment(self):
         """
@@ -114,7 +112,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertEqual(len(a_node_dag2.value), 100000)
         self.assertAlmostEqual(0.5, mean(a_node_dag2.value), delta=0.05)
         self.assertEqual(2, dag_obj.n_nodes)
-
 
     def test_sampling_gamma_assignment(self):
         """
@@ -165,7 +162,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertAlmostEqual(1.0, mean(a_node_dag2.value), delta=0.05)
         self.assertEqual(2, dag_obj.n_nodes)
 
-
     def test_sampling_normal_assignment(self):
         """
         Test if normal sampling distribution assignments are correctly
@@ -192,7 +188,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertAlmostEqual(0.5, mean(a_node_dag.value), delta=0.1)
         self.assertEqual(1, dag_obj.n_nodes)
 
-
     def test_sampling_ln_assignment(self):
         """
         Test if log-normal sampling distribution assignments are
@@ -205,7 +200,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         ###################################
         dag_obj = pgm.DirectedAcyclicGraph()
         
-        cmd_line1 = "ln1 ~ lognormal(n=100000, mean=-3.25, sd=0.25)"
+        cmd_line1 = "ln1 ~ lognormal(n=100000, meanlog=-3.25, sdlog=0.25)"
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
@@ -228,8 +223,8 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         ##########################
 
         exp_mean = str(math.exp(-3.25))
-        cmd_line2 = "ln2 ~ lognormal(n=100000, mean=" + exp_mean \
-            + ", sd=0.25, log_space=\"false\")"
+        cmd_line2 = "ln2 ~ lognormal(n=100000, meanlog=" + exp_mean \
+            + ", sdlog=0.25, log_space=\"false\")"
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line2)
@@ -246,7 +241,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
         self.assertAlmostEqual(0.04, mean(a_node_dag.value), delta=0.1)
         self.assertAlmostEqual(0.01, stdev(a_node_dag.value), delta=0.1)
         self.assertEqual(2, dag_obj.n_nodes)
-
 
     def test_unif_misspec(self):
         """
@@ -321,7 +315,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
              "the name of a distribution (e.g., \'normal\') or its "
              "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
-
     def test_exp_misspec(self):
         """
         Test exponential sampling distribution assignment throws
@@ -381,7 +374,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
              "the name of a distribution (e.g., \'normal\') or its "
              "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
 
-
     def test_gamma_misspec(self):
         """
         Test gamma sampling distribution assignment throws exception
@@ -430,7 +422,6 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
              "sampling distribution specification. Could not find either "
              "the name of a distribution (e.g., \'normal\') or its "
              "specification (e.g., \'(mean=0.0, sd=1.0)\'), or both."))
-
 
     def test_normal_misspec(self):
             """
@@ -487,7 +478,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         dag_obj = pgm.DirectedAcyclicGraph()
 
-        cmd_line1 = "ln ~ lognormal(n=1, nr=1, sd=0.25)"
+        cmd_line1 = "ln ~ lognormal(n=1, nr=1, sdlog=0.25)"
 
         stoch_node_name, _, stoch_node_spec = \
             re.split(cmdu.sampled_as_regex, cmd_line1)
@@ -498,7 +489,7 @@ class TestParametricSamplingDnAssignment(unittest.TestCase):
 
         self.assertEqual(str(exc_inner.exception), 
             "Parsing the specification of \'lognormal\' failed. " \
-            "Parameter \'mean\' is missing.")
+            "Parameter \'meanlog\' is missing.")
 
         cmd_line2 = "ln ~ lognormal(n=1, rate=1.0)"
 

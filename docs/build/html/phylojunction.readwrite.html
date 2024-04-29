@@ -293,6 +293,11 @@ and saved.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.dump_trees_rb_smap_dfs">
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">dump_trees_rb_smap_dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tr_dag_node_name_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_attr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.dump_trees_rb_smap_dfs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.get_write_inference_rev_scripts">
 <span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">get_write_inference_rev_scripts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">all_sims_model_spec_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_sims_mcmc_logging_spec_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write2file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.get_write_inference_rev_scripts" title="Link to this definition"></a></dt>
 <dd><p>Get and/or write full inference .Rev scripts</p>
@@ -436,12 +441,40 @@ These contains tree simulated data.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="phylojunction.readwrite.pj_write.prep_trees_rb_smap_dfs">
-<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">prep_trees_rb_smap_dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_trees_rb_smap_dfs" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">phylojunction.readwrite.pj_write.</span></span><span class="sig-name descname"><span class="pre">prep_trees_rb_smap_dfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><span class="pre">DirectedAcyclicGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree_dag_node_name_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_attr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#phylojunction.readwrite.pj_write.prep_trees_rb_smap_dfs" title="Link to this definition"></a></dt>
 <dd><p>Initialize pandas DataFrame’s for holding stochastic maps.</p>
 <p>Each dataframe will hold stochastic maps for all nodes for all
 (replicate) trees in a single sample. Each iteration will
 correspond to a single replicate.</p>
-<p>Returns:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dag_obj</strong> (<a class="reference internal" href="phylojunction.pgm.html#phylojunction.pgm.pgm.DirectedAcyclicGraph" title="phylojunction.pgm.pgm.DirectedAcyclicGraph"><em>DirectedAcyclicGraph</em></a>) – Instance of DAG class, holding
+the model.</p></li>
+<li><p><strong>tree_dag_node_name_list</strong> (<em>list</em>) – List with names of the DAG nodes
+tree random variables along which attributes have
+transitioned and for which we are producing a stochastic
+mapping dataframe.</p></li>
+<li><p><strong>mapped_attr_name</strong> (<em>str</em>) – Name of the attribute being
+stochastically mapped. E.g., ‘state’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple with two dictionaries. The keys of both</dt><dd><p>dictionaries are DAG node names. The values are lists.
+Inside the lists of one are pandas DataFrame instances
+with all replicates per sample in a single dataframes
+(and one dataframe per sample). In the lists of the other
+dictionary’s values are lists of strings with the contents
+of the dataframes (used for unit testing).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(tuple)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -454,11 +487,9 @@ correspond to a single replicate.</p>
 <li><p><strong>outfile_handle</strong> (<em>file</em>) – Output file object to write to</p></li>
 <li><p><strong>data_df</strong> (<em>pandas.DataFrame</em>) – A data frame containing random
 variable values to print to file</p></li>
-<li><p><strong>format</strong> (<em>str</em>) – Extension for output file</p></li>
+<li><p><strong>format</strong> (<em>str</em>) – Extension for output file. It can be ‘csv’ or
+‘tsv’. Defaults to ‘csv’.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

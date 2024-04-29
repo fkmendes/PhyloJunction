@@ -101,9 +101,9 @@ class DnSSE(pgm.DistrForSampling):
             other words, if the difference between a tiny value 'x'
             and 0.0 is smaller than epsilon, then 'x' is set to 0.0.
             Defaults to 1e-12.
-        runtime_limit (int, optional): Runtime ceiling (in minutes)
+        runtime_limit (int, optional): Runtime ceiling (in seconds)
             for obtaining the 'n' tree samples. If this limit is met,
-            the sampling procedure is aborted. Defaults to 5.
+            the sampling procedure is aborted. Defaults to 300.
         max_n_failed_attempts (int, optional): Maximum number of failed
             tree sampling attempts (replicates included) before
             PhyloJunction quits. Defaults to 200.
@@ -174,7 +174,7 @@ class DnSSE(pgm.DistrForSampling):
                  max_rec_taxa: int = int(1e12),
                  abort_at_alive_count: int = int(1e12),
                  epsilon: float = 1e-12,
-                 runtime_limit: int = 5,
+                 runtime_limit: int = 300,
                  max_n_failed_attempts: int = 200,
                  rng_seed: ty.Optional[int] = None,
                  debug: ty.Optional[bool] = False,
@@ -2180,7 +2180,7 @@ class DnSSE(pgm.DistrForSampling):
             while repl_size < self.n_repl:
                 # abort due to runtime limit
                 ellapsed_time = \
-                    pjh.get_ellapsed_time_in_minutes(start_time, time.time())
+                    pjh.get_ellapsed_time_in_seconds(start_time, time.time())
                 if ellapsed_time >= self.runtime_limit:
                     raise ec.RunTimeLimit(self.runtime_limit)
 

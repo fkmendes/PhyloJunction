@@ -555,14 +555,14 @@ if __name__ == "__main__":
     # exist -- don't forget to export it!
     # 
     # Then you can do:
-    # $ python3 tests/readwrite/test_data_dump.py
+    # $ python3.11 tests/readwrite/test_data_dump.py
     # 
     # or
     #
-    # $ python3 -m tests.readwrite.test_data_dump
+    # $ python3.11 -m tests.readwrite.test_data_dump
     #
     # or 
     #
-    # $ python3 -m unittest tests.readwrite.test_data_dump.TestDataDump.test_bisse_data_dump_file_names
+    # $ python3.11 -m unittest tests.readwrite.test_data_dump.TestDataDump.test_bisse_data_dump_file_names
 
     unittest.main()

@@ -5,7 +5,7 @@ On this page you will find examples of how to invoke the available distributions
 Uniform
 -------
 
-The function for assigning a uniform (``uniform``) distribution to a variable has four parameters:
+The function for assigning a uniform (``uniform``) distribution to a random variable has four parameters:
 
     | ``n`` (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.
     | ``nr``` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
@@ -20,7 +20,7 @@ The function for assigning a uniform (``uniform``) distribution to a variable ha
 Exponential
 -----------
 
-The function for assigning a exponential (``exponential``) distribution to a variable has four parameters:
+The function for assigning a exponential (``exponential``) distribution to a random variable has four parameters:
 
     | ``n`` (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.
     | ``nr`` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
@@ -35,7 +35,7 @@ The function for assigning a exponential (``exponential``) distribution to a var
 Gamma
 -----
 
-The function for assigning a gamma (``gamma``) distribution to a variable has five parameters:
+The function for assigning a gamma (``gamma``) distribution to a random variable has five parameters:
 
     | ``n`` (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.
     | ``nr`` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
@@ -51,7 +51,7 @@ The function for assigning a gamma (``gamma``) distribution to a variable has fi
 Normal
 ------
 
-The function for assigning a normal (``normal``) distribution to a variable has four parameters:
+The function for assigning a normal (``normal``) distribution to a random variable has four parameters:
 
     | ``n`` (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.
     | ``nr`` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
@@ -66,12 +66,12 @@ The function for assigning a normal (``normal``) distribution to a variable has 
 Log-normal
 ----------
 
-The function for assigning a log-normal (``lognormal``) distribution to a variable has five parameters:
+The function for assigning a log-normal (``lognormal``) distribution to a random variable has five parameters:
 
     | ``n`` (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.
     | ``nr`` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
-    | ``mean`` (real, required): Mean (location) of distribution.
-    | ``sd`` (positive real, required): Standard deviation (scale) of distribution.
+    | ``meanlog`` (real, required): Mean (location) of distribution over the logarithm of the random variable.
+    | ``sdlog`` (positive real, required): Standard deviation (scale) of distribution over the logarithm of the random variable.
     | ``log_space`` (string boolean, optional): Whether the value of ``mean`` is in log-space. Defaults to "true".
 
 .. code-block:: 

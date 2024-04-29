@@ -152,21 +152,21 @@ def check_and_vectorize_if_must(
     return vectorized_param_list
 
 
-def get_ellapsed_time_in_minutes(start: float, end: float) -> int:
-    """Calculate ellapsed time
+def get_ellapsed_time_in_seconds(start: float, end: float) -> int:
+    """Calculate ellapsed time in seconds.
 
     Args:
         start (float): Start of time window
         end (float): End of time window
 
     Returns:
-        int: Ellapsed time in minutes in time window
+        int: Ellapsed time in seconds in time window
     """
     # returns (min, sec)
     ellapsed_minutes, ellapsed_secs = divmod(end - start, 60)
 
-    # return int(ellapsed_minutes * 60 + ellapsed_secs) # in seconds
-    return int(ellapsed_minutes)
+    return int(ellapsed_minutes * 60 + ellapsed_secs) # in seconds
+    # return int(ellapsed_minutes)
 
 
 def is_val_in_interval(
@@ -251,4 +251,4 @@ if __name__ == "__main__":
 
     print_progress(49, 100)
 
-    print(get_ellapsed_time_in_minutes(0.0, 125))  # 2 minutes (and 5 seconds)
+    print(get_ellapsed_time_in_seconds(0.0, 125))  # 2 minutes (and 5 seconds)
