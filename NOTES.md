@@ -399,6 +399,9 @@ The `:/` syntax makes use of the resource file.
 Then we must edit the `gui_pages.py` file produced by QtCreator:
 
 ```
+from phylojunction.interface.pysidegui.images.icons import resources # at the top with the imports
+
+# replace the corresponding lines
 icon.addPixmap(QtGui.QPixmap(":/draw.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 icon1.addPixmap(QtGui.QPixmap(":/icon_clear.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 ```

@@ -797,7 +797,7 @@ class MissingColumnName(Exception):
 class RunTimeLimit(Exception):
     def __init__(self, runtime_limit: float) -> None:
         self.message = "ERROR: Hit runtime limit of " + str(runtime_limit) \
-            + " minutes."
+            + " seconds."
 
         super().__init__(self.message)
 

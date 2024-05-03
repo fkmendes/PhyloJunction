@@ -172,7 +172,7 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
                            tree_dag_node_name_list: ty.List[str],
                            mapped_attr_name: str) -> \
         ty.Tuple[ty.Dict[str, ty.List[pd.DataFrame]],
-        ty.Dict[str, ty.List[str]]]:
+                 ty.Dict[str, ty.List[str]]]:
     """Initialize pandas DataFrame's for holding stochastic maps.
 
     Each dataframe will hold stochastic maps for all nodes for all
@@ -208,7 +208,8 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
                                   smap_str_list: ty.List[str],
                                   it_idx_str: str,
                                   eps: float,
-                                  clado_event: ty.Optional[AttributeTransition] = None) \
+                                  clado_event: ty.Optional[AttributeTransition] = None,
+                                  root_call: bool = False) \
             -> ty.List[str]:
 
         # if origin, we move on
@@ -252,36 +253,36 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
             ####################################
 
             if nd_name in clado_at_dict:
-                # it will be in a list, but there should be just one
-                clado_at_list = clado_at_dict[nd_name]
+                clado_at = clado_at_dict[nd_name]
 
-                for clado_at in clado_at_list:
-                    this_nd_clade_event = clado_at  # passed to children if any
-                    clado_at_to_states = [clado_at.to_state, clado_at.to_state2]
-                    clado_at_age = str(clado_at.age)
-                    clado_at_from_state = str(clado_at.from_state)
+                # this_nd_clade_event = clado_at  # passed to children if any
+                clado_at_to_states = [clado_at.to_state, clado_at.to_state2]
+                clado_at_age = str(clado_at.age)
+                clado_at_from_state = str(clado_at.from_state)
 
-                    for clado_at_to_state in clado_at_to_states:
-                        # need to make sure we only write down cladogenetic events
-                        # where the child state is different from the parent state
-                        if clado_at_to_state is not None and \
-                                clado_at_to_state != clado_at.from_state:
-                            clado_at_str_list = [it_idx_str, nd_idx]
+                for clado_at_to_state in clado_at_to_states:
+                    # need to make sure we only write down cladogenetic events
+                    # where the child state is different from the parent state
+                    if clado_at_to_state is not None and \
+                            clado_at_to_state != clado_at.from_state:
+                        clado_at_str_list = [it_idx_str, nd_idx]
 
-                            # add this node's stochastic map string
-                            clado_at_str_list.extend(
-                                [br_start_time, br_end_time, clado_at_from_state,
-                                 str(clado_at_to_state), clado_at_age, "cladogenetic",
-                                 parent_idx])
-                            clado_at_str_list.extend(ch_idxs)
-                            smap_str_list.append(clado_at_str_list)
+                        # add this node's stochastic map string
+                        clado_at_str_list.extend(
+                            [br_start_time, br_end_time, clado_at_from_state,
+                             str(clado_at_to_state), clado_at_age, "cladogenetic",
+                             parent_idx])
+                        clado_at_str_list.extend(ch_idxs)
+                        smap_str_list.append(clado_at_str_list)
 
         #######################################
         # Now collect anagenetic smaps if any #
         #######################################
 
         at_list = list()
-        if nd_name in at_dict:
+        # we ignore anagenetic attribute transitions if the node is the root
+        # because in the reconstructed there is never a root edge
+        if nd_name in at_dict and not root_call:
             at_list = at_dict[nd_name]
 
             # if there was a cladogenetic attribute change event at the
@@ -423,6 +424,7 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
                         it_idx_str = "1"
                         repl_df_content_str_list = list()
 
+                    # recursion! #
                     this_tree_smap_str_list = list()
                     this_tree_smap_str_list = \
                         recursively_collect_smaps(root_node,
@@ -434,7 +436,8 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
                                                   this_tree_smap_str_list,
                                                   it_idx_str,
                                                   ann_tr_repl.epsilon,
-                                                  clado_event=None)
+                                                  clado_event=None,
+                                                  root_call=True)
 
                     # all replicates of a sample
                     repl_df_content_str_list.extend(this_tree_smap_str_list)
@@ -474,35 +477,6 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
 
     return all_tr_nds_df_list_dict, all_tr_nds_df_content_str_list_dict
 
-
-def dump_trees_rb_smap_dfs(dir_string: str,
-                           dag_obj: pgm.DirectedAcyclicGraph,
-                           tr_dag_node_name_list: ty.List[str],
-                           mapped_attr_name: str,
-                           prefix: str = "") -> None:
-
-    # get dataframes ready #
-    all_tr_nds_df_list_dict, all_tr_nds_df_content_str_list_dict = \
-        prep_trees_rb_smap_dfs(dag_obj, tr_dag_node_name_list, mapped_attr_name)
-
-    # sort out file path #
-    if not dir_string.endswith("/"):
-        dir_string += "/"
-
-    if not os.path.isdir(dir_string):
-        os.mkdir(dir_string)
-
-    if prefix:
-        dir_string += prefix + "_"
-
-    # full file paths #
-    for nd_name, df_list in all_tr_nds_df_list_dict.items():
-        for idx, df in enumerate(df_list):
-            file_path = nd_name + "_sample" + str(idx + 1) + "_smaps.tsv"
-
-            if isinstance(df, pd.DataFrame):
-                with open(file_path, "w") as data_out:
-                    write_data_df(data_out, df, format="tsv")
 
 def prep_data_df(
         dag_obj: pgm.DirectedAcyclicGraph,
@@ -716,7 +690,7 @@ def prep_data_df(
                         schema="newick",
                         suppress_annotations=True,
                         suppress_internal_taxon_labels=True,
-                        suppress_internal_node_labels=False).strip("\"")
+                        suppress_internal_node_labels=True).strip("\"")
                     .strip() for ith_val in node_val
                 ]
 
@@ -750,8 +724,8 @@ def prep_data_df(
                             schema="newick",
                             suppress_annotations=True,
                             suppress_internal_taxon_labels=True,
-                            suppress_rooting=True,
-                            suppress_internal_node_labels=False)
+                            suppress_internal_node_labels=True,
+                            suppress_rooting=True)
                         .strip("\"").strip()
                     )
 
@@ -761,7 +735,7 @@ def prep_data_df(
                             suppress_annotations=False,
                             suppress_internal_taxon_labels=True,
                             suppress_rooting=True,
-                            suppress_internal_node_labels=False)
+                            suppress_internal_node_labels=True)
                         .strip("\"").strip()
                     )
 
@@ -1192,6 +1166,37 @@ def dump_pgm_data(dir_string: str,
 
             with open(full_fp, "w") as data_out:
                 write_str_list(data_out, [to_print])
+
+
+def dump_trees_rb_smap_dfs(dir_string: str,
+                           dag_obj: pgm.DirectedAcyclicGraph,
+                           tr_dag_node_name_list: ty.List[str],
+                           mapped_attr_name: str,
+                           prefix: str = "") -> None:
+
+    # get dataframes ready #
+    all_tr_nds_df_list_dict, all_tr_nds_df_content_str_list_dict = \
+        prep_trees_rb_smap_dfs(dag_obj, tr_dag_node_name_list, mapped_attr_name)
+
+    # sort out file path #
+    if not dir_string.endswith("/"):
+        dir_string += "/"
+
+    if not os.path.isdir(dir_string):
+        os.mkdir(dir_string)
+
+    if prefix:
+        dir_string += prefix + "_"
+
+    # full file paths #
+    for nd_name, df_list in all_tr_nds_df_list_dict.items():
+        for idx, df in enumerate(df_list):
+            file_path = \
+                dir_string + nd_name + "_sample" + str(idx + 1) + "_smaps.tsv"
+
+            if isinstance(df, pd.DataFrame):
+                with open(file_path, "w") as data_out:
+                    write_data_df(data_out, df, format="tsv")
 
 
 def dump_serialized_pgm(

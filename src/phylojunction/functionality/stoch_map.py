@@ -337,6 +337,7 @@ class RangeExpansion(StochMap):
         Returns:
             (str): Short string with all information on range expansion.
         """
+
         short_str = "d(" + str(self.age) + ")_"
 
         split_relevant = \

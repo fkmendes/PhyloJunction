@@ -8,7 +8,7 @@ Uniform
 The function for assigning a uniform (``uniform``) distribution to a random variable has four parameters:
 
     | ``n`` (integer, optional): Number of samples to draw (samples are i.i.d.). Defaults to 1.
-    | ``nr``` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
+    | ``nr`` (integer, optional): Number of replicates to draw per sample. Defaults to 1.
     | ``min`` (real number, required): Lower bound (inclusive).
     | ``max`` (real number, required): Upper bound (inclusive).
 

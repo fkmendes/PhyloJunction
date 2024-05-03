@@ -76,9 +76,6 @@ class FromRegionSampler():
         # debugging
         # print(self._param_value_dict)
 
-        print(("Finished reading .log files containing parameter "
-               "values used to decode stochastic maps."))
-
         pass
 
     def populate_param_value_dict(self,

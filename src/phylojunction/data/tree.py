@@ -1717,10 +1717,9 @@ class AnnotatedTree(dp.Tree):
                         at.age = self.rec_tr_root_age - at.global_time
 
             if self.rec_tr_clado_at_dict is not None:
-                for nd_name, clado_at_list in self.rec_tr_clado_at_dict.items():
-                    for clado_at in clado_at_list:
-                        clado_at.global_time -= global_time_offset
-                        clado_at.age = self.rec_tr_root_age - clado_at.global_time
+                for nd_name, clado_at in self.rec_tr_clado_at_dict.items():
+                    clado_at.global_time -= global_time_offset
+                    clado_at.age = self.rec_tr_root_age - clado_at.global_time
 
             if self.rec_tr_sa_lineage_dict is not None:
                 for nd_name, sa_list in self.rec_tr_sa_lineage_dict.items():

@@ -24,7 +24,7 @@ import phylojunction.readwrite.pj_write as pjwrite
 import phylojunction.utility.helper_functions as pjh
 import phylojunction.utility.exception_classes as ec
 import phylojunction.data.tree as pjdt
-from phylojunction.interface.pysidegui.images.icons import resources
+
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -293,6 +293,7 @@ class GUIMainWindow(QMainWindow):
         file_menu.addAction("Load model", self.load_model)
         file_menu.addSeparator()
         file_menu.addAction("Save data as", self.write_data_to_dir)
+        file_menu.addAction("Save stochastic mappings as", self.write_smaps_to_dir)
         file_menu.addAction("Save model as", self.write_model_to_file)
 
     # verify which menu buttons are selected #
@@ -960,7 +961,7 @@ class GUIMainWindow(QMainWindow):
             self.gui_modeling.cmd_log_list,
             prefix=prefix)
 
-    def write_data_to_dir(self, prefix: str = ""):
+    def write_data_to_dir(self):
         # get dir path
         data_out_dir = QFileDialog.getExistingDirectory(
             self, "Save in folder", "./", QFileDialog.ShowDirsOnly
@@ -968,11 +969,28 @@ class GUIMainWindow(QMainWindow):
 
         prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
 
-        # writing all simulated variables to
-        # different files
         pjwrite.dump_pgm_data(
             data_out_dir,
             self.gui_modeling.dag_obj,
+            prefix=prefix)
+
+    def write_smaps_to_dir(self):
+        # get dir path
+        data_out_dir = QFileDialog.getExistingDirectory(
+            self, "Save in folder", "./", QFileDialog.ShowDirsOnly
+        )
+
+        prefix = self.ui.ui_pages.filename_prefix_textbox.toPlainText()
+        mapped_attr_name = \
+            self.ui.ui_pages.attr_name_textbox.toPlainText()
+        tr_dag_node_name_list = \
+            self.ui.ui_pages.tr_dag_node_textbox.toPlainText()
+
+        pjwrite.dump_trees_rb_smap_dfs(
+            data_out_dir,
+            self.gui_modeling.dag_obj,
+            tr_dag_node_name_list,
+            mapped_attr_name,
             prefix=prefix)
 
     #################
