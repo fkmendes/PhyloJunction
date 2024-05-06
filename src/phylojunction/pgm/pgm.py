@@ -422,8 +422,18 @@ class NodeDAG(ABC):
 
     def __len__(self) -> int:
         try:
-            if isinstance(self.value, list):
-                n_values = len(self.value)
+            n_values = 1
+
+            if isinstance(self._value, list):
+                n_values = len(self._value)
+
+            else:
+                # could be instance of:
+                #     SSE rate
+                #     SSE prob
+                if hasattr(self._value, "value") and \
+                        isinstance(self._value.value, list):
+                    n_values = len(self._value.value)
 
             n_repls = self._repl_size
 
