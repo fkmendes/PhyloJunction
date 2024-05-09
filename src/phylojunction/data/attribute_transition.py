@@ -55,25 +55,6 @@ class AttributeTransition():
         self.to_state2 = to_state2
         self.at_speciation = at_speciation
 
-        self.str_representation = \
-            "Attribute (\'" + attr_label + "\') transition:" + \
-            "\n    Time: " + str(global_time) + \
-            "\n    Subtending node: " + subtending_node_label + \
-            "\n    Departing state: " + str(from_state) + \
-            "\n    Arriving state: " + str(to_state)
-
-        # if second arriving state provided, this is a cladogenetic
-        # attribute transition, we must adjust the string representation
-        if to_state2 or at_speciation:
-            self.str_representation = \
-                self.str_representation.replace("Subtending", "Speciating")
-            self.str_representation = \
-                self.str_representation.replace("Departing", "Parent")
-            self.str_representation = \
-                self.str_representation.replace("Arriving", "Left child")
-            self.str_representation += "\n    Right child state: " + \
-                                       str(to_state2)
-
     def update_daughter_members(self,
                                 daughter_node_label: str,
                                 daughter_node_time: float) -> None:
@@ -86,5 +67,28 @@ class AttributeTransition():
         else:
             pass
 
+    def prep_str_representation(self) -> None:
+        self.str_representation = \
+            "Attribute (\'" + self.attr_label + "\') transition:" + \
+            "\n    Time: " + str(self.global_time) + \
+            "\n    Age: " + str(self.age) + \
+            "\n    Subtending node: " + self.subtending_or_speciating_node_label + \
+            "\n    Departing state: " + str(self.from_state) + \
+            "\n    Arriving state: " + str(self.to_state)
+
+        # if second arriving state provided, this is a cladogenetic
+        # attribute transition, we must adjust the string representation
+        if self.to_state2 or self.at_speciation:
+            self.str_representation = \
+                self.str_representation.replace("Subtending", "Speciating")
+            self.str_representation = \
+                self.str_representation.replace("Departing", "Parent")
+            self.str_representation = \
+                self.str_representation.replace("Arriving", "Left child")
+            self.str_representation += "\n    Right child state: " + \
+                                       str(self.to_state2)
+
     def __str__(self) -> str:
+        self.prep_str_representation()
+
         return self.str_representation

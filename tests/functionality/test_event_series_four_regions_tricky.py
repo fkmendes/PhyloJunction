@@ -16,6 +16,7 @@ class TestEventSeriesABCDTricky(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         n_chars = 4
+        n_time_slices = 6
 
         state2bit_lookup = \
             pjbio.State2BitLookup(n_chars,
@@ -45,14 +46,13 @@ class TestEventSeriesABCDTricky(unittest.TestCase):
                 node_states_file_path=node_states_file_path,
                 stoch_map_attr_name="state")
 
-        param_log_dir = \
-            "examples/feature_files/feature_set_event_series_ABCD_tricky"
+        param_log_fp = \
+            "examples/feature_files/feature_set_event_series_ABCD_tricky/rel_rates.log"
 
         frs = pjev.FromRegionSampler(
             n_chars,
-            param_log_dir,
-            "epoch_age_",
-            "_rel_rates",
+            n_time_slices,
+            param_log_fp,
             "m_d"
         )
 

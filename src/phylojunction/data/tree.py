@@ -130,13 +130,27 @@ class AnnotatedTree(dp.Tree):
             definition.
         sa_lineage_dict (dict):
         at_dict (dict, optional): Dictionary holding a list of
-            AttributeTransition objects for each branch (subtending an
+            AttributeTransition instances for each branch (subtending an
             internal node) along which state transitions happened.
             When a cladogenetic event change states, it is recorded as
             the first (oldest) state transition of its children.
         rec_tr_at_dict (dict, optional): Same as 'at_dict', but applies
-            to reconstructed tree.
-        clado_at_dict (dict):
+            to reconstructed tree. Defaults to 'None'.
+        have_updated_rec_tr_at_dict (bool): Flag keeping track of the
+            status of 'rec_tr_at_dict'. If 'extract_reconstructed_tree'
+            updated it, then this flag will be set to True. Defaults to
+            'False'.
+        clado_at_dict (dict): Dictionary holding an AttributeTransition
+            instance for internal nodes that underwent speciation where
+            at least one child's state differs from the parent's. Keys
+            are strings, values are AttributeTransitions.  Defaults to
+            'None'.
+        rec_tr_clado_at_dict (dict): Same as 'clado_at_dict', but
+            applies to reconstructed tree.
+        have_updated_rec_tr_at_dict (bool): Flag keeping track of the
+            status of 'rec_tr_clado_at_dict'.
+            If 'extract_reconstructed_tree' updated it, then this flag
+            will be set to True. Defaults to 'False'.
         epsilon (float): Float threshold to determine if a
             tiny decimal number is to be considered 0.0 or not. In
             other words, if the difference between a tiny value 'x'
@@ -222,12 +236,14 @@ class AnnotatedTree(dp.Tree):
     rec_tr_at_dict: \
         ty.Optional[ty.Dict[
             str, ty.List[pjat.AttributeTransition]]]  # can be None
+    have_updated_rec_tr_at_dict: bool
 
     # dictionary of cladogenetic attribute transitions
     clado_at_dict: \
         ty.Optional[ty.Dict[str, pjat.AttributeTransition]]  # can be None
     rec_tr_clado_at_dict: \
         ty.Optional[ty.Dict[str, pjat.AttributeTransition]]  # can be None
+    have_updated_rec_tr_clado_at_dict: bool
 
     # to deal with effectively zero floats
     epsilon: float
@@ -351,8 +367,10 @@ class AnnotatedTree(dp.Tree):
         self.rec_tr_sa_lineage_dict = copy.deepcopy(sa_lineage_dict)
         self.at_dict = at_dict
         self.rec_tr_at_dict = copy.deepcopy(at_dict)
+        self.have_updated_rec_tr_at_dict = False
         self.clado_at_dict = clado_at_dict
         self.rec_tr_clado_at_dict = copy.deepcopy(clado_at_dict)
+        self.have_updated_rec_tr_clado_at_dict = False
 
         # node counting
         self.n_extant_terminal_nodes = 0
@@ -998,6 +1016,10 @@ class AnnotatedTree(dp.Tree):
                 for at in at_list:
                     at.age = self.seed_age - at.global_time
 
+        if self.clado_at_dict is not None:
+            for nd_name, clado_at in self.rec_tr_clado_at_dict.items():
+                clado_at.age = self.seed_age - clado_at.global_time
+
     def is_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
         """Verify one or more sampled nodes exist on both root sides.
 
@@ -1130,7 +1152,7 @@ class AnnotatedTree(dp.Tree):
             return False
 
     def update_rec_tr_at_dict(self, rec_tree_root_nd: dp.Node) -> None:
-        """Update 'rec_tr_at_dict' and 'rec_clado-at_dict' members.
+        """Update 'rec_tr_at_dict' and 'rec_clado_at_dict' members.
 
         The 'at_dict' member of the AnnotatedTree, when defined, will by
         default host the state transitions of every node of the complete
@@ -1145,7 +1167,8 @@ class AnnotatedTree(dp.Tree):
 
         def recur_grabbing_int_nds_to_merge(
                 nd: dp.Node,
-                final_res_list: ty.List[ty.List[str]]) -> bool:
+                final_res_list: ty.List[ty.List[str]]) -> \
+                    ty.Tuple[bool, ty.List[ty.List[str]], ty.List[ty.List[str]]]:
 
             # debugging
             # print("starting nd", nd.label)
@@ -1155,10 +1178,12 @@ class AnnotatedTree(dp.Tree):
             if nd.is_leaf():
                 # debugging
                 # print("reached tip", nd.label)
+
                 return nd.sampled, [], final_res_list
 
+            # recurring!
             ch_nds_sampled: ty.List[bool] = list()
-            ch_nds_growing_list = list()
+            ch_nds_growing_list: ty.List[ty.List[str]] = list()
             for ch_nd in nd.child_node_iter():
                 is_nd_sampled, ch_list, final_res_list = \
                     recur_grabbing_int_nds_to_merge(ch_nd,
@@ -1181,6 +1206,13 @@ class AnnotatedTree(dp.Tree):
                     for sublist in ch_nds_growing_list:
                         sublist.append(nd.label)
 
+                # debugging
+                # print("doing something about in int node:", nd.label)
+                # print("at_dict")
+                # for k, v in self.at_dict.items():
+                #     print(k, v[0])
+                # print("ch_nds_growing_list before returning", ch_nds_growing_list)
+
                 return True, ch_nds_growing_list, final_res_list  # we do not want to ignore this node!
 
             # if both children are sampled, we reached an internal node
@@ -1202,11 +1234,11 @@ class AnnotatedTree(dp.Tree):
                 return False, [], final_res_list  # nd is not sampled
 
         if self.at_dict is not None:
-            ###########################################
-            # Recursively find all groups of internal #
-            # nodes whose attribute transitions we    #
-            # need to merge                           #
-            ###########################################
+            ##############################################
+            # Recursively find all groups of nodes whose #
+            # whose attribute transitions we need to     #
+            # merge                                      #
+            ##############################################
 
             int_node_lists_to_merge = list()  # populated by recur function
             _, _, int_node_lists_to_merge = \
@@ -1214,37 +1246,42 @@ class AnnotatedTree(dp.Tree):
                                                 int_node_lists_to_merge)
 
             # debugging
-            # print("int_node_lists_to_merge", int_node_lists_to_merge)
+            # print("\nnode_lists_to_merge", int_node_lists_to_merge)
 
             for sublist in int_node_lists_to_merge:
                 # must be the 1st entry b/c of how int_node_lists_to_merge is built
                 # (first item is necessarily the youngest, as older
                 # consecutively pruned internal nodes are appended to end of
                 # list)
-                youngest_int_nd_name = sublist[0]  # in complete tree
+                youngest_int_nd_name = sublist[0]  #
                 found_child_to_paste_to = False
 
                 # look for the node in rec tree to merge
                 for nd2merge_with in self.tree_reconstructed.preorder_node_iter():
+                    # int or terminal
                     nd2merge_with_name = nd2merge_with.label
 
                     # we find the same node in the complete tree
-                    complete_tr_leaf_nd = \
+                    complete_tr_nd = \
                         self.tree.find_node_with_label(nd2merge_with_name)
 
                     # complete_tr_leaf_nd cannot be a node without a parent,
                     # like a root (when it seeds a tree) or the origin; in
                     # such cases, there's nothing older than that node
                     # to merge to anyway
-                    if complete_tr_leaf_nd.parent_node is not None:
+                    if complete_tr_nd.parent_node is not None:
                         # ... and get its parent node's name
-                        complete_tr_leaf_nd_parent_name = \
-                            complete_tr_leaf_nd.parent_node.label
+                        complete_tr_nd_parent_name = \
+                            complete_tr_nd.parent_node.label
 
-                        # if the youngest complete tr internal node to merge
+                        # debugging
+                        # print("complete_tr_leaf_nd_parent_name",
+                        #       complete_tr_nd_parent_name)
+
+                        # if the youngest complete tr node to merge
                         # is the parent of 'nd2merge_with'
                         if youngest_int_nd_name == \
-                                complete_tr_leaf_nd_parent_name:
+                                complete_tr_nd_parent_name:
                             found_child_to_paste_to = True
 
                             # debugging
@@ -1264,6 +1301,8 @@ class AnnotatedTree(dp.Tree):
                                         reversed(self.rec_tr_at_dict[int_nd_name])
 
                                     for at2merge in int_nd_to_merge_at_list:
+                                        at2merge.subtending_or_speciating_node_label \
+                                            = nd2merge_with_name
                                         self.rec_tr_at_dict[nd2merge_with_name].\
                                             insert(0, at2merge)
 
@@ -1286,7 +1325,7 @@ class AnnotatedTree(dp.Tree):
                           "paste the attribute transitions of pruned "
                           "internal node " + youngest_int_nd_name))
 
-            # remove internal nodes that are not in the rec tree
+            # remove complete tree int nodes that are not in the rec tree
             rec_tr_nd_names = \
                 [ctnd.label for ctnd in self.tree_reconstructed.nodes()]
             for nd in self.tree.postorder_node_iter():
@@ -1427,268 +1466,279 @@ class AnnotatedTree(dp.Tree):
                 instance owning the method call.
         """
 
-        ##################################
-        # Prune tree of non-sampled tips #
-        ##################################
+        if not self.tree_reconstructed:
+            ##################################
+            # Prune tree of non-sampled tips #
+            ##################################
 
-        if self.tree_reconstructed:
-            return self.tree_reconstructed
+            # taxon_name space of tree_reconstructed will not
+            # have labels and taxon labels for internal nodes!
+            self.tree_reconstructed = copy.deepcopy(self.tree)
 
-        # taxon_name space of tree_reconstructed will not
-        # have labels and taxon labels for internal nodes!
-        self.tree_reconstructed = copy.deepcopy(self.tree)
+            # get initial members
+            self.rec_tr_root_node = self.tree_reconstructed.seed_node
+            self.rec_tr_root_node_label = self.rec_tr_root_node.label
+            self.rec_tr_root_age = self.node_ages_dict[self.rec_tr_root_node_label]
 
-        # get initial members
-        self.rec_tr_root_node = self.tree_reconstructed.seed_node
-        self.rec_tr_root_node_label = self.rec_tr_root_node.label
-        self.rec_tr_root_age = self.node_ages_dict[self.rec_tr_root_node_label]
-
-        # if tree went extinct, return empty new tree
-        # if (self.n_extant_terminal_nodes + self.n_sa_nodes) <= 1:
-        if (self.n_extant_sampled_terminal_nodes + self.n_sa_nodes) == 0:
-            return dp.Tree()
-
-        # filter_fn = lambda nd: \
-        #     nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
-
-        def filter_fn(nd):
-            return nd.is_sa or \
-                   (nd.is_leaf() and nd.alive and nd.sampled) or \
-                   nd.is_sa_dummy_parent
-            # return nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
-
-        # prune tree of non-sampled tips #
-        self.tree_reconstructed.filter_leaf_nodes(
-            filter_fn, suppress_unifurcations=True)
-
-        #####################################
-        # Preparing for re-rooting rec tree #
-        #####################################
-
-        # getting all root information #
-        root_node_distance_from_seed = 0.0
-        smallest_distance = 0.0
-
-        root_node = self.tree_reconstructed.find_node_with_label("root")
-
-        # could not get node with label, try with taxon label
-        if root_node is None:
-            root_node = \
-                self.tree_reconstructed.find_node_with_taxon_label("root")
-            
-        if root_node:
-            root_node_distance_from_seed = \
-                root_node.distance_from_root()
-            smallest_distance = root_node_distance_from_seed
-
-        int_node_deeper_than_root: dp.Node = None
-
-        # we will now grab the internal node that is deeper
-        # than the root, and also the furthest away from it
-        # (internal_nd_distance will be more and more negative)
-        for internal_nd in \
-            self.tree_reconstructed.preorder_internal_node_iter(
-                exclude_seed_node=False):
-
-            internal_nd_distance = internal_nd.distance_from_root()
-
-            # double-checking we're looking at just internal
-            # nodes that are not the root
-            if internal_nd.label not in ("root", "origin"):
-                # we set int_node_deeper_than_root if
-                # (i) we haven't looked at any internal nodes yet,
-                # i.e., smallest_distance == 0.0,
-                #
-                # OR
-                #
-                # (ii) they are deeper than the last one we checked,
-                # i.e., internal_nd_distance < smallest_distance
-                #
-                # AND
-                #
-                # we also only either
-                # (iii) not have a root at all, possibly because tree
-                # was read in as newick and nodes were unnamed (or maybe
-                # there was no root indeed), and by definition all
-                # internal nodes are deeper than the root, i.e., 
-                # not root_node
-                #
-                # OR
-                #
-                # (iv) have a root, and it is some distance away from
-                # the origin
-                if (smallest_distance == 0.0 or
-                        internal_nd_distance < smallest_distance) and \
-                        (root_node_distance_from_seed != 0.0 or
-                            not root_node):
-                    int_node_deeper_than_root = internal_nd
-                    smallest_distance = internal_nd_distance
-
-        ##############
-        # Re-rooting #
-        ##############
-
-        # if method called by someone other than Tree obj,
-        # then require_obs_both_sides won't be None
-        require_obs_both_sides_root = True
-        if require_obs_both_sides is not None:
-            require_obs_both_sides_root = require_obs_both_sides
-
-        # otherwise, we use the member inside Tree
-        else:
-            require_obs_both_sides_root = \
-                self.condition_on_obs_both_sides_root
-
-        if not require_obs_both_sides_root:
-            # no speciation happened, so complete tree has no root,
-            # or tree was read in as a Newick string with unnamed
-            # nodes; either way, we re-root at the node we found
-            # to be the deepest in the tree except for the origin
-            if root_node is None:
-
-                # root_node got pruned because one of its children went extinct,
-                # and there is nothing deeper than the root other than the origin
-                # (no SAs!) -- the origin must now become this rec tree's root
-                if int_node_deeper_than_root is None:
-                    only_surviving_node = self.tree_reconstructed.seed_node # this will be tip node
-                    self.tree_reconstructed.seed_node = self.rec_tr_root_node
-                    self.tree_reconstructed.seed_node.add_child(only_surviving_node)
-
-                # there is an internal node deeper than the root that is
-                # younger than the origin -- we root there!
-                else:
-                    self.tree_reconstructed \
-                        .reroot_at_node(int_node_deeper_than_root)
-
-                    # populate AnnotatedTree's rec tr members
-                    self.rec_tr_root_node = int_node_deeper_than_root
-                    self.rec_tr_root_node_label = int_node_deeper_than_root.label
-                    self.rec_tr_root_age = \
-                        self.node_ages_dict[int_node_deeper_than_root.label]
-
-                    int_node_deeper_than_root.edge_length = 0.0
-            # so there must be a
-            # sampled ancestor before the root, so we need to re-root
-            # above complete tree's root
-
-            # there is a root in the complete tree, and it may or not
-            # be the MRCA of all sampled taxa
-            else:
-                # if internal nodes in tree do not have a label because
-                # they were read in as Newick strings instead of simulated
-                # by PJ
-                if int_node_deeper_than_root is not None and \
-                        int_node_deeper_than_root.label == "None":
-                    self.tree_reconstructed.reroot_at_node(
-                        int_node_deeper_than_root)
-
-                    # populate AnnotatedTree's rec tree members
-                    self.rec_tr_root_node = int_node_deeper_than_root
-                    self.rec_tr_root_node_label = int_node_deeper_than_root.label
-                    self.rec_tr_root_age = \
-                        self.node_ages_dict[int_node_deeper_than_root.label]
-
-                    # getting origin and removing it if possible
-                    if self.origin_node:
-                        origin_node_rec = self.tree_reconstructed. \
-                            find_node_with_label("origin")
-
-                        # could not get origin node with label,
-                        # try with taxon label
-                        if not origin_node_rec:
-                            origin_node_rec = self.tree_reconstructed. \
-                                find_node_with_taxon_label("origin")
-
-                        # origin should be child because we re-rooted!
-                        int_node_deeper_than_root.remove_child(origin_node_rec)
-
-                    int_node_deeper_than_root.edge_length = 0.0
-
-                # nodes in tree do have labels, so they were simulated in PJ;
-                # we now find the MRCA of sampled (observed) taxa (it may or
-                # not be the complete tree's root)
-                else:
-                    # DendroPy's mrca seems to have side-effect... ugh!
-                    # will do things on deep copy of tree instead, and 
-                    # look at labels
-                    rec_tree_mrca_label = \
-                        pj_get_name_mrca_obs_terminals(
-                            self.tree_reconstructed.seed_node,
-                            [leaf.label for leaf
-                             in self.tree_reconstructed.leaf_node_iter()])
-
-                    # re-root (re-seed in DendroPy) if necessary
-                    # if so, it is because there must be a sampled ancestor
-                    # before the root, so we need to re-root above complete
-                    # tree's root
-                    if rec_tree_mrca_label != "root":
-                        rec_mrca_node = \
-                            self.tree_reconstructed \
-                                .find_node_with_label(rec_tree_mrca_label)
-                        self.tree_reconstructed.reroot_at_node(rec_mrca_node)
-
-                        # populate AnnotatedTree's rec tree members
-                        self.rec_tr_root_node = rec_mrca_node
-                        self.rec_tr_root_node_label = rec_mrca_node.label
-                        self.rec_tr_root_age = \
-                            self.node_ages_dict[rec_mrca_node.label]
-
-                        rec_mrca_node.edge_length = 0.0
-
-                    # complete tree root is rec tree root
-                    else:
-                        root_node.edge_length = 0.0
-
-                        # populate AnnotatedTree's rec tree members
-                        self.rec_tr_root_node = root_node
-                        self.rec_tr_root_node_label = root_node.label
-                        self.rec_tr_root_age = \
-                            self.node_ages_dict[root_node.label]
-
-        # conditioning on sampled (observed) taxa on both sides of root
-        else:
-            # if we condition on sampled nodes on both sides of root,
-            # then by definition the reconstructed tree is empty!
-            if not root_node:
+            # if tree went extinct, return empty new tree
+            # if (self.n_extant_terminal_nodes + self.n_sa_nodes) <= 1:
+            if (self.n_extant_sampled_terminal_nodes + self.n_sa_nodes) == 0:
                 return dp.Tree()
 
+            # filter_fn = lambda nd: \
+            #     nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
+
+            def filter_fn(nd):
+                return nd.is_sa or \
+                       (nd.is_leaf() and nd.alive and nd.sampled) or \
+                       nd.is_sa_dummy_parent
+                # return nd.is_sa or (nd.is_leaf() and nd.alive and nd.sampled)
+
+            # prune tree of non-sampled tips #
+            self.tree_reconstructed.filter_leaf_nodes(
+                filter_fn, suppress_unifurcations=True)
+
+            #####################################
+            # Preparing for re-rooting rec tree #
+            #####################################
+
+            # getting all root information #
+            root_node_distance_from_seed = 0.0
+            smallest_distance = 0.0
+
+            root_node = self.tree_reconstructed.find_node_with_label("root")
+
+            # could not get node with label, try with taxon label
+            if root_node is None:
+                root_node = \
+                    self.tree_reconstructed.find_node_with_taxon_label("root")
+
+            if root_node:
+                root_node_distance_from_seed = \
+                    root_node.distance_from_root()
+                smallest_distance = root_node_distance_from_seed
+
+            int_node_deeper_than_root: dp.Node = None
+
+            # we will now grab the internal node that is deeper
+            # than the root, and also the furthest away from it
+            # (internal_nd_distance will be more and more negative)
+            for internal_nd in \
+                self.tree_reconstructed.preorder_internal_node_iter(
+                    exclude_seed_node=False):
+
+                internal_nd_distance = internal_nd.distance_from_root()
+
+                # double-checking we're looking at just internal
+                # nodes that are not the root
+                if internal_nd.label not in ("root", "origin"):
+                    # we set int_node_deeper_than_root if
+                    # (i) we haven't looked at any internal nodes yet,
+                    # i.e., smallest_distance == 0.0,
+                    #
+                    # OR
+                    #
+                    # (ii) they are deeper than the last one we checked,
+                    # i.e., internal_nd_distance < smallest_distance
+                    #
+                    # AND
+                    #
+                    # we also only either
+                    # (iii) not have a root at all, possibly because tree
+                    # was read in as newick and nodes were unnamed (or maybe
+                    # there was no root indeed), and by definition all
+                    # internal nodes are deeper than the root, i.e.,
+                    # not root_node
+                    #
+                    # OR
+                    #
+                    # (iv) have a root, and it is some distance away from
+                    # the origin
+                    if (smallest_distance == 0.0 or
+                            internal_nd_distance < smallest_distance) and \
+                            (root_node_distance_from_seed != 0.0 or
+                                not root_node):
+                        int_node_deeper_than_root = internal_nd
+                        smallest_distance = internal_nd_distance
+
+            ##############
+            # Re-rooting #
+            ##############
+
+            # if method called by someone other than Tree obj,
+            # then require_obs_both_sides won't be None
+            require_obs_both_sides_root = True
+            if require_obs_both_sides is not None:
+                require_obs_both_sides_root = require_obs_both_sides
+
+            # otherwise, we use the member inside Tree
             else:
-                # if there is a root, but sampled nodes were not found
-                # on both sides, reconstructed tree is empty!
-                if not self.is_extant_or_sa_on_both_sides_complete_tr_root(
-                        root_node):
+                require_obs_both_sides_root = \
+                    self.condition_on_obs_both_sides_root
+
+            if not require_obs_both_sides_root:
+                # no speciation happened, so complete tree has no root,
+                # or tree was read in as a Newick string with unnamed
+                # nodes; either way, we re-root at the node we found
+                # to be the deepest in the tree except for the origin
+                if root_node is None:
+
+                    # root_node got pruned because one of its children went extinct,
+                    # and there is nothing deeper than the root other than the origin
+                    # (no SAs!) -- the origin must now become this rec tree's root
+                    if int_node_deeper_than_root is None:
+                        only_surviving_node = self.tree_reconstructed.seed_node # this will be tip node
+                        self.tree_reconstructed.seed_node = self.rec_tr_root_node
+                        self.tree_reconstructed.seed_node.add_child(only_surviving_node)
+
+                    # there is an internal node deeper than the root that is
+                    # younger than the origin -- we root there!
+                    else:
+                        self.tree_reconstructed \
+                            .reroot_at_node(int_node_deeper_than_root)
+
+                        # populate AnnotatedTree's rec tr members
+                        self.rec_tr_root_node = int_node_deeper_than_root
+                        self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                        self.rec_tr_root_age = \
+                            self.node_ages_dict[int_node_deeper_than_root.label]
+
+                        int_node_deeper_than_root.edge_length = 0.0
+                # so there must be a
+                # sampled ancestor before the root, so we need to re-root
+                # above complete tree's root
+
+                # there is a root in the complete tree, and it may or not
+                # be the MRCA of all sampled taxa
+                else:
+                    # if internal nodes in tree do not have a label because
+                    # they were read in as Newick strings instead of simulated
+                    # by PJ
+                    if int_node_deeper_than_root is not None and \
+                            int_node_deeper_than_root.label == "None":
+                        self.tree_reconstructed.reroot_at_node(
+                            int_node_deeper_than_root)
+
+                        # populate AnnotatedTree's rec tree members
+                        self.rec_tr_root_node = int_node_deeper_than_root
+                        self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                        self.rec_tr_root_age = \
+                            self.node_ages_dict[int_node_deeper_than_root.label]
+
+                        # getting origin and removing it if possible
+                        if self.origin_node:
+                            origin_node_rec = self.tree_reconstructed. \
+                                find_node_with_label("origin")
+
+                            # could not get origin node with label,
+                            # try with taxon label
+                            if not origin_node_rec:
+                                origin_node_rec = self.tree_reconstructed. \
+                                    find_node_with_taxon_label("origin")
+
+                            # origin should be child because we re-rooted!
+                            int_node_deeper_than_root.remove_child(origin_node_rec)
+
+                        int_node_deeper_than_root.edge_length = 0.0
+
+                    # nodes in tree do have labels, so they were simulated in PJ;
+                    # we now find the MRCA of sampled (observed) taxa (it may or
+                    # not be the complete tree's root)
+                    else:
+                        # DendroPy's mrca seems to have side-effect... ugh!
+                        # will do things on deep copy of tree instead, and
+                        # look at labels
+                        rec_tree_mrca_label = \
+                            pj_get_name_mrca_obs_terminals(
+                                self.tree_reconstructed.seed_node,
+                                [leaf.label for leaf
+                                 in self.tree_reconstructed.leaf_node_iter()])
+
+                        # re-root (re-seed in DendroPy) if necessary
+                        # if so, it is because there must be a sampled ancestor
+                        # before the root, so we need to re-root above complete
+                        # tree's root
+                        if rec_tree_mrca_label != "root":
+                            rec_mrca_node = \
+                                self.tree_reconstructed \
+                                    .find_node_with_label(rec_tree_mrca_label)
+                            self.tree_reconstructed.reroot_at_node(rec_mrca_node)
+
+                            # populate AnnotatedTree's rec tree members
+                            self.rec_tr_root_node = rec_mrca_node
+                            self.rec_tr_root_node_label = rec_mrca_node.label
+                            self.rec_tr_root_age = \
+                                self.node_ages_dict[rec_mrca_node.label]
+
+                            rec_mrca_node.edge_length = 0.0
+
+                        # complete tree root is rec tree root
+                        else:
+                            root_node.edge_length = 0.0
+
+                            # populate AnnotatedTree's rec tree members
+                            self.rec_tr_root_node = root_node
+                            self.rec_tr_root_node_label = root_node.label
+                            self.rec_tr_root_age = \
+                                self.node_ages_dict[root_node.label]
+
+            # conditioning on sampled (observed) taxa on both sides of root
+            else:
+                # if we condition on sampled nodes on both sides of root,
+                # then by definition the reconstructed tree is empty!
+                if not root_node:
                     return dp.Tree()
 
-                # there are sampled nodes on both sides of the root!
-                #
-                # but now we need to see if re-rooting is necessary;
-                # if there is an internal node between the origin and
-                # the root, then a direct ancestor sampling event took
-                # place -- we then root at the dummy node who is the
-                # parent of the direct sampled ancestor node (but the 
-                # root in reality is the sampled ancestor itself!)
-                if self.origin_node and \
-                        int_node_deeper_than_root.taxon is not None:
-                    self.tree_reconstructed \
-                        .reroot_at_node(int_node_deeper_than_root)
+                else:
+                    # if there is a root, but sampled nodes were not found
+                    # on both sides, reconstructed tree is empty!
+                    if not self.is_extant_or_sa_on_both_sides_complete_tr_root(
+                            root_node):
+                        return dp.Tree()
 
-                    # populate AnnotatedTree's rec tree members
-                    self.rec_tr_root_node = int_node_deeper_than_root
-                    self.rec_tr_root_node_label = int_node_deeper_than_root.label
-                    self.rec_tr_root_age = \
-                        self.node_ages_dict[int_node_deeper_than_root.label]
+                    # there are sampled nodes on both sides of the root!
+                    #
+                    # but now we need to see if re-rooting is necessary;
+                    # if there is an internal node between the origin and
+                    # the root, then a direct ancestor sampling event took
+                    # place -- we then root at the dummy node who is the
+                    # parent of the direct sampled ancestor node (but the
+                    # root in reality is the sampled ancestor itself!)
+                    if self.origin_node and \
+                            int_node_deeper_than_root.taxon is not None:
+                        self.tree_reconstructed \
+                            .reroot_at_node(int_node_deeper_than_root)
 
-                    # we remove the branch subtending the dummy node
-                    int_node_deeper_than_root.edge_length = 0.0
+                        # populate AnnotatedTree's rec tree members
+                        self.rec_tr_root_node = int_node_deeper_than_root
+                        self.rec_tr_root_node_label = int_node_deeper_than_root.label
+                        self.rec_tr_root_age = \
+                            self.node_ages_dict[int_node_deeper_than_root.label]
 
-        if plotting_overhead:
+                        # we remove the branch subtending the dummy node
+                        int_node_deeper_than_root.edge_length = 0.0
+
+            ##################################################
+            # Populating rec tree node ages and heights dict #
+            #                                                #
+            # Updating                                       #
+            #     (i)  rec_node_heights_dict                 #
+            #     (ii) rec_node_ages_dict                    #
+            ##################################################
+
+            self._populate_node_age_height_dicts(do_reconstructed_tree=True)
+
+        if plotting_overhead and \
+                not self.have_updated_rec_tr_at_dict and \
+                not self.have_updated_rec_tr_clado_at_dict:
+
+            self.have_updated_rec_tr_at_dict = True
+            self.have_updated_rec_tr_clado_at_dict = True
 
             ####################################
             # Updating                         #
             #     (i)   rec_tr_at_dict         #
             #     (ii)  rec_tr_sa_lineage_dict #
-            #     (iii) rec_node_heights_dict  #
-            #     (iv)  rec_node_ages_dict     #
             #####################################
 
             complete_tr_nd_that_roots_rec_tr = \
@@ -1726,12 +1776,6 @@ class AnnotatedTree(dp.Tree):
                     for sa in sa_list:
                         sa.global_time -= global_time_offset
                         sa.age = self.rec_tr_root_age - sa.global_time
-
-            ##################################################
-            # Populating rec tree node ages and heights dict #
-            ##################################################
-
-            self._populate_node_age_height_dicts(do_reconstructed_tree=True)
 
         return self.tree_reconstructed
    
@@ -1821,7 +1865,7 @@ class AnnotatedTree(dp.Tree):
                 Defaults to 'False'.
         """
 
-        if draw_reconstructed and not self.tree_reconstructed:
+        if draw_reconstructed:
             self.extract_reconstructed_tree(plotting_overhead=True)
 
         if not node_attr:
@@ -2088,6 +2132,7 @@ def get_y_coord_from_n_obs_nodes(ann_tr: AnnotatedTree,
             children = [ch for ch in nd.child_nodes()]
 
         n_children = len(children)
+
         if n_children > 0:
             found_sa = 0
             found_non_sa = 0

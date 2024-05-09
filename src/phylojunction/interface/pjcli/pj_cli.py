@@ -18,10 +18,13 @@ def execute_pj_script(
         prefix: str = "",
         out_dir: str = "./",
         write_data: bool = False,
+        write_smap: bool = False,
         write_figures: str = "",
         write_inference: bool = False,
         write_nex_states: bool = False,
-        a_random_seed: ty.Optional[int] = None) -> None:
+        a_random_seed: ty.Optional[int] = None,
+        tr_dag_nd_names: ty.Optional[str] = None,
+        smap_attr_name: ty.Optional[str] = None) -> None:
     """
     Execute .pj script.
 
@@ -64,17 +67,45 @@ def execute_pj_script(
         #     print(node_dag.value)
 
         # Writing data #
-        if write_data:
-            data_dir: str = output_dir
+        if write_data or write_smap:
 
+            data_dir: str = output_dir
             if not os.path.isdir(data_dir):
                 os.mkdir(data_dir)
 
-            pjw.dump_pgm_data(
-                data_dir,
-                dag_obj,
-                prefix,
-                write_nex_states)
+            if write_data:
+                pjw.dump_pgm_data(
+                    data_dir,
+                    dag_obj,
+                    prefix,
+                    write_nex_states)
+
+            if write_smap:
+                if not tr_dag_nd_names:
+                    exit(("Writing stochastic maps (\"--smap\") requires "
+                          "passing tree node names. Exiting."))
+
+                tr_dag_nd_names = \
+                    tr_dag_nd_names.replace("'", "").\
+                        replace("\"", "")
+
+                if not smap_attr_name:
+                    exit(("Writing stochastic maps (\"--smap\") requires "
+                          "passing the name of the attribute being mapped. "
+                          "Exiting."))
+
+                smap_attr_name = \
+                    smap_attr_name.replace("'", ""). \
+                        replace("\"", "")
+
+                tr_dag_nd_name_list = tr_dag_nd_names.split(",")
+
+                pjw.dump_trees_rb_smap_dfs(
+                    data_dir,
+                    dag_obj,
+                    tr_dag_nd_name_list,
+                    smap_attr_name,
+                    prefix=prefix)
 
         # Writing figures #
         if write_figures:
@@ -119,6 +150,13 @@ def call_cli() -> None:
         default=False,
         help="Toggle data output")
     parser.add_argument(
+        "-smap",
+        "--smap-output",
+        dest="write_smap",
+        action="store_true",
+        default=False,
+        help="Toggle stochastic mapping output")
+    parser.add_argument(
         "-f",
         "--figure-output",
         dest="write_figures",
@@ -156,11 +194,26 @@ def call_cli() -> None:
         default=False,
         help="Toggle states nexus file output")
     parser.add_argument(
-        "-r", "--random-seed",
+        "-r",
+        "--random-seed",
         dest="random_seed",
         action="store",
         default=None,
         help="Random seed (integer)")
+    parser.add_argument(
+        "-tr-smap",
+        "--tree-dag-nodes-smap",
+        dest="tr_dag_nd_names",
+        action="store",
+        default=None,
+        help="Tree DAG node names for stochastic mappings.")
+    parser.add_argument(
+        "-smap-attr",
+        "--smap-attr-name",
+        dest="smap_attr_name",
+        action="store",
+        default=None,
+        help="Name of the attribute being stochastically mapped (e.g., 'state').")
 
     args = parser.parse_args()
 
@@ -169,10 +222,13 @@ def call_cli() -> None:
         prefix=args.prefix,
         out_dir=args.out_dir,
         write_data=args.write_data,
+        write_smap=args.write_smap,
         write_figures=args.write_figures,
         # write_inference=args.write_inference,
         write_nex_states=args.write_nex_states,
-        a_random_seed=args.random_seed
+        a_random_seed=args.random_seed,
+        tr_dag_nd_names=args.tr_dag_nd_names,
+        smap_attr_name=args.smap_attr_name,
     )
 
 # if one wants to run pj_cli.py for some reason

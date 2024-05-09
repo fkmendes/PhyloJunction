@@ -16,6 +16,7 @@ class TestEventSeriesFourRegions(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         n_chars = 4
+        n_time_slices = 6
 
         state2bit_lookup = \
             pjbio.State2BitLookup(n_chars,
@@ -45,16 +46,16 @@ class TestEventSeriesFourRegions(unittest.TestCase):
                 node_states_file_path=node_states_file_path,
                 stoch_map_attr_name="state")
 
-        param_log_dir = \
-            "examples/feature_files/feature_set_event_series_ABCD"
+        param_log_fp = \
+            "examples/feature_files/feature_set_event_series_ABCD/rel_rates.log"
 
-        frs = pjev.FromRegionSampler(
-            n_chars,
-            param_log_dir,
-            "epoch_age_",
-            "_rel_rates",
-            "m_d"
-        )
+        frs = pjev.FromRegionSampler(n_chars,
+                                     n_time_slices,
+                                     param_log_fp,
+                                     "m_d")
+        #     "epoch_age_",
+        #     "_rel_rates"
+        # )
 
         feature_summary_fp = \
             ("examples/feature_files/feature_set_event_series_ABCD/"

@@ -578,6 +578,7 @@ class GeoFeatureCollection():
 
         self._check_filepaths(feat_summary_fp)
 
+
         # if only one epoch, age_summary not necessary
         if age_summary_fp is not None and age_summary_fp != "":
             self._check_filepaths(age_summary_fp)
@@ -705,7 +706,7 @@ class GeoFeatureCollection():
             header = infile.readline()
             
             if header != ("index,age_end\n"):
-                exit(("ERROR: Expecting header:\nindex,age_end\n"))
+                exit("ERROR: Expecting header:\nindex,age_end\n")
 
             content = infile.readlines()
             n_epochs_minus_one = len(content)
@@ -785,7 +786,7 @@ class GeoFeatureCollection():
         """Check files exist in initialization file paths"""
 
         if not os.path.isfile(feat_summary_fp):
-            exit("Could not find " + feat_summary_fp + ". Exiting.")
+            exit("Could not find file with feature summary table " + feat_summary_fp + ". Exiting.")
 
     # getters
     def get_feat_by_name(self,
@@ -1267,7 +1268,8 @@ class GeoFeatureQuery():
     def populate_geo_cond_member_dicts(
             self,
             geo_cond_name: str,
-            requirement_fn: MyCallableType,
+            w_bw_bit_patterns: ty.Union[ty.List[ty.List[str]],
+                               ty.List[str]],
             is_directed: bool = False) -> None:
         """Populate geographic connectivity bit dictionaries
 
@@ -1282,19 +1284,18 @@ class GeoFeatureQuery():
             geo_cond_name (str): Name of the geographic
                 condition (e.g., \"mountain range\", \"ancient sea\",
                 \"riverine barrier\").
-            requirement_fn (function): A function that receives a
-                feature collection and a list of integers defining
-                the involved regions, and returns a (1 or 2
-                dimensional) list of bit strings representing the
-                manifestation of geographic connectivity, in each
-                region or region pair, for each epoch.
+            w_bw_bit_patterns (list): Within or between bit patterns
+                returned from connectivity function, one bit per epoch.
+                If within-region features, this will be a list of
+                strings. If between-region features, this will be a 2-D
+                list.
             is_directed (bool): Flag specifying if connectivity graph
                 is directed or not. Defaults to False.
         """
 
         self.geo_cond_name = geo_cond_name
 
-        self.geo_cond_bit_dict[geo_cond_name] = requirement_fn
+        self.geo_cond_bit_dict[geo_cond_name] = w_bw_bit_patterns
 
         # DEPRECATED
         # self._populate_oldest_geo_cond_bit_dict(geo_cond_name)

@@ -45,33 +45,20 @@ class FromRegionSampler():
 
     def __init__(self,
                  n_char: int,
-                 param_log_dir: str,
-                 file_name_prefix: str,
-                 file_name_suffix: str,
+                 n_time_slices: int,
+                 param_log_file_path: str,
                  param_name: str) -> None:
 
         self._n_char = n_char
         self._param_name = param_name
         self._time_slice_dict_list = list()
-
-        # reading log files
-        if not param_log_dir.endswith("/"):
-            param_log_dir += "/"
-        self._param_log_dir = param_log_dir
-
-        log_fp_list = natsorted(
-            [param_log_dir + f for f in os.listdir(param_log_dir) \
-             if f.startswith(file_name_prefix) and \
-             f.endswith(file_name_suffix + ".log")])
-        self._n_time_slices = len(log_fp_list)
+        self._n_time_slices = n_time_slices
 
         # side-effect: populates
         #     (i)  self._n_its
         #     (ii) self._param_value_dict
         self.populate_param_value_dict(
-            log_fp_list,
-            file_name_prefix,
-            file_name_suffix)
+            param_log_file_path)
 
         # debugging
         # print(self._param_value_dict)
@@ -79,18 +66,11 @@ class FromRegionSampler():
         pass
 
     def populate_param_value_dict(self,
-                                  param_log_fp_list: ty.List[str],
-                                  prefix: str,
-                                  suffix: str) -> None:
-        for param_log_fp in param_log_fp_list:
-            time_slice_idx = param_log_fp.\
-                replace(prefix, "").\
-                replace(suffix, "").\
-                replace(".log", "").\
-                replace(self._param_log_dir, "")
+                                  param_log_fp: str) -> None:
+                                  # prefix: str,
+                                  # suffix: str)
 
-            # debugging
-            # print("time_slice_idx", time_slice_idx)
+        for time_slice_idx in range(1, self._n_time_slices + 1):
 
             param_value_dict = dict()
             with open(param_log_fp, "r") as infile:
@@ -107,7 +87,7 @@ class FromRegionSampler():
                         # 3D: to region)
                         param_name = \
                             self._param_name \
-                            + "[" + time_slice_idx + "]" \
+                            + "[" + str(time_slice_idx) + "]" \
                             + "[" + str(region1_idx) + "]" \
                             + "[" + str(region2_idx) + "]"
 
@@ -131,7 +111,7 @@ class FromRegionSampler():
                         for region2_idx in range(1, self._n_char + 1):
                             param_name = \
                                 self._param_name \
-                                + "[" + time_slice_idx + "]" \
+                                + "[" + str(time_slice_idx) + "]" \
                                 + "[" + str(region1_idx) + "]" \
                                 + "[" + str(region2_idx) + "]"
 
@@ -1618,6 +1598,7 @@ if __name__ == "__main__":
 
     # n_chars = 2
     n_chars = 4
+    n_time_slices = 6
 
     state2bit_lookup = pjbio.State2BitLookup(n_chars, 2, geosse=True)
 
@@ -1662,14 +1643,13 @@ if __name__ == "__main__":
                                          node_states_file_path=node_states_file_path,
                                          stoch_map_attr_name="state")
 
-    # param_log_dir = "examples/feature_files/feature_set_event_series_AB"
-    # param_log_dir = "examples/feature_files/feature_set_event_series_ABCD"
-    param_log_dir = "examples/feature_files/feature_set_event_series_ABCD_tricky"
+    # param_log_fp = "examples/feature_files/feature_set_event_series_AB/rel_rates.log"
+    # param_log_fp = "examples/feature_files/feature_set_event_series_ABCD/rel_rates.log"
+    param_log_fp = "examples/feature_files/feature_set_event_series_ABCD_tricky/rel_rates.log"
     frs = FromRegionSampler(
         n_chars,
-        param_log_dir,
-        "epoch_age_",
-        "_rel_rates",
+        n_time_slices,
+        param_log_fp,
         "m_d"
     )
 
@@ -1702,7 +1682,7 @@ if __name__ == "__main__":
 
     # looking at things
     # in epoch_age_2_rel_rates, make iteration 1's A -> C 666 to force scenario (ii)
-    it_to_look_at = [2]
+    it_to_look_at = [1]
     for nd_label, it_event_series_dict in est.event_series_dict.items():
         print(nd_label)
 
