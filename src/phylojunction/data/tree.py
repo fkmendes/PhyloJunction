@@ -82,13 +82,13 @@ class AnnotatedTree(dp.Tree):
         node_heights_dict (dict): Dictionary that holds the heights of
             all nodes in the tree. Keys are node labels, values are
             floats.
-        rec_node_heights_dict (dict): Dictionary that holds the heights
+        rec_tr_node_heights_dict (dict): Dictionary that holds the heights
             of all nodes in the reconstructed tree. Keys are node
             labels, values are floats.
         node_ages_dict (dict): Dictionary that holds the ages of all
             nodes in the tree. Keys are node labels, values are
             floats.
-        rec_node_ages_dict (dict): Dictionary that holds the ages of
+        rec_tr_node_ages_dict (dict): Dictionary that holds the ages of
             all nodes in the reconstructed tree. Keys are node labels,
             values are floats.
         slice_t_ends (float): List of floats with the end times for
@@ -184,9 +184,9 @@ class AnnotatedTree(dp.Tree):
     root_age: float  # can be None
     rec_tr_root_age: float  # can be None
     node_heights_dict: ty.Dict[str, float]
-    rec_node_heights_dict: ty.Dict[str, float]
+    rec_tr_node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
-    rec_node_ages_dict: ty.Dict[str, float]
+    rec_tr_node_ages_dict: ty.Dict[str, float]
     slice_t_ends: ty.Optional[ty.List[float]]
     slice_age_ends: ty.Optional[ty.List[float]]
 
@@ -315,9 +315,9 @@ class AnnotatedTree(dp.Tree):
         self.seed_age = self.tree.max_distance_from_root()
         self.max_age = max_age
         self.node_heights_dict = dict()
-        self.rec_node_heights_dict = dict()
+        self.rec_tr_node_heights_dict = dict()
         self.node_ages_dict = dict()
-        self.rec_node_ages_dict = dict()
+        self.rec_tr_node_ages_dict = dict()
         self.slice_t_ends = slice_t_ends
         self.slice_age_ends = slice_age_ends
 
@@ -366,11 +366,16 @@ class AnnotatedTree(dp.Tree):
         self.sa_lineage_dict = sa_lineage_dict
         self.rec_tr_sa_lineage_dict = copy.deepcopy(sa_lineage_dict)
         self.at_dict = at_dict
-        self.rec_tr_at_dict = copy.deepcopy(at_dict)
         self.have_updated_rec_tr_at_dict = False
         self.clado_at_dict = clado_at_dict
-        self.rec_tr_clado_at_dict = copy.deepcopy(clado_at_dict)
         self.have_updated_rec_tr_clado_at_dict = False
+
+        # updates ages of attribute transitions (side-effect):
+        # (i)  at_dict
+        # (ii) clado_at_dict
+        self._add_at_ages()
+        self.rec_tr_at_dict = copy.deepcopy(at_dict)
+        self.rec_tr_clado_at_dict = copy.deepcopy(clado_at_dict)
 
         # node counting
         self.n_extant_terminal_nodes = 0
@@ -409,10 +414,6 @@ class AnnotatedTree(dp.Tree):
 
         # prepare for dendropy's Nexus printing
         self._prepare_taxon_namespace_for_nexus_printing()
-
-        # updates ages of attribute transitions (side-effect):
-        # (i) at_dict
-        self._add_at_ages()
 
     def _check_input_health(self) -> None:
         """Check the validity of some of initialization arguments.
@@ -811,6 +812,7 @@ class AnnotatedTree(dp.Tree):
                             <= self.epsilon:
                         if self.tree_read_as_newick:
                             self.n_extant_terminal_nodes += 1
+                            self.n_extant_sampled_terminal_nodes += 1
                             extant_terminal_nd_labels_list. \
                                 append(nd.taxon.label)
 
@@ -937,8 +939,8 @@ class AnnotatedTree(dp.Tree):
             (i)   Populate self.node_ages_dict
             (ii)  Populate self.node_heights_dict
             or
-            (iii) Populate self.rec_node_ages_dict
-            (iv)  Populate self.rec_node_heights_dict
+            (iii) Populate self.rec_tr_node_ages_dict
+            (iv)  Populate self.rec_tr_node_heights_dict
 
         Thse two dictionaries have their keys being node names (str)
         and values (float) are their ages and heights, respectively.
@@ -956,6 +958,9 @@ class AnnotatedTree(dp.Tree):
                                    tree_lvl,
                                    do_reconstructed_tree) -> None:
 
+            if remaining_height < self.epsilon:
+                remaining_height = 0.0
+
             for ch_nd in nd.child_nodes():
                 recur_node_ages_height(ch_nd,
                                        remaining_height - ch_nd.edge_length,
@@ -966,15 +971,15 @@ class AnnotatedTree(dp.Tree):
 
             if unit_branch_lengths:
                 if do_reconstructed_tree:
-                    self.rec_node_heights_dict[nd_name] = tree_lvl
+                    self.rec_tr_node_heights_dict[nd_name] = tree_lvl
 
                 else:
                     self.node_heights_dict[nd_name] = tree_lvl
             
             else:
                 if do_reconstructed_tree:
-                    self.rec_node_ages_dict[nd_name] = remaining_height
-                    self.rec_node_heights_dict[nd_name] = \
+                    self.rec_tr_node_ages_dict[nd_name] = remaining_height
+                    self.rec_tr_node_heights_dict[nd_name] = \
                         self.rec_tr_root_age - remaining_height
 
                 else:
@@ -1012,12 +1017,12 @@ class AnnotatedTree(dp.Tree):
         """Add age member values for attribute transitions in at_dict"""
 
         if self.at_dict is not None:
-            for nd_name, at_list in self.rec_tr_at_dict.items():
+            for nd_name, at_list in self.at_dict.items():
                 for at in at_list:
                     at.age = self.seed_age - at.global_time
 
         if self.clado_at_dict is not None:
-            for nd_name, clado_at in self.rec_tr_clado_at_dict.items():
+            for nd_name, clado_at in self.clado_at_dict.items():
                 clado_at.age = self.seed_age - clado_at.global_time
 
     def is_extant_or_sa_on_both_sides_complete_tr_root(self, a_node: dp.Node) -> bool:
@@ -1722,8 +1727,8 @@ class AnnotatedTree(dp.Tree):
             # Populating rec tree node ages and heights dict #
             #                                                #
             # Updating                                       #
-            #     (i)  rec_node_heights_dict                 #
-            #     (ii) rec_node_ages_dict                    #
+            #     (i)  rec_tr_node_heights_dict                 #
+            #     (ii) rec_tr_node_ages_dict                    #
             ##################################################
 
             self._populate_node_age_height_dicts(do_reconstructed_tree=True)
@@ -2051,13 +2056,13 @@ def get_x_coord_from_nd_heights(ann_tr: AnnotatedTree,
     if not unit_branch_lengths:
         if use_age:
             if draw_reconstructed:
-                return ann_tr.rec_node_ages_dict
+                return ann_tr.rec_tr_node_ages_dict
 
             return ann_tr.node_ages_dict
 
         else:
             if draw_reconstructed:
-                return ann_tr.rec_node_heights_dict
+                return ann_tr.rec_tr_node_heights_dict
 
             return ann_tr.node_heights_dict
 

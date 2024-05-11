@@ -1569,7 +1569,6 @@ class EvolRelevantEventSeriesTabulator():
                         print("destabilizing_extinction", destabilizing_extinction)
                         exit("Error: Found truncated event series that cannot be classified.")
 
-
     @property
     def event_series_dict(self) -> ty.Dict[str, ty.Dict[int, EvolRelevantEventSeries]]:
         return self._event_series_dict
@@ -1583,6 +1582,10 @@ class EvolRelevantEventSeriesTabulator():
     def hyp_support_by_node_dict(self) -> \
             ty.Dict[str, ty.Dict[int, str]]:
         return self._hyp_support_by_node_dict
+
+    @property
+    def ann_tr_list(self) -> ty.List[pjt.AnnotatedTree]:
+        return self._ann_tr_list
 
 
 ##################################

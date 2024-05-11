@@ -27,7 +27,9 @@ class AnnotatedTree(dp.Tree):
     root_age: float
     rec_tr_root_age: ty.Optional[float]
     node_heights_dict: ty.Dict[str, float]
+    rec_tr_node_heights_dict: ty.Dict[str, float]
     node_ages_dict: ty.Dict[str, float]
+    rec_tr_node_ages_dict: ty.Dict[str, float]
     slice_t_ends: ty.Optional[ty.List[float]]
     slice_age_ends: ty.Optional[ty.List[float]]
     state_count: int
@@ -48,7 +50,9 @@ class AnnotatedTree(dp.Tree):
     sa_lineage_dict: ty.Optional[ty.Dict[str, ty.List[pjsa.SampledAncestor]]]
     at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]]
     rec_tr_at_dict: ty.Optional[ty.Dict[str, ty.List[pjat.AttributeTransition]]]
+    have_updated_rec_tr_at_dict: bool
     clado_at_dict: ty.Optional[ty.Dict[str, pjat.AttributeTransition]]
+    have_updated_rec_tr_at_dict: bool
     epsilon: float
 
     def __init__(self,

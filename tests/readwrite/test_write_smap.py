@@ -266,10 +266,10 @@ class TestSmapWrite(unittest.TestCase):
                                                  to_state2=1,
                                                  at_speciation=True)
             clado_at_dict = {
-                "nd5": [clado_at1],
-                "nd7": [clado_at2],
-                "nd6": [clado_at3],
-                "nd8": [clado_at4]
+                "nd5": clado_at1,
+                "nd7": clado_at2,
+                "nd6": clado_at3,
+                "nd8": clado_at4
             }
 
             total_state_count = 3
@@ -580,10 +580,10 @@ class TestSmapWrite(unittest.TestCase):
                                                  to_state2=1,
                                                  at_speciation=True)
             clado_at_dict = {
-                "nd5": [clado_at1],
-                "nd7": [clado_at2],
-                "nd6": [clado_at3],
-                "nd8": [clado_at4]
+                "nd5": clado_at1,
+                "nd7": clado_at2,
+                "nd6": clado_at3,
+                "nd8": clado_at4
             }
 
             total_state_count = 3
@@ -608,17 +608,17 @@ class TestSmapWrite(unittest.TestCase):
             # print(ann_tr_str)
 
             # updates rec tree-related members in 'ann_tr'
-            tr_rec = \
-                ann_tr.extract_reconstructed_tree(
-                    plotting_overhead=True,
-                    require_obs_both_sides=False)
+            # tr_rec = \
+            #     ann_tr.extract_reconstructed_tree(
+            #         plotting_overhead=True,
+            #         require_obs_both_sides=False)
 
-            rec_tr_str = \
-                ann_tr.tree_reconstructed.as_string(
-                    schema="newick",
-                    suppress_annotations=False,
-                    suppress_internal_taxon_labels=True,
-                    suppress_internal_node_labels=False)
+            # rec_tr_str = \
+            #     ann_tr.tree_reconstructed.as_string(
+            #         schema="newick",
+            #         suppress_annotations=False,
+            #         suppress_internal_taxon_labels=True,
+            #         suppress_internal_node_labels=False)
             # print(rec_tr_str)
 
             fig = matplotlib.pyplot.figure()
@@ -632,22 +632,25 @@ class TestSmapWrite(unittest.TestCase):
             ax.spines['top'].set_visible(False)
 
             # plotting complete or rec tree
-            draw_reconstructed = True
-            _, _ = \
-                pjtr.plot_ann_tree(ann_tr,
-                                   ax,
-                                   use_age=False,
-                                   sa_along_branches=False,
-                                   attr_of_interest="state",
-                                   draw_reconstructed=draw_reconstructed)
+            # draw_reconstructed = True
+            # _, _ = \
+            #     pjtr.plot_ann_tree(ann_tr,
+            #                        ax,
+            #                        use_age=False,
+            #                        sa_along_branches=False,
+            #                        attr_of_interest="state",
+            #                        draw_reconstructed=draw_reconstructed)
             # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
-            new_png_path = "tree2.png"
-            matplotlib.pyplot.savefig(new_png_path)
+            # new_png_path = "tree2.png"
+            # matplotlib.pyplot.savefig(new_png_path)
 
             return ann_tr
 
         ann_tr1 = build_tree1()
+        # print("Done building tree 1\n")
+
         ann_tr2 = build_tree2()
+        # print("Done building tree 2")
 
         node_val1 = [ann_tr1, ann_tr2]
         node_val2 = [ann_tr1, ann_tr2]
@@ -681,6 +684,7 @@ class TestSmapWrite(unittest.TestCase):
         rb_smap_dfs_outfile_tr2_1 = io.StringIO()
         rb_smap_dfs_outfile_tr2_2 = io.StringIO()
 
+        # call the smap parsing method inside
         pjw.write_data_df(rb_smap_dfs_outfile_tr1, all_nds_df_list_dict["tr1"][0], format="tsv")
         pjw.write_data_df(rb_smap_dfs_outfile_tr2_1, all_nds_df_list_dict["tr2"][0], format="tsv")
         pjw.write_data_df(rb_smap_dfs_outfile_tr2_2, all_nds_df_list_dict["tr2"][1], format="tsv")
@@ -688,13 +692,18 @@ class TestSmapWrite(unittest.TestCase):
         # checking content
         rb_smap_dfs_outfile_tr1.seek(0)  # move to the start of the file handle
         smaps_str_tr1 = rb_smap_dfs_outfile_tr1.read()
+
+        # debugging
+        # print(smaps_str_tr1)
+
         rb_smap_dfs_outfile_tr2_1.seek(0)
         smaps_str_tr2_1 = rb_smap_dfs_outfile_tr2_1.read()
         rb_smap_dfs_outfile_tr2_2.seek(0)
         smaps_str_tr2_2 = rb_smap_dfs_outfile_tr2_2.read()
 
         # looking at file names
-        pjw.dump_trees_rb_smap_dfs("./", dag_obj, ["tr1", "tr2"], "state")
+        # pjw.dump_trees_rb_smap_dfs("./", dag_obj, ["tr1"], "state")
+        # pjw.dump_trees_rb_smap_dfs("./", dag_obj, ["tr1", "tr2"], "state")
 
         # printing the dataframes
         # for dag_node_name, sample_df_list in all_nds_df_list_dict.items():

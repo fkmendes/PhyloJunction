@@ -242,7 +242,7 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
             else str(nd.parent_node.index)
 
         ch_idxs = ["NA", "NA"]
-        this_nd_clade_event: AttributeTransition = None
+        this_nd_clado_event: AttributeTransition = None
         if nd.num_child_nodes() == 2:
             # overwrite ch_idxs if nd has children
             for i, ch_nd in enumerate(nd.child_node_iter()):
@@ -255,7 +255,7 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
             if nd_name in clado_at_dict:
                 clado_at = clado_at_dict[nd_name]
 
-                # this_nd_clade_event = clado_at  # passed to children if any
+                this_nd_clado_event = clado_at  # passed to children if any
                 clado_at_to_states = [clado_at.to_state, clado_at.to_state2]
                 clado_at_age = str(clado_at.age)
                 clado_at_from_state = str(clado_at.from_state)
@@ -349,7 +349,7 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
                                           smap_str_list,
                                           it_idx_str,
                                           eps,
-                                          clado_event=this_nd_clade_event)
+                                          clado_event=this_nd_clado_event)
 
         return smap_str_list
 
@@ -387,7 +387,7 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
                         ann_tr_repl.extract_reconstructed_tree(plotting_overhead=True)
                     root_node = ann_tr_repl.rec_tr_root_node
                     root_age = ann_tr_repl.rec_tr_root_age
-                    node_ages_dict = ann_tr_repl.rec_node_ages_dict
+                    node_ages_dict = ann_tr_repl.rec_tr_node_ages_dict
                     node_attr_dict = ann_tr_repl.node_attr_dict
                     at_dict = ann_tr_repl.rec_tr_at_dict
 
