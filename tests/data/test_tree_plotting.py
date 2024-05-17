@@ -6,6 +6,7 @@ from dendropy import Tree, Node, Taxon
 import phylojunction.data.tree as pjtr
 import phylojunction.data.sampled_ancestor as pjsa
 import phylojunction.data.attribute_transition as pjat
+import phylojunction.interface.cmdbox.cmd_parse as cmdp
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -117,9 +118,9 @@ class TestReconstructedTreePrint(unittest.TestCase):
                                sa_along_branches=sa_along_branches,
                                attr_of_interest="state",
                                draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
-        new_svg_path = "baseline_figs/test_one_lineage_left_rec_tr_plot.svg"
-        matplotlib.pyplot.savefig(new_svg_path)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        # new_svg_path = "baseline_figs/test_one_lineage_left_rec_tr_plot.svg"
+        # matplotlib.pyplot.savefig(new_svg_path)
 
         self.assertEqual(x_coords, {'sp2': 0.0, 'origin': 2.0})
         self.assertEqual(y_coords, {'sp2': 2.0, 'origin': 2.0})
@@ -374,9 +375,9 @@ class TestReconstructedTreePrint(unittest.TestCase):
                            sa_along_branches=sa_along_branches,
                            attr_of_interest="state",
                            draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
-        new_svg_path = "baseline_figs/test_easy_fbd_rec_tr_sa_plot.svg"
-        matplotlib.pyplot.savefig(new_svg_path)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        # new_svg_path = "baseline_figs/test_easy_fbd_rec_tr_sa_plot.svg"
+        # matplotlib.pyplot.savefig(new_svg_path)
 
         exp_x_coords = \
             {"sa1": 3.0, "sp1": 0.0, "sp3": 0.0, "sa2": 1.0,
@@ -621,9 +622,9 @@ class TestReconstructedTreePrint(unittest.TestCase):
                                sa_along_branches=sa_along_branches,
                                attr_of_interest="state",
                                draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
-        new_svg_path = "baseline_figs/test_harder_fbd_rec_tr_sa_plot.svg"
-        matplotlib.pyplot.savefig(new_svg_path)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        # new_svg_path = "baseline_figs/test_harder_fbd_rec_tr_sa_plot.svg"
+        # matplotlib.pyplot.savefig(new_svg_path)
 
 
         exp_x_coords = {"sa1": 4.0, "sp4": 0.0, "sp5": 0.0, "nd7": 1.0, "dummy_node1": 4.0}
@@ -870,7 +871,7 @@ class TestReconstructedTreePrint(unittest.TestCase):
                                sa_along_branches=sa_along_branches,
                                attr_of_interest="state",
                                draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
         # new_svg_path = "baseline_figs/test_sa_tips_fbd_rec_tr_sa_plot.svg"
         # matplotlib.pyplot.savefig(new_svg_path)
 
@@ -1091,7 +1092,7 @@ class TestReconstructedTreePrint(unittest.TestCase):
                                sa_along_branches=sa_along_branches,
                                attr_of_interest="state",
                                draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
         # new_svg_path = "baseline_figs/test_sa_followed_by_sa_tip_fbd_rec_tr_plot.svg"
         # matplotlib.pyplot.savefig(new_svg_path)
 
@@ -1102,7 +1103,12 @@ class TestReconstructedTreePrint(unittest.TestCase):
         self.assertEqual(exp_y_coords, y_coords)
 
     def test_easy_geosse_rec_tr(self) -> None:
-        """Test plot for GeoSSE tree."""
+        """Test plot for GeoSSE tree.
+
+        Only transition is on root edge, which should not have
+        any bearing on reconstructed tree's plot (should be all
+        the same state 0.
+        """
 
         origin_node = Node(taxon=Taxon(label="origin"), label="origin", edge_length=0.0)
         origin_node.state = 2  # AB
@@ -1240,7 +1246,7 @@ class TestReconstructedTreePrint(unittest.TestCase):
                                sa_along_branches=False,
                                attr_of_interest="state",
                                draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
         # new_svg_path = "baseline_figs/test_easy_geosse_rec_tr.svg"
         # matplotlib.pyplot.savefig(new_svg_path)
 
@@ -1508,7 +1514,7 @@ class TestReconstructedTreePrint(unittest.TestCase):
                            sa_along_branches=False,
                            attr_of_interest="state",
                            draw_reconstructed=draw_reconstructed)
-        # matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
+        matplotlib.pyplot.show()  # to see it (compare to baseline figs!)
         # new_svg_path = "baseline_figs/test_harder_geosse_rec_tr.svg"
         # matplotlib.pyplot.savefig(new_svg_path)
 
@@ -1516,6 +1522,70 @@ class TestReconstructedTreePrint(unittest.TestCase):
                          x_coords)
         self.assertEqual({'sp5': 3.0, 'sp2': 2.0, 'root': 2.5},
                          y_coords)
+
+    def test_read_smaps_rec_tr(self) -> None:
+        """Test stochastic-map reading function and tree plotting.
+
+        The tree here is much larger (10 taxa), assumed to be
+        an observed tree (i.e., effectively a 'reconstructed' tree)
+        with multiple anagenetic and cladogenetic attribute transitions.
+        """
+
+        read_smap_str = \
+            ('trs <- read_tree(n=1, file_path="tests/data/test_input/tr.tre", '
+             'node_name_attr="index")\n'
+             'mapped_trs := map_attr(tree=trs, fun="smap", '
+             'maps_file_path="tests/data/test_input/smaps.tsv", '
+             'tip_attr_file_path="tests/data/test_input/tip_data.tsv", '
+             'attr_name="state", n_regions=2, geo="true")')
+
+        dag_obj = cmdp.script2dag(read_smap_str, in_pj_file=False)
+
+        fig = matplotlib.pyplot.figure()
+
+        ax = fig.add_axes([0.25, 0.2, 0.5, 0.6])
+        ax.patch.set_alpha(0.0)
+        ax.xaxis.set_ticks([])
+        ax.yaxis.set_ticks([])
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+
+        for node_name, node_dag in dag_obj.name_node_dict.items():
+            if node_name == "mapped_trs":
+                i = 0  # 1
+                ann_tr = node_dag.value[i]
+
+                x_coords, y_coords = \
+                    pjtr.plot_ann_tree(ann_tr,
+                                       ax,
+                                       use_age=False,
+                                       start_at_origin=False,
+                                       sa_along_branches=False,
+                                       attr_of_interest="state")
+
+        matplotlib.pyplot.show()
+
+        self.assertEqual(
+            x_coords,
+            { 'nd19': 1.0, 'nd20': 1.0, 'nd17': 0.9000279732601156,
+              'nd18': 1.0, 'nd7': 0.8511350440846258, 'nd13': 1.0,
+              'nd14': 1.0, 'nd8': 0.7890570597123967, 'nd1': 0.2996978898812708,
+              'nd15': 1.0, 'nd16': 1.0,
+              'nd9': 0.8082580225200156, 'nd21': 1.0, 'nd22': 1.0,
+              'nd10': 0.9451562520235127, 'nd6': 0.3666853234617953,
+              'nd12': 1.0, 'nd2': 0.20093516010407542, 'nd0': 0.0 }
+        )
+
+        self.assertEqual(
+            y_coords,
+            { 'nd12': 11.0, 'nd22': 10.0, 'nd21': 9.0, 'nd16': 8.0,
+              'nd15': 7.0, 'nd14': 6.0, 'nd13': 5.0, 'nd18': 4.0,
+              'nd20': 3.0, 'nd19': 2.0, 'nd17': 2.5, 'nd7': 3.25, 'nd8': 5.5,
+              'nd1': 4.375, 'nd9': 7.5, 'nd10': 9.5,'nd6': 8.5, 'nd2': 9.75,
+              'nd0': 7.0625}
+        )
 
 
 if __name__ == "__main__":

@@ -55,13 +55,12 @@ class FromRegionSampler():
         self._n_time_slices = n_time_slices
 
         # side-effect: populates
-        #     (i)  self._n_its
-        #     (ii) self._param_value_dict
+        #     (i) self._time_slice_dict_list
         self.populate_param_value_dict(
             param_log_file_path)
 
         # debugging
-        # print(self._param_value_dict)
+        # print(self._time_slice_dict_list)
 
         pass
 
@@ -74,7 +73,8 @@ class FromRegionSampler():
 
             param_value_dict = dict()
             with open(param_log_fp, "r") as infile:
-                tokens = infile.readline().rstrip().split("\t")
+                # header
+                header_col_names = infile.readline().rstrip().split("\t")
 
                 # parameter name as key, column index as value
                 param_name_idx_dict = dict()
@@ -94,12 +94,18 @@ class FromRegionSampler():
                         # this dictionary gives us the column index
                         # of the parameters we care about
                         param_name_idx_dict[param_name] = \
-                            tokens.index(param_name)
+                            header_col_names.index(param_name)
 
                         # debugging
                         # print('param_name', param_name, 'pos', tokens.index(param_name))
 
                 # reading rest of .log file
+                #
+                # this file is normally printed by RevBayes + tensorphylo, where
+                # lower indices mean younger, and higher indices mean older
+                # but as we will see below, in PJ we want older items in the beginning
+                # of lists, and younger items in the end -- which is why we will
+                # insert the 'param_value_dict' at the beginning of _time_slice_dict_list!
                 for line in infile:
                     # empty matrix
                     param_val_mat = [[math.inf] * self._n_char for i in range(self._n_char)]
@@ -122,11 +128,8 @@ class FromRegionSampler():
 
             # NOTE:
             # everything in the event series parsing we do, we want
-            # old -> young, but note that a larger age means older!
-            # so we need to place higher time_slice_idx in the beginning
-            # of _time_slice_dict_list, otherwise this object will have
-            # young -> old parameter values that are later used in
-            # weighing during disambiguation
+            # old -> young, but parameter values will have been read young -> old;
+            # so we need to insert dictionaries at the beginning of the list
             self._time_slice_dict_list.insert(0, param_value_dict)
 
     @property
@@ -285,6 +288,7 @@ class EvolRelevantEventSeries:
 
         if event_list is None:
             self._event_list = list()
+            self._trunc_event_list = list()
 
         else:
             self._event_list = event_list
@@ -739,7 +743,8 @@ class EvolRelevantEventSeriesTabulator():
         def parse_range_expansion(ch1_set,
                                   ch2_set,
                                   ana_smap,
-                                  ana_conn_graph) -> None:
+                                  ana_conn_graph,
+                                  it_idx) -> None:
 
             # disambiguate the source region
             # (this updates from_region_idx inside stoch map)
@@ -855,7 +860,8 @@ class EvolRelevantEventSeriesTabulator():
         def do_anagenetic_smap(ch1_set: ty.Set[int],
                                ch2_set: ty.Set[int],
                                ana_smap: pjsmap.StochMap,
-                               event_series: EvolRelevantEventSeries) -> None:
+                               event_series: EvolRelevantEventSeries,
+                               it_idx) -> None:
             # gathering initial information to annotate
             # anagenetic stochastic map
 
@@ -884,7 +890,8 @@ class EvolRelevantEventSeriesTabulator():
                     ch1_set,
                     ch2_set,
                     ana_smap,
-                    ana_conn_graph)
+                    ana_conn_graph,
+                    it_idx)
 
         def recursively_populate_event_series_dict(nd: dp.Node,
                                                    it_idx: int) -> None:
@@ -969,35 +976,54 @@ class EvolRelevantEventSeriesTabulator():
                 clado_smap.splitting_range_unstable = \
                     splitting_range_is_unstable
 
+                # seeing if we have any anagenetic smaps to annotate #
+                there_are_parent_ana_smaps_to_annotate = False
+                for parent_ana_smap in event_series.event_list:
+                    if isinstance(parent_ana_smap,
+                                  (pjsmap.RangeExpansion,
+                                   pjsmap.RangeContraction)):
+                        there_are_parent_ana_smaps_to_annotate = True
+
+                this_node_has_ana_smaps_to_annotate = False
+                if nd_name in smap_on_tree.anag_stoch_maps_dict:
+                    this_node_has_ana_smaps_to_annotate = True
+
                 # anagenetic
                 # NOTE: assumes stochastic maps are sorted in chronological order!!!
                 # (old first, young later)
-                if nd_name in smap_on_tree.anag_stoch_maps_dict:
+                if there_are_parent_ana_smaps_to_annotate or \
+                        this_node_has_ana_smaps_to_annotate:
+
+                    if there_are_parent_ana_smaps_to_annotate:
+                        # annotating parent events as well
+                        for parent_ana_smap in event_series.event_list:
+                            if isinstance(parent_ana_smap,
+                                          (pjsmap.RangeExpansion,
+                                           pjsmap.RangeContraction)):
+                                do_anagenetic_smap(ch1_set,
+                                                   ch2_set,
+                                                   parent_ana_smap,
+                                                   event_series,
+                                                   it_idx)
+
                     #############################################
                     # Further annotation of anagenetic changes  #
                     # for this node, after we have re-annotated #
                     # anagenetic changes inherited from parent  #
                     #############################################
-                    anagenetic_smaps_list = \
-                        smap_on_tree.anag_stoch_maps_dict[nd_name]
 
-                    for ana_smap in anagenetic_smaps_list:
-                        do_anagenetic_smap(ch1_set,
-                                           ch2_set,
-                                           ana_smap,
-                                           event_series)
+                    if this_node_has_ana_smaps_to_annotate:
+                        anagenetic_smaps_list = \
+                            smap_on_tree.anag_stoch_maps_dict[nd_name]
 
-                    # annotating parent events as well
-                    for parent_ana_smap in event_series.event_list:
-                        if isinstance(parent_ana_smap,
-                                      (pjsmap.RangeExpansion,
-                                       pjsmap.RangeContraction)):
+                        for ana_smap in anagenetic_smaps_list:
                             do_anagenetic_smap(ch1_set,
                                                ch2_set,
-                                               parent_ana_smap,
-                                               event_series)
+                                               ana_smap,
+                                               event_series,
+                                               it_idx)
 
-                    event_series.add_events(anagenetic_smaps_list)
+                        event_series.add_events(anagenetic_smaps_list)
 
                 # cladogenetic (has to be the last one in the event series)
                 event_series.add_events(clado_smap)
@@ -1029,8 +1055,7 @@ class EvolRelevantEventSeriesTabulator():
             #   key2: iteration index
             #   value2 event series object (or empty dictionary if internal
             #   node but no events, like origin node)
-            recursively_populate_event_series_dict(seed_nd,
-                                                   it_idx)
+            recursively_populate_event_series_dict(seed_nd, it_idx)
 
     def add_paleogeo_event_series_dict(self,
                                        geo_cond_name: str,
@@ -1273,13 +1298,13 @@ class EvolRelevantEventSeriesTabulator():
 
         for nd_label, it_event_series_dict in self._event_series_dict.items():
             for it_idx, event_series in it_event_series_dict.items():
-
                 # all events, paleogeographic and biogeographic
                 #
                 # root or origin may not have event series,
                 # in which case event_series will be empty dictionary
                 if isinstance(event_series, dict):
-                    break
+                    # go to next iteration, as this one has no events for this node
+                    continue
 
                 event_list = event_series.event_list
                 rev_event_list = [ev for ev in reversed(event_list)]
@@ -1376,7 +1401,8 @@ class EvolRelevantEventSeriesTabulator():
                 # root or origin may not have event series,
                 # in which case event_series will be empty dictionary
                 if isinstance(event_series, dict):
-                    break
+                    # go to next iteration, as this one has no events for this node
+                    continue
 
                 trunc_event_list = event_series.trunc_event_list
                 n_events = len(trunc_event_list)

@@ -35,7 +35,7 @@ def write_data_df(
         outfile_handle: ty.IO,
         data_df: pd.DataFrame,
         format="csv") -> None:
-    """Write a pandas DataFrame to output file stream
+    """Write a pandas DataFrame to output file stream.
 
     Args:
         outfile_handle (file): Output file object to write to
@@ -480,15 +480,20 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
 
 def prep_data_df(
         dag_obj: pgm.DirectedAcyclicGraph,
-        write_nex_states: bool = False) -> \
-    ty.Tuple[ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
-             ty.List[ty.Dict[str, pd.DataFrame]]]:
+        write_nex_states: bool = False,
+        bit_format: bool = False) -> \
+        ty.Tuple[ty.List[ty.Union[pd.DataFrame, ty.Dict[int, pd.DataFrame]]],
+        ty.List[ty.Dict[str, pd.DataFrame]]]:
     """Return two pandas DataFrame's, with scalar and tree random variables.
 
     Args:
         dag_obj (DirectedAcyclicGraph): DAG object holding the
             simulated data to be tabulated.
-        write_nex_states (bool): Whether to write .nex file with states
+        write_nex_states (bool): Flag specifying if .nex file should be
+            additionally written. Defaults to 'False'.
+        bit_format (bool): Flag specifying if states are to be
+            represented as bit patterns (e.g., 'A' -> '10', 'B' ->
+            '01', 'AB' -> '11'). Defaults to 'False'.
 
     Returns:
         (tuple): Tuple with two lists as elements, one with file-suffix
@@ -908,7 +913,7 @@ def prep_data_df(
                                 states_nex_fp = rv_name + "_sample" \
                                     + str(sample_idx + 1) + "_repl" \
                                     + str(repl_idx + 1) + ".nex"
-                                nexus_str = node_val[idx].get_taxon_states_str(nexus=True)
+                                nexus_str = node_val[idx].get_taxon_states_str(nexus=True, bit_format=bit_format)
                                 tree_living_nd_states_str_nexus_dict[
                                     states_nex_fp] = nexus_str
 
@@ -1091,17 +1096,22 @@ def prep_data_filepaths_dfs(
 def dump_pgm_data(dir_string: str,
                   dag_obj: pgm.DirectedAcyclicGraph,
                   prefix: str = "",
-                  write_nex_states: bool = False) -> None:
-    """Write stochastic-node sampled values in specified directory
+                  write_nex_states: bool = False,
+                  bit_format: bool = False) -> None:
+    """Write stochastic-node sampled values in specified directory.
+
+    This function has the side-effect of writing to disk.
 
     Args:
         dir_string (str): Where to save the files to be written
         dag_obj (DirectedAcyclicGraph): DAG object whose sampled
             values we are extracting and writing to file.
-        prefix (str): String to preceed file names
-
-    Returns:
-        None
+        prefix (str): String to preceed file names.
+        write_nex_states (bool): Flag specifying if .nex file should be
+            additionally written. Defaults to 'False'.
+        bit_format (bool): Flag specifying if states are to be
+            represented as bit patterns (e.g., 'A' -> '10', 'B' ->
+            '01', 'AB' -> '11'). Defaults to 'False'.
     """
 
     sorted_node_dag_list: \
@@ -1116,7 +1126,9 @@ def dump_pgm_data(dir_string: str,
 
     # still prefixless #
     scalar_output_stash, tree_output_stash = \
-        prep_data_df(dag_obj, write_nex_states)
+        prep_data_df(dag_obj,
+                     write_nex_states=write_nex_states,
+                     bit_format=bit_format)
 
     output_fp_list, output_df_str_list = \
         prep_data_filepaths_dfs(scalar_output_stash, tree_output_stash)

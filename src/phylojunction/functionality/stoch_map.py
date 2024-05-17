@@ -1021,6 +1021,9 @@ class StochMapsOnTree():
                 
                 self.clado_stoch_maps_dict[nd_name] = stoch_map
 
+            # DEPRECATED: used to catch multiple cladogenetic
+            # event entries -- not considered a problem anymore
+            #
             # second cladogenetic map entry (child 2!)
             else:
                 # just counting here
@@ -1028,16 +1031,16 @@ class StochMapsOnTree():
                     == int(from_state) and \
                     self.clado_stoch_maps_dict[nd_name].to_state \
                         == int(to_state):
-                    
+
                     if self.iteration_idx \
                             not in self.identical_clado_stoch_maps_dict:
-                        self.identical_clado_stoch_maps_dict \
-                            [self.iteration_idx] = [nd_name]
-                    
+                        self.identical_clado_stoch_maps_dict[self.iteration_idx] \
+                            = [nd_name]
+
                     else:
                         self.identical_clado_stoch_maps_dict \
                             [self.iteration_idx].append(nd_name)
-                    
+
                     self.n_identical_clado_maps += 1
                     self.n_different_clado_maps -= 1
 
@@ -1302,7 +1305,7 @@ class StochMapsOnTreeCollection():
         # side-effects:
         # initializes
         # (i)   n_char
-        # (i)   stoch_maps_tree_list
+        # (i)   stoch_maps_tree_dict
         # (ii)  sorted_iteration_idxs (also sorts it)
         # (iii) n_stoch_map_iterations
         #
@@ -1375,7 +1378,7 @@ class StochMapsOnTreeCollection():
         # and multiple maps (stochastic maps from
         # a single analysis at different MCMC generations),
         # in which that tree is deep copied to match the number
-        # of maps
+        # of maps (see below)
         #
         # or we have multiple trees (n_samples > 1 and/or
         # n_repl > 1) and the number of MCMC stochastic maps
@@ -1465,31 +1468,23 @@ class StochMapsOnTreeCollection():
 
             # now we interrogate the StochMapsOnTree instance
             # for (repeated) identical RangeSplit maps
-            if it_idx in stoch_maps_on_tree.identical_clado_stoch_maps_dict:
-                nd_idx_list = stoch_maps_on_tree \
-                    .identical_clado_stoch_maps_dict[it_idx]
-                identical_cladogenetic_maps_dict[it_idx] = nd_idx_list
+            # if it_idx in stoch_maps_on_tree.identical_clado_stoch_maps_dict:
+            #     nd_idx_list = \
+            #         stoch_maps_on_tree.identical_clado_stoch_maps_dict[it_idx]
+            #     identical_cladogenetic_maps_dict[it_idx] = nd_idx_list
 
-        # len(nonwidespread_cladogenetic_maps_dict) > 0
-        if  len(identical_cladogenetic_maps_dict) > 0:
-            clado_issue_str = ("\nWARNING: Cladogenetic stochastic maps "
-                               "had issues:\n\n")
-
-            clado_issue_str += ("\nIterations with repeated entries"
-                                " (and the affected nodes)\n")
-
-            for it_idx, nd_list \
-                    in identical_cladogenetic_maps_dict.items():
-                clado_issue_str += str(it_idx) \
-                    + "\t" + ", ".join(i for i in nd_list) + "\n"
-
-            # clado_issue_str += ("\nIterations with non-widespread parent ranges"
-            #                     " (and the affected nodes)\n")
-            #
-            # for it_idx, nd_list \
-            #         in nonwidespread_cladogenetic_maps_dict.items():
-            #     clado_issue_str += str(it_idx) \
-            #         + "\t" + ", ".join(i for i in nd_list) + "\n"
+        # DEPRECATED (used to be considered a problem, not anymore
+        # if len(identical_cladogenetic_maps_dict) > 0:
+        #     clado_issue_str = ("\nWARNING: Cladogenetic stochastic maps "
+        #                        "had issues:\n\n")
+        #
+        #     clado_issue_str += ("\nIterations with repeated entries"
+        #                         " (and the affected nodes)\n")
+        #
+        #     for it_idx, nd_list \
+        #             in identical_cladogenetic_maps_dict.items():
+        #         clado_issue_str += str(it_idx) \
+        #             + "\t" + ", ".join(i for i in nd_list) + "\n"
         
         if clado_issue_str != "":
             print(clado_issue_str)

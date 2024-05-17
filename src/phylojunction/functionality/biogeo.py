@@ -27,8 +27,11 @@ class State2BitLookup:
     or not in a region.
 
     Parameters:
-        n_char (int):
-        n_states_per_char (int):
+        n_char (int): Number of places in bit pattern, which could be
+            the number of atomic regions in a biogeographic system.
+        n_states_per_char (int): Number of states a bit pattern can
+            take. Normally this number is 2, since a bit can be either
+            on (1) or off (0).
         n_states (int):
         int2bit_dict (dict):
         bit2int_dict (dict):

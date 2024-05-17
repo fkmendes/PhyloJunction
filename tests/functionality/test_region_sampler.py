@@ -13,11 +13,10 @@ class TestRegionSampler(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.frs = pjes.FromRegionSampler(
             2,
-            "examples/feature_files/feature_set_event_series_AB",
-            "epoch_",
-            "_rel_rates",
+            3,
+            "examples/feature_files/feature_set_event_series_AB/rel_rates.log",
             "m_d"
-        )
+        ) # epoch with index 1 is oldest, index 3 is youngest
 
     def test_region_sampler_reading_methods(self) -> None:
         """Test parameters in .log file are read correctly."""
@@ -25,24 +24,20 @@ class TestRegionSampler(unittest.TestCase):
         # there should be 3 dictionaries, one for each epoch
         self.assertEqual(len(self.frs.time_slice_dict_list), 3)
 
-        # epoch with index 1 (user-specified, should be youngest)
         self.assertEqual(
-            self.frs.time_slice_dict_list[0],
-            {1: [[1.0, 2.0], [0.1, 1.0]], 10: [[1.0, 4.0], [0.5, 1.0]]}
+            {1: [[1.0, 2.0], [0.1, 1.0]], 10: [[1.0, 4.0], [0.5, 1.0]]},
+            self.frs.time_slice_dict_list[2]  # youngest
         )
 
-        # epoch with index 2 (user-specified, should be youngest)
         self.assertEqual(
-            self.frs.time_slice_dict_list[1],
-            {1: [[1.0, 0.1], [0.1, 1.0]], 10: [[1.0, 0.2], [0.2, 1.0]]}
+            {1: [[1.0, 0.1], [0.1, 1.0]], 10: [[1.0, 0.2], [0.2, 1.0]]},
+            self.frs.time_slice_dict_list[1]
         )
 
-        # epoch with index 3 (user-specified, should be youngest)
         self.assertEqual(
-            self.frs.time_slice_dict_list[2],
-            {1: [[1.0, 0.1], [2.1, 1.0]], 10: [[1.0, 0.2], [2.2, 1.0]]}
+            {1: [[1.0, 0.1], [2.1, 1.0]], 10: [[1.0, 0.2], [2.2, 1.0]]},
+            self.frs.time_slice_dict_list[0]  # oldest
         )
-
 
     def test_region_sampler_sample_region(self) -> None:
         """Test regions are sampled correctly."""
@@ -53,7 +48,7 @@ class TestRegionSampler(unittest.TestCase):
             # this test is artificial in that we are forcing the potential 'from region' to be 0 and 1!
             # it should nevertheless still serve its purpose
             sampled_regions.append(
-                self.frs.sample_from_region_idx(1, 0, [0,1], 1)
+                self.frs.sample_from_region_idx(1, 2, [0,1], 1)
             )
 
         n_region_idx0_it0_epoch0 = sum(1 for i in sampled_regions if i == 0)
@@ -87,7 +82,7 @@ class TestRegionSampler(unittest.TestCase):
             # this test is artificial in that we are forcing the potential 'from region' to be 0 and 1!
             # it should nevertheless still serve its purpose
             sampled_regions.append(
-                self.frs.sample_from_region_idx(10, 0, [0, 1], 1)
+                self.frs.sample_from_region_idx(10, 2, [0, 1], 1)
             )
 
         n_region_idx0_it10_epoch1 = sum(1 for i in sampled_regions if i == 0)

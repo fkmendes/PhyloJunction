@@ -15,13 +15,13 @@ __email__ = "f.mendes@wustl.edu"
 
 def execute_pj_script(
         model: str,
-        prefix: str = "",
+        user_prefix: ty.Optional[str] = None,
         out_dir: str = "./",
         write_data: bool = False,
         write_smap: bool = False,
-        write_figures: str = "",
+        write_figures: ty.Optional[str] = None,
         write_inference: bool = False,
-        write_nex_states: bool = False,
+        write_nex_str: ty.Optional[str] = None,
         a_random_seed: ty.Optional[int] = None,
         tr_dag_nd_names: ty.Optional[str] = None,
         smap_attr_name: ty.Optional[str] = None) -> None:
@@ -32,10 +32,29 @@ def execute_pj_script(
     but can also be called from a .py script importing phylojunction
     """
 
-    # Reading model #
+    #######################################
+    # Parsing flags and other basic stuff #
+    #######################################
+
+    prefix = ""
+    if user_prefix is not None:
+        prefix = user_prefix
+
+    write_nex = False
+    if write_nex_str is not None:
+        write_nex = True
+
+    bit_format = False
+    if write_nex_str == "bit":
+        bit_format = True
+
     random_seed: int = None
     if a_random_seed is not None:
         random_seed = int(a_random_seed)
+
+    #################
+    # Reading model #
+    #################
 
     print("Reading script " + model)
     dag_obj: pgm.DirectedAcyclicGraph \
@@ -78,7 +97,8 @@ def execute_pj_script(
                     data_dir,
                     dag_obj,
                     prefix,
-                    write_nex_states)
+                    write_nex,
+                    bit_format)
 
             if write_smap:
                 if not tr_dag_nd_names:
@@ -108,7 +128,7 @@ def execute_pj_script(
                     prefix=prefix)
 
         # Writing figures #
-        if write_figures:
+        if write_figures is not None:
             node_range_dict: ty.Dict[str, ty.Tuple[int]] = \
                 pjr.parse_cli_str_write_fig(write_figures)
             fig_dir: str = output_dir + "figures/"
@@ -190,9 +210,9 @@ def call_cli() -> None:
     parser.add_argument(
         "-nex", "--nexus-state-output",
         dest="write_nex_states",
-        action="store_true",
-        default=False,
-        help="Toggle states nexus file output")
+        action="store",
+        default="num",
+        help="Toggle nexus file output for taxon states ('bit' for bit pattern output)")
     parser.add_argument(
         "-r",
         "--random-seed",
@@ -219,13 +239,13 @@ def call_cli() -> None:
 
     execute_pj_script(
         args.script,
-        prefix=args.prefix,
+        user_prefix=args.prefix,
         out_dir=args.out_dir,
         write_data=args.write_data,
         write_smap=args.write_smap,
         write_figures=args.write_figures,
         # write_inference=args.write_inference,
-        write_nex_states=args.write_nex_states,
+        write_nex_str=args.write_nex_states,
         a_random_seed=args.random_seed,
         tr_dag_nd_names=args.tr_dag_nd_names,
         smap_attr_name=args.smap_attr_name,

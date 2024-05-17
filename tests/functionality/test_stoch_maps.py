@@ -56,7 +56,6 @@ class TestStochMaps(unittest.TestCase):
              "    Number of cladogenetic changes = 3 (50.0%)\n"
              "    Number of identical cladogenetic changes = 0 (0.0%)")
 
-
         self.assertEqual(
             str(self.stoch_mapcoll.stoch_maps_tree_dict[1]),
             expected_str_representation)

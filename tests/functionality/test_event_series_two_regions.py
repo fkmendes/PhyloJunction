@@ -56,12 +56,8 @@ class TestEventSeriesTwoRegions(unittest.TestCase):
             "m_d"
         )
 
-        feature_summary_fp = \
-            ("examples/feature_files/feature_set_event_series_AB/"
-             "feature_summary.csv")
-        age_summary_fp = \
-            ("examples/feature_files/feature_set_event_series_AB/"
-             "/age_summary.csv")
+        feature_summary_fp = "examples/feature_files/feature_summary.csv"
+        age_summary_fp = "examples/feature_files/age_summary.csv"
 
         fc = pjfio.GeoFeatureCollection(
             feature_summary_fp,

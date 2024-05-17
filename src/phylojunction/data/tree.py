@@ -5,6 +5,7 @@ import copy  # type: ignore
 import numpy as np
 import pandas as pd
 import collections
+import math
 # from dendropy import Node, Tree, Taxon
 
 # plotting tree
@@ -18,6 +19,7 @@ import phylojunction.utility.exception_classes as ec
 import phylojunction.utility.helper_functions as pjh
 import phylojunction.data.sampled_ancestor as pjsa
 import phylojunction.data.attribute_transition as pjat
+import phylojunction.functionality.biogeo as pjbio
 
 __author__ = "Fabio K. Mendes"
 __email__ = "f.mendes@wustl.edu"
@@ -1920,14 +1922,14 @@ class AnnotatedTree(dp.Tree):
         internal node states as two separate dictionaries.
 
         Return:
-            (dict): A tuple of dictionaries containing the values of
-            the state attribute for terminal (first dictionary) and
-            internal nodes (second dictionary).
+            (dict): A tuple of dictionaries containing the values of the
+                state attribute for sampled (first dictionary) and
+                internal nodes (second dictionary).
         """
 
         self.populate_nd_attr_dict(["state"])
 
-        terminal_node_states_dict: ty.Dict[str, int] = dict()
+        sampled_node_states_dict: ty.Dict[str, int] = dict()
         int_node_states_dict: ty.Dict[str, int] = dict()
         for taxon_name, attr_val_dict in self.node_attr_dict.items():
             a_node = self.tree.find_node_with_label(taxon_name)
@@ -1936,39 +1938,47 @@ class AnnotatedTree(dp.Tree):
             if a_node.is_internal():
                 int_node_states_dict[taxon_name] = attr_val_dict["state"]
 
-            # ignoring extinct nodes (after internal nodes have been
-            # considered!)
-            if not a_node.alive:
-                continue
+            elif a_node.alive and a_node.sampled:
+                sampled_node_states_dict[taxon_name] = attr_val_dict["state"]
 
-            terminal_node_states_dict[taxon_name] = attr_val_dict["state"]
+        return sampled_node_states_dict, int_node_states_dict
 
-        return terminal_node_states_dict, int_node_states_dict
-
-    def get_taxon_states_str(self, nexus: bool = False) -> str:
+    def get_taxon_states_str(self, nexus: bool = False, bit_format: bool = False) -> str:
         """Get states for all nodes in tree as single string.
         
         Args:
             nexus (bool): Flag specifying whether states are being
                 collected for Nexus printing ('True' if so). Defaults
                 to 'False'.
+            bit_format (bool): Flag specifying if states are to be
+                represented as bit patterns (e.g., 'A' -> '10', 'B' ->
+                '01', 'AB' -> '11'). Defaults to 'False'.
 
         Returns:
             (str): String containing the states of all nodes in tree.
         """
 
-        terminal_node_state_dict, int_node_states_dict = \
+        sampled_node_state_dict, int_node_states_dict = \
             self._get_taxon_states_dict()
 
-        terminal_node_states_str = ""
+        n_char = int(math.log(self.state_count + 1, 2))
+        state2bit_lookup = pjbio.State2BitLookup(n_char, 2, geosse=True)
 
-        for taxon_name, taxon_state in terminal_node_state_dict.items():
-            terminal_node_states_str += \
-                taxon_name + "\t" + str(taxon_state) + "\n"
+        terminal_node_states_str = ""
+        for taxon_name, taxon_state in sampled_node_state_dict.items():
+            terminal_node_states_str += taxon_name + "\t"
+
+            if nexus and bit_format:
+                taxon_state_bit = state2bit_lookup.get_bit(taxon_state)
+                terminal_node_states_str += taxon_state_bit
+
+            else:
+                terminal_node_states_str += str(taxon_state)
+
+            terminal_node_states_str += "\n"
 
         # only care about internal nodes in the reconstructed tree
         int_node_states_str = ""
-
         for taxon_name, taxon_state in int_node_states_dict.items():
             if self.tree_reconstructed.__str__() != "" and \
                     self.tree_reconstructed is not None:
@@ -1978,18 +1988,41 @@ class AnnotatedTree(dp.Tree):
                     self.tree_reconstructed.find_node_with_label(taxon_name)
 
                 if int_node is not None:
-                    int_node_states_str += \
-                        taxon_name + "\t" + str(taxon_state) + "\n"
+                    int_node_states_str += taxon_name + "\t"
+
+                    if nexus and bit_format:
+                        taxon_state_bit = state2bit_lookup.get_bit(taxon_state)
+                        int_node_states_str += taxon_state_bit
+
+                    else:
+                        int_node_states_str += str(taxon_state)
+
+                    int_node_states_str += "\n"
 
         # not sure if I should be adding self.n_sa_nodes here, because
         # I ignore dead taxa in _get_taxon_states_dict()
         if nexus:
+            # numerical (not bit pattern) symbols
+            symbols = \
+                "symbols=\"" + "".join(str(i) for i in range(self.state_count)) + "\""
+            # bit-pattern number of characters
+            n_char = str(n_char)
+
+            # must adjust in reverse
+            #
+            # here
+            if bit_format:
+                symbols = "symbols=\"01\""
+            # and here
+            else:
+                n_char = "1"
+
             nexus_header = \
-                "#Nexus\n\nBegin data;\nDimensions ntax=" + \
-                str(self.n_extant_terminal_nodes + self.n_sa_nodes) + \
-                " nchar=1;\nFormat datatype=Standard symbols=\"" + \
-                "".join(str(i) for i in range(self.state_count)) + \
-                "\" missing=? gap=-;\nMatrix\n"
+                "#Nexus\n\nBegin data;\nDimensions ntax=" \
+                + str(self.n_extant_sampled_terminal_nodes + self.n_sa_nodes) \
+                + " nchar=" + n_char \
+                + ";\nFormat datatype=Standard " + symbols \
+                + " missing=? gap=-;\nMatrix\n"
 
             nexus_str = nexus_header + terminal_node_states_str + ";\nEnd;\n"
 
@@ -2456,7 +2489,7 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         nd_name = get_node_name(nd)
         attr_idx = 0
         
-        # color of node parent to 'nd'!
+        # color of nd's parent
         segment_colors = [color]
 
         # we override it if only one state to attribute
@@ -2467,13 +2500,13 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         # changes, so the color of the branch will not necessarily
         # be the same of the node parent to 'nd' anymore
         #
-        # sowe we update segment_colors with have the color matching
+        # so we update segment_colors to have the color matching
         # the state of nd (the node subtending the branch)
         if ann_tr.node_attr_dict and attr_of_interest is not None and \
             attr_of_interest in ann_tr.node_attr_dict[nd_name] and \
                 not keep_it_black:
-                    attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
-                    segment_colors = [color_map[attr_idx]]
+            attr_idx = ann_tr.node_attr_dict[nd_name][attr_of_interest]
+            segment_colors = [color_map[attr_idx]]
 
         x_starts = [x_start]
         x_heres = []
@@ -2519,9 +2552,6 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                     # this is why we reverse the indexing and add 1
                     segment_colors.insert(0, color_map[attr_trs[-(idx+1)].from_state])
 
-            else:
-                segment_colors.append(color)
-
             # age of focal node is always
             # the latest time (x_here)
             x_heres.append(x_coords[nd_name])
@@ -2549,7 +2579,8 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
         #################################
 
         # debugging
-        # print("\nabout to draw hor. line for node " + nd_name)
+        # print("\nabout to draw hor. line for node " + nd_name,
+        #       "colors are", segment_colors)
         # print("where x_starts:")
         # print(x_starts)
         # print("where x_heres:")
@@ -2660,6 +2691,9 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
 
                     y_top = y_coords[get_node_name(children[0])]
                     y_bot = y_coords[get_node_name(children[1])]
+
+                    # debugging
+                    # print("drawing vertical line for node", nd_name, "w/ color", segment_colors)
 
                     # last color in segment_colors will
                     # match the state of the node whose
@@ -2801,6 +2835,10 @@ def plot_ann_tree(ann_tr: AnnotatedTree,
                   "as a member of the AnnotatedTree instance we are drawing."
                   "Exiting"))
 
+    ##############
+    # First call #
+    ##############
+    #
     # note that in this first call, the color being passed is the color of
     # the node in the first argument; in the recurring calls inside, the
     # color passed to _draw_clade is the color of the node parent to the
@@ -2992,7 +3030,7 @@ if __name__ == "__main__":
     # in PYTHONPATH), or to set it if it does not exist -- don't forget to export it!
     #
     # Then you can do:
-    # $ python3 src/phylojunction/data/tree.py
+    # $ python3.11 src/phylojunction/data/tree.py
 
     ##############################################
     # Below we have an environment for debugging #
@@ -3069,7 +3107,7 @@ if __name__ == "__main__":
     # print("tr_sa_with_root_survives.seed_age = " + str(tr_sa_with_root_survives.max_distance_from_root()))
     # print(tr_sa_with_root_survives.as_string(schema="newick"))
 
-    total_state_count = 4
+    total_state_count = 7
 
     sa_global_time = 1.0
     time_to_sa_lineage_node = 0.5
@@ -3109,6 +3147,7 @@ if __name__ == "__main__":
     # that then populates a member of AnnotatedTree, allowing
     # for branches to be painted according to the right attribute
     print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_str(nexus=True))
+    print(ann_tr_sa_with_root_survives_max_age.get_taxon_states_str(nexus=True, bit_format=True))
 
     ######################
     # Preparing plotting #
