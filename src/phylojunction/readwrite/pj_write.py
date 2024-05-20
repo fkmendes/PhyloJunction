@@ -294,10 +294,12 @@ def prep_trees_rb_smap_dfs(dag_obj: pgm.DirectedAcyclicGraph,
             # PJ keeps information for plotting)
             if clado_event is not None:
                 clado_time = clado_event.global_time
-                at_time = at_list[0].global_time
 
-                if at_time == clado_time:
-                    at_list = at_list[1:]
+                if len(at_list) > 0:
+                    at_time = at_list[0].global_time
+
+                    if at_time == clado_time:
+                        at_list = at_list[1:]
 
             for at in at_list:
                 ana_at_str_list = [it_idx_str, nd_idx]
