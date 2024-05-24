@@ -21,6 +21,7 @@ def make_tree_reader(ct_fn_name: str,
     n_repl: int = 1
     tr_fp_or_str: str = str()
     node_name_attr: str = str()
+    time_slice_age_ends: ty.List[float] = list()
     in_file: bool = False
 
     # args were already grammar-checked in constant_fn_grammar
@@ -30,59 +31,69 @@ def make_tree_reader(ct_fn_name: str,
         extracted_val: ty.List[str] = \
             pgm.extract_vals_as_str_from_node_dag(val)
 
-        if True:
-            if arg == "n":
-                if len(extracted_val) > 1:
-                    raise ec.ParseRequireSingleValueError("read_tree", arg)
+        # if True:
+        if arg == "n":
+            if len(extracted_val) > 1:
+                raise ec.ParseRequireSingleValueError("read_tree", arg)
 
-                # only one element always
-                try:
-                    n_samples = int(extracted_val[0])
+            # only one element always
+            try:
+                n_samples = int(extracted_val[0])
 
-                except ValueError:
-                    raise ec.ParseRequireIntegerError("read_tree", arg)
-            
-            elif arg == "nr":
-                if len(extracted_val) > 1:
-                    raise ec.ParseRequireSingleValueError("read_tree", arg)
+            except ValueError:
+                raise ec.ParseRequireIntegerError("read_tree", arg)
 
-                # only one element always
-                try:
-                    n_repl = int(extracted_val[0])
+        elif arg == "nr":
+            if len(extracted_val) > 1:
+                raise ec.ParseRequireSingleValueError("read_tree", arg)
 
-                except ValueError:
-                    raise ec.ParseRequireIntegerError("read_tree", arg)
-            
-            elif arg == "file_path":
-                if len(extracted_val) > 1:
-                    raise ec.ParseRequireSingleValueError("read_tree", arg)
-                
-                tr_fp_or_str = extracted_val[0].replace('"', '')
+            # only one element always
+            try:
+                n_repl = int(extracted_val[0])
 
-                if "string" in ct_fn_param_dict:
-                    raise ec.ParseMutuallyExclusiveParametersError(arg, "string")
+            except ValueError:
+                raise ec.ParseRequireIntegerError("read_tree", arg)
 
-                if not os.path.isfile(tr_fp_or_str):
-                    raise ec.ParsePathDoesNotExistError(
-                        arg,
-                        tr_fp_or_str)
+        elif arg == "file_path":
+            if len(extracted_val) > 1:
+                raise ec.ParseRequireSingleValueError("read_tree", arg)
 
-                in_file = True
+            tr_fp_or_str = extracted_val[0].replace('"', '')
 
-            elif arg == "string":
-                if len(extracted_val) > 1:
-                    raise ec.ParseRequireSingleValueError("read_tree", arg)
+            if "string" in ct_fn_param_dict:
+                raise ec.ParseMutuallyExclusiveParametersError(arg, "string")
 
-                if "file_path" in ct_fn_param_dict:
-                    raise ec.ParseMutuallyExclusiveParametersError(arg, "file_path")
+            if not os.path.isfile(tr_fp_or_str):
+                raise ec.ParsePathDoesNotExistError(
+                    arg,
+                    tr_fp_or_str)
 
-                tr_fp_or_str = extracted_val[0].replace('"', '')
+            in_file = True
 
-            elif arg == "node_name_attr":
-                node_name_attr = extracted_val[0].replace('"', '')
+        elif arg == "string":
+            if len(extracted_val) > 1:
+                raise ec.ParseRequireSingleValueError("read_tree", arg)
+
+            if "file_path" in ct_fn_param_dict:
+                raise ec.ParseMutuallyExclusiveParametersError(arg, "file_path")
+
+            tr_fp_or_str = extracted_val[0].replace('"', '')
+
+        elif arg == "node_name_attr":
+            node_name_attr = extracted_val[0].replace('"', '')
+
+        elif arg == "epoch_age_ends":
+            try:
+                time_slice_age_ends = \
+                    [float(v) for v in val if isinstance(v, str)]
+
+            except ValueError:
+                raise ec.ParseRequireNumericError(CtFnTreeReader.CT_FN_NAME,
+                                                  arg)
 
     return CtFnTreeReader(n_samples,
                           n_repl,
                           tr_fp_or_str,
                           node_name_attr,
-                          in_file)
+                          in_file,
+                          time_slice_age_ends)

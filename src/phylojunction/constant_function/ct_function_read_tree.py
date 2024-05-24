@@ -23,6 +23,8 @@ class CtFnTreeReader(pgm.ConstantFn):
     n_samples: int
     n_repl: int
     node_name_attr: str
+    slice_age_ends: ty.List[float]
+    slice_t_ends: ty.List[float]
     
     in_file: bool
     total_tr_count: int
@@ -34,14 +36,26 @@ class CtFnTreeReader(pgm.ConstantFn):
                  n_repl: int,
                  tr_fp_or_str: str,
                  node_name_attr: str,
-                 in_file: bool) -> None:
+                 in_file: bool,
+                 list_time_slice_age_ends: ty.Optional[ty.List[float]] = None) -> None:
 
         self.n_samples = n_samples
         self.n_repl = n_repl
         self.node_name_attr = node_name_attr
         self.in_file = in_file
-        self.tr_str_list = list()
 
+        self.slice_t_ends = None
+        self.slice_age_ends = list_time_slice_age_ends
+        # throw away epoch end if last epoch is leads to present
+        if list_time_slice_age_ends[-1] == 0.0:
+            if len(list_time_slice_age_ends) == 1:
+                self.slice_age_ends = None
+
+            else:
+                self.slice_age_ends = list_time_slice_age_ends[:-1]
+
+        # will hold one or more tree Newick strings
+        self.tr_str_list = list()
         if in_file:
             with open(tr_fp_or_str, "r") as tr_in:
                 self.tr_str_list = tr_in.read().splitlines()
@@ -76,11 +90,46 @@ class CtFnTreeReader(pgm.ConstantFn):
                         exp_len=self.n_samples * self.n_repl
                     )
 
+    def _update_ann_trs_time_slice_ends(self,
+                                        generated_values:
+                                        ty.List[AnnotatedTree]) -> None:
+
+        for ann_tr in generated_values:
+            seed_age_for_time_slicing = ann_tr.seed_age
+
+            # convert into time ends
+            # (0.0 at origin, seed_age = stop_val for "age" stop
+            # condition in the present)
+            if seed_age_for_time_slicing:
+                # we make sure that the end of the present age is here
+                # even if user already provided it (we forcefully removed
+                # it at initialization)
+                self.slice_age_ends.append(0.0)
+
+                # initializes/resets slice_t_ends member
+                self.slice_t_ends = list()
+
+                # old first, young last
+                n_slices_to_ignore = 0
+                for age_end in self.slice_age_ends:
+                    # we ignore user-specified age ends that for some reason
+                    # older than the seed (origin/root) age; must have been
+                    # a user oversight...
+                    if age_end > seed_age_for_time_slicing:
+                        n_slices_to_ignore += 1
+                        continue
+
+                    else:
+                        self.slice_t_ends.append(seed_age_for_time_slicing - age_end)
+
+            ann_tr.slice_age_ends = self.slice_age_ends
+            ann_tr.slice_t_ends = self.slice_t_ends
+
     def get_rev_inference_spec_info(self) -> ty.List[str]:
         pass
 
     def generate(self) -> ty.List[AnnotatedTree]:
-        sampled_values: ty.List[AnnotatedTree] = list()
+        generated_values: ty.List[AnnotatedTree] = list()
         
         try:
             for tr_str in self.tr_str_list:
@@ -89,7 +138,7 @@ class CtFnTreeReader(pgm.ConstantFn):
                     in_file=False,
                     node_names_attribute=self.node_name_attr)
                 
-                sampled_values.append(ann_tr)
+                generated_values.append(ann_tr)
 
         except (TypeError,
                 AttributeError,
@@ -101,8 +150,12 @@ class CtFnTreeReader(pgm.ConstantFn):
             
             else:
                 raise ec.ParseInvalidNewickStringError("file_path")
+
+        # if user provided time slice ends (in forward time)
+        if self.slice_age_ends is not None:
+            self._update_ann_trs_time_slice_ends(generated_values)
         
-        return sampled_values
+        return generated_values
             
 
 if __name__ == "__main__":
